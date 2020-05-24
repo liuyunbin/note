@@ -26,9 +26,9 @@ int isalpha(int ch) {
   if (ch == EOF)
     return 0;
 
-  if (islower(ch) != 0)
+  if (::islower(ch) != 0)
     return 1;
-  return isupper(ch);
+  return ::isupper(ch);
 }
 
 } // namespace liuyunbin
