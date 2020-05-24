@@ -9,7 +9,7 @@
 
 std::string check_digit_string_is_valid_and_format(const std::string &str) {
 
-  std::size_t index = 0;
+  size_t index = 0;
   while (index != str.size() && isspace(str[index]))
     ++index;
 
@@ -184,8 +184,8 @@ std::string mul_huge_number(const std::string &lhs, const std::string &rhs) {
   // 结果至少有 m + n - 1 位，最多有 m + n 位
   std::string result(lhs_string.size() + rhs_string.size(), '0');
 
-  std::size_t begin_index = 0;
-  std::size_t i = lhs_string.size();
+  size_t begin_index = 0;
+  size_t i = lhs_string.size();
   while (i > 0) {
     --i;
     int last = 0;
