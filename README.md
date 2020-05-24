@@ -12,3 +12,10 @@ $ ./scripts/install-dependencies.sh
 $ ./scripts/build.sh
 ```
 
+## 运行
+此时，所有的可执行文件位于目录
+
+```
+./build/bin
+```
+
