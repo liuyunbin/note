@@ -2,12 +2,10 @@
 #include "huge_number.h"
 
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <algorithm>
-#include <iostream>
-#include <iterator>
-#include <string>
 
 std::string check_digit_string_is_valid_and_format(const std::string &str) {
 
