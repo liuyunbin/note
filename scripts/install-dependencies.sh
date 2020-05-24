@@ -2,5 +2,5 @@
 
 set -ev
 
-./scripts/install-gtest.sh
+./scripts/install-gtest-for-ubuntu-20.04.sh
 
