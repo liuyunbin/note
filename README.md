@@ -7,3 +7,8 @@
 $ ./scripts/install-dependencies.sh
 ```
 
+## 构建
+```
+$ ./scripts/build.sh
+```
+
