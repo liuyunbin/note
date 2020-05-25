@@ -12,6 +12,7 @@ add_executable(
     strrchr/strrchr_unittest.cc
     strspn/strspn_unittest.cc
     strcspn/strcspn_unittest.cc
+    strpbrk/strpbrk_unittest.cc
     )
 
 target_link_libraries(cstring-unittest gtest gtest_main pthread)  
