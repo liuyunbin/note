@@ -14,6 +14,7 @@ add_executable(
     isgraph/isgraph_unittest.cc
     isprint/isprint_unittest.cc
     tolower/tolower_unittest.cc
+    toupper/toupper_unittest.cc
     )
 
 target_link_libraries(cctype-unittest gtest gtest_main pthread)  
