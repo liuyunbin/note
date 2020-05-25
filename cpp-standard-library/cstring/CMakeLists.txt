@@ -18,6 +18,7 @@ add_executable(
     memchr/memchr_unittest.cc
     memcmp/memcmp_unittest.cc
     memcpy/memcpy_unittest.cc
+    memmove/memmove_unittest.cc
     )
 
 target_link_libraries(cstring-unittest gtest gtest_main pthread)  
