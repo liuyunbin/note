@@ -7,6 +7,7 @@ add_executable(
     isdigit/isdigit_unittest.cc
     isxdigit/isxdigit_unittest.cc
     isalnum/isalnum_unittest.cc
+    isblank/isblank_unittest.cc
     )
 
 target_link_libraries(cctype-unittest gtest gtest_main pthread)  
