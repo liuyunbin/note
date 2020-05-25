@@ -4,6 +4,7 @@ add_executable(
     strlen/strlen_unittest.cc
     strcpy/strcpy_unittest.cc
     strncpy/strncpy_unittest.cc
+    strcat/strcat_unittest.cc
     )
 
 target_link_libraries(cstring-unittest gtest gtest_main pthread)  
