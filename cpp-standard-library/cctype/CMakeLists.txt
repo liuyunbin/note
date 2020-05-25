@@ -10,6 +10,7 @@ add_executable(
     isblank/isblank_unittest.cc
     isspace/isspace_unittest.cc
     iscntrl/iscntrl_unittest.cc
+    ispunct/ispunct_unittest.cc
     )
 
 target_link_libraries(cctype-unittest gtest gtest_main pthread)  
