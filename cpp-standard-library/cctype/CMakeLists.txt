@@ -12,6 +12,7 @@ add_executable(
     iscntrl/iscntrl_unittest.cc
     ispunct/ispunct_unittest.cc
     isgraph/isgraph_unittest.cc
+    isprint/isprint_unittest.cc
     )
 
 target_link_libraries(cctype-unittest gtest gtest_main pthread)  
