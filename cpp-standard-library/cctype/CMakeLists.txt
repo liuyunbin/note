@@ -6,6 +6,7 @@ add_executable(
     isalpha/isalpha_unittest.cc
     isdigit/isdigit_unittest.cc
     isxdigit/isxdigit_unittest.cc
+    isalnum/isalnum_unittest.cc
     )
 
 target_link_libraries(cctype-unittest gtest gtest_main pthread)  
