@@ -7,10 +7,10 @@ const T &max(const T &lhs, const T &rhs);
 template <typename T, typename Compare>
 const T &max(const T &lhs, const T &rhs, Compare comp);
 
-template <class T>
+template <typename T>
 T max(std::initializer_list<T> ilist);
 
-template <class T, class Compare>
+template <typename T, typename Compare>
 T max(std::initializer_list<T> ilist, Compare comp);
 ```
 
