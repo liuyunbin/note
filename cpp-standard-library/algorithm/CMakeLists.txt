@@ -21,6 +21,7 @@ add_executable(
     equal_range/equal_range_unittest.cc
     binary_search/binary_search_unittest.cc
     fill/fill_unittest.cc
+    fill_n/fill_n_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
