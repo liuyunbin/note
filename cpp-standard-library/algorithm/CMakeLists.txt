@@ -13,6 +13,7 @@ add_executable(
     copy_backward/copy_backward_unittest.cc
     copy_if/copy_if_unittest.cc
     copy_n/copy_n_unittest.cc
+    count/count_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
