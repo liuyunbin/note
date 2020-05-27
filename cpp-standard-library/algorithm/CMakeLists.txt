@@ -11,6 +11,7 @@ add_executable(
     swap_ranges/swap_ranges_unittest.cc
     copy/copy_unittest.cc
     copy_backward/copy_backward_unittest.cc
+    copy_if/copy_if_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
