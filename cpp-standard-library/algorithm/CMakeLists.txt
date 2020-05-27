@@ -7,6 +7,7 @@ add_executable(
     max/max_unittest.cc
     minmax_element/minmax_element_unittest.cc
     minmax/minmax_unittest.cc
+    iter_swap/iter_swap_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
