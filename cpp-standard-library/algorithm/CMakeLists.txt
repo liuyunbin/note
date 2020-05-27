@@ -16,6 +16,7 @@ add_executable(
     count/count_unittest.cc
     count_if/count_if_unittest.cc
     equal/equal_unittest.cc
+    lower_bound/lower_bound_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
