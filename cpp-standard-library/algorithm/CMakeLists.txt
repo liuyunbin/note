@@ -29,6 +29,7 @@ add_executable(
     search/search_unittest.cc
     search_n/search_n_unittest.cc
     find_end/find_end_unittest.cc
+    find_first_of/find_first_of_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
