@@ -45,6 +45,7 @@ add_executable(
     move_backward/move_backward_unittest.cc
     is_partitioned/is_partitioned_unittest.cc
     partition/partition_unittest.cc
+    partition_copy/partition_copy_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
