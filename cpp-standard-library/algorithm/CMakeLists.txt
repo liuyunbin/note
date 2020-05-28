@@ -31,6 +31,7 @@ add_executable(
     find_end/find_end_unittest.cc
     find_first_of/find_first_of_unittest.cc
     find_if/find_if_unittest.cc
+    find_if_not/find_if_not_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
