@@ -41,6 +41,7 @@ add_executable(
     merge/merge_unittest.cc
     inplace_merge/inplace_merge_unittest.cc
     mismatch/mismatch_unittest.cc
+    move/move_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
