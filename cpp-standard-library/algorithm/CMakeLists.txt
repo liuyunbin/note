@@ -38,6 +38,7 @@ add_executable(
     none_of/none_of_unittest.cc
     includes/includes_unittest.cc
     lexicographical_compare/lexicographical_compare_unittest.cc
+    merge/merge_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
