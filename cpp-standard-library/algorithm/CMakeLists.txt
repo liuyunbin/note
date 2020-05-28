@@ -25,6 +25,7 @@ add_executable(
     for_each/for_each_unittest.cc
     generate/generate_unittest.cc
     generate_n/generate_n_unittest.cc
+    find/find_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
