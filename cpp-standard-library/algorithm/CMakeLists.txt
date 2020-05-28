@@ -55,6 +55,7 @@ add_executable(
     remove_if/remove_if_unittest.cc
     remove_copy/remove_copy_unittest.cc
     remove_copy_if/remove_copy_if_unittest.cc
+    replace/replace_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
