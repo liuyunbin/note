@@ -40,6 +40,7 @@ add_executable(
     lexicographical_compare/lexicographical_compare_unittest.cc
     merge/merge_unittest.cc
     inplace_merge/inplace_merge_unittest.cc
+    mismatch/mismatch_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
