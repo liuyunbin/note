@@ -23,6 +23,7 @@ add_executable(
     fill/fill_unittest.cc
     fill_n/fill_n_unittest.cc
     for_each/for_each_unittest.cc
+    generate/generate_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
