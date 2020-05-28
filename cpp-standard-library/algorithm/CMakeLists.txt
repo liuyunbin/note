@@ -34,6 +34,7 @@ add_executable(
     find_if_not/find_if_not_unittest.cc
     adjacent_find/adjacent_find_unittest.cc
     all_of/all_of_unittest.cc
+    any_of/any_of_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
