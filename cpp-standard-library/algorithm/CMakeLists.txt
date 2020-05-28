@@ -51,6 +51,7 @@ add_executable(
     transform/transform_unittest.cc
     unique/unique_unittest.cc
     unique_copy/unique_copy_unittest.cc
+    remove/remove_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
