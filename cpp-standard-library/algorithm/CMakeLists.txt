@@ -62,6 +62,7 @@ add_executable(
     reverse/reverse_unittest.cc
     reverse_copy/reverse_copy_unittest.cc
     rotate/rotate_unittest.cc
+    rotate_copy/rotate_copy_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
