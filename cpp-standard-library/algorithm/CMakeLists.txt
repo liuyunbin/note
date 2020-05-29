@@ -70,6 +70,7 @@ add_executable(
     is_permutation/is_permutation_unittest.cc
     next_permutation/next_permutation_unittest.cc
     prev_permutation/prev_permutation_unittest.cc
+    is_heap/is_heap_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
