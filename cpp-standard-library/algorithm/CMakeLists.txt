@@ -77,6 +77,7 @@ add_executable(
     sort_heap/sort_heap_unittest.cc
     make_heap/make_heap_unittest.cc
     is_sorted_until/is_sorted_until_unittest.cc
+    is_sorted/is_sorted_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
