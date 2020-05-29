@@ -82,6 +82,7 @@ add_executable(
     partial_sort_copy/partial_sort_copy_unittest.cc
     sort/sort_unittest.cc
     stable_sort/stable_sort_unittest.cc
+    nth_element/nth_element_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
