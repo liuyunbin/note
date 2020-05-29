@@ -9,3 +9,4 @@ add_subdirectory(algorithm)
 
 add_subdirectory(array)
 
+add_subdirectory(forward_list)
