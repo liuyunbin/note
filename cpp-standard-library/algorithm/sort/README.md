@@ -1,0 +1,15 @@
+
+#### 函数原型：
+```
+template <typename RandomAccessIt, typename Compare>
+void sort(RandomAccessIt first, RandomAccessIt last, Compare comp);
+
+template <typename RandomAccessIt>
+void sort(RandomAccessIt first, RandomAccessIt last);
+```
+
+#### 函数说明：
+* 该函数用于对指定区间进行排序
+
+详细内容见 函数实现及其注释
+
