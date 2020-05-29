@@ -7,3 +7,5 @@ add_subdirectory(numeric)
 
 add_subdirectory(algorithm)
 
+add_subdirectory(array)
+
