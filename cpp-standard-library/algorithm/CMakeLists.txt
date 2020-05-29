@@ -68,6 +68,7 @@ add_executable(
     set_difference/set_difference_unittest.cc
     set_symmetric_difference/set_symmetric_difference_unittest.cc
     is_permutation/is_permutation_unittest.cc
+    next_permutation/next_permutation_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
