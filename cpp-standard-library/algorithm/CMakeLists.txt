@@ -66,6 +66,7 @@ add_executable(
     set_union/set_union_unittest.cc
     set_intersection/set_intersection_unittest.cc
     set_difference/set_difference_unittest.cc
+    set_symmetric_difference/set_symmetric_difference_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
