@@ -75,6 +75,7 @@ add_executable(
     push_heap/push_heap_unittest.cc
     pop_heap/pop_heap_unittest.cc
     sort_heap/sort_heap_unittest.cc
+    make_heap/make_heap_unittest.cc
     )
 
 target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
