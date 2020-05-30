@@ -1,8 +1,9 @@
 
 add_executable(
-    map-unittest
+    map-set-unittest
     map/map_unittest.cc
+    multimap/multimap_unittest.cc
     )
 
-target_link_libraries(map-unittest gtest gtest_main pthread)  
+target_link_libraries(map-set-unittest gtest gtest_main pthread)  
 
