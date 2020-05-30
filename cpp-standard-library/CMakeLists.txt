@@ -21,3 +21,5 @@ add_subdirectory(stack)
 
 add_subdirectory(string)
 
+add_subdirectory(vector)
+
