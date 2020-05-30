@@ -12,3 +12,6 @@ add_subdirectory(array)
 add_subdirectory(deque)
 
 add_subdirectory(forward_list)
+
+add_subdirectory(list)
+
