@@ -4,6 +4,7 @@ add_executable(
     pair/pair_unittest.cc
     swap/swap_unittest.cc
     move/move_unittest.cc
+    forward/forward_unittest.cc
     )
 
 target_link_libraries(utility-unittest gtest gtest_main pthread)  
