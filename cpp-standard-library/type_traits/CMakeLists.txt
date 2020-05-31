@@ -6,6 +6,7 @@ add_executable(
     is_integral/is_integral_unittest.cc
     is_enum/is_enum_unittest.cc
     is_base_of/is_base_of_unittest.cc
+    is_convertible/is_convertible_unittest.cc
     )
 
 target_link_libraries(type-traits-unittest gtest gtest_main pthread)  
