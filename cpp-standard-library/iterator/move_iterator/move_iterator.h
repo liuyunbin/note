@@ -15,7 +15,8 @@ template <typename Iterator>
 class move_iterator {
  public:
   using     iterator_type = Iterator;
-  using difference_type = ptrdiff_t;
+  using difference_type =
+      typename std::iterator_traits<Iterator>::difference_type;
   using        value_type = typename std::iterator_traits<Iterator>::value_type;
   using iterator_category = typename std::iterator_traits<Iterator>::iterator_category;
   using         reference = value_type&&;
