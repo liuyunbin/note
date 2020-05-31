@@ -33,3 +33,5 @@ add_subdirectory(memory)
 
 add_subdirectory(iterator)
 
+add_subdirectory(type_traits)
+
