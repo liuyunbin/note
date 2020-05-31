@@ -6,6 +6,7 @@ add_executable(
     insert_iterator/insert_iterator_unittest.cc
     move_iterator/move_iterator_unittest.cc
     reverse_iterator/reverse_iterator_unittest.cc
+    istream_iterator/istream_iterator_unittest.cc
     )
 
 target_link_libraries(iterator-unittest gtest gtest_main pthread)  
