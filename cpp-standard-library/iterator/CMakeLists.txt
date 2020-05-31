@@ -5,6 +5,7 @@ add_executable(
     front_insert_iterator/front_insert_iterator_unittest.cc
     insert_iterator/insert_iterator_unittest.cc
     move_iterator/move_iterator_unittest.cc
+    reverse_iterator/reverse_iterator_unittest.cc
     )
 
 target_link_libraries(iterator-unittest gtest gtest_main pthread)  
