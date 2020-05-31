@@ -10,6 +10,7 @@ add_executable(
     ostream_iterator/ostream_iterator_unittest.cc
     advance/advance_unittest.cc
     distance/distance_unittest.cc
+    next/next_unittest.cc
     )
 
 target_link_libraries(iterator-unittest gtest gtest_main pthread)  
