@@ -3,3 +3,5 @@ add_subdirectory(shell)
 
 add_subdirectory(bc)
 
+add_subdirectory(ls)
+
