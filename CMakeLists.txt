@@ -21,3 +21,5 @@ add_subdirectory(huge-number)
 
 add_subdirectory(linux-commands)
 
+add_subdirectory(linux-games)
+
