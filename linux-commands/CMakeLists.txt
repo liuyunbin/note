@@ -7,3 +7,5 @@ add_subdirectory(ls)
 
 add_subdirectory(more)
 
+add_subdirectory(cp)
+
