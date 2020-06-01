@@ -5,3 +5,5 @@ add_subdirectory(bc)
 
 add_subdirectory(ls)
 
+add_subdirectory(more)
+
