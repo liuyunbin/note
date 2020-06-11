@@ -1,6 +1,6 @@
 
 add_executable(
-    sudoku
+    linux-games-sudoku
     sudoku.cc
     )
 
