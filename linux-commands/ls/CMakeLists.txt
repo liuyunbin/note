@@ -1,6 +1,6 @@
 
 add_executable(
-    ls
+    linux-commands-ls
     ls.cc
     main.cc
     )
