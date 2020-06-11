@@ -1,6 +1,6 @@
 
 add_executable(
-    cp
+    linux-commands-cp
     cp.cc
     main.cc
     )
