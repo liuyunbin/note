@@ -1,6 +1,6 @@
 
 add_executable(
-    algorithm-unittest
+    cpp-standard-library-algorithm-unittest
     min_element/min_element_unittest.cc
     min/min_unittest.cc
     max_element/max_element_unittest.cc
@@ -86,7 +86,7 @@ add_executable(
     )
 
 target_link_libraries(
-    algorithm-unittest
+    cpp-standard-library-algorithm-unittest
     gtest
     gtest_main
     pthread
