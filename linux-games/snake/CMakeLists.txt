@@ -1,11 +1,11 @@
 
 add_executable(
-    snake
+    linux-games-snake
     snake.cc
     )
 
 target_link_libraries(
-    snake
+    linux-games-snake
     ncurses
     )
 
