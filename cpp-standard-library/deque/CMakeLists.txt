@@ -1,11 +1,11 @@
 
 add_executable(
-    deque-unittest
+    cpp-standard-library-deque-unittest
     deque_unittest.cc
     )
 
 target_link_libraries(
-    deque-unittest
+    cpp-standard-library-deque-unittest
     gtest
     gtest_main
     pthread
