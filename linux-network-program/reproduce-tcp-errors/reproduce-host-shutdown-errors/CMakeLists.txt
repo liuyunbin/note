@@ -1,6 +1,6 @@
 
 add_executable(
-    reproduce-host-shutdown-errors
+    linux-network-program-reproduce-tcp-errors-reproduce-host-shutdown-errors
     reproduce-host-shutdown-errors.cc
     )
 
