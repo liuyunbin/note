@@ -1,6 +1,6 @@
 
 add_executable(
-    more
+    linux-commands-more
     more.cc
     )
 
