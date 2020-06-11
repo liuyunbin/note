@@ -1,11 +1,11 @@
 
 add_executable(
-    vector-unittest
+    cpp-standard-library-vector-unittest
     vector_unittest.cc
     )
 
 target_link_libraries(
-    vector-unittest
+    cpp-standard-library-vector-unittest
     gtest
     gtest_main
     pthread
