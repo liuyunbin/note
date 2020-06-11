@@ -1,12 +1,12 @@
 
 add_executable(
-    shell
+    linux-commands-shell
     shell.cc
     main.cc
     )
 
 target_link_libraries(
-    shell
+    linux-commands-shell
     readline
     )
 
