@@ -1,9 +1,14 @@
 
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(
+    VERSION 3.4
+    )
 
-project(liuyunbin-toys)
+project(
+    liuyunbin-toys
+    )
 
-set(CXX_FLAGS
+set(
+ CXX_FLAGS
  -Wall
  -Werror
  -Wextra
@@ -11,17 +16,36 @@ set(CXX_FLAGS
  -std=c++11
  )
 
-string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")
+string(
+    REPLACE
+    ";"
+    " "
+    CMAKE_CXX_FLAGS
+    "${CXX_FLAGS}"
+    )
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(
+    CMAKE_RUNTIME_OUTPUT_DIRECTORY
+    ${CMAKE_BINARY_DIR}/bin
+    )
 
-add_subdirectory(cpp-standard-library)
+add_subdirectory(
+    cpp-standard-library
+    )
 
-add_subdirectory(huge-number)
+add_subdirectory(
+    huge-number
+    )
 
-add_subdirectory(linux-commands)
+add_subdirectory(
+    linux-commands
+    )
 
-add_subdirectory(linux-games)
+add_subdirectory(
+    linux-games
+    )
 
-add_subdirectory(linux-network-program)
+add_subdirectory(
+    linux-network-program
+    )
 

@@ -14,5 +14,10 @@ add_executable(
     prev/prev_unittest.cc
     )
 
-target_link_libraries(iterator-unittest gtest gtest_main pthread)  
+target_link_libraries(
+    iterator-unittest
+    gtest
+    gtest_main
+    pthread
+    )
 

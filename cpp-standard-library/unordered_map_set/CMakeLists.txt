@@ -7,5 +7,10 @@ add_executable(
     unordered_multiset/unordered_multiset_unittest.cc
     )
 
-target_link_libraries(unordered-map-set-unittest gtest gtest_main pthread)  
+target_link_libraries(
+    unordered-map-set-unittest
+    gtest
+    gtest_main
+    pthread
+    )
 

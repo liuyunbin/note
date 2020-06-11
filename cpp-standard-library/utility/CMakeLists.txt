@@ -7,5 +7,10 @@ add_executable(
     forward/forward_unittest.cc
     )
 
-target_link_libraries(utility-unittest gtest gtest_main pthread)  
+target_link_libraries(
+    utility-unittest
+    gtest
+    gtest_main
+    pthread
+    )
 

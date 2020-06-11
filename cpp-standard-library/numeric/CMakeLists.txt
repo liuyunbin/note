@@ -8,5 +8,10 @@ add_executable(
     partial_sum/partial_sum_unittest.cc
     )
 
-target_link_libraries(numeric-unittest gtest gtest_main pthread)  
+target_link_libraries(
+    numeric-unittest
+    gtest
+    gtest_main
+    pthread
+    )
 

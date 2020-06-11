@@ -6,5 +6,10 @@ add_executable(
     unique_ptr/unique_ptr_unittest.cc
     )
 
-target_link_libraries(memory-unittest gtest gtest_main pthread)  
+target_link_libraries(
+    memory-unittest
+    gtest
+    gtest_main
+    pthread
+    )
 

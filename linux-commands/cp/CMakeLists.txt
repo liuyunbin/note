@@ -1,3 +1,7 @@
 
-add_executable(cp cp.cc main.cc)
+add_executable(
+    cp
+    cp.cc
+    main.cc
+    )
 

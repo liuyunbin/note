@@ -1,5 +1,9 @@
 
-add_subdirectory(snake)
+add_subdirectory(
+    snake
+    )
 
-add_subdirectory(sudoku)
+add_subdirectory(
+    sudoku
+    )
 

@@ -7,5 +7,10 @@ add_executable(
     multiset/multiset_unittest.cc
     )
 
-target_link_libraries(map-set-unittest gtest gtest_main pthread)  
+target_link_libraries(
+    map-set-unittest
+    gtest
+    gtest_main
+    pthread
+    )
 

@@ -1,3 +1,6 @@
 
-add_executable(more more.cc)
+add_executable(
+    more
+    more.cc
+    )
 

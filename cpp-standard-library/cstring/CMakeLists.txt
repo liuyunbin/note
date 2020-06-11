@@ -22,5 +22,10 @@ add_executable(
     memset/memset_unittest.cc
     )
 
-target_link_libraries(cstring-unittest gtest gtest_main pthread)  
+target_link_libraries(
+    cstring-unittest
+    gtest
+    gtest_main
+    pthread
+    )
 

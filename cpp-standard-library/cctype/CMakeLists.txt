@@ -17,5 +17,10 @@ add_executable(
     toupper/toupper_unittest.cc
     )
 
-target_link_libraries(cctype-unittest gtest gtest_main pthread)  
+target_link_libraries(
+    cctype-unittest
+    gtest
+    gtest_main
+    pthread
+    )
 

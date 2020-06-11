@@ -85,5 +85,10 @@ add_executable(
     nth_element/nth_element_unittest.cc
     )
 
-target_link_libraries(algorithm-unittest gtest gtest_main pthread)  
+target_link_libraries(
+    algorithm-unittest
+    gtest
+    gtest_main
+    pthread
+    )
 

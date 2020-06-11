@@ -9,5 +9,10 @@ add_executable(
     is_convertible/is_convertible_unittest.cc
     )
 
-target_link_libraries(type-traits-unittest gtest gtest_main pthread)  
+target_link_libraries(
+    type-traits-unittest
+    gtest
+    gtest_main
+    pthread
+    )
 

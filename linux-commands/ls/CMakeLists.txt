@@ -1,3 +1,7 @@
 
-add_executable(ls ls.cc main.cc)
+add_executable(
+    ls
+    ls.cc
+    main.cc
+    )
 

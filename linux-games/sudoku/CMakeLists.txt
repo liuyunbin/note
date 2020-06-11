@@ -1,3 +1,6 @@
 
-add_executable(sudoku sudoku.cc)
+add_executable(
+    sudoku
+    sudoku.cc
+    )
 
