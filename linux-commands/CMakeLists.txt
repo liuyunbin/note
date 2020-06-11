@@ -1,10 +1,10 @@
 
 add_subdirectory(
-    shell
+    bc
     )
 
 add_subdirectory(
-    bc
+    cp
     )
 
 add_subdirectory(
@@ -16,6 +16,6 @@ add_subdirectory(
     )
 
 add_subdirectory(
-    cp
+    shell
     )
 
