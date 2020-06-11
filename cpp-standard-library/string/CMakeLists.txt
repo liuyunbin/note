@@ -1,11 +1,11 @@
 
 add_executable(
-    string-unittest
+    cpp-standard-library-string-unittest
     string_unittest.cc
     )
 
 target_link_libraries(
-    string-unittest
+    cpp-standard-library-string-unittest
     gtest
     gtest_main
     pthread
