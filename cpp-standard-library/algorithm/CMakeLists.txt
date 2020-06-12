@@ -1,88 +1,103 @@
 
 add_executable(
     cpp-standard-library-algorithm-unittest
-    min_element/min_element_unittest.cc
-    min/min_unittest.cc
-    max_element/max_element_unittest.cc
-    max/max_unittest.cc
-    minmax_element/minmax_element_unittest.cc
-    minmax/minmax_unittest.cc
-    iter_swap/iter_swap_unittest.cc
-    swap_ranges/swap_ranges_unittest.cc
+
+    adjacent_find/adjacent_find_unittest.cc
+    all_of/all_of_unittest.cc
+    any_of/any_of_unittest.cc 
+
+    binary_search/binary_search_unittest.cc
+
     copy/copy_unittest.cc
     copy_backward/copy_backward_unittest.cc
     copy_if/copy_if_unittest.cc
     copy_n/copy_n_unittest.cc
     count/count_unittest.cc
     count_if/count_if_unittest.cc
+
     equal/equal_unittest.cc
-    lower_bound/lower_bound_unittest.cc
-    upper_bound/upper_bound_unittest.cc
     equal_range/equal_range_unittest.cc
-    binary_search/binary_search_unittest.cc
+
     fill/fill_unittest.cc
     fill_n/fill_n_unittest.cc
-    for_each/for_each_unittest.cc
-    generate/generate_unittest.cc
-    generate_n/generate_n_unittest.cc
     find/find_unittest.cc
-    search/search_unittest.cc
-    search_n/search_n_unittest.cc
     find_end/find_end_unittest.cc
     find_first_of/find_first_of_unittest.cc
     find_if/find_if_unittest.cc
     find_if_not/find_if_not_unittest.cc
-    adjacent_find/adjacent_find_unittest.cc
-    all_of/all_of_unittest.cc
-    any_of/any_of_unittest.cc
-    none_of/none_of_unittest.cc
+    for_each/for_each_unittest.cc
+
+    generate/generate_unittest.cc
+    generate_n/generate_n_unittest.cc
+
     includes/includes_unittest.cc
-    lexicographical_compare/lexicographical_compare_unittest.cc
-    merge/merge_unittest.cc
     inplace_merge/inplace_merge_unittest.cc
+    is_heap/is_heap_unittest.cc
+    is_heap_until/is_heap_until_unittest.cc
+    is_partitioned/is_partitioned_unittest.cc
+    is_permutation/is_permutation_unittest.cc
+    is_sorted/is_sorted_unittest.cc
+    is_sorted_until/is_sorted_until_unittest.cc
+    iter_swap/iter_swap_unittest.cc
+
+    lexicographical_compare/lexicographical_compare_unittest.cc
+    lower_bound/lower_bound_unittest.cc
+
+    make_heap/make_heap_unittest.cc
+    max/max_unittest.cc
+    max_element/max_element_unittest.cc
+    merge/merge_unittest.cc
+    min/min_unittest.cc
+    min_element/min_element_unittest.cc
+    minmax/minmax_unittest.cc
+    minmax_element/minmax_element_unittest.cc
     mismatch/mismatch_unittest.cc
     move/move_unittest.cc
     move_backward/move_backward_unittest.cc
-    is_partitioned/is_partitioned_unittest.cc
+
+    next_permutation/next_permutation_unittest.cc
+    none_of/none_of_unittest.cc
+    nth_element/nth_element_unittest.cc
+
+    partial_sort/partial_sort_unittest.cc
+    partial_sort_copy/partial_sort_copy_unittest.cc
     partition/partition_unittest.cc
     partition_copy/partition_copy_unittest.cc
-    stable_partition/stable_partition_unittest.cc
     partition_point/partition_point_unittest.cc
-    transform/transform_unittest.cc
-    unique/unique_unittest.cc
-    unique_copy/unique_copy_unittest.cc
+    pop_heap/pop_heap_unittest.cc
+    prev_permutation/prev_permutation_unittest.cc
+    push_heap/push_heap_unittest.cc
+
     remove/remove_unittest.cc
-    remove_if/remove_if_unittest.cc
     remove_copy/remove_copy_unittest.cc
     remove_copy_if/remove_copy_if_unittest.cc
+    remove_if/remove_if_unittest.cc
     replace/replace_unittest.cc
-    replace_if/replace_if_unittest.cc
     replace_copy/replace_copy_unittest.cc
     replace_copy_if/replace_copy_if_unittest.cc
+    replace_if/replace_if_unittest.cc
     reverse/reverse_unittest.cc
     reverse_copy/reverse_copy_unittest.cc
     rotate/rotate_unittest.cc
     rotate_copy/rotate_copy_unittest.cc
-    set_union/set_union_unittest.cc
-    set_intersection/set_intersection_unittest.cc
+
+    search/search_unittest.cc
+    search_n/search_n_unittest.cc
     set_difference/set_difference_unittest.cc
+    set_intersection/set_intersection_unittest.cc
     set_symmetric_difference/set_symmetric_difference_unittest.cc
-    is_permutation/is_permutation_unittest.cc
-    next_permutation/next_permutation_unittest.cc
-    prev_permutation/prev_permutation_unittest.cc
-    is_heap/is_heap_unittest.cc
-    is_heap_until/is_heap_until_unittest.cc
-    push_heap/push_heap_unittest.cc
-    pop_heap/pop_heap_unittest.cc
-    sort_heap/sort_heap_unittest.cc
-    make_heap/make_heap_unittest.cc
-    is_sorted_until/is_sorted_until_unittest.cc
-    is_sorted/is_sorted_unittest.cc
-    partial_sort/partial_sort_unittest.cc
-    partial_sort_copy/partial_sort_copy_unittest.cc
+    set_union/set_union_unittest.cc
     sort/sort_unittest.cc
+    sort_heap/sort_heap_unittest.cc
+    stable_partition/stable_partition_unittest.cc
     stable_sort/stable_sort_unittest.cc
-    nth_element/nth_element_unittest.cc
+    swap_ranges/swap_ranges_unittest.cc
+
+    transform/transform_unittest.cc
+
+    unique/unique_unittest.cc
+    unique_copy/unique_copy_unittest.cc
+    upper_bound/upper_bound_unittest.cc
     )
 
 target_link_libraries(
