@@ -1,11 +1,11 @@
 
 #### 函数原型：
 ```
-template <typename ForwardIt, typename T, typename Compare>
-bool binary_search(ForwardIt first, ForwardIt last, const T &value, Compare comp);
+template <typename InputIt, typename T, typename Compare>
+bool binary_search(InputIt first, InputIt last, const T &value, Compare comp);
 
-template <typename ForwardIt, typename T>
-bool binary_search(ForwardIt first, ForwardIt last, const T &value);
+template <typename InputIt, typename T>
+bool binary_search(InputIt first, InputIt last, const T &value);
 ```
 
 #### 函数说明：
