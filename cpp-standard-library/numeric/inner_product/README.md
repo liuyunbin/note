@@ -11,5 +11,8 @@ T inner_product(InputIt1 first1, InputIt1 last1, InputIt2 first2, T init, Binary
 #### 函数说明：
 * 该函数用于求指定区间的值的内积，可使用 std::move 提高效率
 
+#### 模板参数要求：
+* 至少是输入迭代器
+
 详细内容见 函数实现及其注释
 
