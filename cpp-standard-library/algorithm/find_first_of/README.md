@@ -13,5 +13,8 @@ find_first_of(InputIt first1, InputIt last1, ForwardIt first2, ForwardIt last2, 
 #### 函数说明：
 * 该函数用于查找对于第一个区间内的元素，如果在第二个区间内的出现过，则返回第一个迭代器的位置
 
+#### 模板参数要求：
+* 至少是输入迭代器 和 前向迭代器
+
 详细内容见 函数实现及其注释
 
