@@ -2,17 +2,39 @@
 #include "reverse_copy.h"
 
 #include <algorithm>
-#include <string>
+#include <forward_list>
+#include <list>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 TEST(test_algorithm, test_reverse_copy) {
-  std::string str_1 = "12341234abcd";
-  std::string str_2 = "12341234abcd";
-  std::string str_3 = "12341234abcd";
-  std::string str_4 = "12341234abcd";
-  std::reverse_copy(str_1.begin(), str_1.end(), str_3.begin());
-  liuyunbin::reverse_copy(str_2.begin(), str_2.end(), str_4.begin());
-  EXPECT_EQ(str_1, str_2);
-  EXPECT_EQ(str_3, str_4);
+  // 双向迭代器
+  {
+    std::list<int> list_1 = {1, 2, 3, 4, 5, 1, 2, 3, 4, 5};
+    std::list<int> list_2 = {1, 2, 3, 4, 5, 1, 2, 3, 4, 5};
+
+    std::forward_list<int> forward_list_3 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_4 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    std::reverse_copy(list_1.cbegin(), list_1.cend(), forward_list_3.begin());
+    liuyunbin::reverse_copy(list_2.cbegin(), list_2.cend(),
+                            forward_list_4.begin());
+    EXPECT_EQ(forward_list_3, forward_list_4);
+  }
+
+  // 随机迭代器
+  {
+    std::vector<int> vector_1 = {1, 2, 3, 4, 5, 1, 2, 3, 4, 5};
+    std::vector<int> vector_2 = {1, 2, 3, 4, 5, 1, 2, 3, 4, 5};
+
+    std::forward_list<int> forward_list_3 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_4 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    std::reverse_copy(vector_1.cbegin(), vector_1.cend(),
+                      forward_list_3.begin());
+    liuyunbin::reverse_copy(vector_2.cbegin(), vector_2.cend(),
+                            forward_list_4.begin());
+    EXPECT_EQ(forward_list_3, forward_list_4);
+  }
 }
