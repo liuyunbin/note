@@ -2,12 +2,12 @@
 #include "is_heap.h"
 
 #include <algorithm>
-#include <cctype>
 #include <string>
 
 #include <gtest/gtest.h>
 
 TEST(test_algorithm, test_is_heap) {
+  // 随机迭代器
   {
     std::string str = "0123456789";
     EXPECT_EQ(std::is_heap(str.begin(), str.end()),
