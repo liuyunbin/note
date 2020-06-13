@@ -2,18 +2,29 @@
 #include "move_backward.h"
 
 #include <algorithm>
-#include <string>
+#include <list>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 TEST(test_algorithm, test_move_backward) {
-  std::string str_from_1 = "1234";
-  std::string str_from_2 = "1234";
-  std::string str_to_1 = "abcd";
-  std::string str_to_2 = "abcd";
-  std::move_backward(str_from_1.begin(), str_from_1.end(), str_to_1.end());
-  liuyunbin::move_backward(str_from_2.begin(), str_from_2.end(),
-                           str_to_2.end());
-  EXPECT_EQ(str_from_1, str_from_2);
-  EXPECT_EQ(str_to_1, str_to_2);
+  // 双向迭代器
+  {
+    std::list<int> list_1 = {1, 2, 3, 4, 5};
+    std::list<int> list_2 = {0, 1, 2, 3, 4};
+    std::list<int> list_3 = {5, 6, 7, 8, 9};
+    std::move_backward(list_1.cbegin(), list_1.cend(), list_2.end());
+    liuyunbin::move_backward(list_1.cbegin(), list_1.cend(), list_3.end());
+    EXPECT_EQ(list_2, list_3);
+  }
+
+  // 随机迭代器
+  {
+    std::vector<int> vector_1 = {1, 2, 3, 4, 5};
+    std::list<int> list_2 = {0, 1, 2, 3, 4};
+    std::list<int> list_3 = {5, 6, 7, 8, 9};
+    std::move_backward(vector_1.cbegin(), vector_1.cend(), list_2.end());
+    liuyunbin::move_backward(vector_1.cbegin(), vector_1.cend(), list_3.end());
+    EXPECT_EQ(list_2, list_3);
+  }
 }
