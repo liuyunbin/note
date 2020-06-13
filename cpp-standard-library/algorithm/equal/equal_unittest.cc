@@ -85,17 +85,17 @@ TEST(test_algorithm, test_equal) {
     std::vector<int> vector_1 = {0, 1, 2, 3, 4};
     std::vector<int> vector_2 = {5, 6, 7, 8, 9};
 
-    auto x = std::equal(vector_1.cbegin(), vector_1.cend(), vector_2.begin());
+    auto x = std::equal(vector_1.cbegin(), vector_1.cend(), vector_2.cbegin());
     auto y =
-        liuyunbin::equal(vector_1.cbegin(), vector_1.cend(), vector_2.begin());
+        liuyunbin::equal(vector_1.cbegin(), vector_1.cend(), vector_2.cbegin());
     EXPECT_EQ(x, y);
   }
   {
     std::vector<int> vector_1 = {0, 1, 2, 3, 4};
 
-    auto x = std::equal(vector_1.cbegin(), vector_1.cend(), vector_1.begin());
+    auto x = std::equal(vector_1.cbegin(), vector_1.cend(), vector_1.cbegin());
     auto y =
-        liuyunbin::equal(vector_1.cbegin(), vector_1.cend(), vector_1.begin());
+        liuyunbin::equal(vector_1.cbegin(), vector_1.cend(), vector_1.cbegin());
     EXPECT_EQ(x, y);
   }
 }
