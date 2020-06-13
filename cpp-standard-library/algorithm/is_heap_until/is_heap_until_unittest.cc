@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 
 TEST(test_algorithm, test_is_heap_until) {
+  // 随机迭代器
   {
     std::string str = "0123456789";
     EXPECT_EQ(std::is_heap_until(str.begin(), str.end()),
