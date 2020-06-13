@@ -1,34 +1,81 @@
 
 #include "find_first_of.h"
 
-#include <algorithm>
-#include <string>
+#include <forward_list>
+#include <list>
+#include <numeric>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 TEST(test_algorithm, test_find_first_of) {
+  // 输入迭代器 不好测试
+
+  // 前向迭代器
   {
-    std::string str_1 = "abcdefghi";
-    std::string str_2 = "abcdefghi";
-    EXPECT_EQ(std::find_first_of(str_1.begin(), str_1.end(), str_2.begin(),
-                                 str_2.end()),
-              liuyunbin::find_first_of(str_1.begin(), str_1.end(),
-                                       str_2.begin(), str_2.end()));
+    std::forward_list<int> forward_list_1 = {0, 1, 2, 3, 4};
+    std::forward_list<int> forward_list_2 = {5, 6, 7, 8, 9};
+
+    auto x = std::find_first_of(forward_list_1.cbegin(), forward_list_1.cend(),
+                                forward_list_2.cbegin(), forward_list_2.cend());
+    auto y = liuyunbin::find_first_of(
+        forward_list_1.cbegin(), forward_list_1.cend(), forward_list_2.cbegin(),
+        forward_list_2.cend());
+    EXPECT_EQ(x, y);
   }
   {
-    std::string str_1 = "abcdefghi";
-    std::string str_2 = "de";
-    EXPECT_EQ(std::find_first_of(str_1.begin(), str_1.end(), str_2.begin(),
-                                 str_2.end()),
-              liuyunbin::find_first_of(str_1.begin(), str_1.end(),
-                                       str_2.begin(), str_2.end()));
+    std::forward_list<int> forward_list_1 = {0, 1, 2, 3, 4};
+    std::forward_list<int> forward_list_2 = {5, 6, 7, 8, 9, 2};
+
+    auto x = std::find_first_of(forward_list_1.cbegin(), forward_list_1.cend(),
+                                forward_list_2.cbegin(), forward_list_2.cend());
+    auto y = liuyunbin::find_first_of(
+        forward_list_1.cbegin(), forward_list_1.cend(), forward_list_2.cbegin(),
+        forward_list_2.cend());
+    EXPECT_EQ(x, y);
+  }
+
+  // 双向迭代器
+  {
+    std::list<int> list_1 = {0, 1, 2, 3, 4};
+    std::list<int> list_2 = {5, 6, 7, 8, 9};
+
+    auto x = std::find_first_of(list_1.cbegin(), list_1.cend(), list_2.cbegin(),
+                                list_2.cend());
+    auto y = liuyunbin::find_first_of(list_1.cbegin(), list_1.cend(),
+                                      list_2.cbegin(), list_2.cend());
+    EXPECT_EQ(x, y);
   }
   {
-    std::string str_1 = "abcdefghi";
-    std::string str_2 = "123";
-    EXPECT_EQ(std::find_first_of(str_1.begin(), str_1.end(), str_2.begin(),
-                                 str_2.end()),
-              liuyunbin::find_first_of(str_1.begin(), str_1.end(),
-                                       str_2.begin(), str_2.end()));
+    std::list<int> list_1 = {0, 1, 2, 3, 4};
+    std::list<int> list_2 = {5, 6, 7, 8, 9, 2};
+
+    auto x = std::find_first_of(list_1.cbegin(), list_1.cend(), list_2.cbegin(),
+                                list_2.cend());
+    auto y = liuyunbin::find_first_of(list_1.cbegin(), list_1.cend(),
+                                      list_2.cbegin(), list_2.cend());
+    EXPECT_EQ(x, y);
+  }
+
+  // 随机迭代器
+  {
+    std::vector<int> vector_1 = {0, 1, 2, 3, 4};
+    std::vector<int> vector_2 = {5, 6, 7, 8, 9};
+
+    auto x = std::find_first_of(vector_1.cbegin(), vector_1.cend(),
+                                vector_2.cbegin(), vector_2.cend());
+    auto y = liuyunbin::find_first_of(vector_1.cbegin(), vector_1.cend(),
+                                      vector_2.cbegin(), vector_2.cend());
+    EXPECT_EQ(x, y);
+  }
+  {
+    std::vector<int> vector_1 = {0, 1, 2, 3, 4};
+    std::vector<int> vector_2 = {5, 6, 7, 8, 9, 2};
+
+    auto x = std::find_first_of(vector_1.cbegin(), vector_1.cend(),
+                                vector_2.cbegin(), vector_2.cend());
+    auto y = liuyunbin::find_first_of(vector_1.cbegin(), vector_1.cend(),
+                                      vector_2.cbegin(), vector_2.cend());
+    EXPECT_EQ(x, y);
   }
 }
