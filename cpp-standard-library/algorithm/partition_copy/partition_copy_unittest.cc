@@ -3,39 +3,90 @@
 
 #include <algorithm>
 #include <cctype>
+#include <forward_list>
+#include <iterator>
+#include <list>
+#include <numeric>
+#include <sstream>
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 TEST(test_algorithm, test_partition_copy) {
+  // 输入迭代器
   {
-    std::string str_1 = "1234abcd";
-    std::string str_2 = "1234abcd";
-    std::string str_3 = "1234abcd";
-    std::string str_4 = "1234abcd";
-    std::string str_5 = "1234abcd";
-    std::string str_6 = "1234abcd";
-    auto f = [](char ch) { return std::isdigit(ch) ? true : false; };
-    std::partition_copy(str_1.begin(), str_1.end(), str_2.begin(),
-                        str_3.begin(), f);
-    liuyunbin::partition_copy(str_4.begin(), str_4.end(), str_5.begin(),
-                              str_6.begin(), f);
-    EXPECT_EQ(str_2, str_5);
-    EXPECT_EQ(str_3, str_6);
+    std::istringstream stream_1("1 2 3 4 5 1 2 3 4 5");
+    std::istringstream stream_2("1 2 3 4 5 1 2 3 4 5");
+    auto f = [](int v) { return v < 5 ? true : false; };
+    std::forward_list<int> forward_list_3 = {0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_4 = {0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_5 = {0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_6 = {0, 0, 0, 0, 0, 0, 0, 0};
+    std::partition_copy(std::istream_iterator<int>(stream_1),
+                        std::istream_iterator<int>(), forward_list_3.begin(),
+                        forward_list_4.begin(), f);
+    std::partition_copy(std::istream_iterator<int>(stream_2),
+                        std::istream_iterator<int>(), forward_list_5.begin(),
+                        forward_list_6.begin(), f);
+    EXPECT_EQ(forward_list_3, forward_list_5);
+    EXPECT_EQ(forward_list_4, forward_list_6);
   }
+
+  // 前向迭代器
   {
-    std::string str_1 = "1a234abcd";
-    std::string str_2 = "1a234abcd";
-    std::string str_3 = "1a234abcd";
-    std::string str_4 = "1a234abcd";
-    std::string str_5 = "1a234abcd";
-    std::string str_6 = "1a234abcd";
-    auto f = [](char ch) { return std::isdigit(ch) ? true : false; };
-    std::partition_copy(str_1.begin(), str_1.end(), str_2.begin(),
-                        str_3.begin(), f);
-    liuyunbin::partition_copy(str_4.begin(), str_4.end(), str_5.begin(),
-                              str_6.begin(), f);
-    EXPECT_EQ(str_2, str_5);
-    EXPECT_EQ(str_3, str_6);
+    std::forward_list<int> forward_list_1 = {1, 2, 3, 4, 5, 1, 2, 3, 4, 5};
+    std::forward_list<int> forward_list_2 = {1, 2, 3, 4, 5, 1, 2, 3, 4, 5};
+    std::forward_list<int> forward_list_3 = {0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_4 = {0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_5 = {0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_6 = {0, 0, 0, 0, 0, 0, 0, 0};
+    auto f = [](int v) { return v < 5 ? true : false; };
+
+    std::partition_copy(forward_list_1.begin(), forward_list_1.end(),
+                        forward_list_3.begin(), forward_list_4.begin(), f);
+    std::partition_copy(forward_list_2.begin(), forward_list_2.end(),
+                        forward_list_5.begin(), forward_list_6.begin(), f);
+
+    EXPECT_EQ(forward_list_3, forward_list_5);
+    EXPECT_EQ(forward_list_4, forward_list_6);
+  }
+
+  // 双向迭代器
+  {
+    std::list<int> list_1 = {1, 2, 3, 4, 5, 1, 2, 3, 4, 5};
+    std::list<int> list_2 = {1, 2, 3, 4, 5, 1, 2, 3, 4, 5};
+    std::forward_list<int> forward_list_3 = {0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_4 = {0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_5 = {0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_6 = {0, 0, 0, 0, 0, 0, 0, 0};
+    auto f = [](int v) { return v < 5 ? true : false; };
+
+    std::partition_copy(list_1.begin(), list_1.end(), forward_list_3.begin(),
+                        forward_list_4.begin(), f);
+    std::partition_copy(list_2.begin(), list_2.end(), forward_list_5.begin(),
+                        forward_list_6.begin(), f);
+
+    EXPECT_EQ(forward_list_3, forward_list_5);
+    EXPECT_EQ(forward_list_4, forward_list_6);
+  }
+
+  // 随机迭代器
+  {
+    std::vector<int> vector_1 = {1, 2, 3, 4, 5, 1, 2, 3, 4, 5};
+    std::vector<int> vector_2 = {1, 2, 3, 4, 5, 1, 2, 3, 4, 5};
+    std::forward_list<int> forward_list_3 = {0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_4 = {0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_5 = {0, 0, 0, 0, 0, 0, 0, 0};
+    std::forward_list<int> forward_list_6 = {0, 0, 0, 0, 0, 0, 0, 0};
+    auto f = [](int v) { return v < 5 ? true : false; };
+
+    std::partition_copy(vector_1.begin(), vector_1.end(),
+                        forward_list_3.begin(), forward_list_4.begin(), f);
+    std::partition_copy(vector_2.begin(), vector_2.end(),
+                        forward_list_5.begin(), forward_list_6.begin(), f);
+
+    EXPECT_EQ(forward_list_3, forward_list_5);
+    EXPECT_EQ(forward_list_4, forward_list_6);
   }
 }
