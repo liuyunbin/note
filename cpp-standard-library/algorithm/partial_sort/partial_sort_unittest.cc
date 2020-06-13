@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 
 TEST(test_algorithm, test_partial_sort) {
+  // 随机迭代器
   std::string str_1 = "98653";
   std::string str_2 = "98653";
   std::partial_sort(str_1.begin(), str_1.begin() + 3, str_1.end());
