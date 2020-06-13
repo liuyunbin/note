@@ -8,19 +8,20 @@ namespace liuyunbin {
 /*
  * inplace_merge
  */
-template <typename BidirIt, typename Compare>
-void inplace_merge(BidirIt first, BidirIt middle, BidirIt last, Compare comp) {
+template <typename ForwardIt, typename Compare>
+void inplace_merge(ForwardIt first, ForwardIt middle, ForwardIt last,
+                   Compare comp) {
   auto n = std::distance(first, middle);
-  auto *p = new typename std::iterator_traits<BidirIt>::value_type[n];
+  auto *p = new typename std::iterator_traits<ForwardIt>::value_type[n];
   std::copy(first, middle, p);
   std::merge(p, p + n, middle, last, first, comp);
   delete[] p;
 }
 
-template <typename BidirIt>
-void inplace_merge(BidirIt first, BidirIt middle, BidirIt last) {
+template <typename ForwardIt>
+void inplace_merge(ForwardIt first, ForwardIt middle, ForwardIt last) {
   auto n = std::distance(first, middle);
-  auto *p = new typename std::iterator_traits<BidirIt>::value_type[n];
+  auto *p = new typename std::iterator_traits<ForwardIt>::value_type[n];
   std::copy(first, middle, p);
   std::merge(p, p + n, middle, last, first);
   delete[] p;
