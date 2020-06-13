@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 
 TEST(test_algorithm, test_pop_heap) {
+  // 随机迭代器
   {
     std::string str_1 = "98653";
     std::string str_2 = "98653";
