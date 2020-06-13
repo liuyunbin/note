@@ -1,10 +1,10 @@
 
 #include "equal.h"
 
+#include <algorithm>
 #include <forward_list>
 #include <iterator>
 #include <list>
-#include <numeric>
 #include <sstream>
 #include <string>
 #include <vector>
