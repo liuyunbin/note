@@ -17,5 +17,8 @@ bool is_permutation(ForwardIt1 first1, ForwardIt1 last1, ForwardIt2 first2);
 #### 函数说明：
 * 该函数用于判断第一个区间能否通过交换转化为第二个区间
 
+#### 模板参数要求：
+* 至少是前向迭代器
+
 详细内容见 函数实现及其注释
 
