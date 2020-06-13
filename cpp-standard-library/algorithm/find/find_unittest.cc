@@ -12,6 +12,30 @@
 #include <gtest/gtest.h>
 
 TEST(test_algorithm, test_find) {
+  // 输入迭代器 不好测试
+  /*
+  {
+    std::istringstream stream_1("1 2 3 4 5");
+    std::istringstream stream_2("1 2 3 4 5");
+    int v = 3;
+    auto x = std::find(std::istream_iterator<int>(stream_1),
+                       std::istream_iterator<int>(), v);
+    auto y = liuyunbin::find(std::istream_iterator<int>(stream_2),
+                             std::istream_iterator<int>(), v);
+    EXPECT_EQ(x, y);
+  }
+  {
+    std::istringstream stream_1("1 2 3 4 5");
+    std::istringstream stream_2("1 2 3 4 5");
+    int v = 10;
+    auto x = std::find(std::istream_iterator<int>(stream_1),
+                       std::istream_iterator<int>(), v);
+    auto y = liuyunbin::find(std::istream_iterator<int>(stream_2),
+                             std::istream_iterator<int>(), v);
+    EXPECT_EQ(x, y);
+  }
+  */
+
   // 前向迭代器
   {
     std::forward_list<int> forward_list_1 = {1, 2, 3, 4, 5};
