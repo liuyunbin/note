@@ -11,5 +11,8 @@ void sort(RandomAccessIt first, RandomAccessIt last);
 #### 函数说明：
 * 该函数用于对指定区间进行排序
 
+#### 模板参数要求：
+* 要求是随机迭代器
+
 详细内容见 函数实现及其注释
 
