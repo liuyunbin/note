@@ -11,5 +11,8 @@ OutputIt transform(InputIt1 first1, InputIt1 last1, InputIt2 first2, OutputIt d_
 #### 函数说明：
 * 该函数用于对指定区间内的元素进行转化
 
+#### 模板参数要求：
+* 至少是输入迭代器 输出迭代器
+
 详细内容见 函数实现及其注释
 
