@@ -466,47 +466,82 @@ Disassembly of section .text:
   // 第三个炸弹共有七种答案
 
 0000000000400fce <func4>:
-  400fce:	48 83 ec 08          	sub    $0x8,%rsp
-  400fd2:	89 d0                	mov    %edx,%eax
-  400fd4:	29 f0                	sub    %esi,%eax
-  400fd6:	89 c1                	mov    %eax,%ecx
-  400fd8:	c1 e9 1f             	shr    $0x1f,%ecx
-  400fdb:	01 c8                	add    %ecx,%eax
-  400fdd:	d1 f8                	sar    %eax
-  400fdf:	8d 0c 30             	lea    (%rax,%rsi,1),%ecx
-  400fe2:	39 f9                	cmp    %edi,%ecx
-  400fe4:	7e 0c                	jle    400ff2 <func4+0x24>
-  400fe6:	8d 51 ff             	lea    -0x1(%rcx),%edx
-  400fe9:	e8 e0 ff ff ff       	callq  400fce <func4>
+  // di 用户输入
+  // si == 0
+  // dx == 14
+  400fce:	48 83 ec 08          	sub    $0x8,%rsp                      
+  // ax == 14
+  400fd2:	89 d0                	mov    %edx,%eax                      -----> ax = dx
+  // ax == ax - 0 == 14                              
+  400fd4:	29 f0                	sub    %esi,%eax                      -----> ax = ax - si = dx - lhs
+  // cx == 14
+  400fd6:	89 c1                	mov    %eax,%ecx                      -----> cx = ax
+  // cx == 0
+  400fd8:	c1 e9 1f             	shr    $0x1f,%ecx                     -----> cx >>= 31 
+  // ax == 14
+  400fdb:	01 c8                	add    %ecx,%eax                      -----> ax += cx
+  // ax == 7 右移一位
+  400fdd:	d1 f8                	sar    %eax                           -----> ax >>= 1
+  // cx == 7 + 0 = 7
+  400fdf:	8d 0c 30             	lea    (%rax,%rsi,1),%ecx             -----> cx = ax + si
+  400fe2:	39 f9                	cmp    %edi,%ecx                      if cx <= di
+  400fe4:	7e 0c                	jle    400ff2 <func4+0x24>               goto 400ff2
+  // dx == cx - 1 == 6，递归调用                                      else    
+  400fe6:	8d 51 ff             	lea    -0x1(%rcx),%edx                   dx = cx - 1
+  400fe9:	e8 e0 ff ff ff       	callq  400fce <func4>                    return func4(di, si, dx) * 2;
   400fee:	01 c0                	add    %eax,%eax
   400ff0:	eb 15                	jmp    401007 <func4+0x39>
-  400ff2:	b8 00 00 00 00       	mov    $0x0,%eax
-  400ff7:	39 f9                	cmp    %edi,%ecx
-  400ff9:	7d 0c                	jge    401007 <func4+0x39>
-  400ffb:	8d 71 01             	lea    0x1(%rcx),%esi
-  400ffe:	e8 cb ff ff ff       	callq  400fce <func4>
+  // eax == 0
+  400ff2:	b8 00 00 00 00       	mov    $0x0,%eax                     ax = 0
+  400ff7:	39 f9                	cmp    %edi,%ecx                     if cx >= di ----- cx == di
+  400ff9:	7d 0c                	jge    401007 <func4+0x39>              return 0  // 最终都要从此返回
+  400ffb:	8d 71 01             	lea    0x1(%rcx),%esi                si == cx + 1
+  400ffe:	e8 cb ff ff ff       	callq  400fce <func4>                return 2 * func4(di, si, dx) + 1 // 要求 返回 0,所以不会从此返回
   401003:	8d 44 00 01          	lea    0x1(%rax,%rax,1),%eax
   401007:	48 83 c4 08          	add    $0x8,%rsp
   40100b:	c3                   	retq   
 
+  // func4(int a, int lhs, int rhs) {
+  //    int mid = lhs + (rhs - lhs) / 2;
+  //    if (mid == a)
+  //       return 0;
+  //    if (mid <  a)
+  //       return 2 * func4(a, lhs + 1, rhs) + 1;
+  //    return 2 * func4(a, lhs, mid - 1);
+  // }
+  // func4(7, 0, 14) == 0
+  // func4(3, 0, 14) == f(3, 0, 6) == 0
+  // func4(1, 0, 14) == f(1, 0, 6) == f(1, 0, 2) == 0
+  // func4(0, 0, 14) == f(0, 0, 6) == f(0, 0, 2) == f(0, 0, 0) == 0
+
 000000000040100c <phase_4>:
+  // %rdi 存储第一个参数，即 用户输入
   40100c:	48 83 ec 18          	sub    $0x18,%rsp
+  // %rcx 存储第四个参数
   401010:	48 8d 4c 24 0c       	lea    0xc(%rsp),%rcx
+  // %rdx 存储第三个参数
   401015:	48 8d 54 24 08       	lea    0x8(%rsp),%rdx
+  // print (char*)0x4025cf == "%d %d"，作为第二个参数
   40101a:	be cf 25 40 00       	mov    $0x4025cf,%esi
   40101f:	b8 00 00 00 00       	mov    $0x0,%eax
   401024:	e8 c7 fb ff ff       	callq  400bf0 <__isoc99_sscanf@plt>
   401029:	83 f8 02             	cmp    $0x2,%eax
   40102c:	75 07                	jne    401035 <phase_4+0x29>
+  // 要求 第三个参数 <= 14
   40102e:	83 7c 24 08 0e       	cmpl   $0xe,0x8(%rsp)
   401033:	76 05                	jbe    40103a <phase_4+0x2e>
   401035:	e8 00 04 00 00       	callq  40143a <explode_bomb>
+  // edx == 14，作为 func4 的第三个参数
   40103a:	ba 0e 00 00 00       	mov    $0xe,%edx
+  // esi == 0 ，作为 func4 的第二个参数
   40103f:	be 00 00 00 00       	mov    $0x0,%esi
+  // 将第三个参数拷入 edi，作为 func4 的第一个参数
   401044:	8b 7c 24 08          	mov    0x8(%rsp),%edi
   401048:	e8 81 ff ff ff       	callq  400fce <func4>
+  // 要求 func4 返回 0
   40104d:	85 c0                	test   %eax,%eax
   40104f:	75 07                	jne    401058 <phase_4+0x4c>
+  // 要求 第四个参数为 0
   401051:	83 7c 24 0c 00       	cmpl   $0x0,0xc(%rsp)
   401056:	74 05                	je     40105d <phase_4+0x51>
   401058:	e8 dd 03 00 00       	callq  40143a <explode_bomb>
