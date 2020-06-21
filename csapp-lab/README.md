@@ -13,6 +13,8 @@ $ sudo apt install gcc-multilib
 
 本实验的一些答案抄自：https://zhuanlan.zhihu.com/p/59534845
 
+## bomb-lab
+总结：汇编太麻烦了，这还只是看，要写更麻烦，用高级语言多爽
 
 ## 官网
 * http://csapp.cs.cmu.edu/3e/labs.html
