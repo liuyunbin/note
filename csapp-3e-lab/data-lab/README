@@ -1,0 +1,42 @@
+
+## csapp-3e-lab-data-lab
+
+本实验主要用于熟悉整数和浮点数的位的表示
+
+实验官网：http://csapp.cs.cmu.edu/3e/labs.html
+
+#### 问题一：使用位操作 非 和 且 实现位操作 异或
+思路：
+
+对于 x，y 中的每一位，都有以下四种情况：
+1. x 中为 0，y 中为 0
+2. x 中为 0，y 中为 1
+3. x 中为 1，y 中为 0
+4. x 中为 1，y 中为 1
+
+我们需要的只有情况 2 和 情况 3，由于我们不能使用 或 操作，
+所以只能找到同时包含情况 1 2 3 的情况 和 同时包含情况 2 3 4 的情况，
+然后取 且 操作
+
+代码：
+```
+//1
+/* 
+ * bitXor - x^y using only ~ and & 
+ *   Example: bitXor(4, 5) = 1
+ *   Legal ops: ~ &
+ *   Max ops: 14
+ *   Rating: 1
+ */
+int bitXor(int x, int y) {
+  // 情况 1
+  int a = (~x) & (~y);
+  // 情况 2 3 4
+  int b = ~a;
+  // 情况 4
+  int c = x & y;
+  // 情况 1 2 3
+  int d = ~c;
+  return b & d;
+}
+```

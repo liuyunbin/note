@@ -143,17 +143,19 @@ NOTES:
  *   Rating: 1
  */
 int bitXor(int x, int y) {
-  // 将 x 中值为 1 的位 且 y 中值为 0 的位 置为 1
-  int a = x & (~y);
-  // 将 x 中值为 0 的位 且 y 中值为 1 的位 置为 1
-  int b = y & (~x);
-  // 将 a 中值为 0 的位 且 b 中值为 0 的位 置为 1
-  int c = (~a) & (~b);
-  return ~c;
+  // 情况 1
+  int a = (~x) & (~y);
+  // 情况 2 3 4
+  int b = ~a;
+  // 情况 4
+  int c = x & y;
+  // 情况 1 2 3
+  int d = ~c;
+  return b & d;
 }
 
-/* 
- * tmin - return minimum two's complement integer 
+/*
+ * tmin - return minimum two's complement integer
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 4
  *   Rating: 1
