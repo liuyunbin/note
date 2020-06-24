@@ -160,7 +160,7 @@ int bitXor(int x, int y) {
  *   Max ops: 4
  *   Rating: 1
  */
-int tmin(void) { return 1 << 31; }
+int tmin(void) { return 0x1 << 31; }
 //2
 /*
  * isTmax - returns 1 if x is the maximum, two's complement number,
