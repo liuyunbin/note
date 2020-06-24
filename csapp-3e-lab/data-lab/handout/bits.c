@@ -302,10 +302,16 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-  // 0 的补码是其本身，符号位是 0
-  // 最小数 0x80000000 的补码也是其本身，符号位是 1
-  // 其它数与其对应的符号位为 01 或 10
-  return ((x | (~x + 1)) >> 31) + 1; // 要求是：算数移位
+  int a;
+  int b;
+
+  // 如果 x 与 -x 的符号位不同，a 的最低位为 1, 否则 a 的最低位为 0
+  a = (x ^ (~x + 1)) >> 31;
+
+  // 如果 x 的最高位为 1，b 的最低位为 1，否则，b 的最低位为 0
+  b = x >> 31;
+
+  return ~(a | b) & 0x1;
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
