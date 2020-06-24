@@ -173,7 +173,9 @@ int isTmax(int x) {
   // if x = 0x7FFFFFFF, x + 1 = 0x80000000, //可能是未定义的行为
   // x + 1 + x + 1 == 0
   // 排除 0 + 0 = 0 的情况
-  return (!(x + 1 + x + 1)) & (!!(x + 1));
+  //  return (!(x + 1 + x + 1)) & (!!(x + 1));
+  int y = x + 1;
+  return (!((~y + 1) ^ y)) & (!!y);
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
