@@ -211,13 +211,36 @@ int negate(int x) { return ~x + 1; }
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  int sign = 0x1 << 31;
-  int rhs = ~(sign | 0x39); // rhs + 0x39 == 0x7FFFFFFF
-  int lhs = ~0x30 + 1;      // lhs + 0x30 == 0x00000000
-  rhs = (sign & (rhs + x)) >> 31; // if x > 0x39, rhs + x < 0
-  lhs = (sign & (lhs + x)) >> 31; // if x < 0x30, lhs + x < 0
-  return !(lhs | rhs);
+  int sign;
+  int a;
+  int b;
+
+  // 符号位置为 1，其它位为 0
+  sign = 0x1 << 31;
+
+  // a == -0x30 即：0x30 + a == 0
+  a = ~0x30 + 1;
+
+  // 获取 x + a 的符号位，其它位置为 0
+  a = sign & (a + x);
+
+  // 对 a 的符号位取反，其它位依然是 0
+  a = sign & (~a);
+
+  // b == ~0x39 == ~0x39 + 1 - 1 == -0x39 - 1 == -0x3a
+  // 即：0x39 + b == -1
+  // 即：0x3a + b ==  0
+  b = ~0x39;
+
+  // 获取 x + b 的符号位，其它位置为 0
+  b = sign & (b + x);
+
+  // 如果 x 属于 [0x30, 0x39]
+  // a == 0x8000 0000
+  // b == 0x8000 0000
+  return !!(a & b);
 }
+
 /* 
  * conditional - same as x ? y : z 
  *   Example: conditional(2,4,5) = 4
