@@ -186,7 +186,9 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
+  // a == 0xAAAA
   int a = (0xAA << 8) + 0xAA;
+  // a == 0xAAAA AAAA
   a = (a << 16) + a;
   return !((a & x) ^ a);
 }
