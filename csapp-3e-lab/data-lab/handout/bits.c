@@ -263,16 +263,38 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  int a = x >> 31; // if x >= 0, a = 0, else a = -1 (0xFFFFFFFF)
-  int b = y >> 31;
-  int c = a + b;            // if a ==  0 && b ==  0, c =  0
-                            // if a ==  0 && b == -1, c = -1 (0xFFFFFFFF)
-                            // if a == -1 && b ==  0, c = -1
-                            // if a == -1 && b == -1, c = -2 (0xFFFFFFFE)
-  int p = y + (~x + 1);     // y - x
-  int q = !((p >> 31) & 1); // if p >= 0, q = 1, else, q = 0
-  //      x, y 异号        x，y 同号
-  return (c & (a & 1)) | ((~c) & q);
+  int sign;
+  int a;
+  int b;
+  int c;
+  int d;
+  int e;
+
+  // 符号位置为 1，其它位为 0
+  sign = 0x1 << 31;
+
+  // 如果 a，b 异号，a == 0x8000 0000，否则，a == 0x0000 0000
+  a = (sign & x) ^ (sign & y);
+
+  // 如果 a，b 异号，a == 1，否则，a == 0
+  a = !!a;
+
+  // 如果 a，b 异号，a == 0xFFFF FFFF，否则，a == 0x0000 0000
+  a = ~a + 1;
+
+  // b = x - y
+  b = x + ~y + 1;
+
+  // 如果 x，y 异号 且 x <  0，c == 1，否则，c == 0
+  c = !!(a & (x & sign));
+
+  // 如果 x，y 同号 且 x <  y，c == 1，否则，c == 0
+  d = !!((~a) & (b & sign));
+
+  // 如果 x，y 同号 且 x == y，c == 1，否则，c == 0
+  e = !!((~a) & (!b));
+
+  return c | d | e;
 }
 //4
 /* 
