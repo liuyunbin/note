@@ -249,8 +249,10 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  x = !!x;    // x == 0 --> x == 0, x != 0 --> x == 1
-  x = ~x + 1; // x == 0 --> x == 0, x == 1 --> x == -1 (0xFFFFFFFF)
+  // x == 0 或 1
+  x = !!x;
+  // x == 0x0000 0000 或 0xFFFF FFFF
+  x = ~x + 1;
   return (x & y) | (~x & z);
 }
 /* 
