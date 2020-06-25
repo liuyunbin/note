@@ -440,28 +440,43 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  int s_ = uf >> 31;
-  int exp_ = ((uf & 0x7f800000) >> 23) - 127;
-  int frac_ = (uf & 0x007fffff) | 0x00800000;
-  if (!(uf & 0x7fffffff))
+  int exp;
+  int frac;
+
+  // 获取 阶码
+  exp = ((uf & 0x7f800000) >> 23) - 127;
+
+  // int 的最大值为 0x7FFFF FFFF
+  // 即：2 的 31 次 - 1
+  // int 的最小值为 0x80000 0000
+  // 即：- 2 的 31 次
+  // 如果 阶数 大于 31 肯定溢出
+  if (exp > 31)
+    return 0x80000000;
+
+  // 如果 阶数 小于 0 ，结果是小数
+  if (exp < 0)
     return 0;
 
-  if (exp_ > 31)
-    return 0x80000000;
-  if (exp_ < 0)
-    return 0;
+  // 活得尾数，并加上省略前置的 1
+  frac = (uf & 0x007fffff) | 0x00800000;
 
-  if (exp_ > 23)
-    frac_ <<= (exp_ - 23);
+  // 阶数大于 23，需要将尾数左移
+  if (exp > 23)
+    frac <<= (exp - 23);
+  // 阶数小于 23，需要将尾数右移
   else
-    frac_ >>= (23 - exp_);
+    frac >>= (23 - exp);
 
-  if (!((frac_ >> 31) ^ s_))
-    return frac_;
-  else if (frac_ >> 31)
-    return 0x80000000;
+  // frac uf 的最到位都为 0
+  if (frac >= 0 && uf < 0x80000000)
+    return frac;
+  // frac 的最到位为 0，uf 最高位为 1
+  else if (frac >= 0 && uf >= 0x80000000)
+    return -frac;
   else
-    return ~frac_ + 1;
+    // frac 的最高位为 1，frac 不足以存储 uf，溢出
+    return 0x80000000;
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
