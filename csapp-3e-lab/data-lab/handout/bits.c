@@ -492,11 +492,19 @@ int floatFloat2Int(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-  int INF = 0xff << 23;
   int exp = x + 127;
+
+  // 阶码必须大于等于 0
+  // 如果 exp == 0，尾码没有前置的 1，所以结果也为 0
   if (exp <= 0)
     return 0;
+
+  // 阶码必须小于等于 255
+  // 如果 exp == 255，表示 无穷大 无穷小 或 NaN，所以结果也为 0xff << 23
+  // 即：符号位为 0，阶码的位都为 1，尾码的位都为 0
   if (exp >= 255)
-    return INF;
+    return 0xff << 23;
+
+  // 符号位为 0，尾码为 0
   return exp << 23;
 }
