@@ -404,15 +404,27 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  int exp = (uf & 0x7f800000) >> 23;
-  int sign = uf & (1 << 31);
+  int sign;
+  int exp;
+
+  // 获取符号位
+  sign = uf & (1 << 31);
+
+  // 阶码部分
+  exp = (uf & 0x7f800000) >> 23;
+
+  // 阶码为 0，表示非规格化的值，即，尾码不包含前置的 1
+  // 尾码直接左移一位表示乘以 2，然后，加上 符号位即可
   if (exp == 0)
     return uf << 1 | sign;
+
+  // 阶码为 255，表示 无穷小 或 无群大  或 NaN
   if (exp == 255)
     return uf;
+
   exp++;
   if (exp == 255)
-    return 0x7f800000 | sign;
+    return 0x7f800000 | sign; // 无穷小 或 无穷大
   return (exp << 23) | (uf & 0x807fffff);
 }
 /* 
