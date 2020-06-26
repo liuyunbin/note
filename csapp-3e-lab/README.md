@@ -11,7 +11,7 @@ $ sudo apt install gcc-multilib
 这个实验主要熟悉位操作
 
 ## bomb-lab
-总结：汇编太麻烦了，这还只是看，要写更麻烦，用高级语言多爽
+这个实验目的是拆除 6 + 1 个炸弹
 
 ## 官网
 * http://csapp.cs.cmu.edu/3e/labs.html
