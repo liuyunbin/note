@@ -347,6 +347,7 @@ Disassembly of section .text:
   // %rdi 存储第一个参数，即 用户输入
   400ee0:	48 83 ec 08          	sub    $0x8,%rsp
   // print (char*)0x402400 == "Border relations with Canada have never been better."
+  // x/s          0x402400 == "Border relations with Canada have never been better."
   400ee4:	be 00 24 40 00       	mov    $0x402400,%esi
   400ee9:	e8 4a 04 00 00       	callq  401338 <strings_not_equal>
   400eee:	85 c0                	test   %eax,%eax
@@ -371,7 +372,7 @@ Disassembly of section .text:
   // *(rsp +  0) 为第一个参数
   // rsp == rsi
  
-  // 第一个参数为一
+  // 第一个参数为 1
   400f0a:	83 3c 24 01          	cmpl   $0x1,(%rsp)
   400f0e:	74 20                	je     400f30 <phase_2+0x34>
   400f10:	e8 25 05 00 00       	callq  40143a <explode_bomb>
@@ -408,6 +409,7 @@ Disassembly of section .text:
   // %rdx 存储第三个参数
   400f4c:	48 8d 54 24 08       	lea    0x8(%rsp),%rdx
   // print (char*)0x4025cf == "%d %d"，作为第二个参数
+  // x/s          0x4025cf == "%d %d"，作为第二个参数
   400f51:	be cf 25 40 00       	mov    $0x4025cf,%esi
   400f56:	b8 00 00 00 00       	mov    $0x0,%eax
   400f5b:	e8 90 fc ff ff       	callq  400bf0 <__isoc99_sscanf@plt>
@@ -576,6 +578,9 @@ Disassembly of section .text:
   //  r ----> 6    & 6 F V f v
   //  s ----> 7    ' 7 G W g w
   // 只要字符的最后 4 位为 9 15 14 5 6 7 即可
+  //
+  // x/s 0x4024b0	== "maduiersnfotvbylSo you think you can stop the bomb with ctrl-c, do you?"
+  //
   401099:	0f b6 92 b0 24 40 00 	movzbl 0x4024b0(%rdx),%edx
   4010a0:	88 54 04 10          	mov    %dl,0x10(%rsp,%rax,1)
   4010a4:	48 83 c0 01          	add    $0x1,%rax
@@ -654,6 +659,7 @@ Disassembly of section .text:
   40116a:	48 39 f0             	cmp    %rsi,%rax
   40116d:	75 f1                	jne    401160 <phase_6+0x6c>
 
+  // 将第 a[i] 个结点的地址，依次存入栈中
   40116f:	be 00 00 00 00       	mov    $0x0,%esi
   401174:	eb 21                	jmp    401197 <phase_6+0xa3>
   
@@ -676,7 +682,6 @@ Disassembly of section .text:
   4011a4:	ba d0 32 60 00       	mov    $0x6032d0,%edx
   4011a9:	eb cb                	jmp    401176 <phase_6+0x82>
   
-  
   // rsp + 2 * 4 * i + 0x20 存储 第 (7 - a[i]) 个结点的地址
   // 0 --> rsp + 2 * 4 * 0 + 0x20 =                   rsp + 0x20
   // 1 --> rsp + 2 * 4 * 1 + 0x20 = rsp +  8 + 0x20 = rsp + 0x28
@@ -684,7 +689,8 @@ Disassembly of section .text:
   // 3 --> rsp + 2 * 4 * 3 + 0x20 = rsp + 24 + 0x20 = rsp + 0x38
   // 4 --> rsp + 2 * 4 * 4 + 0x20 = rsp + 32 + 0x20 = rsp + 0x40
   // 5 --> rsp + 2 * 4 * 5 + 0x20 = rsp + 40 + 0x20 = rsp + 0x48
-  //
+
+  // 将 6 个数连续存储
   4011ab:	48 8b 5c 24 20       	mov    0x20(%rsp),%rbx // 第 (7 - a[0]) 个结点的地址
   4011b0:	48 8d 44 24 28       	lea    0x28(%rsp),%rax
   4011b5:	48 8d 74 24 50       	lea    0x50(%rsp),%rsi
@@ -733,45 +739,139 @@ Disassembly of section .text:
   401203:	c3                   	retq   
 
 0000000000401204 <fun7>:
+  // 如果 di 为 空指针
+  //     返回 0xFFFF FFFF
+  // 如果 *di == 用户输入
+  //     返回 0x0000 0000
+  // 如果 *di <  用户输入
+  //     返回 2 * fun7((char*)di + 16, dx) + 1
+  // 如果 *di >  用户输入
+  //     返回 2 * fun7((char*)di + 8, dx)
+
+  // 类似结构
+  // struct Node {
+  //   int val;
+  //   struct Node* left;
+  //   struct Node* right;
+  // };
+  //
+
+  // 0x006030f0: 0x00000024 0x00000000 0x00603110 0x00000000 0x00603130 0x00000000 0x00000000 0x00000000
+  // 0x00603110: 0x00000008 0x00000000 0x00603190 0x00000000 0x00603150 0x00000000 0x00000000 0x00000000
+  // 0x00603130: 0x00000032 0x00000000 0x00603170 0x00000000 0x006031b0 0x00000000 0x00000000 0x00000000
+  // 0x00603150: 0x00000016 0x00000000 0x00603270 0x00000000 0x00603230 0x00000000 0x00000000 0x00000000
+  // 0x00603170: 0x0000002d 0x00000000 0x006031d0 0x00000000 0x00603290 0x00000000 0x00000000 0x00000000
+  // 0x00603190: 0x00000006 0x00000000 0x006031f0 0x00000000 0x00603250 0x00000000 0x00000000 0x00000000
+  // 0x006031b0: 0x0000006b 0x00000000 0x00603210 0x00000000 0x006032b0 0x00000000 0x00000000 0x00000000
+  // 0x006031d0: 0x00000028 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+  // 0x006031f0: 0x00000001 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+  // 0x00603210: 0x00000063 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+  // 0x00603230: 0x00000023 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+  // 0x00603250: 0x00000007 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+  // 0x00603270: 0x00000014 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+  // 0x00603290: 0x0000002f 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+  // 0x006032b0: 0x000003ef 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+
+  fun7(struct Node* root, int val)
+     if root == NULL
+        return 0xFFFF FFFF
+     if root->val == val
+        return 0
+     if root->val < val
+        return 2 * fun7(root->right, val) + 1
+     if root->val > val
+        return 2 * fun7(root->left, val)
+
+  因为 fun7(0x6030f0, val) 要返回 2
+
+  所以，在树中只有从树的左边走上来，即：
+
+  fun7(0x6030f0, val) == 2 == 2 * fun7(0x603110, val)
+
+  因为 fun7(0x603110, val) 要返回 1
+
+  所以，在树中只有从树的右边走上来，即：
+
+  fun7(0x603110, val) == 1 == 2 * fun7(0x603150, val) + 1
+
+  因为 fun7(0x603150, val) 要返回 0
+
+  所以 val 只要和 (Node*)0x603150 -> val 相同
+
+  即 val == 0x16 == 16 + 6 == 22
+
+  当然还可以继续走，
+
+  如果从树的左边走上来，即：
+
+  fun7(0x603150) == 2 * fun7(0x603270) == 0 即可
+
+  所以 val 只要和 (Node*)0x603270 -> val 相同
+
+  即 val == 0x14 == 16 + 4 == 20
+
+  所以，20 或 22 都可以
+
+  // di  0x6030f0 36 0x24
+  // si  用户输入
   401204:	48 83 ec 08          	sub    $0x8,%rsp
+  // 空指针 返回 0xFFFF FFFF
   401208:	48 85 ff             	test   %rdi,%rdi
   40120b:	74 2b                	je     401238 <fun7+0x34>
+
+  // 36
   40120d:	8b 17                	mov    (%rdi),%edx
   40120f:	39 f2                	cmp    %esi,%edx
+  // 36 <=
   401211:	7e 0d                	jle    401220 <fun7+0x1c>
+
   401213:	48 8b 7f 08          	mov    0x8(%rdi),%rdi
   401217:	e8 e8 ff ff ff       	callq  401204 <fun7>
-  40121c:	01 c0                	add    %eax,%eax
+  40121c:	01 c0                	add    %eax,%eax // 2x
   40121e:	eb 1d                	jmp    40123d <fun7+0x39>
+
   401220:	b8 00 00 00 00       	mov    $0x0,%eax
   401225:	39 f2                	cmp    %esi,%edx
-  401227:	74 14                	je     40123d <fun7+0x39>
-  401229:	48 8b 7f 10          	mov    0x10(%rdi),%rdi
+  401227:	74 14                	je     40123d <fun7+0x39> // 相等，返回 0
+
+  401229:	48 8b 7f 10          	mov    0x10(%rdi),%rdi // rdi + 16
   40122d:	e8 d2 ff ff ff       	callq  401204 <fun7>
-  401232:	8d 44 00 01          	lea    0x1(%rax,%rax,1),%eax
+
+  401232:	8d 44 00 01          	lea    0x1(%rax,%rax,1),%eax // 2x+1
   401236:	eb 05                	jmp    40123d <fun7+0x39>
+
   401238:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
   40123d:	48 83 c4 08          	add    $0x8,%rsp
   401241:	c3                   	retq   
 
 0000000000401242 <secret_phase>:
   401242:	53                   	push   %rbx
+
+  // 将输入的字符串转化为十进制数字
   401243:	e8 56 02 00 00       	callq  40149e <read_line>
   401248:	ba 0a 00 00 00       	mov    $0xa,%edx
   40124d:	be 00 00 00 00       	mov    $0x0,%esi
   401252:	48 89 c7             	mov    %rax,%rdi
   401255:	e8 76 f9 ff ff       	callq  400bd0 <strtol@plt>
+
   40125a:	48 89 c3             	mov    %rax,%rbx
   40125d:	8d 40 ff             	lea    -0x1(%rax),%eax
+
+  // ax - 1 <= 1000
   401260:	3d e8 03 00 00       	cmp    $0x3e8,%eax
   401265:	76 05                	jbe    40126c <secret_phase+0x2a>
   401267:	e8 ce 01 00 00       	callq  40143a <explode_bomb>
+
   40126c:	89 de                	mov    %ebx,%esi
+
   40126e:	bf f0 30 60 00       	mov    $0x6030f0,%edi
   401273:	e8 8c ff ff ff       	callq  401204 <fun7>
+
+  // fun7 必须返回 2
   401278:	83 f8 02             	cmp    $0x2,%eax
   40127b:	74 05                	je     401282 <secret_phase+0x40>
   40127d:	e8 b8 01 00 00       	callq  40143a <explode_bomb>
+
   401282:	bf 38 24 40 00       	mov    $0x402438,%edi
   401287:	e8 84 f8 ff ff       	callq  400b10 <puts@plt>
   40128c:	e8 33 03 00 00       	callq  4015c4 <phase_defused>
@@ -957,6 +1057,7 @@ Disassembly of section .text:
   // r8 == rsi +  8 存储第五个参数
   40147c:	4c 8d 46 08          	lea    0x8(%rsi),%r8
   // print (char*)0x4025c3 == "%d %d %d %d %d %d"，作为第二个参数
+  // x/s          0x4025c3 == "%d %d %d %d %d %d"，作为第二个参数
   401480:	be c3 25 40 00       	mov    $0x4025c3,%esi
   // eax 存储返回值
   401485:	b8 00 00 00 00       	mov    $0x0,%eax
@@ -1044,14 +1145,20 @@ Disassembly of section .text:
   4015d6:	31 c0                	xor    %eax,%eax
   4015d8:	83 3d 81 21 20 00 06 	cmpl   $0x6,0x202181(%rip)        # 603760 <num_input_strings>
   4015df:	75 5e                	jne    40163f <phase_defused+0x7b>
+
+  // 输入的字符串已等于 6
   4015e1:	4c 8d 44 24 10       	lea    0x10(%rsp),%r8
   4015e6:	48 8d 4c 24 0c       	lea    0xc(%rsp),%rcx
   4015eb:	48 8d 54 24 08       	lea    0x8(%rsp),%rdx
+  // "%d %d %s"
   4015f0:	be 19 26 40 00       	mov    $0x402619,%esi
+  // ""
   4015f5:	bf 70 38 60 00       	mov    $0x603870,%edi
   4015fa:	e8 f1 f5 ff ff       	callq  400bf0 <__isoc99_sscanf@plt>
   4015ff:	83 f8 03             	cmp    $0x3,%eax
   401602:	75 31                	jne    401635 <phase_defused+0x71>
+
+  // "DrEvil"
   401604:	be 22 26 40 00       	mov    $0x402622,%esi
   401609:	48 8d 7c 24 10       	lea    0x10(%rsp),%rdi
   40160e:	e8 25 fd ff ff       	callq  401338 <strings_not_equal>
@@ -1063,8 +1170,10 @@ Disassembly of section .text:
   401626:	e8 e5 f4 ff ff       	callq  400b10 <puts@plt>
   40162b:	b8 00 00 00 00       	mov    $0x0,%eax
   401630:	e8 0d fc ff ff       	callq  401242 <secret_phase>
+
   401635:	bf 58 25 40 00       	mov    $0x402558,%edi
   40163a:	e8 d1 f4 ff ff       	callq  400b10 <puts@plt>
+
   40163f:	48 8b 44 24 68       	mov    0x68(%rsp),%rax
   401644:	64 48 33 04 25 28 00 	xor    %fs:0x28,%rax
   40164b:	00 00 
