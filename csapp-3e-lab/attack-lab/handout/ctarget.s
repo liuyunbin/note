@@ -776,6 +776,8 @@ Disassembly of section .text:
 
 00000000004017a8 <getbuf>:
   4017a8:	48 83 ec 28          	sub    $0x28,%rsp
+  // print $rsp == 0x5561dc78
+  // 即 buf 的起始地址
   4017ac:	48 89 e7             	mov    %rsp,%rdi
   4017af:	e8 8c 02 00 00       	callq  401a40 <Gets>
   4017b4:	b8 01 00 00 00       	mov    $0x1,%eax
