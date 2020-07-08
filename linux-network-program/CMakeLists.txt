@@ -8,6 +8,10 @@ add_subdirectory(
     )
 
 add_subdirectory(
+    sudoku
+    )
+
+add_subdirectory(
     ttcp
     )
 
