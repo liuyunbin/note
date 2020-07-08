@@ -10,5 +10,7 @@ sudo apt install libncurses5-dev libncursesw5-dev -y
 
 sudo apt install libevent-dev -y
 
+sudo apt install libgoogle-glog-dev -y
+
 ./scripts/install-gtest-for-ubuntu-20.04.sh
 
