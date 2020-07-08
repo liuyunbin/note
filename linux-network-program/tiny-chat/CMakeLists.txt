@@ -1,25 +1,29 @@
 
 add_subdirectory(
-    echo
+    tiny-chat-01
     )
 
 add_subdirectory(
-    reproduce-multi-machine-data-processing
+    tiny-chat-02
     )
 
 add_subdirectory(
-    reproduce-tcp-errors
+    tiny-chat-03
     )
 
 add_subdirectory(
-    sudoku
+    tiny-chat-04
     )
 
 add_subdirectory(
-    tiny-chat
+    tiny-chat-05
     )
 
 add_subdirectory(
-    ttcp
+    tiny-chat-06
+    )
+
+add_subdirectory(
+    tiny-chat-07
     )
 

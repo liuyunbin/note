@@ -1,0 +1,8 @@
+
+syntax = "proto3";
+
+package chat;
+message heartbeat
+{
+  int32 time = 1;
+}
