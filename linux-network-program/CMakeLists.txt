@@ -4,6 +4,10 @@ add_subdirectory(
     )
 
 add_subdirectory(
+    reproduce-multi-machine-data-processing
+    )
+
+add_subdirectory(
     reproduce-tcp-errors
     )
 
