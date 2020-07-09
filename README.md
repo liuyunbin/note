@@ -9,6 +9,8 @@ $ ./scripts/install-dependencies.sh
 
 ## 构建
 ```
+$ ./scripts/before-build.sh
+$
 $ ./scripts/build.sh
 ```
 
