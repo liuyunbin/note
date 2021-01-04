@@ -1,6 +1,8 @@
 
-# 忽略 CMake 的构建目录
+# CMake
+bin/
 build/
+lib/
 
 # Prerequisites
 *.d
