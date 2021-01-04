@@ -8,13 +8,13 @@ project(
     )
 
 set(
- CXX_FLAGS
- -Wall
- -Werror
- -Wextra
- -Wno-unused-parameter
- -std=c++11
- )
+    CXX_FLAGS
+    -Wall
+    -Werror
+    -Wextra
+    -Wno-unused-parameter
+    -std=c++11
+    )
 
 string(
     REPLACE
@@ -25,8 +25,18 @@ string(
     )
 
 set(
+    CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+    ${CMAKE_SOURCE_DIR}/lib
+    )
+
+set(
+    CMAKE_LIBRARY_OUTPUT_DIRECTORY
+    ${CMAKE_SOURCE_DIR}/lib
+    )
+
+set(
     CMAKE_RUNTIME_OUTPUT_DIRECTORY
-    ${CMAKE_BINARY_DIR}/bin
+    ${CMAKE_SOURCE_DIR}/bin
     )
 
 add_subdirectory(
