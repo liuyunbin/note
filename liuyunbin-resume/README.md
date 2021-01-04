@@ -1,34 +1,36 @@
 ## 刘云宾的简历
 
 ### 个人基本信息
-* 刘云宾 男 1992
-* 本科 2016 届 太原理工大学 计算机科学与技术
-* 手机: 18334706067
-* 邮箱: yunbinliu@outlook.com
-* GitHub: [github.com/liuyunbin][GitHub-link]
-* Stack Overflow: [stackoverflow.com/users/7671328/yunbin-liu][stackoverflow-link]
-* 期望城市: 北京
+* 刘云宾 男
+* 本科 太原理工大学（211） 计算机科学与技术
+* 手机：18334706067
+* 邮箱：yunbinliu@outlook.com
+* GitHub：[github.com/liuyunbin](https://github.com/liuyunbin)
+* 期望城市：北京
 
 ### 项目经历
-1. 读了 muduo, 模拟了多机数据处理, 见 [github.com/liuyunbin/reproduce-multi-machine-data-processing][reproduce-multi-machine-link]
-2. 读了 UNP, 重现了 TCP 常见错误, 见 [github.com/liuyunbin/reproduce-TCP-errors][reproduce-TCP-errors-link]
-3. 读了 APUE, 实现了一个简单的 shell, 支持管道和重定向, 见 [github.com/liuyunbin/tiny-shell-tutorial][tiny-shell-tutorial-link]
-4. 读了 C++ Primer 和 STL 源码剖析, 实现了一个简单的 STL, 见 [github.com/liuyunbin/tiny-STL][tiny-STL-link]
+#### 学习了 陈硕的网络实践课，见：[github.com/liuyunbin/learn-unp](https://github.com/liuyunbin/learn-unp)
+* 实现了 ttcp，用于测试 TCP 的性能，输出服务器的 带宽 和 吞吐量
+* 模拟了多机数据处理，主要利用 socket 通信，模拟解决求取大量数据的平均数 和 中位数 等等
 
-### 工作经历
-#### 联合信源 C++ 软件工程师 2016~2017
-主要工作: 将公司的解码器加入 VLC
+#### 重现了 TCP 的常见错误，见：[github.com/liuyunbin/reproduce-tcp-errors](https://github.com/liuyunbin/reproduce-tcp-errors)
+* 重现了 程序启动时，端口 权限 或 被占用的情况
+* 重现了 客户端连接时，服务端不存在 或 不可达的情况
+* 重现了 客户端连接成功后，对端 不可达，崩溃，关机 以及 之后重启的情况
 
-### 自我评价
-* 对自己的定位: 主攻后端
-* 对工作的态度: 首先完成本职工作, 然后总结, 重构
-* 我怎样克服困难: 在 Bing 和 Stack Overflow 上查找和提问
-* 我的优势: 热爱技术, 喜欢钻研, 追求效率
+#### 实现了部分 Linux 命令，见：[github.com/liuyunbin/linux-commands](https://github.com/liuyunbin/linux-commands)
+* 实现了 bash，使用 dup2() 使其支持管道和重定向
+* 实现了 more，使用 /dev/tty，使其任何时候都可以从终端读入控制，使用 tcgetattr() 和 tcsetattr() 设置终端不回显和无缓冲
 
-[GitHub-link]: https://github.com/liuyunbin
-[stackoverflow-link]: https://stackoverflow.com/users/7671328/yunbin-liu
-[tiny-STL-link]: https://github.com/liuyunbin/tiny-STL
-[tiny-shell-tutorial-link]: https://github.com/liuyunbin/tiny-shell-tutorial
-[reproduce-TCP-errors-link]: https://github.com/liuyunbin/reproduce-TCP-errors
-[reproduce-multi-machine-link]: https://github.com/liuyunbin/reproduce-multi-machine-data-processing
+#### 实现了简单的 STL，见：[github.com/liuyunbin/cpp-standard-library](https://github.com/liuyunbin/cpp-standard-library)
+* 实现了 常见容器和适配器，例如：vector，list，deque，stack，queue 等等
+* 实现了 常见算法，包括 头文件 algorithm，numeric
+* 实现了 头文件 `type_traits` 的部分内容
+
+#### 阅读了开源项目 Tinyhttpd，见：[github.com/liuyunbin/Tinyhttpd](https://github.com/liuyunbin/Tinyhttpd)
+* 了解了该 HTTP 服务器的调用过程
+* 解决了 多线程直接有共享数据，可能会出现的竟态问题
+
+### 其它方面
+给 Nginx 提过一个小的 Bug，见：[github.com/nginx/nginx/commit/f09eae2a7586c5149fe7eaa497c8ff1be684270f](https://github.com/nginx/nginx/commit/f09eae2a7586c5149fe7eaa497c8ff1be684270f)
 
