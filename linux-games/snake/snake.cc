@@ -11,10 +11,10 @@
 #include <list>
 #include <utility>
 
-enum DIRECT { LEFT, RIGHT, UP, DOWN }; // 蛇的方向
+enum DIRECT { LEFT, RIGHT, UP, DOWN };  // 蛇的方向
 
-int row_max; // 终端的长
-int col_max; // 终端的宽
+int row_max;  // 终端的长
+int col_max;  // 终端的宽
 
 // 食物的坐标
 int row_food;
@@ -34,14 +34,14 @@ int snake_time = snake_time_higher;
 // 存储蛇的轨迹
 std::list<std::pair<int, int>> snake;
 
-enum DIRECT direct = RIGHT; // 当前蛇移动的方向
+enum DIRECT direct = RIGHT;  // 当前蛇移动的方向
 
 // 设置指定时间发送信号，
 // n_msecs 单位为 毫秒
 int set_ticker(long n_msecs) {
   struct itimerval new_timeset;
-  long n_sec = n_msecs / 1000;             // 求秒
-  long n_usecs = (n_msecs % 1000) * 1000L; // 求微秒
+  long n_sec = n_msecs / 1000;              // 求秒
+  long n_usecs = (n_msecs % 1000) * 1000L;  // 求微秒
 
   new_timeset.it_interval.tv_sec = n_sec;
   new_timeset.it_interval.tv_usec = n_usecs;
@@ -54,7 +54,7 @@ int set_ticker(long n_msecs) {
 // 销毁界面
 void destroy_snake() {
   set_ticker(0);
-  endwin(); // 删除 ncurses
+  endwin();  // 删除 ncurses
   printf("对不起，你失败了\n");
   printf("你的分数为：%d\n", snake_score);
   printf("输入回车退出\n");
@@ -64,9 +64,7 @@ void destroy_snake() {
 
 // 设置食物的坐标
 void set_food() {
-
   for (;;) {
-
     row_food = rand() % (row_max - 1);
     col_food = rand() % (col_max - 1);
 
@@ -77,8 +75,7 @@ void set_food() {
         move(row_max - 1, col_max - 1);
         return;
       }
-      if (row_food == it->first && col_food == it->second)
-        break;
+      if (row_food == it->first && col_food == it->second) break;
     }
   }
 }
@@ -91,37 +88,37 @@ void move_snake(int) {
   int col_next = elem.second;
 
   switch (direct) {
-  case LEFT:
-    --col_next;
-    if (col_next < 0) {
-      destroy_snake();
-      exit(-1);
-    }
-    break;
-  case RIGHT:
-    ++col_next;
-    if (col_next >= col_max) {
-      destroy_snake();
-      exit(-1);
-    }
-    break;
-  case UP:
-    --row_next;
-    if (row_next < 0) {
-      destroy_snake();
-      exit(-1);
-    }
-    break;
-  case DOWN:
-    ++row_next;
-    if (row_next >= row_max) {
-      destroy_snake();
-      exit(-1);
-    }
-    break;
+    case LEFT:
+      --col_next;
+      if (col_next < 0) {
+        destroy_snake();
+        exit(-1);
+      }
+      break;
+    case RIGHT:
+      ++col_next;
+      if (col_next >= col_max) {
+        destroy_snake();
+        exit(-1);
+      }
+      break;
+    case UP:
+      --row_next;
+      if (row_next < 0) {
+        destroy_snake();
+        exit(-1);
+      }
+      break;
+    case DOWN:
+      ++row_next;
+      if (row_next >= row_max) {
+        destroy_snake();
+        exit(-1);
+      }
+      break;
   }
 
-  if (row_next == row_food && col_next == col_food) { // 吃到食物
+  if (row_next == row_food && col_next == col_food) {  // 吃到食物
     ++snake_score;
     move(row_next, col_next);
     addch('o');
@@ -130,12 +127,11 @@ void move_snake(int) {
     move(row_max - 1, col_max - 1);
     refresh();
     snake_time -= snake_time_reduce;
-    if (snake_time < snake_time_lower)
-      snake_time = snake_time_lower;
-    set_ticker(snake_time); // 加快速度
-  } else {                  // 没吃到食物
+    if (snake_time < snake_time_lower) snake_time = snake_time_lower;
+    set_ticker(snake_time);  // 加快速度
+  } else {                   // 没吃到食物
     for (const auto &data : snake)
-      if (data.first == row_next && data.second == col_next) // 吃到自己
+      if (data.first == row_next && data.second == col_next)  // 吃到自己
         destroy_snake();
 
     // 删除蛇尾
@@ -145,8 +141,8 @@ void move_snake(int) {
     snake.pop_front();
 
     // 添加蛇头
-    move(row_next, col_next); // 移动光标到指定位置
-    addch('o');               // 在指定位置添加字符
+    move(row_next, col_next);  // 移动光标到指定位置
+    addch('o');                // 在指定位置添加字符
     move(row_max - 1, col_max - 1);
     snake.emplace_back(row_next, col_next);
     refresh();
@@ -162,8 +158,7 @@ void set_signal() {
 
   sigemptyset(&newhandler.sa_mask);
 
-  if (sigaction(SIGALRM, &newhandler, NULL) == -1)
-    perror("sigaction");
+  if (sigaction(SIGALRM, &newhandler, NULL) == -1) perror("sigaction");
 }
 
 // 获取终端的长和宽
@@ -178,8 +173,8 @@ void get_row_col(int &row, int &col) {
 void init_snake() {
   set_signal();
 
-  initscr(); // 初始化 ncurses
-  clear();   // 清屏
+  initscr();  // 初始化 ncurses
+  clear();    // 清屏
 
   get_row_col(row_max, col_max);
 
@@ -191,7 +186,6 @@ void init_snake() {
 }
 
 void output_help() {
-
   printf("\n");
   printf("w 或 方向键向左 表示向左\n");
   printf("d 或 方向键向右 表示向右\n");
@@ -204,84 +198,78 @@ void output_help() {
 }
 
 int main() {
-
   output_help();
 
   init_snake();
 
-  bool stop = false; // 是否暂停
+  bool stop = false;  // 是否暂停
 
   for (;;) {
     int user_direct = getchar();
 
-    switch (user_direct) { // 方向键
-    case '\033':
-      getchar(); // 读取 '['
-      switch (getchar()) {
-      case 'D': // 方向键向左
+    switch (user_direct) {  // 方向键
+      case '\033':
+        getchar();  // 读取 '['
+        switch (getchar()) {
+          case 'D':  // 方向键向左
+            user_direct = LEFT;
+            break;
+          case 'C':  // 方向键向右
+            user_direct = RIGHT;
+            break;
+          case 'A':  // 方向键向上
+            user_direct = UP;
+            break;
+          case 'B':  // 方向键向下
+            user_direct = DOWN;
+            break;
+        }
+        break;
+      case 'a':  // 左
         user_direct = LEFT;
         break;
-      case 'C': // 方向键向右
+      case 'd':  // 右
         user_direct = RIGHT;
         break;
-      case 'A': // 方向键向上
+      case 'w':  // 上
         user_direct = UP;
         break;
-      case 'B': // 方向键向下
+      case 's':  // 下
         user_direct = DOWN;
         break;
-      }
-      break;
-    case 'a': // 左
-      user_direct = LEFT;
-      break;
-    case 'd': // 右
-      user_direct = RIGHT;
-      break;
-    case 'w': // 上
-      user_direct = UP;
-      break;
-    case 's': // 下
-      user_direct = DOWN;
-      break;
-    case 'q': // 退出
-      destroy_snake();
-      break;
-    case 'p':              // 暂停 或 开始
-      if (stop == false) { // 暂停
-        stop = true;
-        set_ticker(0);
-      } else { // 开始
-        stop = false;
-        set_ticker(snake_time);
-      }
-      break;
+      case 'q':  // 退出
+        destroy_snake();
+        break;
+      case 'p':               // 暂停 或 开始
+        if (stop == false) {  // 暂停
+          stop = true;
+          set_ticker(0);
+        } else {  // 开始
+          stop = false;
+          set_ticker(snake_time);
+        }
+        break;
     }
 
     switch (user_direct) {
-    case LEFT:
-      if (direct == RIGHT)
+      case LEFT:
+        if (direct == RIGHT) break;
+        direct = LEFT;
         break;
-      direct = LEFT;
-      break;
-    case RIGHT:
-      if (direct == LEFT)
+      case RIGHT:
+        if (direct == LEFT) break;
+        direct = RIGHT;
         break;
-      direct = RIGHT;
-      break;
-    case UP:
-      if (direct == DOWN)
+      case UP:
+        if (direct == DOWN) break;
+        direct = UP;
         break;
-      direct = UP;
-      break;
-    case DOWN:
-      if (direct == UP)
+      case DOWN:
+        if (direct == UP) break;
+        direct = DOWN;
         break;
-      direct = DOWN;
-      break;
     }
   }
 
   return 0;
 }
-

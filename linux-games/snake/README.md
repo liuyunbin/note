@@ -1,6 +1,6 @@
 
 #### 简介：
-利用 ncurses 实现小游戏 snake
+利用 ncurses 实现小游戏 贪吃蛇
 
 #### 程序流程：
 1. 使用 sigaction 设置信号 SIGALRM 处理函数 move_snake
@@ -10,7 +10,7 @@
         3. 否则，删除蛇尾，将该位置添加为蛇的部分
 2. 使用 initscr() 初始化界面
 3. 使用 ioctl(0, TIOCGWINSZ, &wbuf) 获取终端的长和宽
-4. 将终端的中心位置作为蛇的部分
+4. 将终端的中心位置作为蛇的起始位置
 5. 设置食物位置，食物的位置不能和蛇的部分相同
 6. 使用 setitimer(ITIMER_REAL, &new_timeset, NULL) 设置指定时间和时间间隔向程序发送 SIGALRM 信号
 7. 开始接收终端的输入，控制蛇的移动方向
