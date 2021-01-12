@@ -1,6 +1,6 @@
 
 add_executable(
-    cpp-standard-library-map-set-unittest
+    map-set-unittest
     map/map_unittest.cc
     multimap/multimap_unittest.cc
     set/set_unittest.cc
@@ -8,7 +8,7 @@ add_executable(
     )
 
 target_link_libraries(
-    cpp-standard-library-map-set-unittest
+    map-set-unittest
     gtest
     gtest_main
     pthread

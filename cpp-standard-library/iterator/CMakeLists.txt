@@ -1,6 +1,6 @@
 
 add_executable(
-    cpp-standard-library-iterator-unittest
+    iterator-unittest
     back_insert_iterator/back_insert_iterator_unittest.cc
     front_insert_iterator/front_insert_iterator_unittest.cc
     insert_iterator/insert_iterator_unittest.cc
@@ -15,7 +15,7 @@ add_executable(
     )
 
 target_link_libraries(
-    cpp-standard-library-iterator-unittest
+    iterator-unittest
     gtest
     gtest_main
     pthread

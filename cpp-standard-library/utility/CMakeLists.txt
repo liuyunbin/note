@@ -1,6 +1,6 @@
 
 add_executable(
-    cpp-standard-library-utility-unittest
+    utility-unittest
     pair/pair_unittest.cc
     swap/swap_unittest.cc
     move/move_unittest.cc
@@ -8,7 +8,7 @@ add_executable(
     )
 
 target_link_libraries(
-    cpp-standard-library-utility-unittest
+    utility-unittest
     gtest
     gtest_main
     pthread

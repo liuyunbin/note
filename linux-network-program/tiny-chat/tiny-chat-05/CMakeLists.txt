@@ -1,6 +1,6 @@
 
 add_executable(
-    linux-network-program-tiny-chat-05-server
+    tiny-chat-05-server
     tiny-chat-05-server.cc
     log_init.cc
     encode.cc
@@ -10,7 +10,7 @@ add_executable(
     )
 
 target_link_libraries(
-    linux-network-program-tiny-chat-05-server
+    tiny-chat-05-server
     gflags
     glog
     event
@@ -18,7 +18,7 @@ target_link_libraries(
     )
 
 add_executable(
-    linux-network-program-tiny-chat-05-client
+    tiny-chat-05-client
     tiny-chat-05-client.cc
     log_init.cc
     encode.cc
@@ -28,7 +28,7 @@ add_executable(
     )
 
 target_link_libraries(
-    linux-network-program-tiny-chat-05-client
+    tiny-chat-05-client
     gflags
     glog
     event

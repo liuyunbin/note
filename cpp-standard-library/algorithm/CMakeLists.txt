@@ -1,7 +1,7 @@
 
 # 添加 可执行文件
 add_executable(
-    cpp-standard-library-algorithm-unittest
+    algorithm-unittest
 
     adjacent_find/adjacent_find_unittest.cc
     all_of/all_of_unittest.cc
@@ -103,7 +103,7 @@ add_executable(
 
 # 链接所需要的 库文件
 target_link_libraries(
-    cpp-standard-library-algorithm-unittest
+    algorithm-unittest
     gtest
     gtest_main
     pthread

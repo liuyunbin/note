@@ -1,6 +1,6 @@
 
 add_executable(
-    cpp-standard-library-cstring-unittest 
+    cstring-unittest 
     strlen/strlen_unittest.cc
     strcpy/strcpy_unittest.cc
     strncpy/strncpy_unittest.cc
@@ -23,7 +23,7 @@ add_executable(
     )
 
 target_link_libraries(
-    cpp-standard-library-cstring-unittest
+    cstring-unittest
     gtest
     gtest_main
     pthread

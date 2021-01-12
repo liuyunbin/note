@@ -1,6 +1,6 @@
 
 add_executable(
-    cpp-standard-library-numeric-unittest
+    numeric-unittest
 
     accumulate/accumulate_unittest.cc
     adjacent_difference/adjacent_difference_unittest.cc
@@ -12,7 +12,7 @@ add_executable(
     )
 
 target_link_libraries(
-    cpp-standard-library-numeric-unittest
+    numeric-unittest
     gtest
     gtest_main
     pthread

@@ -1,6 +1,6 @@
 
 add_executable(
-    cpp-standard-library-cctype-unittest
+    cctype-unittest
     islower/islower_unittest.cc
     isupper/isupper_unittest.cc
     isalpha/isalpha_unittest.cc
@@ -18,7 +18,7 @@ add_executable(
     )
 
 target_link_libraries(
-    cpp-standard-library-cctype-unittest
+    cctype-unittest
     gtest
     gtest_main
     pthread
