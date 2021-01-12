@@ -1,14 +1,9 @@
 
-cmake_minimum_required(
-    VERSION 3.4
-    )
+cmake_minimum_required(VERSION 3.4) # 设置所需要的 CMake 的最小版本
 
-project(
-    liuyunbin-toys
-    )
+project(liuyunbin-toys) # 项目名称
 
-set(
-    CXX_FLAGS
+set(CXX_FLAGS
     -Wall
     -Werror
     -Wextra
@@ -16,46 +11,16 @@ set(
     -std=c++11
     )
 
-string(
-    REPLACE
-    ";"
-    " "
-    CMAKE_CXX_FLAGS
-    "${CXX_FLAGS}"
-    )
+string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}") # 设置 C++ 编译选项
 
-set(
-    CMAKE_ARCHIVE_OUTPUT_DIRECTORY
-    ${CMAKE_SOURCE_DIR}/lib
-    )
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib) # 设置 静态库     的输出目录 
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib) # 设置 动态库     的输出目录
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin) # 设置 二进制文件 的输出目录
 
-set(
-    CMAKE_LIBRARY_OUTPUT_DIRECTORY
-    ${CMAKE_SOURCE_DIR}/lib
-    )
-
-set(
-    CMAKE_RUNTIME_OUTPUT_DIRECTORY
-    ${CMAKE_SOURCE_DIR}/bin
-    )
-
-add_subdirectory(
-    cpp-standard-library
-    )
-
-add_subdirectory(
-    huge-number
-    )
-
-add_subdirectory(
-    linux-commands
-    )
-
-add_subdirectory(
-    linux-games
-    )
-
-add_subdirectory(
-    linux-network-program
-    )
+# 添加 子目录
+add_subdirectory(cpp-standard-library)
+add_subdirectory(huge-number)
+add_subdirectory(linux-commands)
+add_subdirectory(linux-games)
+add_subdirectory(linux-network-program)
 
