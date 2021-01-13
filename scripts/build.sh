@@ -10,3 +10,5 @@ cmake ..
 
 make
 
+make test
+
