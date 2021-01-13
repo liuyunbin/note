@@ -131,4 +131,3 @@ TEST(test_huge_number, test_div_huge_number) {
       div_huge_number("24691357802469135780", "12345678901234567890").data(),
       "2");
 }
-

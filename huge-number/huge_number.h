@@ -61,4 +61,3 @@ std::string mul_huge_number(const std::string &lhs, const std::string &rhs);
 std::string div_huge_number(const std::string &lhs, const std::string &rhs);
 
 #endif
-
