@@ -16,5 +16,5 @@ sudo apt install libprotobuf-dev -y
 
 sudo apt install protobuf-compiler -y
 
-./scripts/install-gtest-for-ubuntu-20.04.sh
+./script/install-gtest-for-ubuntu-20.04.sh
 
