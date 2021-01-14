@@ -22,7 +22,7 @@ enable_testing() # 激活测试
 # 添加 子目录
 add_subdirectory(cpp-standard-library)
 add_subdirectory(huge-number)
-add_subdirectory(linux-commands)
+add_subdirectory(linux-command)
 add_subdirectory(linux-game)
 add_subdirectory(linux-network-program)
 
