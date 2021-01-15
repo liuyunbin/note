@@ -10,16 +10,19 @@
   3. 依次对每个未填字符进行判断，最后输出解 或 无解
 
 使用：
-  $ sudoku [可选项] [文件名]
+  $ sudoku [可选项]... [文件名]...
 
 可选项：
-  * -a ，输出所有解
-  * -h ，输出帮助
+  * -a，--all  ，输出所有解
+  * -h，--help ，输出帮助
+  * -f，--file ，从文件输入数据
 
 例子：
-  $ sudoku             # 从标准输入输入数据
-  $ sudoku -a          # 从标准输入输入数据，输出所有解
-  $ sudoku data.txt    # 从文件输入数据
-  $ sudoku data.txt -a # 从文件输入数据，输出所有解
-  $ sudoku -h          # 输出帮助
+  $ sudoku                从标准输入输入数据
+  $ sudoku -a             从标准输入输入数据，输出所有解
+  $ sudoku data.txt       从文件输入数据
+  $ sudoku data.txt -a    从文件输入数据，输出所有解
+  $ sudoku -f data.txt    从文件输入数据
+  $ sudoku -f data.txt -a 从文件输入数据，输出所有解
+  $ sudoku -h             输出帮助
 
