@@ -1,0 +1,11 @@
+
+# 压缩
+alias tar_file_to_tar="tar -cvf"
+alias tar_file_to_tar_gz="tar -czf"
+alias tar_file_to_tar_bz2="tar -cjf"
+
+# 解压
+alias tar_tar_to_file="tar -xvf"
+alias tar_tar_gz_to_file="tar -xzvf"
+alias tar_tar_bz2_to_file="tar -xjvf"
+
