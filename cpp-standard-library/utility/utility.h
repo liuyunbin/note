@@ -1,11 +1,41 @@
-#ifndef CPP_STANDARD_LIBRARY_UTILITY_PAIR_H_
-#define CPP_STANDARD_LIBRARY_UTILITY_PAIR_H_
+#ifndef CPP_STANDARD_LIBRARY_UTILITY_H_
+#define CPP_STANDARD_LIBRARY_UTILITY_H_
 
+#include <type_traits>
 #include <iostream>
 #include <iterator>
 #include <utility>
 
 namespace liuyunbin {
+
+/*******************************************
+ *                                         *
+ *              forward                    *
+ *                                         *
+ *******************************************/
+
+template <typename T>
+T&& forward(typename std::remove_reference<T>::type& t) noexcept {
+  return static_cast<T&&>(t);
+}
+
+template <typename T>
+T&& forward(typename std::remove_reference<T>::type&& t) noexcept {
+  return static_cast<T&&>(t);
+}
+
+/*******************************************
+ *                                         *
+ *               move                      *
+ *                                         *
+ *******************************************/
+
+// Universal Reference
+template <typename T>
+auto move(T&& t) noexcept -> typename std::remove_reference<T>::type&& {
+  using return_type = typename std::remove_reference<T>::type&&;
+  return static_cast<return_type>(t);
+}
 
 /********************************************
  *                                          *
@@ -142,6 +172,26 @@ bool operator>(const pair<T1, T2>& left, const pair<T1, T2>& right) {
 template <typename T1, typename T2>
 bool operator>=(const pair<T1, T2>& left, const pair<T1, T2>& right) {
   return !(left < right);
+}
+
+/*******************************************
+ *                                         *
+ *               swap                      *
+ *                                         *
+ *******************************************/
+
+template <typename T>
+void swap(T& a, T& b) noexcept {
+  T temp = std::move(a);
+  a = std::move(b);
+  b = std::move(temp);
+}
+
+template <typename T, std::size_t N>
+void swap(T (&a)[N], T (&b)[N]) noexcept {
+  using std::swap;
+  for (std::size_t i = 0; i != N; ++i)
+    swap(a[i], b[i]);
 }
 
 }  // namespace liuyunbin
