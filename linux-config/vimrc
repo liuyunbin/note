@@ -25,3 +25,6 @@ function! Formatonsave()
 endfunction
 
 autocmd BufWritePre *.h,*.cc,*.cpp,*.c call Formatonsave()
+
+" 自动去除行尾的空格
+autocmd BufWritePre *.h,*.cc,*.cpp,*.c,*.md,*.txt :%s/\s\+$//e
