@@ -1,12 +1,12 @@
 
-## 简介
+#### 简介
 通过实现部分 C++ 标准库来学习 C++
 
-## 感悟
+#### 感悟
 * 对于实现 C++ 标准库，只需明白原理，实现几个典型例子即可，否则就变成体力活了，得不偿失
 * 对于普通程序员来说，对于模板元编程只需明白原理，实现能看懂即可
 
-## 目录
+#### 目录
 * [实现头文件 algorithm](./algorithm)
 * [实现头文件 array](./array)
 * [实现头文件 cstring](./cstring)
@@ -27,7 +27,7 @@
 * [实现头文件 utility](./utility)
 * [实现头文件 vector](./vector)
 
-## 参考资源
+#### 参考资源
 * [llvm-mirror/libcxx](https://github.com/llvm-mirror/libcxx)
 * [cppreference](https://en.cppreference.com)
 * [boost](https://www.boost.org)
