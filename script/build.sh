@@ -2,13 +2,12 @@
 
 set -ev
 
-mkdir -p build
 
-cd build
+cmake -E make_directory "build"
 
-cmake ..
+cmake -E chdir "build" cmake ..
 
-make
+cmake --build "build"
 
-make test
+cmake --build "build" --target test
 
