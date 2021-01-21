@@ -1,12 +1,12 @@
 
 add_executable(
-    shell
-    shell.cc
+    bash
+    bash.cc
     main.cc
     )
 
 target_link_libraries(
-    shell
+    bash
     readline
     )
 

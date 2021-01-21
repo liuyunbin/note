@@ -1,5 +1,5 @@
 
-#include "shell.h"
+#include "bash.h"
 
 #include <ctype.h>
 #include <dirent.h>
