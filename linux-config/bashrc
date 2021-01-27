@@ -1,11 +1,54 @@
 
+# 命令行提示符
+PS1="\[\033[01;32m\]\$(date +%F\ %T)\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
+
 # 压缩
-alias tar_file_to_tar="tar -cvf"
-alias tar_file_to_tar_gz="tar -czf"
-alias tar_file_to_tar_bz2="tar -cjf"
+function file2tar {
+  if [ $# -eq 1 ]; then
+    tar -cvf "${1}.tar" "${1}"
+  else
+    echo "使用: file2tar 文件名"
+  fi
+}
+
+function file2gz {
+  if [ $# -eq 1 ]; then
+    tar -czvf "${1}.tar.gz" "${1}"
+  else
+    echo "使用: file2gz 文件名"
+  fi
+}
+
+function file2bz2 {
+  if [ $# -eq 1 ]; then
+    tar -cjvf "${1}.tar.bz2" "${1}"
+  else
+    echo "使用: file2bz2 文件名"
+  fi
+}
 
 # 解压
-alias tar_tar_to_file="tar -xvf"
-alias tar_tar_gz_to_file="tar -xzvf"
-alias tar_tar_bz2_to_file="tar -xjvf"
+function tar2file {
+  if [ $# -eq 1 ]; then
+    tar -xvf "${1}"
+  else
+    echo "使用: tar2file 文件名.tar"
+  fi
+}
+
+function gz2file {
+  if [ $# -eq 1 ]; then
+    tar -xzvf "${1}"
+  else
+    echo "使用: gz2file 文件名.tar.gz"
+  fi
+}
+
+function bz22file {
+  if [ $# -eq 1 ]; then
+    tar -xjvf "${1}"
+  else
+    echo "使用: bz2file 文件名.tar.bz2"
+  fi
+}
 
