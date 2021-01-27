@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -ev
-
+set -eux
 
 cmake -E make_directory "build"
 

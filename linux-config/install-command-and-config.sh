@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ev
+set -eux
 
 sudo apt install clang-format -y
 
