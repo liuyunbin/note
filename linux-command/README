@@ -19,6 +19,18 @@ ls -R        # 递归列出当前目录中的元素
 ls -1        # 在每一行列出文件名
 
 #####################################################
+#              压缩 和 解压缩
+#####################################################
+tar -cvf  file.tar     file  # 将文件打包成 tar
+tar -czvf file.tar.gz  file  # 将文件压缩成 tar.gz
+tar -czvf file.tgz     file  # 将文件压缩成 tgz
+tar -cjvf file.tar.bz2 file  # 将文件压缩成 tar.bz2
+tar -xvf  file.tar           # 将 tar     解包  为文件
+tar -xzvf file.tar.gz        # 将 tar.gz  解压缩为文件
+tar -xzvf file.tgz           # 将 tgz     解压缩为文件
+tar -xjvf file.tar.bz2       # 将 tar.bz2 解压缩为文件
+
+#####################################################
 #                   ps 常用参数
 #####################################################
 
