@@ -1,0 +1,13 @@
+
+#####################################################
+#                    apt 常用参数
+#####################################################
+
+apt search  clang-format # 查找软件包
+apt show    clang-format # 列出软件包的信息
+apt install clang-format # 安装软件包
+apt remove  clang-format # 卸载软件包
+apt purge   clang-format # 卸载软件包，删除数据和配置文件
+apt update               # 更新软件源
+apt upgrade              # 更新软件
+
