@@ -1,4 +1,6 @@
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/huge-number)
+
 add_executable(
     huge-number-unittest
     huge_number_unittest.cc
