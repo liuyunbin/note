@@ -5,75 +5,18 @@
 
 通过实现部分 linux 命令来学习 linux 命令
 
-#####################################################
-#                    ls 常用参数
-#####################################################
+lyb=123           # 定义变量
+echo $lyb         # 输出变量的值
+echo ${lyb}       # 输出变量的值
+lyb=(1 2 3)       # 定义数组
+echo ${lyb[1]}    # 输出数组中指定元素的值
+echo ${lyb[*]}    # 输出数组中所有元素的值
+lyb=$[1+3]        # 定义变量，包括数学运算
+ls -l `which ls`  # 命令替换，首先执行 which ls
+ls -l $(which ls) # 命令替换，首先执行 which ls
 
-ls           # 列出当前目录中的元素
-ls -a        # 列出当前目录中的元素（包括隐藏的文件）
-ls -l        # 列出当前目录中的元素的详细信息
-ls -F        # 在目录后添加 /，在可执行文件后添加 *
-ls -d        # 只列出目录本身，而不列出目录内元素
-ls -r        # 逆序列出当前目录中的元素
-ls -R        # 递归列出当前目录中的元素
-ls -1        # 在每一行列出文件名
-
-#####################################################
-#                apt dpkg yum 常用参数
-#####################################################
-
-apt search  clang-format # 查找软件包
-apt show    clang-format # 列出软件包的信息
-apt install clang-format # 安装软件包
-apt remove  clang-format # 卸载软件包
-apt purge   clang-format # 卸载软件包，删除数据和配置文件
-apt update               # 更新软件源
-apt upgrade              # 更新软件
-
-dpkg -L vim              # 列出 vim 软件包安装的全部文件
-dpkg --search /...       # 查看该文件是哪个软件包安装的，使用绝对路径
-
-yum list installed       # 列出已安装的软件
-yum list vim             # 列出某软件包的详细信息
-yum list updates         # 列出可用更新
-yum provides file_name   # 查看文件属于哪个软件包
-yum update package_name  # 更新某个软件包
-yum update               # 更新所有软件包
-yum install package_name # 安装软件
-yum remove package_name  # 卸载软件
-yum erase  package_name  # 卸载软件，删除数据和文件
-
-#####################################################
-#              压缩 和 解压缩
-#####################################################
-tar -cvf  file.tar     file  # 将文件打包成 tar
-tar -czvf file.tar.gz  file  # 将文件压缩成 tar.gz
-tar -czvf file.tgz     file  # 将文件压缩成 tgz
-tar -cjvf file.tar.bz2 file  # 将文件压缩成 tar.bz2
-tar -xvf  file.tar           # 将 tar     解包  为文件
-tar -xzvf file.tar.gz        # 将 tar.gz  解压缩为文件
-tar -xzvf file.tgz           # 将 tgz     解压缩为文件
-tar -xjvf file.tar.bz2       # 将 tar.bz2 解压缩为文件
-
-#####################################################
-#                   ps 常用参数
-#####################################################
-
-ps                      # 显示当前终端的当前用户的进程
-ps -ef                  # 显示所有进程的详细信息
-ps -o pid,ppid,command  # 按指定格式显示进程的信息
-ps -f 123               # 显示指定进程的信息
-
-#####################################################
-#                   sort 常用参数
-#####################################################
-
-sort       # 排序
-sort -k 4  # 指定排序的列字段
-sort -t :  # 指定列的分割符
-sort -n    # 以数字进行排序
-sort -r    # 逆序
-sort -f    # 忽略大小写
+IFS=$'\n' # 将字段分割符改成 '\n'
+IFS=:     # 将字段分割符改成 :
 
 #####################################################
 #                    参考资源
