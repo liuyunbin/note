@@ -32,4 +32,5 @@ add_subdirectory(map_set)
 add_subdirectory(memory)
 add_subdirectory(numeric)
 add_subdirectory(queue)
+add_subdirectory(stack)
 
