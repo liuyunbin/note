@@ -35,4 +35,5 @@ add_subdirectory(queue)
 add_subdirectory(stack)
 add_subdirectory(string)
 add_subdirectory(type_traits)
+add_subdirectory(unordered_map_set)
 
