@@ -34,4 +34,5 @@ add_subdirectory(numeric)
 add_subdirectory(queue)
 add_subdirectory(stack)
 add_subdirectory(string)
+add_subdirectory(type_traits)
 
