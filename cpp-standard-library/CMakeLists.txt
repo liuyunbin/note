@@ -26,4 +26,5 @@ add_subdirectory(cctype)
 add_subdirectory(cstring)
 add_subdirectory(deque)
 add_subdirectory(forward_list)
+add_subdirectory(iterator)
 
