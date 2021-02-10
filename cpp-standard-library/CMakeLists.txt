@@ -29,4 +29,5 @@ add_subdirectory(forward_list)
 add_subdirectory(iterator)
 add_subdirectory(list)
 add_subdirectory(map_set)
+add_subdirectory(memory)
 
