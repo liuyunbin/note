@@ -21,4 +21,5 @@ add_test(
     )
 
 add_subdirectory(algorithm)
+add_subdirectory(array)
 
