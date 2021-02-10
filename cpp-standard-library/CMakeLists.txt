@@ -19,3 +19,6 @@ add_test(
     NAME cpp-standard-library-unittest
     COMMAND cpp-standard-library-unittest
     )
+
+add_subdirectory(algorithm)
+
