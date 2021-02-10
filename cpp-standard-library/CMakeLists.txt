@@ -1,4 +1,6 @@
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/cpp-standard-library)
+
 file(GLOB_RECURSE UNITTEST_FILE "*_unittest.cc")  # 递归
 
 add_executable(
