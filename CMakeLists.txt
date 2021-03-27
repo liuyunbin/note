@@ -20,10 +20,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin) # 设置 二进制�
 enable_testing() # 激活测试
 
 # 添加 子目录
-add_subdirectory(cpp-standard-library)
-add_subdirectory(huge-number)
-add_subdirectory(linux-command)
-add_subdirectory(linux-function)
+#add_subdirectory(cpp-standard-library)
+#add_subdirectory(huge-number)
+#add_subdirectory(linux-command)
+#add_subdirectory(linux-function)
 add_subdirectory(linux-game)
-add_subdirectory(linux-network-program)
+#add_subdirectory(linux-network-program)
 
