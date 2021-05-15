@@ -1,14 +1,14 @@
 
-#####################################################
-#             压缩 和 解压缩 常用参数
-#####################################################
+tar -xvf /path/to/foo.tar -C /path/to/destination/      # 解包
+tar -cvf /path/to/foo.tar /path/to/foo/                 # 打包
 
-tar -cvf  file.tar     file  # 将文件打包成 tar
-tar -czvf file.tar.gz  file  # 将文件压缩成 tar.gz
-tar -czvf file.tgz     file  # 将文件压缩成 tgz
-tar -cjvf file.tar.bz2 file  # 将文件压缩成 tar.bz2
-tar -xvf  file.tar           # 将 tar     解包  为文件
-tar -xzvf file.tar.gz        # 将 tar.gz  解压缩为文件
-tar -xzvf file.tgz           # 将 tgz     解压缩为文件
-tar -xjvf file.tar.bz2       # 将 tar.bz2 解压缩为文件
+tar -xzvf /path/to/foo.tgz                              # 解压缩 .tgz
+tar -xzvf /path/to/foo.tar.gz                           # 解压缩 .tar.gz
+tar -xjvf /path/to/foo.tar.bz2                          # 解压缩 .tar.bz2
+
+tar -czvf /path/to/foo.tgz     /path/to/foo/            # 压缩成 .tgz
+tar -czvf /path/to/foo.tar.gz  /path/to/foo/            # 压缩成 .tar.gz
+tar -cjvf /path/to/foo.tar.bz2 /path/to/foo/            # 压缩成 .tar.bz2
+
+tar -czvf /path/to/foo.tgz --exclude=\*.o /path/to/foo/ # 忽略 .o 文件
 
