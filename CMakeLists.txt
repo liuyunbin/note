@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 3.4) # 设置所需要的 CMake 的最小版本
 
-project(liuyunbin-note) # 项目名称
+project(liuyunbin-toys) # 项目名称
 
 set(CXX_FLAGS
     -Wall
