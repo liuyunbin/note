@@ -5,7 +5,7 @@ project(liuyunbin-toys) # 项目名称
 
 set(CXX_FLAGS
     -Wall
-    -Werror
+#    -Werror # 将所有警告转为错误
     -Wextra
     -Wno-unused-parameter
     -std=c++11
