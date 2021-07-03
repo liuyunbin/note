@@ -129,15 +129,16 @@ ps -ef                  # 显示所有进程的详细信息
 ps -o pid,ppid,command  # 按指定格式显示进程的信息
 ps -f 123               # 显示指定进程的信息
 
-#### tar
-tar -cvf  file.tar     file  # 将文件打包成 tar
-tar -czvf file.tar.gz  file  # 将文件压缩成 tar.gz
-tar -czvf file.tgz     file  # 将文件压缩成 tgz
-tar -cjvf file.tar.bz2 file  # 将文件压缩成 tar.bz2
-tar -xvf  file.tar           # 将 tar     解包  为文件
-tar -xzvf file.tar.gz        # 将 tar.gz  解压缩为文件
-tar -xzvf file.tgz           # 将 tgz     解压缩为文件
-tar -xjvf file.tar.bz2       # 将 tar.bz2 解压缩为文件
+tar -cvf  /path/to/foo.tar --exclude=\*.o /path/to/foo/ # foo         --> foo.tar, 忽略 .o 文件
+tar -cvf  /path/to/foo.tar                /path/to/foo/ # foo         --> foo.tar
+tar -czvf /path/to/foo.tgz                /path/to/foo/ # foo         --> foo.tgz
+tar -czvf /path/to/foo.tar.gz             /path/to/foo/ # foo         --> foo.tar.gz
+tar -cjvf /path/to/foo.tar.bz2            /path/to/foo/ # foo         --> foo.tar.bz2
+tar -xvf  /path/to/foo.tar                              # foo.tar     --> foo
+tar -xzvf /path/to/foo.tgz                              # foo.tgz     --> foo
+tar -xzvf /path/to/foo.tar.gz                           # foo.tar.gz  --> foo
+tar -xjvf /path/to/foo.tar.bz2                          # foo.tar.bz2 --> foo
+tar -xjvf /path/to/foo.tar.bz2 -C /path/to/destination/ # foo.tar.bz2 --> foo, 指定工作目录
 
 #### Linux 的三个特殊权限
 set-user-ID  (SUID) # 可执行文件执行时将拥有程序所有者的权限
