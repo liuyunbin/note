@@ -4,6 +4,9 @@ bin/
 build/
 lib/
 
+# openssl
+third-party/openssl/openssl/
+
 # Prerequisites
 *.d
 
