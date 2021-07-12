@@ -16,3 +16,8 @@ sudo apt install libprotobuf-dev -y
 
 sudo apt install protobuf-compiler -y
 
+./third-party/googletest/install-googletest.sh
+
+./third-party/openssl/install-openssl.sh
+
+./third-party/libevent/install-libevent.sh
