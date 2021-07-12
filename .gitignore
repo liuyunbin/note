@@ -3,6 +3,7 @@
 bin/
 build/
 lib/
+lib64/
 
 # openssl
 third-party/openssl/openssl/
