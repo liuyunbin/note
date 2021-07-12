@@ -2,8 +2,6 @@
 
 set -eux
 
-export LD_LIBRARY_PATH=$(pwd)/lib:$(pwd)/lib64:$LD_LIBRARY_PATH
-
 INSTALL_DIR=$(pwd)
 LIBEVENT=libevent-2.1.12-stable
 
