@@ -11,6 +11,9 @@ third-party/googletest/googletest/
 # openssl
 third-party/openssl/openssl/
 
+# libevent
+third-party/libevent/libevent/
+
 # Prerequisites
 *.d
 
