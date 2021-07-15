@@ -17,9 +17,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib) # 设置 静态库  
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib) # 设置 动态库     的输出目录
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin) # 设置 二进制文件 的输出目录
 
-include_directories(${CMAKE_SOURCE_DIR}/include) # 设置头文件的搜索目录
-   link_directories(${CMAKE_SOURCE_DIR}/lib)     # 设置库文件的搜索目录
-   link_directories(${CMAKE_SOURCE_DIR}/lib64)   # 设置库文件的搜索目录
+#include_directories(${CMAKE_SOURCE_DIR}/include) # 设置头文件的搜索目录
+#   link_directories(${CMAKE_SOURCE_DIR}/lib)     # 设置库文件的搜索目录
+#   link_directories(${CMAKE_SOURCE_DIR}/lib64)   # 设置库文件的搜索目录
 
 enable_testing() # 激活测试
 
