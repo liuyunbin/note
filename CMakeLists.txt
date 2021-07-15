@@ -23,6 +23,6 @@ include_directories(${CMAKE_SOURCE_DIR}/include) # 设置头文件的搜索目�
 
 enable_testing() # 激活测试
 
-#add_subdirectory(third-party)
+add_subdirectory(third-party)
 add_subdirectory(src)
 

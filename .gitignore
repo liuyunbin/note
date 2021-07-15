@@ -6,9 +6,6 @@ lib/
 lib64/
 include/
 
-# googletest
-third-party/googletest/googletest/
-
 # openssl
 third-party/openssl/openssl/
 
