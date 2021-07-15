@@ -2,11 +2,12 @@
 
 set -eux
 
-cmake -E make_directory "build"
+mkdir -p build
 
-cmake -E chdir "build" cmake ..
+cd build
 
-cmake --build "build"
+cmake .. -DEVENT__DISABLE_OPENSSL=ON \
+         -DEVENT__LIBRARY_TYPE=STATIC
 
-cmake --build "build" --target test
+make
 
