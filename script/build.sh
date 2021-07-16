@@ -11,3 +11,5 @@ cmake .. -DEVENT__DISABLE_OPENSSL=ON \
 
 make
 
+make test
+
