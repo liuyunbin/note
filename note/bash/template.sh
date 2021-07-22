@@ -29,14 +29,39 @@ function log_fatal() {
 
 function usage() {
     cat <<EOF
-Usage:
+使用说明:
     这是一个脚本模板
     使用例如:
+        $(basename $0) -h     # 帮助文档
+        $(basename $0) -a 123 # 测试
 EOF
     exit 0
 }
 
-(( $# >= 1 )) && [[ $1 == "-h" || $1 == "--help" ]] && usage
+while getopts ":ha:" arg; do
+    case "$arg" in
+        h)
+            usage
+            exit 0
+            ;;
+        a)
+            val="$OPTARG"
+            echo "$OPTARG"
+            ;;
+        :)
+            echo "$(basename $0) 可选项要求参数 -- '$OPTARG'"
+            echo "使用 '$(basename $0) -h' 获取帮助信息"
+            exit -1
+            ;;
+        ?)
+            echo "$(basename $0) 非法参数 -- '$OPTARG'"
+            echo "使用 '$(basename $0) -h' 获取帮助信息"
+            exit -1
+            ;;
+    esac
+done
+
+shift $(($OPTIND - 1))
 
 log_info info
 log_warning warning
