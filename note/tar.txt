@@ -1,5 +1,6 @@
 
 #### tar 常用命令
+* tar -cvf  /path/to/foo.tar -X file        /path/to/foo/ # foo         --> foo.tar, 忽略 文件 file 内的文件
 * tar -cvf  /path/to/foo.tar --exclude=\*.o /path/to/foo/ # foo         --> foo.tar, 忽略 .o 文件
 * tar -cvf  /path/to/foo.tar                /path/to/foo/ # foo         --> foo.tar
 * tar -czvf /path/to/foo.tgz                /path/to/foo/ # foo         --> foo.tgz
