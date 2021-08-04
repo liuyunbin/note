@@ -1,0 +1,76 @@
+
+#### gdb 常用命令
+$ gdb main.cc -g                # 生成可以 gdb 的文件
+
+$ gdb [a.out] [pid]             # 启动 gdb
+$ gdb> q                        #
+$ gdb> quit                     # 退出 gdb
+
+$ gdb> file a.out               # 设置可执行文件
+$ gdb>                          #
+$ gdb> set args arguments       # 设置参数
+$ gdb>                          #
+$ gdb> r   [arguments]          #
+$ gdb> run [arguments]          # 运行程序
+$ gdb>                          #
+$ gdb> attach pid               # gdb 正在运行的程序
+$ gdb>                          #
+$ gdb> kill                     # 退出程序
+
+$ gdb> info breakpoints         # 列出断点信息
+$ gdb>                          #
+$ gdb> b     file:function:line #
+$ gdb> break file:function:line # 在指定行设置断点
+$ gdb> break function           # 在制定函数设置断点
+$ gdb> break function if b==0   # 根据条件设置断点
+$ gdb>                          #
+$ gdb> rbreak function*         # 使用正则设置断点
+$ gdb>                          #
+$ gdb> tbreak function          # 设置临时断点
+$ gdb>                          #
+$ gdb> ignore n count           # 忽略断点 n， count 次
+$ gdb>                          #
+$ gdb> disable [num]            # 忽略断点 num
+$ gdb>  enable [num]            # 使断点 num 生效
+$ gdb>  delete [num]            # 删除断点 num
+$ gdb>                          #
+$ gdb> clear file:function:line # 清除指定行的断点
+
+$ gdb> c        [num]           #
+$ gdb> continue [num]           # 继续运行到指定行 或 断点
+$ gdb> u     line               #
+$ gdb> until line               # 运行到指定行
+
+$ gdb> n    [num]               #
+$ gdb> next [num]               # 继续运行多次
+
+$ gdb> s                        #
+$ gdb> step                     # 进入函数
+$ gdb> finish                   # 退出函数
+
+
+$ gdb> p     v            #
+$ gdb> print v            # 输出变量的值
+$ gdb> print *pointer     # 输出指针指向的值
+$ gdb> print *pointeri@10 # 输出数组
+$ gdb>                    #
+$ gdb> x/8xb &v           # 输出 double 的二进制表示
+
+$ gdb> l                  #
+$ gdb> list               # 列出源码
+$ gdb> list 2,10          #
+$ gdb>  set listsize 20   # 设置列出源码的行数
+$ gdb> show listsize      # 输出列出源码的行数
+
+$ gdb> into display       # 列出自动打印的值
+$ gdb>                    #
+$ gdb> display v          # 自动打印 v
+$ gdb> delete display     # 删除自动打印
+
+$ gdb> info skip          # 列出要跳过的文件 或 函数
+$ gdb>                    #
+$ gdb> skip function add  # 跳过函数
+$ gdb> skip disable [num] # 暂时不跳过
+$ gdb> skip  enable [num] # 设置跳过
+$ gdb> skip  delete [num] # 删除跳过
+
