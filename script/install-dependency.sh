@@ -22,8 +22,3 @@ sudo apt install protobuf-compiler -y
 
 sudo apt install vim -y
 
-#./third-party/googletest/install-googletest.sh
-
-#./third-party/openssl/install-openssl.sh
-
-#./third-party/libevent/install-libevent.sh
