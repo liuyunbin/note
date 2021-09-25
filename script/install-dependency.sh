@@ -6,6 +6,8 @@ sudo apt install cmake -y
 
 sudo apt install g++ -y
 
+sudo apt install icdiff -y
+
 sudo apt install libevent-dev -y
 
 sudo apt install libgoogle-glog-dev -y
