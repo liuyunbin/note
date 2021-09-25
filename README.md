@@ -2,15 +2,15 @@
 ## 项目说明
 本项目用于记录刘云宾的玩具程序
 
+**注意**: 此项目目前只支持 Ubuntu 20.04 及其以后的版本
+
 ## 安装依赖
 ```
-$ ./scripts/install-dependencies.sh
+$ ./script/install-dependency.sh
 ```
 
 ## 构建
 ```
-$ ./scripts/before-build.sh
-$
 $ ./scripts/build.sh
 ```
 
@@ -20,11 +20,4 @@ $ ./scripts/build.sh
 ```
 ./build/bin
 ```
-
-## 目录
-* [通过实现部分 C++ 标准库来学习 C++](./cpp-standard-library)
-* [解决大数的加减乘除](./huge-number)
-* [通过实现部分 Linux 命令来学习 Linux](./linux-commands)
-* [Linux 小游戏](./linux-games)
-* [大学的毕业设计](./university-ftp)
 
