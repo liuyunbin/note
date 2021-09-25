@@ -23,6 +23,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin) # 设置 二进制�
 
 enable_testing() # 激活测试
 
-add_subdirectory(third-party)
+#add_subdirectory(third-party)
 add_subdirectory(src)
 
