@@ -56,7 +56,8 @@ $ clang-format -style=file main.cc                         # 使用自定义代�
 #                  参考资源
 #################################################
 
-* clang-format  -> http://clang.llvm.org/docs/ClangFormat.html
+* clang-format  -> https://clang.llvm.org/docs/ClangFormat.html
+                -> https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 * askubuntu     -> https://askubuntu.com/questions/730609/how-can-i-find-the-directory-to-clang-format
 * stackoverflow -> https://stackoverflow.com/a/39781747/7671328
 
