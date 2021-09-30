@@ -6,7 +6,7 @@
 
 ## 安装依赖
 ```
-$ ./script/install-dependency.sh
+$ ./script/install_dependency.sh
 ```
 
 ## 构建

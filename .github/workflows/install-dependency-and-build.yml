@@ -14,7 +14,7 @@ jobs:
 
       - name: install dependencies
         shell: bash
-        run: ./script/install-dependency.sh
+        run: ./script/install_dependency.sh
 
       - name: build
         shell: bash
