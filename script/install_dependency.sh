@@ -2,6 +2,8 @@
 
 set -ev
 
+sudo apt install clang-format -y
+
 sudo apt install cmake -y
 
 sudo apt install g++ -y
