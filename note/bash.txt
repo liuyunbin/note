@@ -1,5 +1,5 @@
 
-()    -- 子 shell, 初始化数组, 
+()    -- 子 shell, 初始化数组,
 $()   -- 变量替换, 和 `` 等价, 返回变量执行的结果, 例如 $(ls)
 
 <()   -- 将命令 或 函数的输出做为 文件, 命令要有打开 文件 的动作
@@ -8,7 +8,7 @@ $()   -- 变量替换, 和 `` 等价, 返回变量执行的结果, 例如 $(ls)
 (())  -- 表达式求值, 不需要转义 <, 返回结果 0 或 1, 优先使用 进行 数字 处理
 $(()) -- 和 (()) 类似, 返回 求值的结果
 
-[]    -- 测试条件, < 号必须转义 
+[]    -- 测试条件, < 号必须转义
 $[]   -- 整数的运算
 
 [[]]  -- [] 的加强版, 不需要转义 <, 优先使用 进行 字符串 处理
@@ -147,16 +147,9 @@ ps -ef                  # 显示所有进程的详细信息
 ps -o pid,ppid,command  # 按指定格式显示进程的信息
 ps -f 123               # 显示指定进程的信息
 
-tar -cvf  /path/to/foo.tar --exclude=\*.o /path/to/foo/ # foo         --> foo.tar, 忽略 .o 文件
-tar -cvf  /path/to/foo.tar                /path/to/foo/ # foo         --> foo.tar
-tar -czvf /path/to/foo.tgz                /path/to/foo/ # foo         --> foo.tgz
-tar -czvf /path/to/foo.tar.gz             /path/to/foo/ # foo         --> foo.tar.gz
-tar -cjvf /path/to/foo.tar.bz2            /path/to/foo/ # foo         --> foo.tar.bz2
-tar -xvf  /path/to/foo.tar                              # foo.tar     --> foo
-tar -xzvf /path/to/foo.tgz                              # foo.tgz     --> foo
-tar -xzvf /path/to/foo.tar.gz                           # foo.tar.gz  --> foo
-tar -xjvf /path/to/foo.tar.bz2                          # foo.tar.bz2 --> foo
-tar -xjvf /path/to/foo.tar.bz2 -C /path/to/destination/ # foo.tar.bz2 --> foo, 指定工作目录
+tar -acf /path/to/foo.tgz --exclude="*.o" /path/to/foo/ # 根据后缀自动 打包 或 压缩, 并忽略指定文件
+tar -acf /path/to/foo.tgz -X file         /path/to/foo/ # 根据后缀自动 打包 或 压缩, 并忽略 file 内的文件
+tar -xf  /path/to/foo.tgz -C /path/to/destination/      # 根据后缀 解包 或 解压 到指定目录
 
 #### Linux 的三个特殊权限
 set-user-ID  (SUID) # 可执行文件执行时将拥有程序所有者的权限
