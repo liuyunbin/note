@@ -7,58 +7,58 @@ set -E          # 即使意外退出, 也会执行 trap 命令
 #set -o xtrace   # 执行前打印命令 同 -x
 
 function log_info() {
-    # 白色
-    echo -e "\033[37;1m[$(date +'%Y-%m-%d %H:%M:%S')]: $@\033[0m"
+  # 白色
+  echo -e "\033[37;1m[$(date +'%Y-%m-%d %H:%M:%S')]: $@\033[0m"
 }
 
 function log_warning() {
-    # 蓝色
-    echo -e "\033[34;1m[$(date +'%Y-%m-%d %H:%M:%S')]: $@\033[0m"
+  # 蓝色
+  echo -e "\033[34;1m[$(date +'%Y-%m-%d %H:%M:%S')]: $@\033[0m"
 }
 
 function log_error() {
-    # 黄色
-    echo -e "\033[33;1m[$(date +'%Y-%m-%d %H:%M:%S')]: $@\033[0m"
+  # 黄色
+  echo -e "\033[33;1m[$(date +'%Y-%m-%d %H:%M:%S')]: $@\033[0m"
 }
 
 function log_fatal() {
-    # 红色
-    echo -e "\033[31;1m[$(date +'%Y-%m-%d %H:%M:%S')]: $@\033[0m"
-    exit -1
+  # 红色
+  echo -e "\033[31;1m[$(date +'%Y-%m-%d %H:%M:%S')]: $@\033[0m"
+  exit -1
 }
 
 function usage() {
-    cat <<EOF
+  cat <<EOF
 使用说明:
-    这是一个脚本模板
-    使用例如:
-        $(basename $0) -h     # 帮助文档
-        $(basename $0) -a 123 # 测试
+  这是一个脚本模板
+  使用例如:
+    $(basename $0) -h     # 帮助文档
+    $(basename $0) -a 123 # 测试
 EOF
-    exit 0
+  exit 0
 }
 
 while getopts ":ha:" arg; do
-    case "$arg" in
-        h)
-            usage
-            exit 0
-            ;;
-        a)
-            val="$OPTARG"
-            echo "$OPTARG"
-            ;;
-        :)
-            echo "$(basename $0) 可选项要求参数 -- '$OPTARG'"
-            echo "使用 '$(basename $0) -h' 获取帮助信息"
-            exit -1
-            ;;
-        ?)
-            echo "$(basename $0) 非法参数 -- '$OPTARG'"
-            echo "使用 '$(basename $0) -h' 获取帮助信息"
-            exit -1
-            ;;
-    esac
+  case "$arg" in
+    h)
+      usage
+      exit 0
+      ;;
+    a)
+      val="$OPTARG"
+      echo "$OPTARG"
+      ;;
+    :)
+      echo "$(basename $0) 可选项要求参数 -- '$OPTARG'"
+      echo "使用 '$(basename $0) -h' 获取帮助信息"
+      exit -1
+      ;;
+    ?)
+      echo "$(basename $0) 非法参数 -- '$OPTARG'"
+      echo "使用 '$(basename $0) -h' 获取帮助信息"
+      exit -1
+      ;;
+  esac
 done
 
 shift $(($OPTIND - 1))
