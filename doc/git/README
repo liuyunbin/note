@@ -9,7 +9,7 @@ Git 是一个分布式版本管理的工具
 ```
 $ sudo apt install git
 ```
-    
+
 ## 配置
 #### 配置用户名
 ```
@@ -115,7 +115,7 @@ $ git commit --amend
 #### 列出处于未跟踪 或 已修改 或 已暂存的文件的状态
 ```
 $ git status
-$ git status  -s     # 显示简短信息 
+$ git status  -s     # 显示简短信息
 $ git status --short # 显示简短信息
 ```
 
@@ -161,7 +161,7 @@ $ git log --since=2021-07-16
 $ git log --before=2021-07-16
 $ git log --after=2021-07-16
 $ git log --author=liuyunbin
-$ 
+$
 ```
 
 #### 取消暂存的文件
@@ -267,12 +267,12 @@ $ git branch -d test-branch
 #### 查看远程分支
 ```
 $ git branch -r
-$ git ls-remote (remote) 
+$ git ls-remote (remote)
 ```
 
 #### 拉取并合并数据
 ```
-$ git pull 
+$ git pull
 ```
 
 #### 删除远程分支
@@ -289,7 +289,7 @@ $ git push origin -u orgin/develop
 #### 变基
 将 server-branch 分支变基到 master 分支
 ```
-$  $ git rebase master server-branch
+$ git rebase master server-branch
 ```
 
 ## 参考资源
