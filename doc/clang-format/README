@@ -9,21 +9,19 @@
 #############################################
 #                  安装：
 #############################################
-
-$ sudo apt install clang-format
 $ sudo yum install clang-format -y
 $ sudo apt install clang-format -y
 
 #############################################
 #        作为单独的命令使用
 #############################################
-
 $ clang-format    main.cc                                  # 预览规范后的代码
 $ clang-format -i main.cc                                  # 直接在原文件上规范代码
 $ clang-format -style=Google main.cc                       # 显示指明代码规范，默认为 LLVM
 $ clang-format --dump-config -style=Google > .clang-format # 将代码规范配置信息写入文件 .clang-format
 $ clang-format -style=file main.cc                         # 使用自定义代码规范,
-                                                           # 规范位于当前目录或任一父目录的文件 .clang-format 或 _clang-format 中，
+                                                           # 规范位于当前目录或任一父目录的文件
+                                                           # 的 .clang-format 或 _clang-format 中，
                                                            #（如果未找到文件，使用默认代码规范）
 
 #############################################
