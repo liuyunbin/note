@@ -12,10 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: install dependencies
-        shell: bash
-        run: ./script/install_dependency.sh
+#- name: install dependencies
+#        shell: bash
+#        run: ./script/install_dependency.sh
 
       - name: build
         shell: bash
-        run: ./script/build.sh
+        run: ./bash/build.sh
