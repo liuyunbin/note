@@ -45,7 +45,7 @@ $ ssh-keygen -t rsa -b 4096 -C yunbinliu@outlook.com
 ```
 
 #### 复制公钥到 GitHub
-将文件 ~/.ssh/id_rsa.pub 里的公钥添加到：https://github.com/settings/keys
+将文件 `~/.ssh/id_rsa.pub` 里的公钥添加到：https://github.com/settings/keys
 
 ## 使用
 ### 三个工作区域：
@@ -131,11 +131,16 @@ $ git reset HEAD~ --soft         # HEAD~ 之后的数据 已提交 ----> 已暂�
 $ git reset HEAD~ --mixed        # HEAD~ 之后的数据 已提交 ----> 已暂存 ----> 已修改
 $ git reset HEAD~                # HEAD~ 之后的数据 已提交 ----> 已暂存 ----> 已修改
 $ git reset HEAD~ --hard         # HEAD~ 之后的数据 已提交 ----> 已暂存 ----> 已修改 --> 上次提交
-$ git reset HEAD~ README         # 此时 当前目录 和 HEAD 相同, 之前已暂存 ----> 已修改
+$ git reset HEAD~ README         # 此时 当前目录 和 HEAD 相同, 之前已暂存的 README ----> 已修改
 $ git reset HEAD~ README --mixed # 暂存区域中的 README 和 HEAD~ 的 README 相同
+$                                # 本质上是:
+$                                # * 如果 README 已暂存, 将其移到 已修改
+$                                # * 将 HEAD~ 的 README 移到 暂存中
 $
 $ git checkout    -- README # 已修改 ----> 上次提交
 $ git checkout HEAD~ README # 当前目录 和 暂存区域中的 README 和 HEAD~ 的 README 相同
+$                           # 本质上是:
+$                           # * 将 HEAD~ 的 README 移到 当前目录
 $
 $ git remote -v                    # 查看远程仓库
 $ git remote add <shortname> <url> # 添加远程仓库
