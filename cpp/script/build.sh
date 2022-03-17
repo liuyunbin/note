@@ -14,3 +14,7 @@ make
 
 make test
 
+cd ..
+
+cp -rf  bin/* ../bin
+

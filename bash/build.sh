@@ -4,19 +4,8 @@ set -e          # 只要发生错误就退出
 set -o pipefail # 只要管道发生错误就退出
 set -E          # 即使意外退出, 也会执行 trap 命令
 
+mkdir -p bin
+
 cd cpp
-
-mkdir -p build
-
-cd build
-
-cmake ..
-
-make
-
-make test
-
-cd ../..
-
-mv cpp/bin .
+./script/build.sh
 
