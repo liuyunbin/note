@@ -198,6 +198,17 @@ $ git stash apply               # 恢复已贮藏的工作
 $ git stash apply --index       # 恢复已贮藏的工作, 同时恢复暂存区
 $ git stash drop                # 丢弃贮藏区的工作
 $ git stash pop                 # 恢复已贮藏的工作, 并丢弃贮藏区的工作
+$
+$ git submodule add https://github.com...              # 添加子模块
+$ git clone --recurse-submodules https://github.com... # 克隆包含子模块的项目
+$ git submodule init                                   # 子模块配置初始化
+$ git submodule update                                 # 获取子模块远程数据
+$ git submodule update --init                          # 等价于前两个命令
+$ git submodule update --init --recursive              # 递归获取子模块的远程数据
+$
+$ git diff --submodule                      # 获取子模块的修改
+$ git submodule update --remote DbConnector # 在主目录更新子模块
+$
 ```
 
 ## 参考资源
