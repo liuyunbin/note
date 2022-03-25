@@ -1,5 +1,7 @@
 ## 一步一步探索 git reset
-为求简单, 本文只考虑初始状态 Git 仓库, 缓存区域 和 当前目录 相同的情况
+* 为求简单, 本文只考虑初始状态 Git 仓库, 缓存区域 和 当前目录 相同的情况
+* 本文的源地址: https://github.com/liuyunbin/liuyunbin-toys/bash/git/git-reset.md
+* 在同一目录下, 有相关的测试脚本
 
 ### 本文使用的 Git 版本
 ```
