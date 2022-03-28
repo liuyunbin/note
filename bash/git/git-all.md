@@ -97,53 +97,85 @@ $ git commit -m "message"
 ```
 
 ### 已提交 --> 已暂存
+#### 命令
 ```
-$ git reset HEAD~ --soft # HEAD~ 之后的数据 已提交 --> 已暂存
-$                        # 此时, 暂存区域 和 工作目录数据相同
-```
-
-### 已提交 --> 已暂存 --> 已修改
-```
-$ git reset HEAD~ --mixed # HEAD~ 之后的数据 已提交 --> 已暂存 --> 已修改
-$ git reset HEAD~         # HEAD~ 之后的数据 已提交 --> 已暂存 --> 已修改
-$                         # 此时, Git 仓库 和 暂存区域的数据相同
+$ git reset HEAD~ --soft
 ```
 
-### 已提交 --> 已暂存 --> 已修改 --> 上次提交
+#### 行为
+* 将 HEAD 指针指向 HEAD~
+
+#### 结果
+* HEAD~ 之后的数据 已提交 --> 已暂存
+* 之前 暂存区域 内的数据依旧会保留在 暂存区域 内
+* 假设执行命令前, 暂存区域 和 工作目录相同,
+* 执行此命令后, 暂存区域 和 工作目录数据相同
+
+### 已提交 或 已暂存 --> 已修改
+#### 命令
 ```
-$ git reset HEAD~ --hard  # HEAD~ 之后的数据 已提交 --> 已暂存 --> 已修改 --> 上次提交
-$                         # 相当于直接抛弃 本地目录, 暂存区域, 和 HEAD~ 之后的修改
-$                         # 此时, Git 仓库, 暂存区域 本地目录 的数据相同
+$ git reset HEAD~ --mixed
+$ git reset HEAD~
 ```
 
-### [已提交 --> ]已暂存 --> 已修改 --> 未跟踪
+#### 行为
+* 将暂存区中 HEAD~ 之后的数据, 移到 工作目录
+* 将 HEAD 指针指向 HEAD~
+
+#### 结果
+* 如果之前有新的 已暂存的数据, 现在变成 已修改
+* HEAD~ 之后的数据 已提交 --> 已修改
+* 执行此命令后, Git 仓库 和 暂存区域 数据相同
+
+### 已提交 --> 上次提交
+#### 命令
 ```
-$ git rm          README   # 从 暂存区域 和 本地目录 中移除文件
-$ git rm  -f      README   # 强行删除
-$ git rm --cached README   # 从 暂存区域 中移除文件, 本地目录保留
+$ git reset HEAD~ --hard
 ```
 
-### 已暂存 --> 已修改
+#### 行为
+* 将 HEAD 指针指向 HEAD~
+* 使用 HEAD 所指向的数据替换 暂存区域 和 工作目录
+
+#### 结果
+* 将 Git 仓库, 暂存区域 和 工作目录中 HEAD~ 之后的数据 都删除
+* 会丢失之前 已修改 或 已暂存 的数据
+
+### 将 指定 提交 的指定文件移到 暂存区域
+#### 命令
 ```
-$ git reset HEAD~ README         # 此时 当前目录 和 HEAD 相同, 之前已暂存的 README ----> 已修改
+$ git reset HEAD~ README         # 此时 当前目录 和 HEAD 相同, 之前已暂存的 README --> 已修改
 $ git reset HEAD~ README --mixed # 暂存区域中的 README 和 HEAD~ 的 README 相同
 $                                # 本质上是:
 $                                # * 如果 README 已暂存, 将其移到 已修改
 $                                # * 将 HEAD~ 的 README 移到 暂存中
-$
 ```
+
+#### 行为
+* 将暂存区域中 HEAD 之后的数据移到当前目录
+* 将 Git 仓库 HEAD~ 的 README 加入暂存区
+
+#### 结果
+* 假设执行命令前, Git 仓库, 暂存区域 和 工作目录相同
+* 执行此命令后, Git 仓库 和 工作目录数据相同
 
 ### (未跟踪 --> 已暂存) --> 未跟踪
 ```
 $ git restore --staged <file>... # 已跟踪(已暂存) --> 未跟踪
 ```
 
+### 已暂存 --> 未跟踪
+```
+$ git rm          README # 从 暂存区域 和 本地目录 中移除文件
+$ git rm  -f      README # 强行删除
+$ git rm --cached README # 从 暂存区域 中移除文件, 本地目录保留
+```
+
 ### 已修改 ----> 上次提交
 ```
 $ git checkout    -- README # 已修改 ----> 上次提交
 $ git checkout HEAD~ README # 当前目录 和 暂存区域中的 README 和 HEAD~ 的 README 相同
-$                           # 本质上是:
-$                           # * 将 HEAD~ 的 README 移到 当前目录
+$                           # 本质上是: 将 HEAD~ 的 README 移到 当前目录
 ```
 
 ### 移动文件或目录
