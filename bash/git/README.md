@@ -1,5 +1,7 @@
 ## 简介
-Git 是一个分布式版本管理的工具
+* Git 是一个分布式版本管理的工具
+* 本文只列举 Git 最常用的功能
+* Git 只是版本管理的工具, 未必需要做到, 知其然并知其所以然, 够用就好
 
 ## 安装
 ```
@@ -72,138 +74,95 @@ $ ssh-keygen -t rsa -b 4096 -C yunbinliu@outlook.com
 ### 复制公钥到 GitHub, 到此可以免密码使用 GitHub
 将文件 `~/.ssh/id_rsa.pub` 里的公钥添加到：https://github.com/settings/keys
 
-###  克隆 或 初始化 仓库
+### 其他常用命令
 ```
 $ git init                                              # 初始化仓库
 $
 $ git clone https://github.com/liuyunbin/liuyunbin-toys # 克隆仓库
 $ git clone git@github.com:liuyunbin/liuyunbin-toys     # ssh 协议
 $ git clone git@github.com:liuyunbin/liuyunbin-toys.git
-```
-
-### 未跟踪 或 已修改 --> 已暂存
-```
-$ git add README
-```
-
-### 已修改 --> 已暂存 --> 已提交
-```
-$ git commit -a -m "message"
-```
-
-### 已暂存 --> 已提交
-```
-$ git commit -m "message"
-```
-
-### 已提交 --> 已暂存
-#### 命令
-```
-$ git reset HEAD~ --soft
-```
-
-#### 行为
-* 将 HEAD 指针指向 HEAD~
-
-#### 结果
-* HEAD~ 之后的数据 已提交 --> 已暂存
-* 之前 暂存区域 内的数据依旧会保留在 暂存区域 内
-* 假设执行命令前, 暂存区域 和 工作目录相同,
-* 执行此命令后, 暂存区域 和 工作目录数据相同
-
-### 已提交 或 已暂存 --> 已修改
-#### 命令
-```
-$ git reset HEAD~ --mixed
-$ git reset HEAD~
-```
-
-#### 行为
-* 将暂存区中 HEAD~ 之后的数据, 移到 工作目录
-* 将 HEAD 指针指向 HEAD~
-
-#### 结果
-* 如果之前有新的 已暂存的数据, 现在变成 已修改
-* HEAD~ 之后的数据 已提交 --> 已修改
-* 执行此命令后, Git 仓库 和 暂存区域 数据相同
-
-### 已提交 --> 上次提交
-#### 命令
-```
-$ git reset HEAD~ --hard
-```
-
-#### 行为
-* 将 HEAD 指针指向 HEAD~
-* 使用 HEAD 所指向的数据替换 暂存区域 和 工作目录
-
-#### 结果
-* 将 Git 仓库, 暂存区域 和 工作目录中 HEAD~ 之后的数据 都删除
-* 会丢失之前 已修改 或 已暂存 的数据
-
-### 将 指定 提交 的指定文件移到 暂存区域
-#### 命令
-```
-$ git reset HEAD~ README         # 此时 当前目录 和 HEAD 相同, 之前已暂存的 README --> 已修改
-$ git reset HEAD~ README --mixed # 暂存区域中的 README 和 HEAD~ 的 README 相同
-$                                # 本质上是:
-$                                # * 如果 README 已暂存, 将其移到 已修改
-$                                # * 将 HEAD~ 的 README 移到 暂存中
-```
-
-#### 行为
-* 将暂存区域中 HEAD 之后的数据移到当前目录
-* 将 Git 仓库 HEAD~ 的 README 加入暂存区
-
-#### 结果
-* 假设执行命令前, Git 仓库, 暂存区域 和 工作目录相同
-* 执行此命令后, Git 仓库 和 工作目录数据相同
-
-### (未跟踪 --> 已暂存) --> 未跟踪
-```
-$ git restore --staged <file>... # 已跟踪(已暂存) --> 未跟踪
-```
-
-### 已暂存 --> 未跟踪
-```
+$ git clone --recurse-submodules https://github.com...  # 克隆包含子模块的项目
+$
+$ git add README # 未跟踪 或 已修改 --> 已暂存
+$ git add README # 合并时把有冲突的文件标记为已解决状态
+$
+$ git commit -a -m "message" # 已修改 --> 已暂存 --> 已提交
+$ git commit    -m "message" #            已暂存 --> 已提交
+$
+$ git reset HEAD~ --soft  # 已提交 --> 已暂存
+$                         # 行为:
+$                         #     * 将 HEAD 指针指向 HEAD~
+$                         #     * 暂存区域 和 工作目录 的数据不变
+$                         # 结果:
+$                         #     * HEAD~ 之后的数据 已提交 --> 已暂存
+$                         #     * 之前 已暂存 的数据保持不变
+$
+$ git reset HEAD~ --mixed # 已提交 或 已暂存 --> 已修改
+$ git reset HEAD~         #
+$                         # 行为:
+$                         #     * 将 HEAD 指针指向 HEAD~
+$                         #     * 使用 HEAD 指针的数据重置暂存区
+$                         #     * 工作目录 的数据不变
+$                         # 结果:
+$                         #     * 之前 已暂存 的数据 --> 已修改
+$                         #     * HEAD~ 之后的数据 已提交 --> 已修改
+$                         #     * 执行此命令后, Git 仓库 和 暂存区域 数据相同
+$
+$ git reset HEAD~ --hard  # 已提交 --> 上次提交
+$                         # 行为:
+$                         #     * 将 HEAD 指针指向 HEAD~
+$                         #     * 使用 HEAD 所指向的数据重置 暂存区域 和 工作目录
+$                         # 结果:
+$                         #     * 将 Git 仓库, 暂存区域 和 工作目录中 HEAD~ 之后的数据 都删除
+$                         #     * 会丢失之前 已修改 或 已暂存 的数据
+$
+$ git reset HEAD~ README         # 使用 HEAD~ 的 README 替换 暂存区域 中的 README
+$ git reset HEAD~ README --mixed
+$                                # 行为:
+$                                #      * 将 Git 仓库 HEAD~ 的 README 替换 暂存区中的 README
+$                                #      * Git 仓库 和 工作目录 保持不变
+$                                # 结果:
+$                                #      * 之前 已暂存 的 README --> 已修改
+$                                #      * HEAD~ 的 README 和 暂存区中的 README 相同
+$                                #
+$                                # git reset -- README  和 git reset HEAD README 等价
+$
+$ git checkout    -- README             # 使用暂存区域内的 README 替换当前目录的 README
+$ git checkout HEAD~ README             # 使用 HEAD~ 的 README 替换当前目录 和 暂存区域 中的 README
+$ git checkout test-branch              # 切换分支
+$ git checkout -b test-branch           # 新建并切换分支
+$ git checkout --orphan test-branch     # 新建并切换到独立分支
+$ git checkout --track origin/serverfix # 新建并关联到远程分支
+$ git checkout serverfix                # 本地分支不存在, 且 远程分支存在, 新建并关联到远程分支
+$
+$ git restore                     README # 使用 暂存区 的 README 覆盖 当前目录 中 的 README
+$                                        # 和 git checkout -- README 意思相同
+$ git restore --staged            README # 使用 HEAD   的 README 覆盖 暂存区 的 README
+$                                        # 和 git reset -- README 意思相同
+$ git restore --staged --worktree README # 使用 HEAD   的 README 覆盖 暂存区 和 当前目录 中的 README
+$                                        # 和 git checkout HEAD README 意思相同
+$ git restore --staged --worktree --source HEAD~2 README
+$                                        # 使用 HEAD~2 的 README 覆盖 暂存区 和 当前目录 中的 README
+$                                        # 如果 指定提交 或 暂存区域不含 README, 则删除对应的 README
+$                                        # 和 git checkout HEAD~2 README 意思相同
+$
 $ git rm          README # 从 暂存区域 和 本地目录 中移除文件
 $ git rm  -f      README # 强行删除
 $ git rm --cached README # 从 暂存区域 中移除文件, 本地目录保留
-```
-
-### 已修改 ----> 上次提交
-```
-$ git checkout    -- README # 已修改 ----> 上次提交
-$ git checkout HEAD~ README # 当前目录 和 暂存区域中的 README 和 HEAD~ 的 README 相同
-$                           # 本质上是: 将 HEAD~ 的 README 移到 当前目录
-```
-
-### 移动文件或目录
-```
-$ git mv file_from file_to
-```
-
-### 修改提交记录
-```
+$
+$ git mv file_from file_to # 移动文件或目录
+$
 $ git commit --amend # 修改最后一次的提交信息，或增加提交的文件
-```
-
-### 查看当前目录的状态
-```
+$
 $ git status         # 列出文件状态
 $ git status  -s     # 显示简短信息
 $ git status --short # 显示简短信息
-```
-
-### 已修改, 暂存区域 和 已提交 的差异
-```
-$ git diff           # 暂存区域 和 已修改   的差异
-$ git diff --staged  # 暂存区域 和 Git 仓库 的差异
-$ git diff --cached  # 暂存区域 和 Git 仓库 的差异
-```
-
-### 查看提交日志
-```
+$
+$ git diff             # 暂存区域 和 已修改   的差异
+$ git diff --staged    # 暂存区域 和 Git 仓库 的差异
+$ git diff --cached    # 暂存区域 和 Git 仓库 的差异
+$ git diff --submodule # 获取子模块的修改
+$
 $ git log
 $ git log --stat              # 显示简略统计信息
 $ git log --shortstat         # 只显示添加移除信息
@@ -224,11 +183,11 @@ $ git log a..b                         # 不在 a 中, 在 b 中的提交
 $ git log ^a b                         # 不在 a 中, 在 b 中的提交
 $ git log --not a b                    # 不在 a 中, 在 b 中的提交
 $ git log a...b                        # 在 a 或 b 中, 但不同时在 a 且 b 中的提交
-$ git log -L :git_deflate_bound:zlib.c # 查询某一函数的变更记录
-```
-
-### 本地仓库分支相关命令
-```
+$ git log -L :main:main.cpp            # 查询某一函数的变更记录
+$ git log -L :10:main.cpp              # 查询某一行的变更记录
+$ git log -L 8,10:main.cpp             # 查询某几行的变更记录
+$ git log -S doRzrqPtywHqzqdmxx        # 搜索字符串的增加 删除
+$
 $ git branch                # 列出所有的本地分支
 $ git branch -v             # 列出所有的本地分支, 以及最后一次提交
 $ git branch --merged       # 列出已合并到本分支的本地分支
@@ -237,33 +196,22 @@ $ git branch test-branch    # 新建分支
 $ git branch -d test-branch # 删除分支
 $ git branch -D test-branch # 强制删除分支
 $ git branch -r             # 查看远程分支
+$ git branch --set-upstream-to=orgin/develop # 本地分支和远程分支关联
+$ git branch -u orgin/develop                # 本地分支和远程分支关联
 $
 $ git ls-remote (remote)    # 查看远程分支
 $
-$ git checkout test-branch              # 切换分支
-$ git checkout -b test-branch           # 新建并切换分支
-$ git checkout --orphan test-branch     # 新建并切换到独立分支
 $ git merge test-branch # 将 test-branch 合并到 当前分支
-$ git add README # 把有冲突的文件标记为已解决状态
-$                # 合并时把有冲突的文件标记为已解决状态
-$
 $
 $ git rebase master server-branch # 将 server-branch 分支变基到 master
 $
-```
-
-### 远程仓库相关的命令
-```
 $ git remote -v                       # 查看远程仓库
 $ git remote add <shortname> <url>    # 添加远程仓库
 $ git remote rm     origin            # 删除远程仓库
 $ git remote remove origin            # 删除远程仓库
 $ git remote rename origin new-origin # 重命名远程仓库
 $ git remote show   origin            # 查看远程仓库的详细信息
-```
-
-### 本地仓库 和 远程仓库交互
-```
+$
 $ git fetch [remote-name]                         # 从远程仓库获取数据
 $
 $ git pull                                        # 从远程仓库获取数据, 然后合并
@@ -272,37 +220,26 @@ $ git push origin master                          # 推送提交到远程仓库
 $ git push origin --delete serverfix              # 删除远程分支
 $ git push origin --set-upstream-to=orgin/develop # 本地分支和远程分支关联
 $ git push origin -u orgin/develop                # 本地分支和远程分支关联
+$ git push origin v1.0                            # 将指定 标签 推送到远程
+$ git push origin --tags                          # 将所有 标签 推送到远程
+$ git push origin --delete v1.0                   # 删除远程 标签
 $
-$ git checkout --track origin/serverfix           # 新建并关联到远程分支
-$ git checkout serverfix                          # 本地分支不存在, 且 远程分支存在, 新建并关联到远程分支
-```
-
-### 标签 相关
-```
+$ git revert -m 1 HEAD # 撤销提交
+$
 $ git tag                       # 列出 标签
 $ git tag -l "v*"               # 列出 标签
 $ git tag v1.0                  # 创建 标签
 $ git tag -d v1.0               # 删除本地 标签
-$ git push origin v1.0          # 将指定 标签 推送到远程
-$ git push origin --tags        # 将所有 标签 推送到远程
-$ git push origin --delete v1.0 # 删除远程 标签
-```
-
-### 子模块 相关
-```
+$
 $ git submodule add https://github.com...              # 添加子模块
-$ git clone --recurse-submodules https://github.com... # 克隆包含子模块的项目
 $ git submodule init                                   # 子模块配置初始化
 $ git submodule update                                 # 获取子模块远程数据
 $ git submodule update --init                          # 等价于前两个命令
 $ git submodule update --init --recursive              # 递归获取子模块的远程数据
+$ git submodule update --remote DbConnector            # 在主目录更新子模块
+$ git submodule update --remote --merge
+$ git submodule update --remote --rebase
 $
-$ git diff --submodule                      # 获取子模块的修改
-$ git submodule update --remote DbConnector # 在主目录更新子模块
-```
-
-### 贮藏 相关
-```
 $ git stash                     # 贮藏工作
 $ git stash --keep-index        # 贮藏工作, 同时将暂存的内容存在索引内
 $ git stash --include-untracked # 贮藏工作, 同时贮藏未跟踪的文件, 不包括忽略的文件
