@@ -231,14 +231,14 @@ $ git tag -l "v*"               # 列出 标签
 $ git tag v1.0                  # 创建 标签
 $ git tag -d v1.0               # 删除本地 标签
 $
-$ git submodule add https://github.com...              # 添加子模块
-$ git submodule init                                   # 子模块配置初始化
-$ git submodule update                                 # 获取子模块远程数据
-$ git submodule update --init                          # 等价于前两个命令
-$ git submodule update --init --recursive              # 递归获取子模块的远程数据
-$ git submodule update --remote DbConnector            # 在主目录更新子模块
-$ git submodule update --remote --merge
-$ git submodule update --remote --rebase
+$ git submodule add https://github.com...      # 添加子模块
+$ git submodule init                           # 初始化本地子模块的配置
+$ git submodule update                         # 获取子模块远程数据, 相对于当前仓库中子模块的提交号
+$ git submodule update --init                  # 等价于前两个命令
+$ git submodule update --init --recursive      # 递归获取子模块的远程数据
+$ git submodule update --remote DbConnector    # 在主目录更新子模块, 远程子模块仓库的最新数据
+$ git submodule update --remote --merge        # 合并远程修改到本地
+$ git submodule update --remote --rebase       # 变基远程修改到本地
 $
 $ git stash                     # 贮藏工作
 $ git stash --keep-index        # 贮藏工作, 同时将暂存的内容存在索引内
