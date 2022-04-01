@@ -230,6 +230,7 @@ $ git tag                       # 列出 标签
 $ git tag -l "v*"               # 列出 标签
 $ git tag v1.0                  # 创建 标签
 $ git tag -d v1.0               # 删除本地 标签
+$ git tag --contains 提交号     # 查看某个提交号在哪些 tag 中出现
 $
 $ git submodule add https://github.com...      # 添加子模块
 $ git submodule init                           # 初始化本地子模块的配置
