@@ -18,4 +18,4 @@ jobs:
 
       - name: build
         shell: bash
-        run: ./bash/build.sh
+        run: ./build.sh
