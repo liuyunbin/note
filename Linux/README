@@ -79,3 +79,6 @@ cat /proc/sys/net/ipv4/ip_local_port_range
 * [32768, 60990) 动态端口, 进程未指定端口号时, 将从这个范围内获取一个端口号
 * [60990, 65535)
 
+# 查询 域名 对应 的 IP
+* nslookup baidu.com
+
