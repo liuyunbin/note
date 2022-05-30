@@ -28,6 +28,13 @@ ls -r  # 逆序列出当前目录中的元素
 ls -R  # 递归列出当前目录中的元素
 ls -1  # 在每一行列出文件名
 
+lsof               # sudo yum install lsof
+lsof -iTCP         # 查看 TCP 信息
+lsof -i :22        # 查看指定 端口号 的信息
+lsof -i@1.2.3.4:22 # 查看是否连接到指定 IP 和 端口号上
+lsof -p 1234       # 查看 进程 1234 打开的文件信息
+lsof -t            # 仅获取进程ID
+
 ps -ef                  # 显示所有进程的详细信息
 ps -o pid,ppid,command  # 按指定格式显示进程的信息
 ps -f 123               # 显示指定进程的信息
@@ -52,6 +59,18 @@ sort -t :  # 指定列的分割符
 sort -n    # 以数字进行排序
 sort -r    # 逆序
 sort -f    # 忽略大小写
+
+su              # 切换 root, 输入 root 密码
+su root         # 同 su
+su -            # 切换 root, 更新主目录, 环境变量等等
+su -l           # 同 su -
+su - root       # 同 su -
+su - root -c ls # 使用 root 执行命令 ls
+
+sudo                                                 # 权限管理文件: /etc/sudoers, 使用 visudo 编辑
+                                                     # 使用当前用户的密码
+sudo -u USERNAME COMMAND                             # 指定用户执行命令
+echo "654321" | sudo -S date -s "20210722 10:10:10"  # 脚本中免密码使用
 
 yum list installed       # 列出已安装的软件
 yum list vim             # 列出某软件包的详细信息
