@@ -35,6 +35,14 @@ lsof -i@1.2.3.4:22 # 查看是否连接到指定 IP 和 端口号上
 lsof -p 1234       # 查看 进程 1234 打开的文件信息
 lsof -t            # 仅获取进程ID
 
+
+pgrep vim         # 列出 使用 vim 的进程号
+pgrep vim  -l     # 列出 使用 vim 的进程号和进程名称
+pgrep vim  -a     # 列出 使用 vim 的进程号和全路径的完整的进程名称
+pgrep vim  -f     # 只要完整进程路径匹配到即可, 而不是进程名的前缀匹配
+pgrep vim  -u lyb # 列出有效用户ID 是 lyb 的进程 ID
+pgrep vim  -U lyb # 列出真正用户ID 是 lyb 的进程 ID
+
 ps -ef                  # 显示所有进程的详细信息
 ps -o pid,ppid,command  # 按指定格式显示进程的信息
 ps -f 123               # 显示指定进程的信息
