@@ -13,6 +13,16 @@ scale=2         # 设置使用两位小数
 ibase=2         # 输入使用二进制
 obase=2         # 输出使用二进制
 
+date -s "20200202 10:10:10" # 更新系统时间, 需要 root 权限
+date "+%Y-%m-%d %H:%M:%S"   # 指定输出的格式, 年-月-日 时-分-秒
+date "+%F %T"               # 同上
+date "+%Y-%m-%d %H:%M"      # 指定输出的格式, 年-月-日 时-分
+date "+%F %R"               # 同上
+date "+%s"                  # 使用纪元
+date -d "20200202 01:01:01" # 指定输入日期
+
+ntpdate -s time-b.nist.gov # 使用时间服务器更新时间
+
 dpkg -L vim        # 列出 vim 软件包安装的全部文件
 dpkg --search /... # 查看该文件是哪个软件包安装的, 使用绝对路径
 
@@ -65,6 +75,9 @@ tar -xjvf /path/to/foo.tar.bz2 -C /path/to/destination/ # foo.tar.bz2 --> foo, �
 tar -acf /path/to/foo.tgz --exclude="*.o" /path/to/foo/ # 根据后缀自动 打包 或 压缩, 并忽略指定文件
 tar -acf /path/to/foo.tgz -X file         /path/to/foo/ # 根据后缀自动 打包 或 压缩, 并忽略 file 内的文件
 tar -xf  /path/to/foo.tgz -C /path/to/destination/      # 根据后缀 解包 或 解压 到指定目录
+
+tee    1.txt # 管道中把文件拷贝到文件
+tee -a 1.txt # 管道中把文件添加到文件
 
 sort       # 排序
 sort -k 4  # 指定排序的列字段
