@@ -91,6 +91,10 @@ tar -xf  /path/to/foo.tgz -C /path/to/destination/      # 根据后缀 解包 �
 tee    1.txt # 管道中把文件拷贝到文件
 tee -a 1.txt # 管道中把文件添加到文件
 
+tr    'a-z' 'A-Z' # 小写转大写
+tr -d 'a-z'       # 删除字符
+tr -s ' '         # 压缩字符
+
 sort       # 排序
 sort -k 4  # 指定排序的列字段
 sort -t :  # 指定列的分割符
