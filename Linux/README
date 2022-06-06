@@ -29,6 +29,18 @@ dpkg --search /... # 查看该文件是哪个软件包安装的, 使用绝对路
 df -Th # 所挂载的系统的使用情况
 du -sh # 某一目录的使用大小
 
+find . -name  lyb                     # 以文件名 或 通配符 查找文件
+find . -iname lyb                     # 以文件名 或 通配符 查找文件, 忽略大小写
+find . -regex ".*p+"                  # 以文件名 或 正则表达式 查找文件, 忽略大小写
+find . -type  f                       # 以类型查找文件
+find . \( -type f -and -name lyb \)   # 且, 多个条件必须同时成立
+find . \( -type f -a   -name lyb \)   # 同上
+find .    -type f      -name lyb      # 同上
+find . \( -type f -or  -name lyb \)   # 或, 多个条件成立一个即可
+find . \( -type f -o   -name lyb \)   # 同上
+find . ! -type f -o   -name lyb       # ! 只否定最近的条件
+find . -name '.git' -prune -o -type f # 忽略 .git 目录
+
 gcc -0g main.cc
 gcc -01 main.cc
 gcc -02 main.cc
