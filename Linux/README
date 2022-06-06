@@ -101,6 +101,15 @@ sort -t :  # 指定列的分割符
 sort -n    # 以数字进行排序
 sort -r    # 逆序
 sort -f    # 忽略大小写
+sort -u    # 重复项只输出一次
+sort lyb -o lyb # 排序并存入原文件
+
+uniq    # 删除重复的行
+uniq -c # 输出统计的次数
+uniq -d # 只输出重复的行, 重复的项只输出一次
+uniq -D # 只输出重复的行, 重复的项只输出多次
+uniq -i # 忽略大小写
+uniq -u # 只输出没重复的行
 
 su              # 切换 root, 输入 root 密码
 su root         # 同 su
