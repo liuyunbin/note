@@ -110,6 +110,8 @@ sudo                                                 # 权限管理文件: /etc/
 sudo -u USERNAME COMMAND                             # 指定用户执行命令
 echo "654321" | sudo -S date -s "20210722 10:10:10"  # 脚本中免密码使用
 
+cat lyb | xargs -i vim {} # 以此编辑 lyb 中的每一个文件
+
 yum list installed       # 列出已安装的软件
 yum list vim             # 列出某软件包的详细信息
 yum list updates         # 列出可用更新
