@@ -13,6 +13,13 @@ scale=2         # 设置使用两位小数
 ibase=2         # 输入使用二进制
 obase=2         # 输出使用二进制
 
+comm 1.txt 2.txt       | tr -d '\t' # 求两个文件的全集
+comm 1.txt 2.txt -1 -2 | tr -d '\t' # 求两个文件的交集
+comm 1.txt 2.txt -1 -2              # 同上
+comm 1.txt 2.txt -3    | tr -d '\t' # 求不同时出现在两个文件中的部分
+comm 1.txt 2.txt -1 -3              # B - A
+comm 1.txt 2.txt -2 -3              # A - B
+
 date -s "20200202 10:10:10" # 更新系统时间, 需要 root 权限
 date "+%Y-%m-%d %H:%M:%S"   # 指定输出的格式, 年-月-日 时-分-秒
 date "+%F %T"               # 同上
