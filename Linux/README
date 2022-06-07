@@ -35,9 +35,6 @@ diff -u 1.txt 2.txt              # 一体化输出, 比较两个文件的不同
 diff    1.txt 2.txt > diff.pathc
 patch   1.txt diff.pathc         # 恢复文件 2.txt
 
-# 比较两个文件的不同
-
-
 dpkg -L vim        # 列出 vim 软件包安装的全部文件
 dpkg --search /... # 查看该文件是哪个软件包安装的, 使用绝对路径
 
@@ -60,6 +57,19 @@ gcc -0g main.cc
 gcc -01 main.cc
 gcc -02 main.cc
 gcc -03 main.cc
+
+grep -v          # 输出不匹配的内容
+grep -c          # 输出匹配的行的次数
+grep -o          # 只输出匹配的内容
+grep -n          # 输出匹配的行号
+grep -l          # 输出匹配的文件
+grep -i          # 忽略大小写
+grep -h          # 不输出文件名
+grep -q          # 静默输出
+grep -A 5        # 输出之前的行
+grep -B 5        # 输出之后的行
+grep -C 5        # 输出之前之后的行
+grep -e .. -e .. # 多个模式取或
 
 ls     # 列出当前目录中的元素
 ls -a  # 列出当前目录中的元素（包括隐藏的文件）
