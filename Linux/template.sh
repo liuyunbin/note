@@ -7,23 +7,18 @@ set -E          # 即使意外退出, 也会执行 trap 命令
 #set -o xtrace   # 执行前打印命令 同 -x
 
 function log_info() {
-  # 白色
-  echo -e "\033[37;1m[$(date +'%Y-%m-%d %H:%M:%S')]: $@\033[0m"
+  # 黑色
+  echo -e "\033[30;1m[$(date +'%Y-%m-%d %H:%M:%S') info]: $@\033[0m"
 }
 
-function log_warning() {
-  # 蓝色
-  echo -e "\033[34;1m[$(date +'%Y-%m-%d %H:%M:%S')]: $@\033[0m"
-}
-
-function log_error() {
+function log_warn() {
   # 黄色
-  echo -e "\033[33;1m[$(date +'%Y-%m-%d %H:%M:%S')]: $@\033[0m"
+  echo -e "\033[33;1m[$(date +'%Y-%m-%d %H:%M:%S') warn]: $@\033[0m"
 }
 
 function log_fatal() {
   # 红色
-  echo -e "\033[31;1m[$(date +'%Y-%m-%d %H:%M:%S')]: $@\033[0m"
+  echo -e "\033[31;1m[$(date +'%Y-%m-%d %H:%M:%S') fatal]: $@\033[0m"
   exit -1
 }
 
@@ -64,7 +59,12 @@ done
 shift $(($OPTIND - 1))
 
 log_info info
-log_warning warning
-log_error error
+log_info info
+log_info info
+log_info info
+log_info info
+log_info info
+log_info info
+log_warn warning
 log_fatal fatal
 
