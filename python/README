@@ -91,4 +91,6 @@
         * 由于 time 只能处理 1970 年之后的数据, 所以 建议使用 datetime
         * 计算时间戳时, 主要考虑时区
 
-* request
+* requests
+    * requests.get(url=, headers=, params=)
+    * requests.post(url=, headers=, data=)

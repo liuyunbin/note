@@ -2,7 +2,7 @@ import requests
 import json
 import datetime
 
-post_url = 'https://capi.tianyancha.com/cloud-tempest/advance'
+url = 'https://capi.tianyancha.com/cloud-tempest/advance'
 
 headers = {
     'authority': 'capi.tianyancha.com',
@@ -31,31 +31,38 @@ x = datetime.datetime.now()
 y = datetime.datetime(1970, 1, 1) + datetime.timedelta(hours=8)
 time2 = (x - y).total_seconds() * 1000
 
-data1 = {
-# 输入注册资本
-"regCapitalRangeSet": [
-    5000,
-    -1
-],
-# 行业代码
-"categoryGuobiao2017Set":["01"],
+data = {
+    # 输入注册资本
+    "regCapitalRangeSet" : [
+        5000,
+        -1
+    ],
 
-# 省份代码
-"customAreaCodeSet":["00110000V2020"],
+    # 行业代码
+    "categoryGuobiao2017Set" : [
+        "01"
+    ],
 
-# 注册时间, 单位是毫秒
-"establishTimeRangeSet": [
-    time1,
-    time2
-],
-"regStatusSet": [
-    "存续（在营、开业、在业）"
-],
-"pageNum": 1,
-"pageSize": 20,
-"searchType": 2
+    # 省份代码
+    "customAreaCodeSet" : [
+        "00110000V2020"
+    ],
+
+    # 注册时间, 单位是毫秒
+    "establishTimeRangeSet": [
+        time1,
+        time2
+    ],
+
+    "regStatusSet": [
+        "存续（在营、开业、在业）"
+    ],
+
+    "pageNum": 1,
+    "pageSize": 20,
+    "searchType": 2
 }
 
-response = requests.post(url=post_url, headers=headers, data=json.dumps(data1))
+response = requests.post(url=url, headers=headers, data=json.dumps(data))
 json_data = response.json()
 print(json_data)

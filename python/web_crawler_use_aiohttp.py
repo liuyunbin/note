@@ -1,11 +1,12 @@
 import aiohttp
 import asyncio
 import json
-import time, datetime
+import time
+import datetime
 import itertools
 import csv
 
-post_url = 'https://capi.tianyancha.com/cloud-tempest/advance'
+url = 'https://capi.tianyancha.com/cloud-tempest/advance'
 
 headers = {
     'authority': 'capi.tianyancha.com',
@@ -32,20 +33,18 @@ headers = {
     'Set-Cookie': 'CLOUDID=431a6a37-e037-49dc-b0b4-e90d0356df6f; Expires=Sat, 10-Jun-2023 11:39:38 GMT; Path=/; HttpOnly'
 }
 
-# async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit=64,verify_ssl=False)) as session:
-
 # 用于存储最终所有的结果
 results = []
 
-async def get_data(data1):
+async def get_data(data):
     try:
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit=64, ssl=False)) as session:
-            async with await session.post(url=post_url, headers=headers, data=json.dumps(data1)) as response:
+        async with aiohttp.ClientSession() as session:
+            async with await session.post(url=url, headers=headers, data=json.dumps(data)) as response:
                 json_data = await response.json()
                 result = json_data['data']['realTotal']
-                area_code = data1['customAreaCodeSet']
-                cate_code = data1['categoryGuobiao2017Set']
-                capital = data1['regCapitalRangeSet']
+                area_code = data['customAreaCodeSet']
+                cate_code = data['categoryGuobiao2017Set']
+                capital = data['regCapitalRangeSet']
 
                 # 将网站的返回暂时存入变量 results
                 temp = [area_code, cate_code, capital, result]
@@ -100,13 +99,13 @@ def main() :
     for v in areas_cates:
         area = v[0]
         cate = v[1]
-        data1 = {
-            ######## 输入注册资本
+        data = {
+            # 输入注册资本
             "regCapitalRangeSet": [
                 5000,
                 -1
             ],
-            # # 行业代码
+            # 行业代码
             'categoryGuobiao2017Set': cate,
             # 省份代码
             'customAreaCodeSet': area,
@@ -122,7 +121,7 @@ def main() :
             "pageSize": 20,
             "searchType": 2
         }
-        c = get_data(data1)
+        c = get_data(data)
         task = asyncio.ensure_future(c)
         tasks.append(task)
     loop = asyncio.get_event_loop()
