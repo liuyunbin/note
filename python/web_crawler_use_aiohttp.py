@@ -59,18 +59,15 @@ async def get_data(data1):
         # 忽略所有异常
         pass
 
-# 参数设定 / 加引号的正则表达式为 (.*):(.*)    "$1":"$2",
-######## 输入注册开始时间(1953-01-01:-512899200000)
-# timeDateStr1 = "2017-01-01 00:00:00"
-# time0 = datetime.datetime.strptime(timeDateStr1,"%Y-%m-%d %H:%M:%S")
-# secondsFrom1970_1 = time.mktime(time0.timetuple())*1000
-# time1 = int(secondsFrom1970_1)
+# 注册开始时间 -- 与 1970-1-1 +0000 utc 的差值, 毫秒
+x = datetime.datetime(1953, 1, 1)
+y = datetime.datetime(1970, 1, 1) + datetime.timedelta(hours=8)
+time1 = (x - y).total_seconds() * 1000
 
-######### 输入注册截至时间
-timeDateStr2 = "2010-12-31 00:00:00"
-time2 = datetime.datetime.strptime(timeDateStr2, "%Y-%m-%d %H:%M:%S")
-secondsFrom1970_2 = time.mktime(time2.timetuple()) * 1000
-time3 = int(secondsFrom1970_2)
+# 注册截止时间 -- 与 1970-1-1 +0000 utc 的差值, 毫秒
+x = datetime.datetime.now()
+y = datetime.datetime(1970, 1, 1) + datetime.timedelta(hours=8)
+time2 = (x - y).total_seconds() * 1000
 
 # 省份国标代码
 areas = [['00110000V2020'], ['00120000V2020'], ['00130000V2020'], ['00140000V2020'],
@@ -115,8 +112,8 @@ def main() :
             'customAreaCodeSet': area,
             # 注册时间
             "establishTimeRangeSet": [
-                -512899200000,
-                time3
+                time1,
+                time2
             ],
             "regStatusSet": [
                 "存续（在营、开业、在业）"

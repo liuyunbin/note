@@ -1,0 +1,94 @@
+
+## 目录说明
+此目录用使用 pycharm 生成, 官网见: https://www.jetbrains.com/pycharm/
+
+## python 数据类型
+* 数字类型:
+    * 整数
+    * bool 类型
+    * 浮点数
+    * 复数
+* 字符串
+    * 单引号和双引号的作用完全相同
+    * 三引号可以跨行
+    * r 不让字符串转义, 例如, "123\n" 中的 '\n' 不会转义
+    * + 用于 字符串相加, 例如, "123" + "456" == "123456"
+    * * 用于重复字符串, 例如, "123"*2 == "123123"
+    * 字符串的值不能变
+    * 下标从左到右以 0 开始, 从右到左以 -1 开始
+    * 子串, [左标, 右标, 步长], 例如, "0123456"[1:5:2] == "13"
+* List 列表
+    * 使用中括号包含, 使用 逗号 分割
+    * 列表中的元素类型可以不同
+    * + 用于列表相加, * 用于重复列表
+    * 列表中的值可以变化
+    * 下标从左到右以 0 开始, 从右到左以 -1 开始
+    * append 添加元素, remove 删除元素, len 元素个数
+    * 空列表 []
+* Tuple 元组
+    * 使用小括号包含, 使用 逗号 分割
+    * 元组中的元素类型可以不同
+    * 元组中的值不能变化
+    * 下标从左到右以 0 开始, 从右到左以 -1 开始
+    * 空元组 ()
+    * 一个元素的元组 (1,)
+* Set 集合
+    * 使用大括号包含, 使用 逗号 分割
+    * 空集合 set{}
+    * add 添加元素
+    * update 更新集合
+    * remove  移除元素, 如果元素不存在, 报错
+    * discard 移除元素, 如果元素不存在, 不报错
+    * pop 随机删除一个元素
+* Dict 字典
+    * 使用大括号包含, 使用 逗号 分割的 key, val 串
+    * key 的值为不可变类型
+    * 同一字典 key 值类型必须相同
+    * 空字典 {}
+
+## python 命名空间和作用域
+    * global 指明使用 全局变量
+    * nonlocal 指明使用上一层作用域的变量
+
+## python 常用库
+* os
+    * os.getcwd() # 返回当前目录
+
+* random
+    * random.random() # 产生随机数
+
+* json
+    * json.dumps(), json --> string
+    * json.loads(), string --> json
+
+* time, 只能表示 1970 年之后的数据
+    * time.time()            时间戳: 1970-01-01 +0000 utc 到今天的浮点秒数
+    * 时间戳 <--> 时间元组
+        * time.localtime()   时间戳   --> 时间元组, 本地时间
+        * time.gmtime()      时间戳   --> 时间元组, 格林威治天文时间
+        * time.mktime()      时间元组 --> 时间戳
+    * 可读形式 <--> 时间元组
+        * time.strftime()    时间元组 --> 可读形式
+        * time.strptime()    可读形式 --> 时间元组
+
+* datetime
+    * datetime
+        * 初始化 和 初始化
+            * x = datetime.now()
+            * y = datetime.datetime(2020, 6, 26)
+            * z = datetime.datetime.strptime("2020", "%Y")
+            * x.strptime("2020", "%Y")
+        * 格式化为字符串
+            * x.strftime("%B")
+    * timedelta
+        * (x - y).total_seconds() 两个日期的差的秒数
+        * x + timedelta(hours=8) 日期 和 时分秒 加减 运算
+    * 计算时间戳, 使用当前分区计算
+        * x = datetime.now()
+        * y = datetime.datetime(1970, 1, 1) + datetime.timedelta(hours=8)
+        * (x-y).total_seconds()
+    * 额外说明
+        * 由于 time 只能处理 1970 年之后的数据, 所以 建议使用 datetime
+        * 计算时间戳时, 主要考虑时区
+
+* request
