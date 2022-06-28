@@ -56,6 +56,17 @@ find . \( -type f -o   -name lyb \)   # 同上
 find . ! -type f -o   -name lyb       # ! 只否定最近的条件
 find . -name '.git' -prune -o -type f # 忽略 .git 目录
 
+firewall-cmd --zone=public --list-ports                       查看所有打开的端口
+firewall-cmd --zone=public --get-services                     查看所有的服务
+firewall-cmd --zone=public --permanent --add-service=http     添加服务, 永久生效
+firewall-cmd --zone=public --permanent --add-service=https    添加服务, 永久生效
+firewall-cmd --zone=public             --add-service=https    添加服务
+firewall-cmd --zone=public             --remove-service=http  移除服务
+firewall-cmd --zone=public --permanent --add-port=8080/tcp    添加端口, 永久生效
+firewall-cmd --zone=public             --add-port=8080/tcp    添加端口
+firewall-cmd --zone=public             --remove-port=8080/tcp 移除端口
+firewall-cmd --reload                                         重新加载配置
+
 gcc -0g main.cc
 gcc -01 main.cc
 gcc -02 main.cc
