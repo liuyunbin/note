@@ -143,6 +143,16 @@ sort -f    # 忽略大小写
 sort -u    # 重复项只输出一次
 sort lyb -o lyb # 排序并存入原文件
 
+systemctl start      nginx   启动 nginx
+systemctl stop       nginx   停止 nginx
+systemctl restart    nginx   重启 nginx
+systemctl status     nginx   查看 nginx 状态
+systemctl enable     nginx   开机自动启动 nginx
+systemctl disable    nginx   开机禁止启动 nginx
+systemctl is-active  nginx   查看 nginx 是否已启动
+systemctl is-enabled nginx   查看 nginx 是否开机启动
+systemctl list-unit-files    列出所有可用单元
+
 uniq    # 删除重复的行
 uniq -c # 输出统计的次数
 uniq -d # 只输出重复的行, 重复的项只输出一次
