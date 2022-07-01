@@ -1,0 +1,116 @@
+
+## 官网
+* https://nginx.org/
+
+## 安装 nginx, centos7
+* 安装: sudo yum install nginx
+* 默认的网站目录：/usr/share/nginx/html
+* 默认的配置文件：/etc/nginx/nginx.conf
+
+## 常用命令
+* nginx -s stop    退出 nginx
+* nginx -s quit    工作进程处理完当前请求后, 退出 nginx
+* nginx -s reload  重新加载配置, 
+* nginx -s reopen  重新打开日志文件
+
+* systemctl start      nginx   启动 nginx
+* systemctl stop       nginx   停止 nginx
+* systemctl restart    nginx   重启 nginx
+* systemctl status     nginx   查看 nginx 状态
+* systemctl enable     nginx   开机自动启动 nginx
+* systemctl disable    nginx   开机禁止启动 nginx
+* systemctl is-active  nginx   查看 nginx 是否已启动
+* systemctl is-enabled nginx   查看 nginx 是否开机启动
+* systemctl list-unit-files    列出所有可用单元
+
+* firewall-cmd --zone=public --list-ports                       查看所有打开的端口
+* firewall-cmd --zone=public --get-services                     查看所有的服务
+* firewall-cmd --zone=public --permanent --add-service=http     添加服务, 永久生效
+* firewall-cmd --zone=public --permanent --add-service=https    添加服务, 永久生效
+* firewall-cmd --zone=public             --add-service=https    添加服务
+* firewall-cmd --zone=public             --remove-service=http  移除服务
+* firewall-cmd --zone=public --permanent --add-port=8080/tcp    添加端口, 永久生效
+* firewall-cmd --zone=public             --add-port=8080/tcp    添加端口
+* firewall-cmd --zone=public             --remove-port=8080/tcp 移除端口
+* firewall-cmd --reload                                         重新加载配置
+
+## 常用配置
+* root /usr 指定工作目录
+* location, 位于 server, location 中,
+    * 匹配顺序如下
+        * location  =  /kds {} 精确匹配, 如果匹配, 立即停止匹配其他
+        * location ^~  /kds {} 前缀匹配, 如果匹配, 立即停止匹配其他
+        * location  ~  /kds {} 正则匹配,   区分大小写
+        * location  ~* /kds {} 正则匹配, 不区分大小写, 这两个正则匹配优先级相同, 先匹配的先返回
+        * location     /kds {} 普通前缀匹配, 匹配的越长, 优先级越高
+    * location @405 {} 内部匹配
+* rewrite regex replacement [flag];
+    * 使用正则匹配
+    * 如果 replacement 以 http 或 https 打头, 将直接被重定向
+    * flag 的类型:
+        * last  重新匹配新的 location
+        * break 忽略后续的 rewrite, 并顺序执行
+        * redirect  返回302临时重定向
+        * permanent 返回301永久重定向
+        * 空, 顺序执行
+## 实战
+
+#### 情况一
+
+配置:
+    location  /proxy/ {
+        proxy_pass http://1.2.3.4;
+    }
+请求: http://0.0.0.0/proxy/index.html
+相当于访问:  http://1.2.3.4/proxy/index.html
+
+结论: proxy_pass 的 IP 什么都不跟时, 使用绝对路径, 匹配到的 /proxy/ 也会用到 
+
+#### 情况二
+
+配置:
+    location  /proxy/ {
+        proxy_pass http://1.2.3.4/;
+    }
+请求: http://0.0.0.0/proxy/index.html
+
+相当于访问:  http://1.2.3.4/index.html
+
+#### 情况三
+
+配置:
+    location  /proxy/ {
+        proxy_pass http://1.2.3.4/kds/;
+    }
+请求: http://0.0.0.0/proxy/index.html
+相当于访问:  http://1.2.3.4/kds/index.html
+
+#### 情况四
+
+配置:
+    location  /proxy/ {
+        proxy_pass http://1.2.3.4/kds;
+    }
+请求: http://0.0.0.0/proxy/index.html
+相当于访问:  http://1.2.3.4/kdsindex.html
+
+结论: proxy_pass 的 IP 还有内容时, 使用相对路径, 匹配到的 /proxy/ 会被丢弃
+
+#### 情况五
+
+配置:
+    location  /proxy/ {
+        proxy_pass http://1.2.3.4/kds/;
+    }
+请求: http://0.0.0.0/proxy/
+请求: http://0.0.0.0/proxy
+相当于访问:  http://1.2.3.4/kds/
+
+结论:
+当 location 中使用 proxy_pass, fastcgi_pass, uwsgi_pass, scgi_pass, memcached_pass, 或 grpc_pass 时,
+如果请求的内容未添加末尾的 /, 且 匹配失败时, 如果 添加 末尾的 / 可以匹配成功的话, 将导致重定向, 最终返回添加 / 后的结果
+
+见: https://nginx.org/en/docs/http/ngx_http_core_module.html#location
+
+#### 情况六
+www.bing.com 和 www.bing.com/ 意思相同
