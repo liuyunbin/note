@@ -1,11 +1,17 @@
 
-## 目录说明
-此目录用使用 pycharm 生成, 官网见: https://www.jetbrains.com/pycharm/
+## 安装：
+* windows 7, 3.8.10: https://www.python.org/downloads/windows/
+
+## IDE
+* pycharm : https://www.jetbrains.com/pycharm/
+
+## 安装第三方模块
+* sudo apt install python3-pip
 
 ## python 数据类型
 * 数字类型:
-    * 整数
-    * bool 类型
+    * 整数, 可表示任意大小, 可用 _ 分割, 100_100 表示 100100
+    * bool 类型, True, False, and, or, not
     * 浮点数
     * 复数
 * 字符串
@@ -17,13 +23,17 @@
     * 字符串的值不能变
     * 下标从左到右以 0 开始, 从右到左以 -1 开始
     * 子串, [左标, 右标, 步长], 例如, "0123456"[1:5:2] == "13"
+    * "中国".encode("utf8"), str -> utf8
+    * b'\xe4\xb8\xad\xe5\x9b\xbd'.decode("utf8"), utf8 -> str
+    * len(str) 字符数
+    * len(b'\xe4\xb8\xad\xe5\x9b\xbd') 字节数
 * List 列表
     * 使用中括号包含, 使用 逗号 分割
     * 列表中的元素类型可以不同
     * + 用于列表相加, * 用于重复列表
     * 列表中的值可以变化
     * 下标从左到右以 0 开始, 从右到左以 -1 开始
-    * append 添加元素, remove 删除元素, len 元素个数
+    * append, insert 添加元素, remove, pop 删除元素, len 元素个数
     * 空列表 []
 * Tuple 元组
     * 使用小括号包含, 使用 逗号 分割
@@ -50,47 +60,54 @@
     * global 指明使用 全局变量
     * nonlocal 指明使用上一层作用域的变量
 
-## python 常用库
-* os
-    * os.getcwd() # 返回当前目录
+## python 常用功能
+### json 和 string 相互转化
+* json --> string: json.dumps()
+* string --> json: json.loads()
 
-* random
-    * random.random() # 产生随机数
+### time, 核心是时间元组
+* 概念
+  * 时间戳: 与 1970-01-01 0:0:0 +0000 utc 的浮点秒数的差值
+  * 时间戳不受时区影响
+* 时间戳, 字符串 --> 时间元组
+  * t = time.strptime("2022-02-02 0:0:0", "%Y-%m-%d %H:%M:%S") # 字符串 --> 时间元组
+  * t = time.localtime(-1)                                     # 时间戳 --> 时间元组, utc +0800, 本地时间
+  * t = time.gmtime(-1)                                        # 时间戳 --> 时间元组, utc +0000
+* 时间元组 等 --> 时间戳
+  * time.time()                                                # 当前时间的时间戳
+  * time.mktime(t)                                             # 时间元组 --> 时间戳, 其中时间元组是本地时间
+* 时间元组 --> 字符串
+  * time.strftime("%Y-%m-%d %H:%M:%S", t)                      # 时间元组 --> 字符串
+* time.sleep(10)                                               # 停止 10s
+* time, 只能表示 1970 年之后的数据?
+    * time.strptime("1950-01-01 8:0:0", "%Y-%m-%d %H:%M:%S")
+    * time.mktime(dt)
+    * Linux 不报错
 
-* json
-    * json.dumps(), json --> string
-    * json.loads(), string --> json
+### datetime, 核心是类 datetime, timedelta
+* 时间戳, 字符串 --> datetime
+  * dt = datetime.datetime.now()
+  * dt = datetime.datetime(2020, 6, 26)                                      # 生成 datetime 类
+  * dt = datetime.datetime.fromtimestamp(t)                                  # 时间戳 --> datetime, 基于 utf +0800 的 datetime，本地时间
+  * dt = datetime.datetime.utcfromtimestamp(t)                               # 时间戳 --> datetime, 基于 utf +0000 的 datetime
+  * dt = datetime.datetime.strptime("2022-02-02 0:0:0", "%Y-%m-%d %H:%M:%S") # 字符串 --> datetime
+* datetime --> 字符串
+  * dt.strftime("%Y-%m-%d %H:%M:%S")
+* datetime --> 时间戳
+  * dt.timestamp()
+* timedelta
+    * (x - y).total_seconds() # 两个日期的差的秒数
+    * x + timedelta(hours=8)  # 日期 和 时分秒 加减 运算
+* 额外说明
+    * 由于 time 只能处理 1970 年之后的数据, 所以 建议使用 datetime
 
-* time, 只能表示 1970 年之后的数据
-    * time.time()            时间戳: 1970-01-01 +0000 utc 到今天的浮点秒数
-    * 时间戳 <--> 时间元组
-        * time.localtime()   时间戳   --> 时间元组, 本地时间
-        * time.gmtime()      时间戳   --> 时间元组, 格林威治天文时间
-        * time.mktime()      时间元组 --> 时间戳
-    * 可读形式 <--> 时间元组
-        * time.strftime()    时间元组 --> 可读形式
-        * time.strptime()    可读形式 --> 时间元组
+### requests
+* requests.get(url=, headers=, params=)
+* requests.post(url=, headers=, data=)
 
-* datetime
-    * datetime
-        * 初始化 和 初始化
-            * x = datetime.now()
-            * y = datetime.datetime(2020, 6, 26)
-            * z = datetime.datetime.strptime("2020", "%Y")
-            * x.strptime("2020", "%Y")
-        * 格式化为字符串
-            * x.strftime("%B")
-    * timedelta
-        * (x - y).total_seconds() 两个日期的差的秒数
-        * x + timedelta(hours=8) 日期 和 时分秒 加减 运算
-    * 计算时间戳, 使用当前分区计算
-        * x = datetime.now()
-        * y = datetime.datetime(1970, 1, 1) + datetime.timedelta(hours=8)
-        * (x-y).total_seconds()
-    * 额外说明
-        * 由于 time 只能处理 1970 年之后的数据, 所以 建议使用 datetime
-        * 计算时间戳时, 主要考虑时区
+### os
+* os.getcwd() # 返回当前目录
 
-* requests
-    * requests.get(url=, headers=, params=)
-    * requests.post(url=, headers=, data=)
+### random
+* random.random() # 产生随机数
+
