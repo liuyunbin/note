@@ -27,6 +27,13 @@
     * b'\xe4\xb8\xad\xe5\x9b\xbd'.decode("utf8"), utf8 -> str
     * len(str) 字符数
     * len(b'\xe4\xb8\xad\xe5\x9b\xbd') 字节数
+    * str.strip() 去除首尾的空白字符
+    * str.lower() 小写
+    * str.upper() 大写
+    * str.replace("123", "456") 字符串替换
+    * str.split(",") 字符串切割
+    * str1 in str2
+    * str1 + str2
 * List 列表
     * 使用中括号包含, 使用 逗号 分割
     * 列表中的元素类型可以不同
@@ -69,8 +76,9 @@
 * 概念
   * 时间戳: 与 1970-01-01 0:0:0 +0000 utc 的浮点秒数的差值
   * 时间戳不受时区影响
+  * 时间戳不处理闰秒
 * 时间戳, 字符串 --> 时间元组
-  * t = time.strptime("2022-02-02 0:0:0", "%Y-%m-%d %H:%M:%S") # 字符串 --> 时间元组
+  * t = time.strptime("2022-02-02 00:00:00", "%Y-%m-%d %H:%M:%S") # 字符串 --> 时间元组
   * t = time.localtime(-1)                                     # 时间戳 --> 时间元组, utc +0800, 本地时间
   * t = time.gmtime(-1)                                        # 时间戳 --> 时间元组, utc +0000
 * 时间元组 等 --> 时间戳
@@ -83,13 +91,14 @@
     * time.strptime("1950-01-01 8:0:0", "%Y-%m-%d %H:%M:%S")
     * time.mktime(dt)
     * Linux 不报错
+    * windows 报错
 
 ### datetime, 核心是类 datetime, timedelta
 * 时间戳, 字符串 --> datetime
   * dt = datetime.datetime.now()
-  * dt = datetime.datetime(2020, 6, 26)                                      # 生成 datetime 类
-  * dt = datetime.datetime.fromtimestamp(t)                                  # 时间戳 --> datetime, 基于 utf +0800 的 datetime，本地时间
-  * dt = datetime.datetime.utcfromtimestamp(t)                               # 时间戳 --> datetime, 基于 utf +0000 的 datetime
+  * dt = datetime.datetime(2020, 6, 26)
+  * dt = datetime.datetime.fromtimestamp(t) # 时间戳 --> datetime, 基于 utf +0800 的 datetime，本地时间
+  * dt = datetime.datetime.utcfromtimestamp(t) # 时间戳 --> datetime, 基于 utf +0000 的 datetime
   * dt = datetime.datetime.strptime("2022-02-02 0:0:0", "%Y-%m-%d %H:%M:%S") # 字符串 --> datetime
 * datetime --> 字符串
   * dt.strftime("%Y-%m-%d %H:%M:%S")
@@ -98,8 +107,14 @@
 * timedelta
     * (x - y).total_seconds() # 两个日期的差的秒数
     * x + timedelta(hours=8)  # 日期 和 时分秒 加减 运算
+* 计算时间戳, 使用当前分区计算
+    * x = datetime.now()
+    * y = datetime.datetime(1970, 1, 1) + datetime.timedelta(hours=8)
+    * (x-y).total_seconds()
 * 额外说明
-    * 由于 time 只能处理 1970 年之后的数据, 所以 建议使用 datetime
+    * 由于 datetime 比 time 更方便, 所以建议使用 datetime
+    * 由于直接计算时间戳受制于具体平台的实现, 能表示的范围也不同,
+        * 所以建议使用 datetiem 和 datedelta 计算时间戳
 
 ### requests
 * requests.get(url=, headers=, params=)
@@ -107,6 +122,8 @@
 
 ### os
 * os.getcwd() # 返回当前目录
+* os.system('ls') # 执行命令, 返回成功或失败
+* a=os.popen('ls'); a.read()  # 执行命令, 返回执行的结果
 
 ### random
 * random.random() # 产生随机数

@@ -25,7 +25,6 @@ headers = {
 x = datetime.datetime(1953, 1, 1)
 y = datetime.datetime(1970, 1, 1) + datetime.timedelta(hours=8)
 time1 = (x - y).total_seconds() * 1000
-time1 = datetime.datetime(1953, 1, 1).timestamp() * 1000;
 
 # 注册截止时间 -- 与 1970-1-1 +0000 utc 的差值, 毫秒
 x = datetime.datetime.now()
