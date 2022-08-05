@@ -1,0 +1,3 @@
+
+mktemp    #
+mktemp -d # 临时目录
