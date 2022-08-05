@@ -1,0 +1,8 @@
+
+pgrep vim         # 列出 使用 vim 的进程号
+pgrep vim  -l     # 列出 使用 vim 的进程号和进程名称
+pgrep vim  -a     # 列出 使用 vim 的进程号和全路径的完整的进程名称
+pgrep vim  -f     # 只要完整进程路径匹配到即可, 而不是进程名的前缀匹配
+pgrep vim  -u lyb # 列出有效用户ID 是 lyb 的进程 ID
+pgrep vim  -U lyb # 列出真正用户ID 是 lyb 的进程 ID
+
