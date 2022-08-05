@@ -1,0 +1,47 @@
+
+## 常用参数
+```
+chmod u=rwx g=rw o=r filename # 修改文件权限
+chmod a+x filename            # 添加 用户, 组, 其他的 可执行 权限
+chmod  +x filename            # 添加 用户, 组, 其他的 可执行 权限
+chmod  -x filename            # 删除 用户, 组, 其他的 可执行 权限
+chmod 655 filename            # 使用数字设置权限
+chmod u+s executable_file     # 设置 setuid权限, 允许其他用户以文件所有者的身份来执行文件
+chmod g+s executable_file     # 设置 setgid权限, 允许其他用户以文件所属组的身份来执行文件
+chmod o+t directory_name      # 设置 粘滞位, 只有目录的所有者才能够删除目录中的文件
+```
+
+## SUID
+```
+* 只针对文件生效
+* 只针对二进制文件生效
+* 命令运行时, 拥有命令所属用户的权限
+* chmod  u+s filename
+* chmod 4755 filename
+* 没有可执行权限时, 展示 S
+*   有可执行权限时, 展示 s
+```
+
+## SGID
+```
+* 对文件:
+    * 只针对二进制文件生效
+    * 命令运行时, 拥有命令所属组的权限
+* 对目录:
+    * 在此目录下新增的文件所属的组是此目录所属的组, 而不是此用户所属的组
+* chmod  g+s filename
+* chmod 2755 filename
+* 没有可执行权限时, 展示 S
+*   有可执行权限时, 展示 s
+```
+
+## SBIT
+```
+* 只针对目录生效
+* 此目录下的文件只有自己可以删除
+* chmod  o+t filename
+* chmod 1755 filename
+* 没有可执行权限时, 展示 T
+*   有可执行权限时, 展示 t
+```
+
