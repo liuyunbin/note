@@ -1,0 +1,23 @@
+
+## docker
+docker run ubuntu:15.10     /bin/ls                 # 启动 docker 并执行命令 ls
+docker run ubuntu:15.10 -it /bin/bash               # 使用交互式终端
+docker run ubuntu:15.10 -d                          # 使用后台模式, 返回容器 ID
+docker run ubuntu:15.10 -d --name "lyb"             # 给 docker 起一个名字
+docker run ubuntu:15.10 -d --net=host               # 主机和 docker 共享 IP 和 端口号
+docker run ubuntu:15.10 -d -P                       # docke 内使用随机端口映射主机端口
+docker run ubuntu:15.10 -d -p 2000:3000             # 将本机的端口号 2000 绑定到docker 的 3000
+docker run ubuntu:15.10 -d -v /home/123:/home/456   # 将本机目录 /home/123 绑定到 docker 的 /home/456
+
+docker port     容器ID                   # 查看端口号映射
+docker ps                                # 列出当前运行的容器
+docker ps -a                             # 列出所有容器
+docker logs     容器ID                   # 查看容器的输出
+docker start    容器ID                   # 启动容器
+docker stop     容器ID                   # 停止容器
+docker restart  容器ID                   # 重新启动容器
+docker rm -f    容器ID                   # 删除容器
+docker attach   容器ID                   # 进入在后台运行的容器
+docker exec -it 容器ID /bin/bash         # 对于在后台运行的容器, 开启交互式终端, 终端退出, docker 不会终止
+docker exec     容器ID ls                # 对于在后台运行的容器, 执行命令
+
