@@ -1,0 +1,11 @@
+
+yum list installed       # 列出已安装的软件
+yum list vim             # 列出某软件包的详细信息
+yum list updates         # 列出可用更新
+yum provides file_name   # 查看文件属于哪个软件包
+yum update package_name  # 更新某个软件包
+yum update               # 更新所有软件包
+yum install package_name # 安装软件
+yum remove  package_name # 卸载软件
+yum erase   package_name # 卸载软件，删除数据和文件
+
