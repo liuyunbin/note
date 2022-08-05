@@ -1,0 +1,3 @@
+
+ln -s target symbolic_link_name # 创捷符号链接
+
