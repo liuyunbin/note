@@ -1,0 +1,4 @@
+
+patch     1.txt diff.pathc  # 恢复文件
+patch -p1 1.txt diff.pathc  # 恢复文件, 忽略 diff.pathc 的第一个路径
+
