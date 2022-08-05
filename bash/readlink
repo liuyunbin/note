@@ -1,0 +1,3 @@
+
+readlink symbolic_link_name     # 读取符号链接
+readlink symbolic_link_name -f  # 读取符号链接, 递归
