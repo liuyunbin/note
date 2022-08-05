@@ -1,0 +1,21 @@
+
+## grep
+grep -v                   # 输出不匹配的内容
+grep -c                   # 输出匹配的行的次数, 同一行只输出一次
+grep -o                   # 只输出匹配的内容
+grep -n                   # 输出匹配的行号
+grep -l                   # 输出匹配的文件
+grep -i                   # 忽略大小写
+grep -h                   # 不输出文件名
+grep -q                   # 静默输出
+grep -A 5                 # 输出之前的行
+grep -B 5                 # 输出之后的行
+grep -C 5                 # 输出之前之后的行
+grep -e .. -e ..          # 多个模式取或
+grep -E ..                # 使用扩展的正则表达式, 同 egrep
+grep -W ..                # 单词匹配
+grep -X ..                # 行匹配
+grep ... --inclue "*.c"   # 指定文件
+grep ... --exclue "*.c"   # 忽略文件
+grep ... --exclue-dir src # 忽略目录
+
