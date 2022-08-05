@@ -1,0 +1,7 @@
+
+## gcc
+gcc -0g main.cc
+gcc -01 main.cc
+gcc -02 main.cc
+gcc -03 main.cc
+
