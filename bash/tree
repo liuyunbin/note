@@ -1,0 +1,7 @@
+
+
+tree
+tree -p "*.cc"       # 只显示  匹配到的文件
+tree -I "*.cc"       # 只显示没匹配到的文件
+tree -H . -o 1.html  # 指定目录生成 html 文件
+
