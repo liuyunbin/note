@@ -1,0 +1,2 @@
+
+ntpdate -s time-b.nist.gov # 使用时间服务器更新时间
