@@ -1,0 +1,5 @@
+
+diff    1.txt 2.txt              # 比较两个文件的不同
+diff -u 1.txt 2.txt              # 一体化输出, 比较两个文件的不同
+diff    1.txt 2.txt > diff.pathc
+
