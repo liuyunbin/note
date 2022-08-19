@@ -8,7 +8,7 @@ set -E          # 即使意外退出, 也会执行 trap 命令
 
 function log_info() {
   # 黑色
-  echo -e "\033[30;1m[$(date +'%Y-%m-%d %H:%M:%S') info]: $@\033[0m"
+  echo -e "\033[37;1m[$(date +'%Y-%m-%d %H:%M:%S') info]: $@\033[0m"
 }
 
 function log_warn() {
