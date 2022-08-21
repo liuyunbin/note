@@ -1,10 +1,55 @@
 
-## 内容修改时间 mtime
+## atime
+* 名称
+    * 最后访问时间
+* 查看
+    * stat -c  %X 1.txt -- 时间戳
+    * stat -c  %x 1.txt -- 人类可读的形式
+    * ls   -lu    1.txt -- 人类可读的形式
+* 更新
+    * 使用 cat 等都会更新 atime
+* 修改
+    * touch -a 1.txt
+    * touch    1.txt
+* 注意
+    * 出于性能考虑，在内核 2.6.30 之后 只有以下情况会更新 atime
+        * atime 比 mtime 或 ctime 旧
+        * atime 比上一次 atime 超过 24 小时
+        * mount 时, 使用了 strictatime 选项
 
-## 状态改时间 ctime
-* 文件名称修改
-* 所有者， 所属组变化
-* 权限修改
+## mtime
+* 名称
+    * 内容修改时间
+* 查看
+    * stat -c  %Y 1.txt -- 时间戳
+    * stat -c  %y 1.txt -- 人类可读的形式
+    * ls   -l     1.txt -- 人类可读的形式
+* 更新
+    * 使用 vim 编辑并保存时, 会修改 mtime
+    * 重定向时, 会修改 mtime
+* 修改
+    * touch -m 1.txt
+    * touch    1.txt
 
-## 最后访问时间 atime
+## ctime
+* 名称
+    * 状态修改时间
+* 查看
+    * stat -c  %Z 1.txt -- 时间戳
+    * stat -c  %z 1.txt -- 人类可读的形式
+    * ls   -lc    1.txt -- 人类可读的形式
+* 更新
+    * 文件内容修改
+    * 文件名称修改: mv, rename
+    * 所有者, 所属组变化: chown
+    * 权限修改: chmod
+* 修改
+    * touch -m 1.txt -- 修改 mtime 将修改 ctime
+    * touch    1.txt
+
+## 例子
+* 只修改 atime: cat 1.txt
+* 只修改 ctime: chmod +x 1.txt
+* 同时修改 mtime 和 ctime: echo "123" >> 1.txt
+* 同时修改 atime, mtime 和 ctime: 使用 vim 编辑并保存
 
