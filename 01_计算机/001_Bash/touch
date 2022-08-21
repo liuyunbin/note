@@ -1,5 +1,0 @@
-
-touch -a 1.txt               # 修改文件访问时间
-touch -m 1.txt               # 修改文件修改时间
-touch -m 1.txt -d "20220202" # 指定时间
-
