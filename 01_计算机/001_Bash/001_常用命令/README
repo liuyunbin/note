@@ -15,3 +15,13 @@ ls -ul  # 以 访问时间 展示, 文件名排序
 ls -u   # 以 访问时间排序, 新到旧
 
 
+
+touch    1.txt                          # 使用当前时间修改 atime mtime, 修改 mtime 将修改 ctime
+touch -a 1.txt                          # 使用当前时间修改 atime
+touch -m 1.txt                          # 使用当前时间修改       mtime, 修改 mtime 将修改 ctime
+touch -m 1.txt -d "20220202"            # 指定时间, 而不是当前时间
+touch -m 1.txt -t [[CC]YY]MMDDhhmm[.ss] # 指定时间, 而不是当前时间, 依次是: 时区-年-月-日-时-分-秒
+touch -c 1.txt                          # 文件不存在时, 不创建文件
+touch -r 1.txt 2.txt                    # 以 1.txt 的 ctime atime 而不是当前时间修改 2.txt
+touch -h 1.txt                          # 改变符号链接本身, 而不是所指向的文件
+
