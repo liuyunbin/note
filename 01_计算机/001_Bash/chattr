@@ -1,4 +1,0 @@
-
-chattr +i file # 设置文件不可修改
-chattr -i file # 取消文件不可修改的属性
-
