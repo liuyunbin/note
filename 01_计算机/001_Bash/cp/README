@@ -6,3 +6,4 @@ cp -d 1.txt.link 2.txt.link # 拷贝符号链接本身
                             # 拷贝目录时, 默认拷贝符号链接本身
 
 cp --parents                # 全路径复制
+

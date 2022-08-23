@@ -1,0 +1,8 @@
+
+## 读取文件的内容
+cat -b 1.txt # 显示行号, 不包括空行
+cat -n 1.txt # 显示行号
+cat -E 1.txt # 列出换行符
+cat -s 1.txt # 去掉多余的连续的空行
+cat -T 1.txt # 显示 TAB
+
