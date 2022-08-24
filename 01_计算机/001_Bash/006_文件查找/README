@@ -1,0 +1,25 @@
+
+find . -name  lyb                     # 以文件名查找文件, 不包括路径, 可以使用通配符
+find . -iname lyb                     # 同上, 忽略大小写
+find . -path   "*/bash/*"             # 以全路径名查找文件, 可包括文件名, 可以使用通配符
+find . -ipath  "*/bash/*"             # 同上, 忽略大小写
+find . -regex ".*p+"                  # 同上, 使用正则表达式
+find . -iregex ".*p+"                 # 同上, 忽略大小写
+find . -maxdepth 5 –mindepth 2 -name lyb # 使用目录深度过滤
+find . -L -name lyb                   # 是否跟着符号链接跳
+find . -type  f                       # 以类型查找文件
+find . -type f -atime -7              #     7天内访问过的文件
+find . -type f -mtime  7              # 恰好7天前修改过的文件
+find . -type f -ctime +7              #     7天前变化过的文件
+find . -type f -newer file.txt        # 查找修改时间比 file.txt 新的文件
+find . -type f -size +2G              # 以文件大小查找
+find . -type f -perm 644              # 以权限查找
+find . -type f -user lyb              # 以用户查找
+find . -name '.git' -prune -o -type f # -prune 将前面匹配到的文件 或 目录 忽略掉
+find . ! -type f -o   -name lyb       # ! 只否定最近的条件
+find . \( -type f -and -name lyb \)   # 且, 多个条件必须同时成立
+find . \( -type f -a   -name lyb \)   # 同上
+find .    -type f      -name lyb      # 同上, 默认多个条件同时成立
+find . \( -type f -or  -name lyb \)   # 或, 多个条件成立一个即可
+find . \( -type f -o   -name lyb \)   # 同上
+
