@@ -1,0 +1,63 @@
+
+                       # 新建文件
+touch    1.txt         # 使用当前时间修改 atime mtime ctime
+touch -a 1.txt         # 使用当前时间修改 atime
+touch -m 1.txt         # 使用当前时间修改       mtime ctime
+touch -m 1.txt -d ...  # 指定时间, 而不是当前时间
+touch -m 1.txt -t ...  # 指定时间, 依次是: 时区-年-月-日-时-分-秒
+touch -c 1.txt         # 文件不存在时, 不创建文件
+touch -r 1.txt 2.txt   # 以 1.txt 的时间修改 2.txt
+touch -h 1.txt         # 改变符号链接本身, 而不是所指向的文件
+
+cp 1.txt abc  # 如果 abc 存在且是文件, 将使用 1.txt 覆盖 abc
+              # 如果 abc 存在且是目录, 将 1.txt 拷贝到目录 abc 下
+              # 如果 abc 不存在,       将生成新文件 abc, 内容和 1.txt 相同
+cp 1.txt abc/ # 如果 abc 存在且是文件, 这种情况不合法
+              # 如果 abc 存在且是目录, 将 1.txt 拷贝到目录 abc 下
+              # 如果 abc 不存在,       报错
+
+cp --parents a/b/c/d test   # 全路径复制, 将生成 test/a/b/c/d
+
+cp 1.txt.link abc  # 拷贝符号链接所指的文件
+                   # abc 不存在时, 新文件名为 abc
+                   # abc 是文件时, 新文件名为 abc, 旧内容将被覆盖
+                   # abc 是目录时, 新文件名为 1.txt.link
+cp -d 1.txt.link b # 总是拷贝符号链接本身
+cp -P 1.txt.link b # 总是拷贝符号链接本身
+cp -L 1.txt.link b # 总是拷贝符号链接所指的文件
+cp -s 1.txt.link b # 生成符号链接
+
+          # a 是目录, 拷贝目录时, 默认拷贝符号链接本身
+cp -r a b # b 是文件报错
+          # b 是目录, 将拷贝到 b 目录下
+          # b 不存在, 相当于重命名
+
+cp -f a b # 强制拷贝
+
+mv a b   # a 是目录, b 存在且是文件时, 报错
+mv a b/  # b 存在且是文件时, -- 不存在这种情况
+mv a b   #
+mv a b/  # b 存在且是目录时, 将 a 拷入目录 b 中,
+         # 如果 b 中已存在目录 a, 将报错
+         # 使用 -f 强行覆盖
+mv a b   #
+mv a b/  # b 不存在时, 相当于 重命名
+
+rm     a    # 文件删除
+rm -r  a    # 递归删除
+rm -rf a    # 强行删除, 文件不存在时, 忽略
+
+mkdir    abc
+mkdir -p a/b/c # 递归创建目录, 目录已存在时不报错
+
+rmdir    abc
+rmdir -p a/b/c # 递归删除, 依次删除 a/b/c a/b a
+
+mktemp         # 临时文件
+mktemp -d      # 临时目录
+
+ln -s target symbolic_link_name ## 符号链接
+
+readlink symbolic_link_name     # 读取符号链接
+readlink symbolic_link_name -f  # 读取符号链接, 递归
+
