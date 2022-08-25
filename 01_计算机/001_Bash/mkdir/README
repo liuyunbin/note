@@ -1,0 +1,4 @@
+
+mkdir    abc
+mkdir -p a/b/c # 递归创建目录, 目录已存在时不报错
+

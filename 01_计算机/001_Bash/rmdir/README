@@ -1,0 +1,4 @@
+
+rmdir    abc
+rmdir -p a/b/c # 递归删除, 依次删除 a/b/c a/b a
+

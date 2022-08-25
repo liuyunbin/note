@@ -8,4 +8,7 @@ yum update               # 更新所有软件包
 yum install package_name # 安装软件
 yum remove  package_name # 卸载软件
 yum erase   package_name # 卸载软件，删除数据和文件
+yum provides /etc/vimrc  # 查看文件由哪个软件使用
+yum repolist             # 列出使用的软件源
+
 

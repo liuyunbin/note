@@ -1,0 +1,9 @@
+
+## 查看作业
+jobs    # 列出后台作业
+jobs -l # 列出 PID
+jobs -n # 只列出进程改变的作业
+jobs -p # 只列出 PID
+jobs -s # 只列出停止的作业
+jobs -r # 只列出运行中的作业
+

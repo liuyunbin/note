@@ -1,3 +1,5 @@
 
-mktemp    #
-mktemp -d # 临时目录
+mktemp         # 临时文件
+mktemp -d      # 临时目录
+
+

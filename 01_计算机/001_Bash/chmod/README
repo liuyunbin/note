@@ -1,10 +1,10 @@
 
-* chmod u=rwx g=rw o=r 1.txt # 修改文件权限
-* chmod a+x filename         # 添加 用户, 组, 其他的 可执行 权限
-* chmod  +x filename         # 添加 用户, 组, 其他的 可执行 权限
-* chmod  -x filename         # 删除 用户, 组, 其他的 可执行 权限
-* chmod 755 filename         # 使用数字设置权限
-* chmod u+s executable_file  # 设置 setuid权限, 允许其他用户以文件所有者的身份来执行文件
-* chmod g+s executable_file  # 设置 setgid权限, 允许其他用户以文件所属组的身份来执行文件
-* chmod o+t directory_name   # 设置 粘滞位, 只有目录的所有者才能够删除目录中的文件
+chmod u=rwx g=rw o=r 1.txt # 修改文件权限
+chmod a+x filename         # 添加 用户, 组, 其他的 可执行 权限
+chmod  +x filename         # 添加 用户, 组, 其他的 可执行 权限
+chmod  -x filename         # 删除 用户, 组, 其他的 可执行 权限
+chmod 755 filename         # 使用数字设置权限
+chmod u+s executable_file  # 设置 setuid权限, 允许其他用户以文件所有者的身份来执行文件
+chmod g+s executable_file  # 设置 setgid权限, 允许其他用户以文件所属组的身份来执行文件
+chmod o+t directory_name   # 设置 粘滞位, 只有目录的所有者才能够删除目录中的文件
 

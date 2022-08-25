@@ -1,4 +1,5 @@
 
+                       # 新建文件
 touch    1.txt         # 使用当前时间修改 atime mtime ctime
 touch -a 1.txt         # 使用当前时间修改 atime
 touch -m 1.txt         # 使用当前时间修改       mtime ctime
