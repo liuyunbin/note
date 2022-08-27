@@ -1,4 +1,13 @@
 
+cat -A 1.txt # 同 -vET
+cat -b 1.txt # 显示行号, 不包括空行
+cat -e 1.txt # 同 -vE
+cat -E 1.txt # 列出行尾标识
+cat -n 1.txt # 显示行号
+cat -s 1.txt # 去掉多余的连续的空行
+cat -t 1.txt # 同 -Tv
+cat -T 1.txt # 显示 TAB
+cat -v 1.txt # 显示不可打印字符
 
 unix2doc 1.txt # \n --> \r\n
 dos2unix 1.txt # \r\n --> \n
