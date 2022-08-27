@@ -6,3 +6,9 @@ rmdir abc                            # 删除空目录
 rmdir -p a/b/c                       # 递归删除, 相当于依次删除 a/b/c a/b a
 rmdir --ignore-fail-on-non-empty abc # 忽略非空目录
 
+wc    # 输出 换行符数 单词数 字节数
+wc -l #   行数
+wc -w # 单词数
+wc -c # 字节数
+wc -m # 字符数
+
