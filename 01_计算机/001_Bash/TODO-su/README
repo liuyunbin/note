@@ -1,9 +1,0 @@
-
-## 用户切换
-su              # 切换 root, 输入 root 密码
-su root         # 同 su
-su -            # 切换 root, 更新主目录, 环境变量等等
-su -l           # 同 su -
-su - root       # 同 su -
-su - root -c ls # 使用 root 执行命令 ls
-

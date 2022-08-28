@@ -1,5 +1,0 @@
-
-sudo                                                 # 权限管理文件: /etc/sudoers, 使用 visudo 编辑
-                                                     # 使用当前用户的密码
-sudo -u USERNAME COMMAND                             # 指定用户执行命令
-echo "654321" | sudo -S date -s "20210722 10:10:10"  # 脚本中免密码使用

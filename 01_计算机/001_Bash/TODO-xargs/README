@@ -1,2 +1,0 @@
-
-cat lyb | xargs -i vim {} # 以此编辑 lyb 中的每一个文件

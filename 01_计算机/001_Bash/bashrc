@@ -1,0 +1,31 @@
+
+PS1="$ "
+
+log=~/log
+
+mkdir -p $log
+function log_debug() {
+    msg="$(date +'%Y-%m-%d %H:%M:%S') DEBUG $@"
+    echo "$msg" | tee &> /dev/null -a $log/debug.log
+    echo -e "\e[1;34m$msg \e[0m" &> /dev/tty # 蓝色 + 加粗
+}
+
+function log_info() {
+    msg="$(date +'%Y-%m-%d %H:%M:%S')  INFO $@"
+    echo "$msg" | tee &> /dev/null -a $log/debug.log $log/info.log
+    echo -e "\e[1;32m$msg \e[0m" &> /dev/tty # 绿色 + 加粗
+}
+
+function log_warn() {
+    msg="$(date +'%Y-%m-%d %H:%M:%S')  WARN $@"
+    echo "$msg" | tee &> /dev/null -a $log/debug.log $log/info.log $log/warn.log
+    echo -e "\e[1;33m$msg \e[0m" &> /dev/tty # 黄色 + 加粗
+}
+
+function log_error() {
+    msg="$(date +'%Y-%m-%d %H:%M:%S') ERROR $@"
+    echo "$msg" | tee &> /dev/null -a $log/debug.log $log/info.log $log/warn.log $log/error.log
+    echo -e "\e[1;31m$msg \e[0m" &> /dev/tty # 红色 + 加粗
+    exit -1
+}
+

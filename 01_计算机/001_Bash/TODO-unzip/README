@@ -1,4 +1,0 @@
-
-unzip -l a.zip # 列出 zip 的内容
-unzip -j a.zip # 解压时, 不要路径
-

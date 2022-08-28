@@ -1,9 +1,0 @@
-
-                   ## lsof -- sudo yum install lsof
-lsof -iTCP         # 查看 TCP 信息
-lsof -i :22        # 查看指定 端口号 的信息
-lsof -i@1.2.3.4:22 # 查看是否连接到指定 IP 和 端口号上
-lsof -p 1234       # 查看 进程 1234 打开的文件信息
-lsof -t            # 仅获取进程ID
-
-

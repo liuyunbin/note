@@ -1,3 +1,0 @@
-
-ln -s target symbolic_link_name # 创建符号链接
-
