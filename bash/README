@@ -412,6 +412,11 @@ grep ... --inclue "*.c"   # 指定文件
 grep ... --exclue "*.c"   # 忽略文件
 grep ... --exclue-dir src # 忽略目录
 
+groupadd               # 添加组
+groupdel               # 删除组
+groupdel               # 修改组
+groups                 # 查看所属的组
+
 iconv
 
 ip addr
@@ -498,6 +503,8 @@ ntpdate -s time-b.nist.gov # 使用时间服务器更新时间
 
 patch     1.txt diff.pathc  # 恢复文件
 patch -p1 1.txt diff.pathc  # 恢复文件, 忽略 diff.pathc 的第一个路径
+
+passwd lyb # 修改密码
 
 pgrep vim         # 列出 使用 vim 的进程号
 pgrep vim  -l     # 列出 使用 vim 的进程号和进程名称
@@ -727,6 +734,13 @@ uniq -u # 只输出没重复的行
 
 unzip -l a.zip # 列出 zip 的内容
 unzip -j a.zip # 解压时, 不要路径
+
+useradd               # 添加用户
+userdel               # 删除用户
+usermod               # 修改用户
+usermod    -g lyb kds # 将 kds 的主组变为 lyb
+usermod    -G lyb kds # 将 kds 的附组变为 lyb
+usermod -a -G lyb kds # 将 kds 的附组添加 lyb
 
 Ctrl+F 下翻一屏
 Ctrl+B 上翻一屏
