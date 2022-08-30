@@ -1,6 +1,8 @@
 
 PS1="$ "
 
+set -o vi
+
 log=~/log
 
 mkdir -p $log
