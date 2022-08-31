@@ -141,15 +141,17 @@ env            # 设置环境变量, 然后执行程序
 [123]
 [1-5]
 [!a]
+[^a]
 
-#### 正则表达式
+#### 基础正则表达式
 ^      : 开头
 $      : 结尾
-.      : 任意字符
-[]     :  中括号中      的任意字符
+.      : 除换行符以外的任意字符
+[]     : 中括号中      的任意字符
 [^]    : 中括号中字符外的任意字符
 ?      : 前面字符出现 0 次 或 一次
 *      : 前面字符出现 0 次 或 多次
+#### 扩展正则表达式
 +      : 前面字符出现 1 次 或 多次
 {n}    : 前面字符出现 n 次
 {n,}   : 前面字符出现 n 次 及以上
@@ -221,6 +223,16 @@ apt update      # 更新软件源
 apt upgrade     # 更新软件
 
 awk 'BEGIN{ print "start" } pattern { commands } END{ print "end" }' file
+FS 输入字段分隔符
+RS 输入记录分隔符
+OFS 输出字段分隔符
+ORS 输出记录分隔符
+ENVIRON 取环境变量
+FILENAME 数据文件的文件名
+FNR 当前数据文件中的数据行数
+IGNORECASE 忽略大小写
+NF 数据文件中的字段总数
+NR 已处理的输入记录数
 * BEGIN 和 END 都是可选的
 * print 以逗号分割
 * NR 当前行号
@@ -231,12 +243,15 @@ awk 'BEGIN{ print "start" } pattern { commands } END{ print "end" }' file
 * getline 读取一行
 * ls | getline 从命令中读取
 * -F: 或 FS=":" 或 OFS=":" # 设置分割符
+* -v ... # 定义变量
 awk 'NR < 5'      # 行号小于5的行
 awk 'NR==1,NR==4' # 行号在 1 到 5 之间的行
 awk '/linux/'     # 包含模式为linux的行
 awk '!/linux/'    # 不包含模式为linux的行
+awk $1 ~ /lyb.*/  # 字段正则匹配
+awk $1 !~ /lyb.*/  # 排除字段正则匹配
 awk -v lyb=$SHELL ... # 将外部变量的值传给 awk
-awk ..... lyb=$SHELL  # 将外部变量的值传给 awk
+awk ..... lyb=$SHELL  # 将外部变量的值传给 awk, 在 BEGIN 块不起作用
 awk '/start_pattern/, /end_pattern/' filename
 
 bc <<< "scale=2; 10/2" # 设置使用两位小数, 输出: 5.00
@@ -362,7 +377,10 @@ docker exec     容器ID ls                # 对于在后台运行的容器, 执
 dpkg -L vim        # 列出 vim 软件包安装的全部文件
 dpkg --search /... # 查看该文件是哪个软件包安装的, 使用绝对路径
 
-du -sh # 某一目录的使用大小
+du -d 1          #
+du --max-depth=1 # 最大目录深度
+du -sh           # 只列出整体使用大小
+du -ch           #   列出整体使用大小
 
 echo       "123"   # 输出换行
 echo    -n "123"   # 不换行
@@ -603,10 +621,15 @@ jobs -n          # 只列出进程改变的作业
 jobs -s          # 只列出停止的作业
 jobs -r          # 只列出运行中的作业
 
-killall vim # 进程名称
+killall vim        # 进程名称
+killall -I vim     # 忽略大小写
+killall -i vim     # 删除之前确认
+killall -r vim     # 使用扩展的正则表达式, 包括 通配符?
+killall -u lyb vim # 指定用户的进程
 
-kill PID    # 进程ID
-kill %作业号 ## 杀死作业 -- 作业号必须有 %, bash 内置的 kill
+kill PID     # 进程ID
+kill %作业号 # 杀死作业 -- 作业号必须有 %
+             # bash 内置的 kill
 
 less
 空格   : 下一页
@@ -623,7 +646,8 @@ ln -s target symbolic_link_name # 创建符号链接
 lsof -iTCP         # 查看 TCP 信息
 lsof -i :22        # 查看指定 端口号 的信息
 lsof -i@1.2.3.4:22 # 查看是否连接到指定 IP 和 端口号上
-lsof -p 1234       # 查看 进程 1234 打开的文件信息
+lsof -p 1234       # 指定 进程号
+lsof -d 0,1,2,3    # 指定 文件描述符
 lsof -t            # 仅获取进程ID
 
 ls           # 列出当前目录中的元素
@@ -710,7 +734,30 @@ rmdir abc                            # 删除空目录
 rmdir -p a/b/c                       # 递归删除, 相当于依次删除 a/b/c a/b a
 rmdir --ignore-fail-on-non-empty abc # 忽略非空目录
 
+sed # 读取一行到模式空间 --> 执行操作 -- 循环
+    # i-行前插入, a-行后插入, c-修改行, y-字符转换, = 行号,
+    # l 打印不可打印字符
+    # w 写入文件, r 插入文件的内容
+    # n 读取下一行到模式空间 N 将下一行添加到模式空间内容后
+    # d 删除模式空间的内容   D 删除模式空间的第一行内容, 之后跳到开头
+    # p 打印模式空间的内容   P 打印模式空间的第一行内容
+# h 将模式空间复制到保持空间
+# H 将模式空间附加到保持空间
+# g 将保持空间复制到模式空间
+# G 将保持空间附加到模式空间
+# x 交换模式空间和保持空间的内容
+# ! 不执行...
+# :abc 定义标签
+# b abc 跳到指定标签
+# t abc 前一个命令成功会跳转
+# & 匹配到的内容
+sed -n                              # 不输出内容
+sed -e ...                          # 指定命令
+sed -f ...                          # 从文件读取命令
 sed    "s/123/456/g"          1.txt
+sed    "1,5s/123/456/g"       1.txt # [1,5]
+sed    "1,$s/123/456/g"       1.txt # [1,$]
+sed    "/lyb/s/123/456/g"     1.txt # 使用正则表达式确定范围
 sed -i "s/123/456/g"          1.txt # 直接在原文件上修改
 sed -i "s|123|456|g"          1.txt # 使用不同的分割符
 sed -i "/^$/d"                1.txt # 删除空行
