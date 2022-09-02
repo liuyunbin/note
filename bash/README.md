@@ -3,6 +3,7 @@
 
 
 ## 作业控制
+```
 sleep &          # 在后台运行程序
 ctrl+z           # 前台运行 --> 后台暂停
 bg %jobspec      # 后台暂停 --> 后台运行
@@ -17,8 +18,10 @@ jobs -p %jobspec # 只列出 PID
 jobs -n          # 只列出进程改变的作业
 jobs -s          # 只列出停止的作业
 jobs -r          # 只列出运行中的作业
+```
 
 ## 文件时间
+```
 atime            # 文件内容最后被读取的时间
                  # 出于性能考虑, 只有以下情况会更新
                  #     atime 比 mtime 或 ctime 旧
@@ -37,6 +40,7 @@ stat -c %z 1.txt # 查看 ctime
 touch    1.txt   # 修改 atime mtime, 修改 ctime 会影响到 ctime
 touch -a 1.txt   # 修改 atime
 touch -m 1.txt   # 修改 mtime, 修改 mtime 会影响到 ctime
+```
 
 ## 文件权限
 chmod u=rwx g=rw o=r 1.txt # 修改文件权限
