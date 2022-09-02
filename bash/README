@@ -5,38 +5,38 @@
 ## 作业控制
 sleep &          # 在后台运行程序
 ctrl+z           # 前台运行 --> 后台暂停
-bg %作业号       # 后台暂停 --> 后台运行
+bg %jobspec      # 后台暂停 --> 后台运行
                  # 有无 % 都成
                  # 可能失败, 比如 vim
-fg %作业号       # 后台暂停 --> 前台运行
+fg %jobspec      # 后台暂停 --> 前台运行
                  # 后台运行 --> 前台运行
                  # 有无 % 都成
-jobs    %作业号  # 列出后台作业, 有无 % 都成
-jobs -l %作业号  # 列出 PID
-jobs -p %作业号  # 只列出 PID
+jobs    %jobspec # 列出后台作业, 有无 % 都成
+jobs -l %jobspec # 列出 PID
+jobs -p %jobspec # 只列出 PID
 jobs -n          # 只列出进程改变的作业
 jobs -s          # 只列出停止的作业
 jobs -r          # 只列出运行中的作业
 
 ## 文件时间
-atime             # 文件内容最后被读取的时间
-                  # 出于性能考虑，在内核 2.6.30 之后 只有以下情况会更新
-                  #   atime 比 mtime 或 ctime 旧
-                  #   atime 比上一次 atime 超过 24 小时
-                  #   mount 时, 使用了 strictatime 选项
-                  # 修改:
-mtime             # 文件内容被修改的时间
-ctime             # 状态修改时间
-                  #   文件内容修改
-                  #   文件名称修改: mv, rename
-                  #   所有者, 所属组变化: chown
-                  #   权限修改: chmod
-stat -c %x 1.txt  # 查看 atime
-stat -c %y 1.txt  # 查看 mtime
-stat -c %z 1.txt  # 查看 ctime
-touch    1.txt    # 修改 atime mtime, 修改 ctime 会影响到 ctime
-touch -a 1.txt    # 修改 atime
-touch -m 1.txt    # 修改 mtime, 修改 mtime 会影响到 ctime
+atime            # 文件内容最后被读取的时间
+                 # 出于性能考虑, 只有以下情况会更新
+                 #     atime 比 mtime 或 ctime 旧
+                 #     atime 比上一次 atime 超过 24 小时
+                 #     mount 时, 使用了 strictatime 选项
+                 # 修改:
+mtime            # 文件内容被修改的时间
+ctime            # 状态修改时间
+                 #   文件内容修改
+                 #   文件名称修改: mv, rename
+                 #   所有者, 所属组变化: chown
+                 #   权限修改: chmod
+stat -c %x 1.txt # 查看 atime
+stat -c %y 1.txt # 查看 mtime
+stat -c %z 1.txt # 查看 ctime
+touch    1.txt   # 修改 atime mtime, 修改 ctime 会影响到 ctime
+touch -a 1.txt   # 修改 atime
+touch -m 1.txt   # 修改 mtime, 修改 mtime 会影响到 ctime
 
 ## 文件权限
 chmod u=rwx g=rw o=r 1.txt # 修改文件权限
