@@ -1,13 +1,132 @@
 
+## 通用参数
+
+
+## 作业控制
+sleep &          # 在后台运行程序
+ctrl+z           # 前台运行 --> 后台暂停
+bg %作业号       # 后台暂停 --> 后台运行
+                 # 有无 % 都成
+                 # 可能失败, 比如 vim
+fg %作业号       # 后台暂停 --> 前台运行
+                 # 后台运行 --> 前台运行
+                 # 有无 % 都成
+jobs    %作业号  # 列出后台作业, 有无 % 都成
+jobs -l %作业号  # 列出 PID
+jobs -p %作业号  # 只列出 PID
+jobs -n          # 只列出进程改变的作业
+jobs -s          # 只列出停止的作业
+jobs -r          # 只列出运行中的作业
+
+## 文件时间
+atime             # 文件内容最后被读取的时间
+                  # 出于性能考虑，在内核 2.6.30 之后 只有以下情况会更新
+                  #   atime 比 mtime 或 ctime 旧
+                  #   atime 比上一次 atime 超过 24 小时
+                  #   mount 时, 使用了 strictatime 选项
+                  # 修改:
+mtime             # 文件内容被修改的时间
+ctime             # 状态修改时间
+                  #   文件内容修改
+                  #   文件名称修改: mv, rename
+                  #   所有者, 所属组变化: chown
+                  #   权限修改: chmod
+stat -c %x 1.txt  # 查看 atime
+stat -c %y 1.txt  # 查看 mtime
+stat -c %z 1.txt  # 查看 ctime
+touch    1.txt    # 修改 atime mtime, 修改 ctime 会影响到 ctime
+touch -a 1.txt    # 修改 atime
+touch -m 1.txt    # 修改 mtime, 修改 mtime 会影响到 ctime
+
+## 文件权限
+chmod u=rwx g=rw o=r 1.txt # 修改文件权限
+chmod a+x  filename        # 添加 用户, 组, 其他的 可执行 权限
+chmod  +x  filename        # 添加 用户, 组, 其他的 可执行 权限
+chmod  -x  filename        # 删除 用户, 组, 其他的 可执行 权限
+chmod 755  filename        # 使用数字设置权限
+chmod 4755 filename
+chmod u+s  filename        # 设置 SUID 权限
+                           # 只针对文件生效
+                           # 只针对二进制文件生效
+                           # 命令运行时, 拥有命令所属用户的权限
+                           # 没有可执行权限时, 展示 S
+                           #   有可执行权限时, 展示 s
+chmod 2755 filename
+chmod g+s  filename        # 设置 SGID 权限
+                           # 对文件:
+                           #    * 只针对二进制文件生效
+                           #    * 命令运行时, 拥有命令所属组的权限
+                           # 对目录:
+                           #    * 在此目录下新增的文件所属的组是此目录所属的组, 而不是此用户所属的组
+                           # 没有可执行权限时, 展示 S
+                           #   有可执行权限时, 展示 s
+chmod 1755 filename
+chmod o+t  filename        # 设置 SBIT, 只有目录的所有者才能够删除目录中的文件
+                           # 只针对目录生效
+                           # 此目录下的文件只有自己可以删除
+                           # 没有可执行权限时, 展示 T
+                           #   有可执行权限时, 展示 t
+
+chown lyb:lyb 1.txt        # 修改文件所属的组和用户
+
+## 符号链接
+
+## 通配符
+? # 代表一个字符
+* # 代表零个或多个字符
+[123]
+[1-5]
+[!a]
+[^a]
+
+## 基础正则表达式
+^      : 开头
+$      : 结尾
+.      : 除换行符以外的任意字符
+[]     : 中括号中      的任意字符
+[^]    : 中括号中字符外的任意字符
+?      : 前面字符出现 0 次 或 一次
+*      : 前面字符出现 0 次 或 多次
+
+## 扩展正则表达式
++      : 前面字符出现 1 次 或 多次
+{n}    : 前面字符出现 n 次
+{n,}   : 前面字符出现 n 次 及以上
+{n, m} : 前面字符出现 n 次 到 m 次
+()     : 将括号内的内容看成一个整体
+|      : 或
+
+## 软件安装
+apt show    vim # 列出软件包的信息
+apt install vim # 安装软件包
+apt remove  vim # 卸载软件包
+apt purge   vim # 卸载软件包, 删除数据和配置文件
+apt update      # 更新软件源
+apt upgrade     # 更新软件
+
+yum list installed       # 列出已安装的软件
+yum list vim             # 列出某软件包的详细信息
+yum list updates         # 列出可用更新
+yum provides file_name   # 查看文件属于哪个软件包
+yum update package_name  # 更新某个软件包
+yum update               # 更新所有软件包
+yum install package_name # 安装软件
+yum remove  package_name # 卸载软件
+yum erase   package_name # 卸载软件，删除数据和文件
+yum provides /etc/vimrc  # 查看文件由哪个软件使用
+yum repolist             # 列出使用的软件源
+
+
+-----------------------------
+
 ## TODO
 * 判断一个进程是否处于后台运行
-
-## Linux 基础
 
 ## Bash 基础
 
 Linux 基础知识
 * 文件名称不能包含 /
+
 #### 查看 Linux 临时端口号的范围
 ```
 cat /proc/sys/net/ipv4/ip_local_port_range
@@ -31,8 +150,6 @@ tee
 
 \command # 忽略别名
 
-##
-jobs
 history
 
 -----------------------------------------------
@@ -61,22 +178,20 @@ exec &>> lyb.log    # 脚本内重定向, 将 当前 shell 的标准输出 和 �
 * ls &> /dev/null
 * exec &>> lyb.log
 
-#### 各种括号的作用
-* 小括号
-    * 单个小括号
-        * lyb=(1 2 3)  # 数组
-        * (ls)         # 子shell执行命令, 输出到屏幕上
-        * lyb=$(ls)    # 子shell执行命令, 存入变量
-        * cat <(ls)    # 将命令 或 函数的输出做为 文件, 命令要有打开 文件 的动作
-    * 双小括号
-        * ((1+2))      # 数学计算, 变量不需要加 $, 计算结果不为 0 时, 表示状态正常
-        * lyb=$((1+2)) # 数学计算, 变量不需要加 $, 计算结果存入变量
-* 中括号
-    * 单中括号
-        * [ -a file ]    # 判断文件的各种状态, < 等会有问题
-        * lyb=$[lyb+lyb] # 数学计算, 变量不需要加 $, 计算结果存入变量
-    * 双中括号
-        * [[ -a file ]]    # 判断文件的各种状态, < 等不会有问题, 支持正则
+## 各种括号的作用
+* 单个小括号
+    * lyb=(1 2 3)  # 数组
+    * (ls)         # 子shell执行命令, 输出到屏幕上
+    * lyb=$(ls)    # 子shell执行命令, 存入变量
+    * cat <(ls)    # 将命令 或 函数的输出做为 文件, 命令要有打开 文件 的动作
+* 双小括号
+    * ((1+2))      # 数学计算, 变量不需要加 $, 计算结果不为 0 时, 表示状态正常
+    * lyb=$((1+2)) # 数学计算, 变量不需要加 $, 计算结果存入变量
+* 单中括号
+    * [ -a file ]    # 判断文件的各种状态, < 等会有问题
+    * lyb=$[lyb+lyb] # 数学计算, 变量不需要加 $, 计算结果存入变量
+* 双中括号
+    * [[ -a file ]]    # 判断文件的各种状态, < 等不会有问题, 支持正则
 * 大括号
     * 代码块
     * 作为变量的分割符
@@ -86,7 +201,7 @@ exec &>> lyb.log    # 脚本内重定向, 将 当前 shell 的标准输出 和 �
 * 使用双小括号进行数学计算, 比如: lyb=$((123+456))
 * 使用双中括号进行文件判断, 支持正则: [[ lyb =~ ^l ]]
 
-#### 字符串
+## 字符串
 length=${#val}       # 输出字符串的长度
 ${val:起始位置:长度} # 获取子串
 lyb=123
@@ -113,7 +228,7 @@ lyb=${lyb,,}        # 变为小写
 * 以 $ 开头的, 也是变量
 * 其他的无论加不加引号, 都是字符串
 
-#### 数组
+## 数组
 v=(1 2 3) # 定义数组
 ${v[1]}   # 数组中指定元素的值
 ${v[*]}   # 数组中所有元素的值, "1 2 3"
@@ -127,7 +242,7 @@ declare -A v # 关联数组, map
 v[a]=a
 v[b]=b
 
-#### 子shell
+## 子shell
 source .bashrc # 当前 shell 执行, 变量等会影响当前 shell
      . .bashrc # 同上
 ./bin.sh       # 在子 shell 中执行, 变量等不会影响当前 shell
@@ -135,29 +250,6 @@ exec ls        # 替换当前 shell, 执行后不再执行之后的命令
 exec &>1.txt   # 打开文件描述符, 然后继续执行之后的命令
 env            # 设置环境变量, 然后执行程序
 
-#### 通配符
-? # 代表一个字符
-* # 代表零个或多个字符
-[123]
-[1-5]
-[!a]
-[^a]
-
-#### 基础正则表达式
-^      : 开头
-$      : 结尾
-.      : 除换行符以外的任意字符
-[]     : 中括号中      的任意字符
-[^]    : 中括号中字符外的任意字符
-?      : 前面字符出现 0 次 或 一次
-*      : 前面字符出现 0 次 或 多次
-#### 扩展正则表达式
-+      : 前面字符出现 1 次 或 多次
-{n}    : 前面字符出现 n 次
-{n,}   : 前面字符出现 n 次 及以上
-{n, m} : 前面字符出现 n 次 到 m 次
-()     : 将括号内的内容看成一个整体
-|      : 或
 
 ## 脚本
 $0 # 脚本名称
@@ -166,62 +258,12 @@ $* # 所有参数拼成一个字符串
 $@ # 参数序列
 $# # 参数个数
 
-#### 脚本上重定向
+## 脚本上重定向
 cat << EOF
     $lyb
 EOF
 
-
-
-
-
-## 作业有三种状态
-* 前台运行
-* 后台运行
-* 后台暂停
-
-## 在后台运行程序
-* sleep &
-
-## 三种状态的切换 -- 作业号有无 % 都成
-* 前台运行 --> 后台暂停: ctrl+z
-* 前台运行 --> 后台运行: 无法直接实现
-* 后台暂停 --> 后台运行: bg %作业号, 可能失败, 比如 vim
-* 后台运行 --> 后台暂停: 无法直接实现
-
-## 文件的三个时间
-* atime: 文件内容最后被读取的时间--更新可能不及时
-* mtime: 文件内容被修改的时间
-* ctime: 状态修改时间
-    * 文件内容修改
-    * 文件名称修改: mv, rename
-    * 所有者, 所属组变化: chown
-    * 权限修改: chmod
-
-* ls   -lu    1.txt # atime 人类可读的形式
-* ls   -lt    1.txt # mtime 人类可读的形式
-* ls   -lc    1.txt # ctime 人类可读的形式
-
-## 出于性能考虑，在内核 2.6.30 之后 只有以下情况会更新 atime
-* atime 比 mtime 或 ctime 旧
-* atime 比上一次 atime 超过 24 小时
-* mount 时, 使用了 strictatime 选项
-
-## 例子
-* 修改 atime            : cat 1.txt
-* 修改             ctime: chmod +x 1.txt
-* 修改       mtime ctime: echo "123" >> 1.txt
-* 修改 atime mtime ctime: 使用 vim 编辑并保存
-
-
 ## 常用命令
-apt show    vim # 列出软件包的信息
-apt install vim # 安装软件包
-apt remove  vim # 卸载软件包
-apt purge   vim # 卸载软件包, 删除数据和配置文件
-apt update      # 更新软件源
-apt upgrade     # 更新软件
-
 awk 'BEGIN{ print "start" } pattern { commands } END{ print "end" }' file
 FS 输入字段分隔符
 RS 输入记录分隔符
@@ -270,36 +312,6 @@ cat -v 1.txt # 显示不可打印字符
 
 chattr +i file             # 设置文件不可修改
 chattr -i file             # 取消文件不可修改
-
-chmod u=rwx g=rw o=r 1.txt # 修改文件权限
-chmod a+x  filename        # 添加 用户, 组, 其他的 可执行 权限
-chmod  +x  filename        # 添加 用户, 组, 其他的 可执行 权限
-chmod  -x  filename        # 删除 用户, 组, 其他的 可执行 权限
-chmod 755  filename        # 使用数字设置权限
-chmod 4755 filename
-chmod u+s  filename        # 设置 SUID 权限
-                           # 只针对文件生效
-                           # 只针对二进制文件生效
-                           # 命令运行时, 拥有命令所属用户的权限
-                           # 没有可执行权限时, 展示 S
-                           #   有可执行权限时, 展示 s
-chmod 2755 filename
-chmod g+s  filename        # 设置 SGID 权限
-                           # 对文件:
-                           #    * 只针对二进制文件生效
-                           #    * 命令运行时, 拥有命令所属组的权限
-                           # 对目录:
-                           #    * 在此目录下新增的文件所属的组是此目录所属的组, 而不是此用户所属的组
-                           # 没有可执行权限时, 展示 S
-                           #   有可执行权限时, 展示 s
-chmod 1755 filename
-chmod o+t  filename        # 设置 SBIT, 只有目录的所有者才能够删除目录中的文件
-                           # 只针对目录生效
-                           # 此目录下的文件只有自己可以删除
-                           # 没有可执行权限时, 展示 T
-                           #   有可执行权限时, 展示 t
-
-chown lyb:lyb 1.txt        # 修改文件所属的组和用户
 
 comm 1.txt 2.txt                    # 文件的交并补全
 comm 1.txt 2.txt       | tr -d '\t' # 全集
@@ -377,10 +389,15 @@ docker exec     容器ID ls                # 对于在后台运行的容器, 执
 dpkg -L vim        # 列出 vim 软件包安装的全部文件
 dpkg --search /... # 查看该文件是哪个软件包安装的, 使用绝对路径
 
-du -d 1          #
-du --max-depth=1 # 最大目录深度
-du -sh           # 只列出整体使用大小
-du -ch           #   列出整体使用大小
+du                      # 列出目录大小
+du -a                   # 列出目录和文件大小
+du -d 1                 #
+du --max-depth=1        # 最大目录深度
+du -sh                  # 只列出整体使用大小
+du -ch                  #   列出整体使用大小
+du -X 1.txt             #
+du --exclude-from=1.txt # 忽略文件中的内容
+du --exclude="*.txt"    # 忽略指定文件, 支持通配符
 
 echo       "123"   # 输出换行
 echo    -n "123"   # 不换行
@@ -458,9 +475,6 @@ firewall-cmd --runtime-to-permanent             # 将当前防火墙的规则永
 flock    123.txt ls # 使用 123.txt 设置文件互斥锁 并执行命令, 如果获取锁失败, 将等待
 flock -n 123.txt ls # 使用 123.txt 设置文件互斥锁 并执行命令, 如果获取锁失败, 将退出
 flock -e 123.txt ls # 使用 123.txt 设置文件共享锁 并执行命令, 默认为互斥锁
-
-fg %作业号 # 后台暂停 --> 前台运行
-           # 后台运行 --> 前台运行
 
 gcc -0g main.cc
 gcc -01 main.cc
@@ -614,13 +628,6 @@ iconv
 ip addr
 ip route
 
-jobs    %作业号  # 列出后台作业, 有无 % 都成
-jobs -l %作业号  # 列出 PID
-jobs -p %作业号  # 只列出 PID
-jobs -n          # 只列出进程改变的作业
-jobs -s          # 只列出停止的作业
-jobs -r          # 只列出运行中的作业
-
 killall vim        # 进程名称
 killall -I vim     # 忽略大小写
 killall -i vim     # 删除之前确认
@@ -649,6 +656,7 @@ lsof -i@1.2.3.4:22 # 查看是否连接到指定 IP 和 端口号上
 lsof -p 1234       # 指定 进程号
 lsof -d 0,1,2,3    # 指定 文件描述符
 lsof -t            # 仅获取进程ID
+lsof -a            # 参数取且
 
 ls           # 列出当前目录中的元素
 ls -a        # 列出当前目录中的元素, 包括隐藏的文件
@@ -879,14 +887,6 @@ GatewayPorts no            # 远程转发时, 是否允许其他主机使改端�
 
 stat       1.txt # 列出 birth atime mtime ctime
 stat -L    1.txt # 符号链接所指向的文件, 而不是符号链接本身
-stat -c %w 1.txt # 列出 birth, 可读形式
-stat -c %W 1.txt # 列出 birth, 时间戳
-stat -c %x 1.txt # 列出 atime, 可读形式
-stat -c %X 1.txt # 列出 atime, 时间戳
-stat -c %y 1.txt # 列出 mtime, 可读形式
-stat -c %Y 1.txt # 列出 mtime, 时间戳
-stat -c %z 1.txt # 列出 ctime, 可读形式
-stat -c %Z 1.txt # 列出 ctime, 时间戳
 
 sudo                                                 # 权限管理文件: /etc/sudoers, 使用 visudo 编辑
                                                      # 使用当前用户的密码
@@ -1059,17 +1059,6 @@ wc -m # 字符数
 
 cat lyb | xargs -i vim {} # 以此编辑 lyb 中的每一个文件
 
-yum list installed       # 列出已安装的软件
-yum list vim             # 列出某软件包的详细信息
-yum list updates         # 列出可用更新
-yum provides file_name   # 查看文件属于哪个软件包
-yum update package_name  # 更新某个软件包
-yum update               # 更新所有软件包
-yum install package_name # 安装软件
-yum remove  package_name # 卸载软件
-yum erase   package_name # 卸载软件，删除数据和文件
-yum provides /etc/vimrc  # 查看文件由哪个软件使用
-yum repolist             # 列出使用的软件源
 --------------------------------------------------
 
 #### IFS
