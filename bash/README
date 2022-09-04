@@ -962,20 +962,16 @@ tar -tf a.tgz                                           # 列出 tgz 中的文�
 tee    1.txt # 管道中把文件拷贝到文件
 tee -a 1.txt # 管道中把文件添加到文件
 
-touch    1.txt         # 使用当前时间修改 atime mtime ctime
-touch -a 1.txt         # 使用当前时间修改 atime
-touch -m 1.txt         # 使用当前时间修改       mtime ctime
-touch -m 1.txt -d ...  # 指定时间, 而不是当前时间
-touch -m 1.txt -t ...  # 指定时间, 依次是: 时区-年-月-日-时-分-秒
-touch -c 1.txt         # 文件不存在时, 不创建文件
-touch -r 1.txt 2.txt   # 以 1.txt 的时间修改 2.txt
-touch -h 1.txt         # 改变符号链接本身, 而不是所指向的文件
-touch    1.txt   # 修改 atime mtime
-                 # 修改 ctime 会修改 ctime
-touch -a 1.txt   # 修改 atime
-touch -m 1.txt   # 修改 mtime
-                 # 修改 mtime 会修改 ctime
-
+touch        1.c # 修改 atime mtime
+                 # 修改 mtime 会影响 ctime
+touch -a     1.c # 修改 atime
+touch -c     1.c # 文件不存在时, 不创建文件
+touch -d ... 1.c # 指定时间, 而不是当前时间
+touch -h     1.c # 改变符号链接本身, 而不是所指向的文件
+touch -m     1.c # 修改 mtime
+                 # 修改 mtime 会影响 ctime
+touch -r 2.c 1.c # 以 2.c 的时间修改 1.c
+touch -t ... 1.c # 指定时间, 依次是: 时区-年-月-日-时-分-秒
 
 trap ... ERR  # 发生错误退出时, 执行指定命令
 trap ... EXIT # 任意情况退出时, 执行指定命令
