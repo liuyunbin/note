@@ -269,6 +269,16 @@ comm 1.txt 2.txt -3    | tr -d '\t' # 求不同时出现在两个文件中的部
 comm 1.txt 2.txt -1 -3              # B - A
 comm 1.txt 2.txt -2 -3              # A - B
 
+cp    123 456             # 拷贝文件时, 123 默认使用符号链接所指向的文件
+                          # 拷贝目录时, 123 默认使用符号链接本身
+                          # 456 只使用符合链接所指向的文件
+cp -r 123 456             # 递归复制
+cp -s 123 456             # 生成符号链接, 只能在当前目录生效
+cp -d 123 456             # 总是拷贝符号链接本身
+cp -P 123 456             # 总是拷贝符号链接本身
+cp -L 123 456             # 总是拷贝符号链接所指的文件
+cp --parents a/b/c/d test # 全路径复制, 将生成 test/a/b/c/d
+
 crontab -l # 查询任务表
 crontab -e # 编辑任务表
 crontab -r # 删除任务表
@@ -316,7 +326,6 @@ Ctrl+Z  # 前台运行的程序 --> 后台暂停
 Ctrl+/      # TODO-撤销之前的操作
 Ctrl+\      # TODO-产生 SIGQUIT, 默认杀死进程, 并生成 core 文件
 
-
 curl -I ... # 只打印头部信息
 
 cut -f 1,2  # 按列切割
@@ -343,18 +352,6 @@ diff    1.txt 2.txt > diff.pathc
 
 dirname $(readlink -f $0) # 获取脚本的名称
 
-dos2unix 1.txt # \r\n --> \n
-
-cp    123 456             # 拷贝文件时, 123 默认使用符号链接所指向的文件
-                          # 拷贝目录时, 123 默认使用符号链接本身
-                          # 456 只使用符合链接所指向的文件
-cp -r 123 456             # 递归复制
-cp -s 123 456             # 生成符号链接, 只能在当前目录生效
-cp -d 123 456             # 总是拷贝符号链接本身
-cp -P 123 456             # 总是拷贝符号链接本身
-cp -L 123 456             # 总是拷贝符号链接所指的文件
-cp --parents a/b/c/d test # 全路径复制, 将生成 test/a/b/c/d
-
 docker run ubuntu:15.10     /bin/ls                 # 启动 docker 并执行命令 ls
 docker run ubuntu:15.10 -it /bin/bash               # 使用交互式终端
 docker run ubuntu:15.10 -d                          # 使用后台模式, 返回容器 ID
@@ -375,6 +372,8 @@ docker rm -f    容器ID                   # 删除容器
 docker attach   容器ID                   # 进入在后台运行的容器
 docker exec -it 容器ID /bin/bash         # 对于在后台运行的容器, 开启交互式终端, 终端退出, docker 不会终止
 docker exec     容器ID ls                # 对于在后台运行的容器, 执行命令
+
+dos2unix 1.txt # \r\n --> \n
 
 dpkg -L vim        # 列出 vim 软件包安装的全部文件
 dpkg --search /... # 查看该文件是哪个软件包安装的, 使用绝对路径
