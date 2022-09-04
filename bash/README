@@ -913,11 +913,20 @@ PasswordAuthentication     # 指定是否允许密码登录，默认值为 yes
 Port 22                    # 监听端口号
 GatewayPorts no            # 远程转发时, 是否允许其他主机使改端口号, 默认不允许
 
-stat       1.txt # 列出 birth atime mtime ctime
-stat -L    1.txt # 符号链接所指向的文件, 而不是符号链接本身
-stat -c %x 1.txt # 查看 atime
-stat -c %y 1.txt # 查看 mtime
-stat -c %z 1.txt # 查看 ctime
+stat       1.c # 列出 birth atime mtime ctime
+stat -c %a 1.c # 查看权限, 644 形式
+stat -c %A 1.c # 查看权限, rwx 形式
+stat -c %g 1.c # 查看文件所属组的 ID
+stat -c %G 1.c # 查看文件所数组的 name
+stat -c %h 1.c # 查看硬链接的个数
+stat -c %m 1.c # 查看挂载点
+stat -c %u 1.c # 查看文件所属用户的 ID
+stat -c %U 1.c # 查看文件所属用户的 name
+stat -c %w 1.c # 查看 birth
+stat -c %x 1.c # 查看 atime
+stat -c %y 1.c # 查看 mtime
+stat -c %z 1.c # 查看 ctime
+stat -L    1.c # 符号链接所指向的文件, 而不是符号链接本身
 
 sudo                                                 # 权限管理文件: /etc/sudoers, 使用 visudo 编辑
                                                      # 使用当前用户的密码
