@@ -232,38 +232,40 @@ cat -t 1.txt # 同 -Tv
 cat -T 1.txt # 显示 TAB
 cat -v 1.txt # 显示不可打印字符
 
-chattr +i file             # 设置文件不可修改
-chattr -i file             # 取消文件不可修改
+chattr +i file # 设置文件不可修改
+chattr -i file # 取消文件不可修改
 
-chmod u=rwx g=rw o=r 1.txt # 修改文件权限
-chmod a+x  filename        # 添加 用户, 组, 其他的 可执行 权限
-chmod  +x  filename        # 添加 用户, 组, 其他的 可执行 权限
-chmod  -x  filename        # 删除 用户, 组, 其他的 可执行 权限
-chmod 755  filename        # 使用数字设置权限
-chmod 4755 filename
-chmod u+s  filename        # 设置 SUID 权限
-                           # 只针对文件生效
-                           # 只针对二进制文件生效
-                           # 命令运行时, 拥有命令所属用户的权限
-                           # 没有可执行权限时, 展示 S
-                           #   有可执行权限时, 展示 s
-chmod 2755 filename
-chmod g+s  filename        # 设置 SGID 权限
-                           # 对文件:
-                           #    * 只针对二进制文件生效
-                           #    * 命令运行时, 拥有命令所属组的权限
-                           # 对目录:
-                           #    * 在此目录下新增的文件所属的组是此目录所属的组, 而不是此用户所属的组
-                           # 没有可执行权限时, 展示 S
-                           #   有可执行权限时, 展示 s
-chmod 1755 filename
-chmod o+t  filename        # 设置 SBIT, 只有目录的所有者才能够删除目录中的文件
-                           # 只针对目录生效
-                           # 此目录下的文件只有自己可以删除
-                           # 没有可执行权限时, 展示 T
-                           #   有可执行权限时, 展示 t
+chmod u=rwx 1.c # 所属用户
+chmod g+x   1.c # 所属组
+chmod o-r   1.c # 其他
+chmod a+x   1.c # 上述所有
+chmod  +x   1.c # 排除 umask 的权限
+chmod  755  1.c # 使用数字设置权限
+chmod 4755  1.c #
+chmod u+s   1.c # 设置 SUID 权限
+                # 只针对文件生效
+                # 只针对二进制文件生效
+                # 命令运行时, 拥有命令所属用户的权限
+                # 没有可执行权限时, 展示 S
+                #   有可执行权限时, 展示 s
+chmod 2755  1.c
+chmod g+s   1.c # 设置 SGID 权限
+                # 对文件:
+                #   只针对二进制文件生效
+                #   命令运行时, 拥有命令所属组的权限
+                # 对目录:
+                #   新增的文件所属的组是此目录所属的组
+                #      而不是此用户所属的组
+                # 没有可执行权限时, 展示 S
+                #   有可执行权限时, 展示 s
+chmod 1755  1.c
+chmod o+t   1.c # 设置 SBIT
+                # 只针对目录生效
+                # 此目录下的文件只有自己可以删除
+                # 没有可执行权限时, 展示 T
+                #   有可执行权限时, 展示 t
 
-chown lyb:lyb 1.txt        # 修改文件所属的组和用户
+chown lyb:lyb 1.c # 修改文件所属的组和用户
 
 comm 1.txt 2.txt                    # 文件的交并补全
 comm 1.txt 2.txt       | tr -d '\t' # 全集
@@ -660,7 +662,9 @@ jobs -r          # 只列出运行中的作业
 killall vim        # 进程名称
 killall -I vim     # 忽略大小写
 killall -i vim     # 删除之前确认
-killall -r vim     # 使用扩展的正则表达式, 包括 通配符?
+killall -r vim     # 使用扩展的正则表达式
+                   # 前缀匹配
+killall -e vim     # TODO 干嘛的?
 killall -u lyb vim # 指定用户的进程
 
 kill PID     # 进程ID
