@@ -24,7 +24,61 @@
                       # 使用 bash 内置的 kill
 ```
 
+## 进程
+```
+ps -ef             # 显示所有进程
+ps -o pid,command  # 只显示进程 ID 和进程名称
+ps -o fuser=       # 只显示实际用户
+ps -o euser=       # 只显示有效用户
+ps -o lstart,etime # 只显示启动时间, 耗时
+ps -p 123          #   显示指定进程的信息
+ps -u lyb          # 有效用户为 lyb 的进程
+ps -U lyb          # 实际用户为 lyb 的进程
+ps -ww             # 不限制输出宽度
+                   # 显示完整进程名称
+pwdx pid...        # 列出进程的工作目录
+                   #
+pgrep vim          # 列出 vim 的进程号
+                   # 使用前缀匹配
+                   # 使用扩展的正则表达式
+                   # 进程名称只能使用前 15 位
+pgrep -a           # 列出进程号和完整的进程名称
+pgrep -c           # 列出进程数目
+pgrep -l           # 列出进程号和进程名称
+pgrep -u lyb       # 有效用户ID
+pgrep -U lyb       # 实际用户ID
+                   #
+pkill    vim       # 杀死进程
+                   # 使用前缀匹配
+                   # 使用扩展的正则表达式
+                   # 进程名称只能使用前 15 位
+pkill -9 vim       # 发送指定信号
+                   # 其他参数和 pgrep 类似
+killall vim        # 进程名称
+killall -9 vim     # 指定信号
+killall -I vim     # 忽略大小写
+killall -i vim     # 删除之前确认
+killall -r vim     # 使用扩展的正则表达式
+                   # 前缀匹配
+killall -e vim     # TODO 干嘛的?
+killall -u lyb vim # 指定用户的进程
+                   #
+kill PID           # 进程ID
+                   #
+/proc/.../cmdline  # 完整的启动命令
+/proc/.../comm     # 进程名称, 最多 15 位
+/proc/.../cwd      # 当前目录
+                   #
+top                # 使用 CPU 排序
+                   # M 按内存使用排序
+                   # f 选择排序字段
+```
+
+
 -----------------------------------------------------------------
+getconf NAME_MAX /
+getconf PATH_MAX /
+
 ## 命令需要注意的问题
 通配符还是基础正则表达式, 还是扩展正则表达式
 如何处理符号链接
@@ -670,16 +724,6 @@ iconv
 ip addr
 ip route
 
-killall vim        # 进程名称
-killall -I vim     # 忽略大小写
-killall -i vim     # 删除之前确认
-killall -r vim     # 使用扩展的正则表达式
-                   # 前缀匹配
-killall -e vim     # TODO 干嘛的?
-killall -u lyb vim # 指定用户的进程
-
-kill PID     # 进程ID
-
 less
 空格   : 下一页
 ctrl+F : 下一页
@@ -755,21 +799,6 @@ patch     1.txt diff.pathc  # 恢复文件
 patch -p1 1.txt diff.pathc  # 恢复文件, 忽略 diff.pathc 的第一个路径
 
 passwd lyb # 修改密码
-
-pgrep vim         # 列出 使用 vim 的进程号
-pgrep vim  -l     # 列出 使用 vim 的进程号和进程名称
-pgrep vim  -a     # 列出 使用 vim 的进程号和全路径的完整的进程名称
-pgrep vim  -f     # 只要完整进程路径匹配到即可, 而不是进程名的前缀匹配
-pgrep vim  -u lyb # 列出有效用户ID 是 lyb 的进程 ID
-pgrep vim  -U lyb # 列出真正用户ID 是 lyb 的进程 ID
-
-ps -ef                             # 显示所有进程的详细信息
-ps -p 123                          # 显示指定进程的信息
-ps -o pid,ppid,command             # 按指定格式显示进程的信息
-ps -p 123 -o user,lstart,etime     # 查看指定进程的启动用户, 启动时间, 耗时
-ps -p 123 -o user=,lstart=,etime=  # 不显示列名称
-
-pwdx pid... # 列出进程的启动目录
 
 readlink symbolic_link_name     # 读取符号链接
 readlink symbolic_link_name -f  # 读取符号链接, 递归
