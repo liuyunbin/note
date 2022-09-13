@@ -1,11 +1,11 @@
 
 add_executable(
-    solve-sudoku
-    solve-sudoku.cc
+    solve_sudoku
+    solve_sudoku.cc
     )
 
 add_test(
-    NAME solve-sudoku
-    COMMAND solve-sudoku data.txt
+    NAME solve_sudoku
+    COMMAND solve_sudoku data.txt
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
