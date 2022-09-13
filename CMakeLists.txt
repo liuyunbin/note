@@ -1,40 +1,33 @@
-cmake_minimum_required(VERSION 2.8) # 设置所需要的 CMake 的最小版本
+# 设置所需要的 CMake 的最小版本
+cmake_minimum_required(VERSION 3.2)
 
-project(note) # 项目名称
+# 项目名称
+project(note)
 
+# 设置 C++ 编译选项
 set(CXX_FLAGS
     -Wall
-#    -Werror # 将所有警告转为错误
+    -Werror # 将所有警告转为错误
     -Wextra
     -Wno-unused-parameter
     -std=c++11
     )
 
-string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}") # 设置 C++ 编译选项
+string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib) # 设置 静态库     的输出目录
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib) # 设置 动态库     的输出目录
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin) # 设置 二进制文件 的输出目录
+# 设置 静态库     的输出目录
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+# 设置 动态库     的输出目录
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+# 设置 二进制文件 的输出目录
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 #include_directories(${CMAKE_SOURCE_DIR}/include) # 设置头文件的搜索目录
 #   link_directories(${CMAKE_SOURCE_DIR}/lib)     # 设置库文件的搜索目录
 #   link_directories(${CMAKE_SOURCE_DIR}/lib64)   # 设置库文件的搜索目录
 
-enable_testing() # 激活测试
+# 激活测试
+enable_testing()
 
-#add_subdirectory(linux-game/solve-sudoku)
-#add_subdirectory(university-code/read-up-down-left-right)
-
-#add_subdirectory(cpp-standard-library)
-#add_subdirectory(huge-number)
-#add_subdirectory(linux-command)
-#add_subdirectory(linux-function)
-#add_subdirectory(linux-game)
-#add_subdirectory(linux-network-program)
-
-
-#add_executable(
-#    double_to_string
-#    double_to_string.cc
-#    )
+add_subdirectory(src)
 
