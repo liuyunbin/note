@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8) # 设置所需要的 CMake 的最小版本
 
-project(liuyunbin-toys) # 项目名称
+project(note) # 项目名称
 
 set(CXX_FLAGS
     -Wall
@@ -33,8 +33,8 @@ enable_testing() # 激活测试
 #add_subdirectory(linux-network-program)
 
 
-add_executable(
-    double_to_string
-    double_to_string.cc
-    )
+#add_executable(
+#    double_to_string
+#    double_to_string.cc
+#    )
 

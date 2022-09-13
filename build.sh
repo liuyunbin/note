@@ -12,9 +12,7 @@ cmake ..
 
 make
 
-make test
+#make test
 
 cd ..
-
-cp -rf  bin/* ../bin
 
