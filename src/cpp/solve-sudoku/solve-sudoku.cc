@@ -1,31 +1,4 @@
 
-//简介：
-//  * 本程序用于解数独，可从文件 或 标准输入 输入数据
-//  * 数据格式为 81 个数字字符 [0, 9]
-//  * 本程序将忽略除数字字符以外的其它字符
-//
-//程序执行流程：
-//  1. 从 文件 或 标准输入 读取数据
-//  2. 判断数独是否合法，如果不合法，直接退出
-//  3. 依次对每个未填字符进行判断，最后输出解 或 无解
-//
-//使用：
-//  $ sudoku [可选项]... [文件名]...
-//
-//可选项：
-//  * -a，--all  ，输出所有解
-//  * -h，--help ，输出帮助
-//  * -f，--file ，从文件输入数据
-//
-//例子：
-//  $ sudoku                从标准输入输入数据
-//  $ sudoku -a             从标准输入输入数据，输出所有解
-//  $ sudoku data.txt       从文件输入数据
-//  $ sudoku data.txt -a    从文件输入数据，输出所有解
-//  $ sudoku -f data.txt    从文件输入数据
-//  $ sudoku -f data.txt -a 从文件输入数据，输出所有解
-//  $ sudoku -h             输出帮助
-
 #include <ctype.h>   // isdigit
 #include <errno.h>   // program_invocation_name
 #include <getopt.h>  // getopt_long
