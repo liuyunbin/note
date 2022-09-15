@@ -36,7 +36,7 @@ string add(string x, string y) {
     int sum = 0;
     string z;
 
-    for (int i = x.size() - 1; i > 1; --i) {
+    for (size_t i = x.size() - 1; i > 1; --i) {
         sum += (x[i] - '0') + (y[i] - '0');
         z  = string(1, '0' + sum%10) + z;
         sum /= 10;
@@ -48,7 +48,7 @@ string div(string x) {
     string z = "0.";
     int sum = 0;
 
-    for (int  i = 2; i < x.size(); ++i){
+    for (size_t  i = 2; i < x.size(); ++i){
         sum = sum * 10 + (x[i] - '0');
         z += string(1, sum / 2 + '0');
         sum %= 2;
@@ -68,10 +68,9 @@ void output(double x) {
     string e_str = str.substr(1, 11);
     int    e_int = (int)bitset<32>(e_str).to_ulong();
     string f_str = str.substr(12);
-    long   f_int = 0;
 
     string result="0.0";
-    for (int i = 0; i < f_str.size(); ++i)
+    for (size_t i = 0; i < f_str.size(); ++i)
         if (f_str[i] == '1')
             result = add(result, arr[i]);
 
