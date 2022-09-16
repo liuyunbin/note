@@ -153,7 +153,7 @@ string bit_to_double_by_cs(const string& str) {
     return result.substr(0, index + 1);
 }
 
-struct Double {
+struct HandleDouble {
     string s_str;      // 符号位
     string e_str;      // 阶码
     int    e_int;      // 阶码的十进制
@@ -260,7 +260,7 @@ void handle_bit(const string& str) {
         }
         str_format[k++] = str[i];
     }
-    Double t;
+    HandleDouble t;
     t.cal(str_format);
     t.output();
 }
