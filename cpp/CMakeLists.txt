@@ -8,7 +8,7 @@ add_executable(
 
 
 add_executable(
-    double
-    double.cc
+    handle_double
+    handle_double.cc
     )
 
