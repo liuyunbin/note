@@ -1,15 +1,18 @@
-                                  # 官网: https://EditorConfig.org
-root                     = true   # 表示顶层配置
-                                  #
-[*]                               # 通用配置:
-indent_style             = space  #     * 使用 空格 缩进
-indent_size              = 4      #     * 缩进大小是 4 格
-charset                  = utf-8  #     * 使用 UTF-8 编码
-end_of_line              = lf     #     * 换行符为 \n
-insert_final_newline     = true   #     * 文件末尾插入换行符
-trim_trailing_whitespace = true   #     * 移除行尾的空字符
-                                  #
-[Makefile]                        # Makefile 配置
-indent_style             = tab    #     * 缩进使用 Tab
-tab_width                = 4      #     * 缩进 大小为 4 格
+# 官网: https://editorconfig.org
+
+root         = true  # 表示顶层配置
+                     #
+[*]                  # 通用配置:
+indent_style = space #   使用 空格 缩进
+indent_size  = 4     #   缩进大小是 4 格
+charset      = utf-8 #   使用 UTF-8 编码
+end_of_line  = lf    #   换行符为 \n
+insert_final_newline = true
+                     #   文件末尾插入换行符
+trim_trailing_whitespace = true
+                     #   移除行尾的空字符
+                     #
+[Makefile]           # Makefile 配置
+indent_style = tab   #   使用 Tab 缩进
+tab_width    = 4     #   Tab 大小为 4 格
 
