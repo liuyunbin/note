@@ -53,3 +53,239 @@ CMKAE_BINARY_DIR     # 项目的构建目录
 CMAKE_INSTALL_PREFIX # 安装目录前缀
 CMAKE_CXX_FLAGS      # C++ 编译选项
 
+## 简介
+CMake 是一个构建工程的工具
+
+## 测试环境
+* Ubuntu 18.04 LTS
+* CMake 3.10.2
+
+## 安装
+```
+$ sudo apt install cmake
+```
+
+## 使用
+#### 1. 在指定目录下写 CMakeLists.txt，文件名区分大小写
+
+#### 2. 创建并切换到构建目录
+```
+$ mkdir -p build
+$ cd build
+```
+
+#### 3. 设置安装前缀，生成 Makefile
+```
+$ cmake -DCMAKE_INSTALL_PREFIX=/usr  ..
+```
+
+#### 4. 编译
+```
+$ make
+```
+
+#### 5. 测试（可选）
+```
+$ make test
+```
+
+#### 6. 安装（可选）
+```
+$ make install
+```
+
+说明：内部编译会导致文件结构混乱，因此这里使用外部构建
+
+## CMake 常用命令
+### CMake 命令不区分大小写，以下说明均用小写字母说明
+#### 指定 CMake 的最小版本
+```
+cmake_minimum_required(VERSION min-version)
+```
+
+#### 指定项目名称
+```
+project(project-name)
+```
+
+#### 向用户输出提示信息
+```
+message(STATUS "message to display")
+```
+
+#### 向用户输出错误信息，构建直接停止
+```
+message(FATAL_ERROR "message to display")
+```
+
+#### 添加子目录
+```
+add_subdirectory(source-dir)
+```
+
+#### 添加头文件的搜索目录
+```
+include_directories(include-dir)
+```
+
+#### 添加动态库的搜索目录
+```
+link_directories(library-dir)
+```
+
+#### 构建二进制文件
+```
+add_executable(executable-name source.cc)
+```
+
+#### 对文件添加需要链接的库文件
+```
+target_link_libraries(executable-name library-name)
+```
+
+#### 设置二进制文件的输出目录
+```
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+```
+
+#### 构建动态库
+```
+add_library(library-name SHARED source.cc)
+```
+
+#### 设置动态库的输出目录
+```
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+```
+
+#### 设置动态库的版本
+```
+set_target_properties(
+    library-name-shared
+    PROPERTIES
+        VERSION 1.2  # 设置动态库的版本
+        SOVERSION 1) # 设置 API 版本
+```
+
+#### 构建静态库
+```
+add_library(library-name STATIC source.cc)
+```
+
+#### 设置静态库的输出目录
+```
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+```
+
+#### 同时构建动态库和静态库
+```
+add_library(library-name-shared SHARED source.cc)
+add_library(library-name-static STATIC source.cc)
+
+set_target_properties(
+    library-name-shared
+    PROPERTIES
+        OUTPUT_NAME library-name)  # 设置库文件的输出名字
+
+set_target_properties(
+    library-name-static
+    PROPERTIES
+        OUTPUT_NAME library-name) # 设置库文件的输出名字
+```
+
+#### 设对象的属性
+```
+set_target_properties(
+    target  # 对象名称
+    PROPERTIES
+        OUTPUT_NAME huge_number  # 设置输出名称
+        OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/huge-number  # 设置输出目录
+        VERSION 1.2  # 设置动态库的版本
+        SOVERSION 1  # 设置 API 版本
+    )
+```
+
+#### 通过通配符，将指定文件存入变量
+```
+file(GLOB HEADERS "*.h")  # 非递归
+file(GLOB_RECURSE HEADERS "*.h")  # 递归
+```
+
+#### 设置需要安装的文件
+```
+install(TARGETS executable-name library-name-shared library-name-static
+    RUNTIME DESTINATION bin  # 设置二进制文件的安装目录
+    LIBRARY DESTINATION lib  # 设置动态库的安装目录
+    ARCHIVE DESTINATION lib) # 设置静态库的安装目录
+
+install(FILES hearder-name.h
+    DESTINATION include) # 设置普通文件的安装目录
+```
+
+#### 激活测试命令
+```
+enable_testing()
+```
+
+#### 添加测试程序
+```
+add_test(test-name executable-name arg)
+```
+
+#### 设置变量的值
+如果有多个值，将以分号分割，例如：如果设置 `set(var a b c)`，`${var}` 的值将为：`"a;b;c"`
+```
+set(variable-name value)
+```
+####  添加用户的 make doc 命令
+```
+add_custom_target(doc COMMAND doxygen doc/Doxyfile
+WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+```
+
+## CMake 常用变量
+### CMake 变量区分大小写
+#### 项目名称
+```
+CMAKE_PROJECT_NAME
+```
+
+#### 项目的源目录
+```
+CMKAE_SOURCE_DIR
+```
+
+#### 项目的构建目录
+```
+CMKAE_BINARY_DIR
+```
+
+#### 安装目录前缀
+```
+CMAKE_INSTALL_PREFIX
+```
+
+#### C++ 编译选项
+```
+CMAKE_CXX_FLAGS
+```
+
+## CMake 常用控制指令
+#### 判断变量是否定义
+```
+if(val)
+   command()
+endif(val)
+```
+
+#### 判断变量是否未定义
+```
+if(not val)
+   command()
+endif(not val)
+```
+
+## 参考资源
+* https://cmake.org/cmake/help/latest/manual/cmake-commands.7.html
+* [CMake  实践](https://github.com/liuyunbin/liuyunbin-toys/blob/master/doc/CMake/CMake-Practice.pdf)
+
