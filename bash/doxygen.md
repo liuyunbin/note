@@ -1,0 +1,260 @@
+## 简介
+* Doxygen 是一个将文件的特定注释转化为文档的工具
+* Doxygen 默认支持的语言有：
+C，C++，C#，Objective-C，IDL，Java，VHDL，PHP，Python，Tcl，Fortran 和 D
+
+## 测试环境
+* Ubuntu 18.04 LTS
+* Doxygen 1.8.13
+* C++
+
+## 安装
+```
+$ sudo apt install graphviz
+$ sudo apt install doxygen
+```
+
+## 使用
+### 1. 生成配置文件
+#### 默认配置文件名为：Doxyfile
+```
+$ doxygen -g <config-file>
+```
+
+#### 或（不含注释）
+```
+$ doxygen -s -g <config-file>
+```
+
+### 2. 修改配置文件（见下文）
+
+### 3. 给代码添加注释（见下文）
+
+### 4. 生成文档
+```
+$ doxygen <config-file>
+```
+
+##  修改配置文件
+### 常用配置选项如下：
+#### 设置项目的编码，默认为 UTF-8
+```
+DOXYFILE_ENCODING = UTF-8
+```
+
+#### 设置项目的名称
+```
+PROJECT_NAME = "project-name"
+```
+
+#### 设置项目的版本号
+```
+PROJECT_NUMBER = "1.0.0"
+```
+
+#### 设置项目的描述
+```
+PROJECT_BRIEF = "这是项目描述"
+```
+
+#### 设置项目的 logo
+```
+PROJECT_LOGO = ""
+```
+
+#### 设置需要处理的输入目录，如果未设置，则在当前目录查找
+```
+INPUT = src
+```
+
+#### 设置需要匹配的输入文件
+```
+FILE_PATTERNS = *.cc *.h
+```
+
+#### 设置不需要处理的输入目录
+```
+EXCLUDE =
+```
+
+#### 设置不需要匹配的输入文件
+```
+EXCLUDE_PATTERNS =
+```
+
+#### 设置输入编码，默认为 UTF-8
+```
+INPUT_ENCODING = UTF-8
+```
+
+#### 设置是否递归搜索输入目录，默认为 NO
+```
+RECURSIVE = NO
+```
+
+#### 设置是否提取所有类，函数等（不包括类的私有成员和静态成员），默认为 NO
+```
+EXTRACT_ALL = NO
+```
+
+#### 设置是否提取类的私有成员，默认为 NO
+```
+EXTRACT_PRIVATE = NO
+```
+
+#### 设置是否提取类的静态成员，默认为 NO
+```
+EXTRACT_STATIC = NO
+```
+
+#### 设置文档是否包含源文件，默认为 NO
+```
+SOURCE_BROWSER = NO
+```
+
+#### 设置是否对每个类都链接其所在的头文件中，默认值为 YES
+```
+VERBATIM_HEADERS = YES
+```
+
+#### 设置文档的输出目录，如果未设置，输出到当前目录
+```
+OUTPUT_DIRECTORY = doc
+```
+
+#### 设置是否支持 Markdown，默认值为 YES
+```
+MARKDOWN_SUPPORT = YES
+```
+
+#### 设置文档的主界面
+```
+USE_MDFILE_AS_MAINPAGE = README.md
+```
+
+#### 设置文档的语言，默认为 English
+```
+OUTPUT_LANGUAGE = Chinese
+```
+
+其它配置选项见：http://www.doxygen.nl/manual/config.html
+
+## 给代码添加注释
+### 常用的注释风格有：
+#### 在全局作用域，类前 或 函数前 注释
+```
+/**     注释的内容       */
+/*!     注释的内容       */
+///     注释的内容
+//!     注释的内容
+```
+
+#### 在文件成员，类成员，结构体成员，共同体成员，枚举成员 或 函数参数 后注释
+```
+int a; /**<      注释的内容        */
+int a; /*!<      注释的内容        */
+int a; ///<      注释的内容        */
+int a; //!<      注释的内容        */
+```
+
+其它注释风格见：http://doxygen.nl/manual/docblocks.html
+
+### 常用的注释标记如下（标记以 / 或 @ 开头表示）：
+#### 添加简单描述
+```
+@brief 简要描述
+```
+
+#### 添加详细描述
+```
+@details 详细描述
+```
+
+#### 添加类信息
+```
+@class 类名 类所在的文件 类所在的文件（可包括路径）
+```
+
+#### 添加结构体信息
+```
+@struct 结构体名 结构体所在的文件 结构体所在的文件（可包括路径）
+```
+
+#### 添加参数说明
+```
+@param [in]  输入参数名 说明
+@param [out] 输出参数名 说明
+```
+
+#### 添加返回说明
+```
+@return 返回说明
+```
+
+#### 添加返回特定值说明
+```
+@retval 特定值 特定返回值说明
+```
+
+#### 添加异常说明
+```
+@exception 异常类型 异常说明
+```
+
+#### 添加代码
+```
+@code
+...代码...
+@encode
+```
+
+#### 添加参考
+```
+@see 参考其它
+```
+
+#### 添加过时说明
+```
+@deprecated 过时说明
+```
+
+#### 添加 bug 说明
+```
+@bug "bug 说明"
+```
+
+#### 添加例子
+```
+@example 例子文件名
+```
+
+#### 添加警告信息
+```
+@warning 警告信息
+```
+
+#### 添加开始使用的版本
+```
+@since 版本
+```
+
+#### 添加注意事项
+```
+@note 注意事项
+```
+
+#### 添加作者声明
+```
+@author liuyunbin
+```
+
+#### 添加版权声明
+```
+@copyright GPL-3.0
+```
+
+其它标记选项见：http://www.doxygen.nl/manual/commands.html
+
+## 参考资源
+* http://doxygen.nl/
+
