@@ -1,4 +1,11 @@
 //
+// 原码: 正数: 最高位添加 0, 负数: 最高位添加 1
+// 反码: 正数: 等于原码, 负数: 在原码的基础上, 除符号位外, 各位取反
+// 补码: 正数: 等于原码, 负数: 在反码的基础上, 加 1
+// 移码: 加上指定数字, 使其全部变正
+//
+// int (假设 32 位)
+// int (假设 32 位)
 // double 区分大小端
 // 格式:    1-符号位 11-阶码(偏移量 1023) 52-尾码
 // +0,-0             00000000000          全为0   非规约, 没有前置 1
@@ -18,13 +25,287 @@
 #include <string>
 #include <bitset>
 #include <iomanip>
+#include <ctype.h>
 #include <algorithm>
 #include <sstream>
 #include <map>
 
 using namespace std;
 
-union Node {
+// 忽略所有的空白字符 并格式化
+// 返回结果: 空字符串, 零(+0), 正数(+1), 负数(-1)
+string digit_string_check_and_format(const string &str) {
+    string result;
+    // 去掉所有的空白字符
+    for (char ch : str)
+        if (not isspace(ch))
+            result.push_back(ch);
+
+    if (result == "")
+        return "";
+
+    if (result[0] != '-') {
+        result = "+" + result;
+    }
+
+    for (size_t i = 1; i < result.size(); ++i)
+        if (not isdigit(result[i])) {
+            cout <<  "参数不是数字: " << str << endl;
+            exit(EXIT_FAILURE);
+        }
+
+    return result;
+}
+
+// 比较两个数字字符串的大小
+int digit_string_compare(const string &lhs, const string &rhs) {
+    string lhs_string = digit_string_check_and_format(lhs);
+    string rhs_string = digit_string_check_and_format(rhs);
+
+    if (lhs_string[0] == '-' && rhs_string[0] == '-')
+        return digit_string_compare(rhs_string.substr(1), lhs_string.substr(1));
+
+    if (lhs_string[0] == '-') return -1;
+    if (rhs_string[0] == '-') return +1;
+
+    if (lhs_string.size() < rhs_string.size()) return -1;
+    if (lhs_string.size() > rhs_string.size()) return +1;
+
+    if (lhs_string < rhs_string) return -1;
+    if (lhs_string > rhs_string) return +1;
+
+    return 0;
+}
+
+string sub_digit_string(const string &lhs, const string &rhs);
+
+// 两个数字字符串相加
+string add_digit_string(const string &lhs, const string &rhs) {
+    string lhs_string = digit_string_check_and_format(lhs);
+    string rhs_string = digit_string_check_and_format(rhs);
+
+    if (lhs_string == "0") return rhs_string;
+    if (rhs_string == "0") return lhs_string;
+
+    if (lhs_string[0] == '-')
+        return sub_digit_string(rhs_string, lhs_string.substr(1));
+    if (rhs_string[0] == '-')
+        return sub_digit_string(lhs_string, rhs_string.substr(1));
+
+    auto lhs_string_it = lhs_string.crbegin();
+    auto rhs_string_it = rhs_string.crbegin();
+
+    int last = 0;
+    string result;
+
+    while (lhs_string_it != lhs_string.crend() ||
+            rhs_string_it != rhs_string.crend()) {
+        if (lhs_string_it != lhs_string.crend()) last += *lhs_string_it++ - '0';
+        if (rhs_string_it != rhs_string.crend()) last += *rhs_string_it++ - '0';
+        result.push_back('0' + last % 10);
+        last /= 10;
+    }
+    if (last == 1) result.push_back('1');
+    reverse(std::begin(result), std::end(result));
+    return result;
+}
+
+/*
+ * 两个数字字符串相减
+ * 必须处理可能存在的前置 0，例如 111 - 110 应该等于 1，而不是 001
+ */
+std::string sub_digit_string(const std::string &lhs, const std::string &rhs) {
+    std::string lhs_string = digit_string_check_and_format(lhs);
+    std::string rhs_string = digit_string_check_and_format(rhs);
+
+    if (lhs_string == rhs_string) return "0";
+
+    if (rhs_string == "0") return lhs_string;
+
+    if (lhs_string == "0") {
+        if (rhs_string[0] == '-')
+            return rhs_string.substr(1);
+        else
+            return "-" + rhs_string;
+    }
+
+    if (lhs_string[0] == '-') {
+        std::string result = add_digit_string(lhs_string.substr(1), rhs_string);
+        if (result[0] == '-')
+            return result.substr(1);
+        else
+            return '-' + result;
+    }
+
+    if (rhs_string[0] == '-')
+        return add_digit_string(lhs_string, rhs_string.substr(1));
+
+    if (digit_string_compare(lhs_string, rhs_string) == -1)
+        return "-" + sub_digit_string(rhs_string, lhs_string);
+
+    std::string result;
+
+    auto lhs_string_it = lhs_string.crbegin();
+    auto rhs_string_it = rhs_string.crbegin();
+
+    int prev = 0;
+
+    while (lhs_string_it != lhs_string.crend() ||
+            rhs_string_it != rhs_string.crend()) {
+        if (lhs_string_it != lhs_string.crend()) prev += *lhs_string_it++ - '0';
+        if (rhs_string_it != rhs_string.crend()) prev -= *rhs_string_it++ - '0';
+        if (prev < 0) {
+            result.push_back(prev + 10 + '0');
+            prev = -1;
+        } else {
+            result.push_back(prev + '0');
+            prev = 0;
+        }
+    }
+    std::reverse(std::begin(result), std::end(result));
+    auto index = result.find_first_not_of('0');  // 去除可能存在的前置 0
+    return result.substr(index);
+}
+
+/*
+ * 两个数字字符串相乘
+ */
+std::string mul_digit_string(const std::string &lhs, const std::string &rhs) {
+    std::string lhs_string = digit_string_check_and_format(lhs);
+    std::string rhs_string = digit_string_check_and_format(rhs);
+
+    if (lhs_string == "0" || rhs_string == "0") return "0";
+
+    if (lhs_string[0] == '-' && rhs_string[0] == '-')
+        return mul_digit_string(lhs_string.substr(1), rhs_string.substr(1));
+
+    if (lhs_string[0] == '-')
+        return "-" + mul_digit_string(lhs_string.substr(1), rhs_string);
+
+    if (rhs_string[0] == '-')
+        return "-" + mul_digit_string(lhs_string, rhs_string.substr(1));
+
+    // 对于 m 位无符号的数 乘以 n 位无符号的数，
+    // 结果至少有 m + n - 1 位，最多有 m + n 位
+    std::string result(lhs_string.size() + rhs_string.size(), '0');
+
+    size_t begin_index = 0;
+    size_t i = lhs_string.size();
+    while (i > 0) {
+        --i;
+        int last = 0;
+        int k = begin_index++;
+        int j = rhs_string.size();
+        while (j > 0) {
+            --j;
+            last += (lhs_string[i] - '0') * (rhs_string[j] - '0') + result[k] - '0';
+            result[k++] = '0' + last % 10;
+            last /= 10;
+        }
+        if (last != 0) result[k] = result[k] - '0' + last + '0';
+    }
+    std::reverse(std::begin(result), std::end(result));
+    if (result[0] == '0')  // 去掉多余的 0
+        return result.substr(1);
+    else
+        return result;
+}
+
+/*
+ * 两个数字字符串相除，本函数结果只包含整数部分
+ * 如果除数为 0，将退出
+ */
+std::string div_digit_string(const std::string &lhs, const std::string &rhs) {
+    std::string lhs_string = digit_string_check_and_format(lhs);
+    std::string rhs_string = digit_string_check_and_format(rhs);
+
+    if (rhs_string == "0") {
+        printf("除数不能为 0\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (lhs_string == "0") return "0";
+
+    if (lhs_string == rhs_string) return "1";
+
+    if (lhs_string[0] == '-' && rhs_string[0] == '-')
+        return div_digit_string(lhs_string.substr(1), rhs_string.substr(1));
+
+    if (lhs_string[0] == '-') {
+        std::string result = div_digit_string(lhs_string.substr(1), rhs_string);
+        return result == "0" ? "0" : ("-" + result);
+    }
+
+    if (rhs_string[0] == '-') {
+        std::string result = div_digit_string(lhs_string, rhs_string.substr(1));
+        return result == "0" ? "0" : ("-" + result);
+    }
+
+    if (digit_string_compare(lhs_string, rhs_string) == -1) return "0";
+
+    std::string result;
+
+    std::string current_str = lhs_string.substr(0, rhs_string.size());
+    std::string last_str = lhs_string.substr(rhs_string.size());
+
+    if (digit_string_compare(current_str, rhs_string) == -1) {
+        current_str += last_str[0];
+        last_str = last_str.substr(1);
+    }
+
+    for (;;) {
+        int count = 0;
+        for (;;) {
+            std::string temp = sub_digit_string(current_str, rhs_string);
+            if (temp == "0") {
+                ++count;
+                current_str = "";
+                break;
+            }
+            if (temp[0] == '-') break;
+            ++count;
+            current_str = temp;
+        }
+        result.push_back('0' + count);
+
+        if (last_str.empty()) break;
+
+        current_str += last_str[0];
+        last_str = last_str.substr(1);
+    }
+
+    return result;
+}
+
+struct StringDigit {
+    string integral; // 整数部分
+    string decimal;  // 小数部分
+
+} ;
+
+int main() {
+    StringDigit string_digit;
+
+    string_digit.integral = "123";
+
+    cout << string_digit.integral << endl;
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+union Node1 {
     double        val_double;
     unsigned long val_ulong;
 };
@@ -34,7 +315,7 @@ map<int, string> dict; // 存储 2 的幂次
 // 获取浮点数的二进制形式
 string double_to_bit(const string& str) {
     stringstream input(str);
-    Node node;
+    Node1 node;
     input >> node.val_double;
     return bitset<64>(node.val_ulong).to_string();
 }
@@ -166,16 +447,16 @@ struct HandleDouble {
     string result;
 
     void cal(const string& str) {
-                   arg        = str;
+        arg        = str;
 
-                   s_str      = str.substr(0, 1);
-                   e_str      = str.substr(1, 11);
+        s_str      = str.substr(0, 1);
+        e_str      = str.substr(1, 11);
         bitset<11> e_bit(e_str);
-                   e_int      = e_bit.to_ulong();
-                   e_int_real = e_int;
+        e_int      = e_bit.to_ulong();
+        e_int_real = e_int;
 
-                   f_str      = str.substr(12);
-                   f_str_real = f_str;
+        f_str      = str.substr(12);
+        f_str_real = f_str;
         bitset<52> f_bit(f_str);
 
         if (e_bit.all() && f_bit.none()) {
@@ -269,7 +550,18 @@ void handle_double(const string& str) {
     handle_bit(double_to_bit(str));
 }
 
-int main() {
+int main1() {
+
+    unsigned char ch = 'a';
+
+    cout << ch << endl;
+
+    return 0;
+
+
+
+
+
     int n = 3000;
     string str = "5";
     for (int  i = -1; i >= -n; --i) {

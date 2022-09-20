@@ -6,10 +6,9 @@ add_executable(
     format_iostream.cc
     )
 
-
 add_executable(
-    handle_double
-    handle_double.cc
+    digit_string
+    digit_string.cc
     )
 
 #add_executable(
