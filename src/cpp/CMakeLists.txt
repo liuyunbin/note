@@ -2,13 +2,8 @@
 add_subdirectory(solve_sudoku)
 
 add_executable(
-    format_iostream
-    format_iostream.cc
-    )
-
-add_executable(
-    digit_string
-    digit_string.cc
+    test_double
+    test_double.cc
     )
 
 #add_executable(
