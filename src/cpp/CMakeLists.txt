@@ -1,10 +1,8 @@
 
 add_subdirectory(solve_sudoku)
 
-add_executable(
-    test_double
-    test_double.cc
-    )
+add_executable(test_iostream test_iostream.cc)
+add_executable(test_double   test_double.cc)
 
 #add_executable(
 #    huge-number-unittest
