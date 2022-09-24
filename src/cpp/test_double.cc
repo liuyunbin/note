@@ -1,14 +1,15 @@
 
 // 浮点数区分大小端
 //
-// 浮点数的舍入模式有四种
-// * FE_DOWNWARD   向下舍入
-// * FE_TONEAREST  最近舍入 -- 这个使用的多 -- 四舍六入五取偶
-// * FE_TOWARDZERO 向零舍入
-// * FE_UPWARD     向上舍入
-//
-// 查看舍入方向: fegetround()
-// 设置舍入方向: fesetround(...)
+// 查看舍入模式: fegetround()
+// 设置舍入模式: fesetround(...)
+// 舍入模式 
+// * 向下舍入: std::floor
+// * 向上舍入: std::ceil
+// * 向零舍入: std::trunc, 浮点数-->整数
+// * 最近舍入: 四舍六入五取偶
+// * 四舍五入: std::round
+// * 由舍入模式决定: std::rint, std::nearbyint, printf 等
 //
 // 浮点数字符串 --> 浮点数二进制, 可能会损失精度
 // 浮点数二进制 --> 浮点数字符串,   不会损失精度
