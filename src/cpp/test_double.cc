@@ -2,10 +2,10 @@
 // 浮点数区分大小端
 //
 // 舍入模式 
-// * 向下舍入: std::floor
-// * 向上舍入: std::ceil
-// * 向零舍入: std::trunc, 浮点数-->整数
-// * 最近舍入:  默认舍入模式, 四舍六入五取偶
+// * 向下舍入(FE_DOWNWARD): std::floor
+// * 向上舍入(FE_UPWARD): std::ceil
+// * 向零舍入(FE_TOWARDZERO): std::trunc, 浮点数-->整数
+// * 最近舍入(FE_TONEAREST):  默认舍入模式, 四舍六入五取偶
 // * 四舍五入: std::round
 // * 由舍入模式决定: std::rint, std::nearbyint, printf 等
 //
@@ -121,7 +121,6 @@ void output_by_string(const string& str);
 
 int main() {
     init_dict(2000);
-
 
     name[FE_DOWNWARD]   = "向下舍入";
     name[FE_TONEAREST]  = "最近舍入";
