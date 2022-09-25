@@ -1,13 +1,12 @@
 
-#include "counter.h"
-
 #include <functional>
 #include <iostream>
 #include <thread>
 
+#include "counter.h"
+
 void function(Counter& count) {
-    for (int i = 0; i != 100; ++i)
-        ++count;
+    for (int i = 0; i != 100; ++i) ++count;
 }
 
 int main() {

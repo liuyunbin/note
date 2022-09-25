@@ -10,22 +10,22 @@
  * Testcase Example:  '[]'
  *
  * Given a binary tree, return the postorder traversal of its nodes' values.
- * 
- * 
+ *
+ *
  * For example:
  * Given binary tree {1,#,2,3},
- * 
+ *
  * ⁠  1
  * ⁠   \
  * ⁠    2
  * ⁠   /
  * ⁠  3
- * 
- * 
- * 
+ *
+ *
+ *
  * return [3,2,1].
- * 
- * 
+ *
+ *
  * Note: Recursive solution is trivial, could you do it iteratively?
  */
 /**
@@ -43,15 +43,14 @@
 
 #define MAX 1000
 void function(struct TreeNode* root, int* result, int* returnSize) {
-    if (root == NULL)
-        return ;
-    function(root->left,  result, returnSize);
+    if (root == NULL) return;
+    function(root->left, result, returnSize);
     function(root->right, result, returnSize);
     result[(*returnSize)++] = root->val;
 }
 
 int* postorderTraversal(struct TreeNode* root, int* returnSize) {
-    int* result = (int*)malloc(sizeof(int)*MAX);
+    int* result = (int*)malloc(sizeof(int) * MAX);
     *returnSize = 0;
     function(root, result, returnSize);
     return result;

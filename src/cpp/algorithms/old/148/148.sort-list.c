@@ -19,13 +19,12 @@
  * };
  */
 struct ListNode* sortList(struct ListNode* head) {
-    if (head == NULL || head->next == NULL)
-        return head;
+    if (head == NULL || head->next == NULL) return head;
     struct ListNode* fast = head;
-    struct ListNode* low  = head;
+    struct ListNode* low = head;
     while (fast->next != NULL && fast->next->next != NULL) {
         fast = fast->next->next;
-        low  = low->next;
+        low = low->next;
     }
     struct ListNode* p1 = sortList(low->next);
     low->next = NULL;

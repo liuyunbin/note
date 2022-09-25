@@ -19,16 +19,14 @@
  * };
  */
 struct ListNode* insertionSortList(struct ListNode* head) {
-    if (head == NULL || head->next == NULL)
-        return head;
+    if (head == NULL || head->next == NULL) return head;
     struct ListNode node;
     node.next = NULL;
     while (head != NULL) {
         struct ListNode* p1 = head;
         head = head->next;
         struct ListNode* p2 = &node;
-        while (p2->next != NULL && p2->next->val < p1->val)
-            p2 = p2->next;
+        while (p2->next != NULL && p2->next->val < p1->val) p2 = p2->next;
         p1->next = p2->next;
         p2->next = p1;
     }

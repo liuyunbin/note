@@ -1,16 +1,9 @@
-#include<iostream>
+#include <iostream>
 
 using namespace std;
 
-class String
-{
-private:
-
-
+class String {
+   private:
 };
 
-int main()
-{
-
-	return 0;
-}
+int main() { return 0; }

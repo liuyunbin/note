@@ -13,23 +13,23 @@
  * could represent a number.
  * An example is the root-to-leaf path 1->2->3 which represents the number
  * 123.
- * 
+ *
  * Find the total sum of all root-to-leaf numbers.
- * 
+ *
  * For example,
- * 
+ *
  * ⁠   1
  * ⁠  / \
  * ⁠ 2   3
- * 
- * 
- * 
+ *
+ *
+ *
  * The root-to-leaf path 1->2 represents the number 12.
  * The root-to-leaf path 1->3 represents the number 13.
- * 
- * 
+ *
+ *
  * Return the sum = 12 + 13 = 25.
- * 
+ *
  */
 /**
  * Definition for a binary tree node.
@@ -41,14 +41,13 @@
  */
 
 void function(const struct TreeNode* root, int val, int* result) {
-    if (root == NULL)
-        return ;
+    if (root == NULL) return;
     val = val * 10 + root->val;
     if (root->left == NULL && root->right == NULL) {
         *result += val;
-        return ;
+        return;
     }
-    function(root->left,  val, result);
+    function(root->left, val, result);
     function(root->right, val, result);
 }
 

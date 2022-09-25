@@ -11,19 +11,19 @@
  *
  * Given an integer n, generate all structurally unique BST's (binary search
  * trees) that store values 1...n.
- * 
- * 
+ *
+ *
  * For example,
  * Given n = 3, your program should return all 5 unique BST's shown below.
- * 
- * 
+ *
+ *
  * ⁠  1         3     3      2      1
  * ⁠   \       /     /      / \      \
  * ⁠    3     2     1      1   3      2
  * ⁠   /     /       \                 \
  * ⁠  2     1         2                 3
- * 
- * 
+ *
+ *
  */
 /**
  * Definition for a binary tree node.
@@ -35,17 +35,16 @@
  * };
  */
 class Solution {
-public:
+   public:
     vector<TreeNode*> generateTrees(int n) {
         vector<TreeNode*> result;
-        if (n <= 0)
-            return result;
+        if (n <= 0) return result;
         result.push_back(NULL);
         for (int k = 1; k <= n; ++k) {
             vector<TreeNode*> new_result;
-            for (auto it:result) {
+            for (auto it : result) {
                 TreeNode* temp = new TreeNode(k);
-                temp->left  = copy(it);
+                temp->left = copy(it);
                 temp->right = NULL;
                 new_result.push_back(temp);
                 if (it != NULL) {
@@ -53,7 +52,7 @@ public:
                     while (p->right != NULL) {
                         TreeNode* right = p->right;
                         p->right = new TreeNode(k);
-                        p->right->left  = right;
+                        p->right->left = right;
                         new_result.push_back(copy(it));
                         p = p->right = right;
                     }
@@ -68,10 +67,9 @@ public:
     }
 
     TreeNode* copy(TreeNode* root) {
-        if (root == NULL)
-            return NULL;
+        if (root == NULL) return NULL;
         TreeNode* new_root = new TreeNode(root->val);
-        new_root->left  = copy(root->left);
+        new_root->left = copy(root->left);
         new_root->right = copy(root->right);
         return new_root;
     }

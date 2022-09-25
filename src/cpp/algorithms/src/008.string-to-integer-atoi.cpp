@@ -82,26 +82,21 @@
  *
  */
 class Solution {
-public:
+   public:
     int myAtoi(string str) {
         int k = 0;
-        while (k < str.size() && str[k] == ' ')
-            ++k;
-        if (k == str.size())
-            return 0;
+        while (k < str.size() && str[k] == ' ') ++k;
+        if (k == str.size()) return 0;
         int sign = 1;
         if (str[k] == '-' || str[k] == '+') {
-            if (str[k] == '-')
-                sign = -1;
+            if (str[k] == '-') sign = -1;
             ++k;
         }
         long long ret = 0;
         while (k < str.size() && isdigit(str[k])) {
             ret = ret * 10 + (str[k] - '0');
-            if (ret * sign > INT_MAX)
-                return INT_MAX;
-            if (ret * sign < INT_MIN)
-                return INT_MIN;
+            if (ret * sign > INT_MAX) return INT_MAX;
+            if (ret * sign < INT_MIN) return INT_MIN;
             ++k;
         }
         return ret * sign;

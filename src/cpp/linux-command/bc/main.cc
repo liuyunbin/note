@@ -2,10 +2,9 @@
 #include "bc.h"
 
 int main() {
-  for (;;) {
-    input();
-    output();
-  }
-  return 0;
+    for (;;) {
+        input();
+        output();
+    }
+    return 0;
 }
-

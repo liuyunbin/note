@@ -28,12 +28,11 @@
  *
  */
 class Solution {
-public:
+   public:
     vector<int> twoSum(vector<int>& nums, int target) {
         unordered_map<int, int> dic;
         for (int i = 0; i != nums.size(); ++i) {
-            if (dic.find(nums[i]) != dic.end())
-                return {dic[nums[i]], i};
+            if (dic.find(nums[i]) != dic.end()) return {dic[nums[i]], i};
             dic[target - nums[i]] = i;
         }
         return {};

@@ -9,10 +9,10 @@
  * Total Submissions: 684K
  * Testcase Example:  '[]'
  *
- * 
+ *
  * Merge k sorted linked lists and return it as one sorted list. Analyze and
  * describe its complexity.
- * 
+ *
  */
 /**
  * Definition for singly-linked list.
@@ -22,13 +22,12 @@
  * };
  */
 struct ListNode* mergeKLists(struct ListNode** lists, int listsSize) {
-    if (listsSize <= 0)
-        return NULL;
-    if (listsSize == 1)
-        return lists[0];
-    struct ListNode* left  = mergeKLists(lists, listsSize / 2);
-    struct ListNode* right = mergeKLists(lists + listsSize / 2, listsSize - listsSize / 2);
-    struct ListNode  node;
+    if (listsSize <= 0) return NULL;
+    if (listsSize == 1) return lists[0];
+    struct ListNode* left = mergeKLists(lists, listsSize / 2);
+    struct ListNode* right =
+        mergeKLists(lists + listsSize / 2, listsSize - listsSize / 2);
+    struct ListNode node;
     struct ListNode* p = &node;
     while (left != NULL && right != NULL)
         if (left->val < right->val) {

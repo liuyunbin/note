@@ -1,7 +1,18 @@
 
 // 浮点数区分大小端
 //
-// 舍入模式 
+// 格式:
+// *  float: 1-符号位  8-阶码(偏移量  127) 23-尾码
+// * double: 1-符号位 11-阶码(偏移量 1023) 52-尾码
+//
+// 类型:
+// * 正负  零: 阶码都为 0, 尾码  都为 0
+// * 正负无穷: 阶码都为 1, 尾码  都为 0, inf
+// *   非数字: 阶码都为 1, 尾码不都为 0, nan
+// *   规约数: 阶码都为 0, 尾码不都为 1, 尾码整数部分为 0
+// * 非规约数: 阶码不都为 0 或 1, 尾码整数部分为 1
+//
+// 舍入模式:
 // * 向下舍入(FE_DOWNWARD): std::floor
 // * 向上舍入(FE_UPWARD): std::ceil
 // * 向零舍入(FE_TOWARDZERO): std::trunc, 浮点数-->整数
@@ -17,19 +28,19 @@
 //
 // TODO: 16 位精度究竟是什么意思?
 
-#include <iostream>
-#include <string>
-#include <iomanip>
+#include <ctype.h>
+
+#include <algorithm>
+#include <bitset>
 #include <cfenv>
-#include <map>
-#include <vector>
 #include <cstdio>
 #include <cstdlib>
-#include <cstdio>
-#include <bitset>
-#include <ctype.h>
-#include <algorithm>
+#include <iomanip>
+#include <iostream>
+#include <map>
 #include <sstream>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -46,22 +57,21 @@ void init_dict(int n);
 string trim(const string& str) {
     string result;
     for (char ch : str)
-        if (!isspace(ch))
-            result += ch;
+        if (!isspace(ch)) result += ch;
     return result;
 }
 
 // 计算机计算的结果
 union Node {
-    double   x;
+    double x;
     uint64_t y;
-    char     s[8];
+    char s[8];
 
-    void     set_double(double   v) {    x = v; }
-    double   get_double()           { return x; }
+    void set_double(double v) { x = v; }
+    double get_double() { return x; }
 
-    void     set_ulong(uint64_t v)  {    y = v; }
-    uint64_t get_ulong()            { return y; }
+    void set_ulong(uint64_t v) { y = v; }
+    uint64_t get_ulong() { return y; }
 
     void set_str(const string& str) {
         stringstream tmp(str);
@@ -70,24 +80,20 @@ union Node {
 
     string get_str() {
         stringstream tmp;
-        tmp << setprecision(2000) << fixed << x; // TODO: 两千够吗?
+        tmp << setprecision(2000) << fixed << x;  // TODO: 两千够吗?
         string result = tmp.str();
         size_t index = result.find_last_not_of('0');
 
-        if (result[index] == '.')
-            --index;
+        if (result[index] == '.') --index;
         return result.substr(0, index + 1);
     }
 
-    void set_bit(const string& bit) {
-        y = bitset<64>(trim(bit)).to_ulong();
-    }
+    void set_bit(const string& bit) { y = bitset<64>(trim(bit)).to_ulong(); }
 
     string get_bit() {
         string str = bitset<64>(y).to_string();
         string result;
-        for (int i = 0; i < 64; i += 8)
-            result += str.substr(i, 8) + " ";
+        for (int i = 0; i < 64; i += 8) result += str.substr(i, 8) + " ";
         return result;
     }
 
@@ -122,10 +128,10 @@ void output_by_string(const string& str);
 int main() {
     init_dict(2000);
 
-    name[FE_DOWNWARD]   = "向下舍入";
-    name[FE_TONEAREST]  = "最近舍入";
+    name[FE_DOWNWARD] = "向下舍入";
+    name[FE_TONEAREST] = "最近舍入";
     name[FE_TOWARDZERO] = "向零舍入";
-    name[FE_UPWARD]     = "向上舍入";
+    name[FE_UPWARD] = "向上舍入";
 
     Node node;
 
@@ -144,7 +150,7 @@ void init_dict(int n) {
 
         str = "";
         int sum = 0;
-        for (char ch : dict[i]){
+        for (char ch : dict[i]) {
             sum = sum * 10 + (ch - '0');
             str += string(1, sum / 2 + '0');
             sum %= 2;
@@ -160,9 +166,9 @@ void init_dict(int n) {
 
         str = "";
         int sum = 0;
-        for (int j = (int)dict[i].size() - 1; j >= 0; --j){
+        for (int j = (int)dict[i].size() - 1; j >= 0; --j) {
             sum += (dict[i][j] - '0') * 2;
-            str  = string(1, sum % 10 + '0') + str;
+            str = string(1, sum % 10 + '0') + str;
             sum /= 10;
         }
         if (sum != 0) {
@@ -170,7 +176,6 @@ void init_dict(int n) {
         }
     }
 }
-
 
 // 手动计算的结果
 // 两个数的加法
@@ -191,11 +196,10 @@ string add(string x, string y, int type = 0) {
 
     for (int i = (int)x.size() - 1; i >= 0; --i) {
         sum += (x[i] - '0') + (y[i] - '0');
-        z  = string(1, '0' + sum%10) + z;
+        z = string(1, '0' + sum % 10) + z;
         sum /= 10;
     }
-    if (sum != 0)
-        z = string(1, '0' + sum) + z;
+    if (sum != 0) z = string(1, '0' + sum) + z;
     return z;
 }
 
@@ -209,8 +213,7 @@ string bit_to_double(const string& str_int, const string& str_dec) {
 
     string result_dec;
     for (int i = 0; i < (int)str_dec.size(); ++i)
-        if (str_dec[i] == '1')
-            result_dec = add(result_dec, dict[- 1 - i], 1);
+        if (str_dec[i] == '1') result_dec = add(result_dec, dict[-1 - i], 1);
 
     if (result_dec.empty())
         return result_int;
@@ -230,16 +233,16 @@ string bit_to_double(const string& str) {
     bitset<52> f_bit(f_str);
 
     // 阶码都为 1, 尾码都为 0
-    if (e_bit.all()  && f_bit.none())     return s_str == "1" ? "负无穷" : "正无穷";
+    if (e_bit.all() && f_bit.none()) return s_str == "1" ? "负无穷" : "正无穷";
 
     // 阶码都为 1, 尾码不都为 0
-    if (e_bit.all()  && not f_bit.none()) return "非数字";
+    if (e_bit.all() && not f_bit.none()) return "非数字";
 
     // 阶码都为 0, 尾码都为 0
-    if (e_bit.none() && f_bit.none())     return  s_str == "1" ? "负零" : "正零";
+    if (e_bit.none() && f_bit.none()) return s_str == "1" ? "负零" : "正零";
 
-    string str_int;         // 尾码的整数部分
-    string str_dec = f_str; // 尾码的小数部分
+    string str_int;          // 尾码的整数部分
+    string str_dec = f_str;  // 尾码的小数部分
 
     if (e_bit.none() && not f_bit.none()) {
         // 阶码都为 0, 尾码不都为 0
@@ -261,12 +264,12 @@ string bit_to_double(const string& str) {
         }
 
         str_int += str_dec.substr(0, e_int);
-        str_dec  = str_dec.substr(e_int);
+        str_dec = str_dec.substr(e_int);
     } else if (e_int < 0) {
         if (!str_int.empty()) {
-            str_dec = string(-e_int - 1 , '0') + str_int +  str_dec;
+            str_dec = string(-e_int - 1, '0') + str_int + str_dec;
         } else {
-            str_dec = string(-e_int , '0') +  str_dec;
+            str_dec = string(-e_int, '0') + str_dec;
         }
         str_int = "";
     }
@@ -285,13 +288,6 @@ string bit_to_double(const string& str) {
 // 补码: 正数: 等于原码, 负数: 在反码的基础上, 加 1
 // 移码: 加上指定数字, 使其全部变正
 //
-// 格式:    1-符号位 11-阶码(偏移量 1023) 52-尾码
-// +0,-0             00000000000          全为0   非规约, 没有前置 1
-// +1,-1             01111111111          全为0     规约,   有前置 1
-// 无穷              11111111111          全为0   实际输出 -inf 或 inf
-// 异常数字          11111111111        非全为0   实际输出 -nan 或 nan
-// 非规约数          00000000000        非全为0   非规约, 没有前置 0
-//
 // 十进制数字   --> 二进制字符串  bitset<64>( 123 ).to_string()
 // 二进制字符串 --> 十进制数字    bitset<64>("111").to_ulong()
 //
@@ -302,8 +298,6 @@ string bit_to_double(const string& str) {
 // 0 +0 -0
 // 溢出
 // 精度
-
-
 
 //    //    cout << setprecision(2000) << fixed;
 //        cout << "            二进制: " << node.get_bit() << endl;
@@ -321,7 +315,8 @@ string bit_to_double(const string& str) {
 //    //        cout << "                尾码: " << f_str      << endl;
 //    //        cout << "          真实的尾码: " << f_str_real << endl;
 //    //        cout << "      二进制完整格式: " << arg        << endl;
-//    //        cout << "计算机实际存储的小数: " << bit_to_double_by_cs(arg) << endl;
+//    //        cout << "计算机实际存储的小数: " << bit_to_double_by_cs(arg) <<
+//    endl;
 //    //        cout << "        手动计算结果: " << result     << endl;
 //    //    }
 //    }

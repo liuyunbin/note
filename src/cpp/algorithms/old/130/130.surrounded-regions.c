@@ -7,40 +7,42 @@
  * Medium (19.09%)
  * Total Accepted:    93.8K
  * Total Submissions: 490.9K
- * Testcase Example:  '[["X","X","X","X"],["X","O","O","X"],["X","X","O","X"],["X","O","X","X"]]'
+ * Testcase Example:
+ * '[["X","X","X","X"],["X","O","O","X"],["X","X","O","X"],["X","O","X","X"]]'
  *
- * 
+ *
  * Given a 2D board containing 'X' and 'O' (the letter O), capture all regions
  * surrounded by 'X'.
- * 
+ *
  * A region is captured by flipping all 'O's into 'X's in that surrounded
  * region.
- * 
- * 
- * 
+ *
+ *
+ *
  * For example,
- * 
+ *
  * X X X X
  * X O O X
  * X X O X
  * X O X X
- * 
- * 
- * 
- * 
+ *
+ *
+ *
+ *
  * After running your function, the board should be:
- * 
+ *
  * X X X X
  * X X X X
  * X X X X
  * X O X X
- * 
- * 
+ *
+ *
  */
 
 void function(char** board, int boardRowSize, int boardColSize, int x, int y) {
-    if (x < 0 || x >= boardRowSize || y < 0 || y >= boardColSize || board[x][y] != 'O')
-        return ;
+    if (x < 0 || x >= boardRowSize || y < 0 || y >= boardColSize ||
+        board[x][y] != 'O')
+        return;
     board[x][y] = '1';
     function(board, boardRowSize, boardColSize, x + 1, y);
     function(board, boardRowSize, boardColSize, x - 1, y);

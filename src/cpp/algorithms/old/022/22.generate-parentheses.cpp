@@ -9,15 +9,15 @@
  * Total Submissions: 391.8K
  * Testcase Example:  '3'
  *
- * 
+ *
  * Given n pairs of parentheses, write a function to generate all combinations
  * of well-formed parentheses.
- * 
- * 
- * 
+ *
+ *
+ *
  * For example, given n = 3, a solution set is:
- * 
- * 
+ *
+ *
  * [
  * ⁠ "((()))",
  * ⁠ "(()())",
@@ -25,24 +25,24 @@
  * ⁠ "()(())",
  * ⁠ "()()()"
  * ]
- * 
+ *
  */
 class Solution {
-public:
+   public:
     vector<string> generateParenthesis(int n) {
         vector<string> result;
-        if (n <= 0)
-            return result;
+        if (n <= 0) return result;
         string temp;
         backtrack(n, 0, 0, temp, result);
         return result;
     }
 
-private:
-    void backtrack(int n, int left, int right, string& temp, vector<string>& result) {
+   private:
+    void backtrack(int n, int left, int right, string& temp,
+                   vector<string>& result) {
         if (left == n && right == n) {
             result.push_back(temp);
-            return ;
+            return;
         }
         if (left < n) {
             temp.push_back('(');

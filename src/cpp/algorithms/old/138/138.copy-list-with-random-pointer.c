@@ -9,14 +9,14 @@
  * Total Submissions: 533.8K
  * Testcase Example:  '{}'
  *
- * 
+ *
  * A linked list is given such that each node contains an additional random
  * pointer which could point to any node in the list or null.
- * 
- * 
- * 
+ *
+ *
+ *
  * Return a deep copy of the list.
- * 
+ *
  */
 /**
  * Definition for singly-linked list with a random pointer.
@@ -26,14 +26,14 @@
  *     struct RandomListNode *random;
  * };
  */
-struct RandomListNode *copyRandomList(struct RandomListNode *head) {
-    if (head == NULL)
-        return NULL;
-    for (struct RandomListNode* p = head; p != NULL; ) {
-        struct RandomListNode* q = (struct RandomListNode*)malloc(sizeof(struct RandomListNode));
-        q->next  = p->next;
+struct RandomListNode* copyRandomList(struct RandomListNode* head) {
+    if (head == NULL) return NULL;
+    for (struct RandomListNode* p = head; p != NULL;) {
+        struct RandomListNode* q =
+            (struct RandomListNode*)malloc(sizeof(struct RandomListNode));
+        q->next = p->next;
         q->label = p->label;
-        p->next  = q;
+        p->next = q;
         p = q->next;
     }
     for (struct RandomListNode* p = head; p != NULL; p = p->next->next)

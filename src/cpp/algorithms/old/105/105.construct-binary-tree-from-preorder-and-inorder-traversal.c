@@ -10,10 +10,10 @@
  * Testcase Example:  '[]\n[]'
  *
  * Given preorder and inorder traversal of a tree, construct the binary tree.
- * 
+ *
  * Note:
  * You may assume that duplicates do not exist in the tree.
- * 
+ *
  */
 /**
  * Definition for a binary tree node.
@@ -23,15 +23,16 @@
  *     struct TreeNode *right;
  * };
  */
-struct TreeNode* buildTree(int* preorder, int preorderSize, int* inorder, int inorderSize) {
-    if (preorderSize <= 0)
-        return NULL;
+struct TreeNode* buildTree(int* preorder, int preorderSize, int* inorder,
+                           int inorderSize) {
+    if (preorderSize <= 0) return NULL;
     int k;
     for (k = 0; inorder[k] != preorder[0]; ++k)
         ;
     struct TreeNode* root = (struct TreeNode*)malloc(sizeof(struct TreeNode));
-    root->val   = preorder[0];
-    root->left  = buildTree(preorder + 1, k, inorder, k);
-    root->right = buildTree(preorder + k + 1, preorderSize - k - 1, inorder + k + 1, inorderSize - k - 1);
+    root->val = preorder[0];
+    root->left = buildTree(preorder + 1, k, inorder, k);
+    root->right = buildTree(preorder + k + 1, preorderSize - k - 1,
+                            inorder + k + 1, inorderSize - k - 1);
     return root;
 }

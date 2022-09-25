@@ -1,5 +1,3 @@
 hello
 
-centos
-
-
+    centos

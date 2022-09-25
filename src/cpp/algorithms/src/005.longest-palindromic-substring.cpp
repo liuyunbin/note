@@ -29,12 +29,12 @@
  *
  */
 class Solution {
-public:
+   public:
     string longestPalindrome(string s) {
         int index = 0;
-        int len   = 0;
+        int len = 0;
         for (int i = 0; i != s.size(); ++i) {
-            int left  = i;
+            int left = i;
             int right = i;
             while (left >= 0 && right < s.size() && s[left] == s[right]) {
                 --left;
@@ -44,9 +44,8 @@ public:
                 index = left + 1;
                 len = right - left - 1;
             }
-            if (i == 0)
-                continue;
-            left  = i - 1;
+            if (i == 0) continue;
+            left = i - 1;
             right = i;
             while (left >= 0 && right < s.size() && s[left] == s[right]) {
                 --left;

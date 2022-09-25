@@ -36,31 +36,34 @@
  *
  */
 class Solution {
-public:
-    int findkth(const int* nums1, int nums1_len, const int* nums2, int nums2_len, int k) {
+   public:
+    int findkth(const int* nums1, int nums1_len, const int* nums2,
+                int nums2_len, int k) {
         if (nums1_len > nums2_len)
             return findkth(nums2, nums2_len, nums1, nums1_len, k);
-        if (nums1_len == 0)
-            return nums2[k-1];
-        if (k == 1)
-            return min(*nums1, *nums2);
+        if (nums1_len == 0) return nums2[k - 1];
+        if (k == 1) return min(*nums1, *nums2);
         int nums1_index = min(nums1_len, k / 2);
         int nums2_index = k - nums1_index;
         if (nums1[nums1_index - 1] == nums2[nums2_index - 1])
             return nums1[nums1_index - 1];
-        if (nums1[nums1_index - 1] <  nums2[nums2_index - 1])
-            return findkth(nums1 + nums1_index, nums1_len - nums1_index, nums2, nums2_index, k - nums1_index);
-        return findkth(nums2 + nums2_index, nums2_len - nums2_index, nums1, nums1_index, k - nums2_index);
+        if (nums1[nums1_index - 1] < nums2[nums2_index - 1])
+            return findkth(nums1 + nums1_index, nums1_len - nums1_index, nums2,
+                           nums2_index, k - nums1_index);
+        return findkth(nums2 + nums2_index, nums2_len - nums2_index, nums1,
+                       nums1_index, k - nums2_index);
     }
 
     double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
         int nums1_len = nums1.size();
         int nums2_len = nums2.size();
-        int       len = nums1_len + nums2_len;
-        int         k = len / 2 + 1;
-        if (len%2 != 0)
+        int len = nums1_len + nums2_len;
+        int k = len / 2 + 1;
+        if (len % 2 != 0)
             return findkth(nums1.data(), nums1_len, nums2.data(), nums2_len, k);
-        return (findkth(nums1.data(), nums1_len, nums2.data(), nums2_len, k)
-              + findkth(nums1.data(), nums1_len, nums2.data(), nums2_len, k - 1)) / 2.0;
+        return (findkth(nums1.data(), nums1_len, nums2.data(), nums2_len, k) +
+                findkth(nums1.data(), nums1_len, nums2.data(), nums2_len,
+                        k - 1)) /
+               2.0;
     }
 };

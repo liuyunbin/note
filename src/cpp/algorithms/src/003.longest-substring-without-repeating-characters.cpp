@@ -46,11 +46,10 @@
  *
  */
 class Solution {
-public:
+   public:
     int lengthOfLongestSubstring(string s) {
         int index[127];
-        for (int i = 0; i != sizeof(index) / sizeof(*index); ++i)
-            index[i] = -1;
+        for (int i = 0; i != sizeof(index) / sizeof(*index); ++i) index[i] = -1;
         int ret = 0;
         int current_low_index = -1;
         for (int i = 0; i != s.size(); ++i) {

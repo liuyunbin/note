@@ -13,10 +13,8 @@ int test(int x, int y) {
 }
 
 int main(int argc, char *argv[]) {
-
     test(1, 1);
     test(1, 2);
 
     return 0;
 }
-

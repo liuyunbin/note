@@ -11,28 +11,28 @@
  *
  * Given a binary tree, return the bottom-up level order traversal of its
  * nodes' values. (ie, from left to right, level by level from leaf to root).
- * 
- * 
+ *
+ *
  * For example:
  * Given binary tree [3,9,20,null,null,15,7],
- * 
+ *
  * ⁠   3
  * ⁠  / \
  * ⁠ 9  20
  * ⁠   /  \
  * ⁠  15   7
- * 
- * 
- * 
+ *
+ *
+ *
  * return its bottom-up level order traversal as:
- * 
+ *
  * [
  * ⁠ [15,7],
  * ⁠ [9,20],
  * ⁠ [3]
  * ]
- * 
- * 
+ *
+ *
  */
 /**
  * Definition for a binary tree node.
@@ -44,7 +44,7 @@
  * };
  */
 class Solution {
-public:
+   public:
     vector<vector<int>> levelOrderBottom(TreeNode* root) {
         int depth = get_depth(root);
         vector<vector<int>> result(depth, vector<int>());
@@ -53,18 +53,14 @@ public:
     }
 
     void backtrack(const TreeNode* root, int k, vector<vector<int>>& result) {
-        if (root == NULL)
-            return ;
-        backtrack(root->left,  k - 1, result);
+        if (root == NULL) return;
+        backtrack(root->left, k - 1, result);
         result[k].push_back(root->val);
         backtrack(root->right, k - 1, result);
     }
 
     int get_depth(TreeNode* root) {
-        if (root == NULL)
-            return 0;
+        if (root == NULL) return 0;
         return 1 + max(get_depth(root->left), get_depth(root->right));
     }
-
-
 };

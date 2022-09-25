@@ -22,14 +22,14 @@
  * };
  */
 class Solution {
-public:
+   public:
     int maxPoints(vector<Point>& points) {
         int result = 0;
         for (int i = 0; i < points.size(); ++i) {
             map<pair<int, int>, int> my_map;
-            int same_count  = 1;
-            int same_x      = 0;
-            int same_y      = 0;
+            int same_count = 1;
+            int same_x = 0;
+            int same_y = 0;
             int current_max = 0;
             for (int j = i + 1; j < points.size(); ++j) {
                 if (points[i].x == points[j].x && points[i].y == points[j].y) {
@@ -47,7 +47,8 @@ public:
                 int x = points[i].x - points[j].x;
                 int y = points[i].y - points[j].y;
                 int z = function(x, y);
-                current_max = max(current_max, ++my_map[make_pair(x / z, y / z)]);
+                current_max =
+                    max(current_max, ++my_map[make_pair(x / z, y / z)]);
             }
             result = max(result, same_x + same_count);
             result = max(result, same_y + same_count);
@@ -57,9 +58,7 @@ public:
     }
 
     int function(int x, int y) {
-        if (y == 0)
-            return x;
-        return function(y, x%y);
+        if (y == 0) return x;
+        return function(y, x % y);
     }
 };
-

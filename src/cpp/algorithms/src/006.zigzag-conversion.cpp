@@ -48,29 +48,25 @@
  *
  */
 class Solution {
-public:
+   public:
     string convert(string s, int numRows) {
-        if (numRows <= 1)
-            return s;
+        if (numRows <= 1) return s;
         string st = s;
         int k = 0;
 
         int step = (numRows - 1) * 2;
-        for (int i = 0; i < s.size(); i += step)
-            st[k++] = s[i];
+        for (int i = 0; i < s.size(); i += step) st[k++] = s[i];
 
         for (int i = 1; i + 1 < numRows; ++i) {
             int temp_step = (numRows - i - 1) * 2;
             for (int j = i; j < s.size(); j += step) {
                 st[k++] = s[j];
                 int index = j + temp_step;
-                if (index < s.size())
-                    st[k++] = s[index];
+                if (index < s.size()) st[k++] = s[index];
             }
         }
 
-        for (int i = numRows - 1; i < s.size(); i += step)
-            st[k++] = s[i];
+        for (int i = numRows - 1; i < s.size(); i += step) st[k++] = s[i];
 
         return st;
     }

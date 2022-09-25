@@ -43,13 +43,11 @@
  *
  */
 class Solution {
-public:
+   public:
     bool isPalindrome(int x) {
-        if (x < 0)
-            return false;
+        if (x < 0) return false;
         long long temp = 0;
-        for (int i = x; i != 0; i /= 10)
-            temp = temp * 10 + i % 10;
+        for (int i = x; i != 0; i /= 10) temp = temp * 10 + i % 10;
         return x == temp;
     }
 };

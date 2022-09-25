@@ -34,7 +34,7 @@
  * };
  */
 class Solution {
-public:
+   public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
         ListNode node(0);
         ListNode* l3 = &node;
@@ -48,11 +48,10 @@ public:
                 count += l2->val;
                 l2 = l2->next;
             }
-            l3 = l3->next = new ListNode(count%10);
+            l3 = l3->next = new ListNode(count % 10);
             count /= 10;
         }
-        if (count == 1)
-            l3 = l3->next = new ListNode(1);
+        if (count == 1) l3 = l3->next = new ListNode(1);
         l3->next = NULL;
         return node.next;
     }

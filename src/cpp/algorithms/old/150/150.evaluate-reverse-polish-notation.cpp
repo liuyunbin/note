@@ -9,29 +9,29 @@
  * Total Submissions: 379K
  * Testcase Example:  '["18"]'
  *
- * 
+ *
  * Evaluate the value of an arithmetic expression in Reverse Polish
  * Notation.
- * 
- * 
- * 
+ *
+ *
+ *
  * Valid operators are +, -, *, /. Each operand may be an integer or another
  * expression.
- * 
- * 
- * 
+ *
+ *
+ *
  * Some examples:
- * 
+ *
  * ⁠ ["2", "1", "+", "3", "*"] -> ((2 + 1) * 3) -> 9
  * ⁠ ["4", "13", "5", "/", "+"] -> (4 + (13 / 5)) -> 6
- * 
- * 
+ *
+ *
  */
 class Solution {
-public:
+   public:
     int evalRPN(vector<string>& tokens) {
         stack<int> st;
-        for (auto str:tokens)
+        for (auto str : tokens)
             if (isdigit(str[0]) || str.size() > 1)
                 st.push(stoi(str));
             else {
@@ -40,10 +40,18 @@ public:
                 int x = st.top();
                 st.pop();
                 switch (str[0]) {
-                    case '+': st.push(x+y); break;
-                    case '-': st.push(x-y); break;
-                    case '*': st.push(x*y); break;
-                    case '/': st.push(x/y); break;
+                    case '+':
+                        st.push(x + y);
+                        break;
+                    case '-':
+                        st.push(x - y);
+                        break;
+                    case '*':
+                        st.push(x * y);
+                        break;
+                    case '/':
+                        st.push(x / y);
+                        break;
                 }
             }
         return st.top();
