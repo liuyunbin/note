@@ -6,26 +6,39 @@
 // * double: 1-符号位 11-阶码(偏移量 1023) 52-尾码
 //
 // 类型:
-// * 正负  零: 阶码都为 0, 尾码  都为 0
-// * 正负无穷: 阶码都为 1, 尾码  都为 0, inf
-// *   非数字: 阶码都为 1, 尾码不都为 0, nan
-// *   规约数: 阶码都为 0, 尾码不都为 1, 尾码整数部分为 0
-// * 非规约数: 阶码不都为 0 或 1, 尾码整数部分为 1
+// * 正负  零(FP_ZERO)     : 阶码都为 0, 尾码  都为 0
+// * 正负无穷(FP_INFINITE) : 阶码都为 1, 尾码  都为 0, inf
+// *   非数字(FP_NAN)      : 阶码都为 1, 尾码不都为 0, nan
+// *   规约数(FP_NORMAL)   : 阶码都为 0, 尾码不都为 1, 尾码整数部分为 0
+// * 非规约数(FP_SUBNORMAL): 阶码不都为 0 或 1,        尾码整数部分为 1
+// * 查看浮点数类型        : pclassify(...)
 //
 // 舍入模式:
-// * 向下舍入(FE_DOWNWARD): std::floor
-// * 向上舍入(FE_UPWARD): std::ceil
+// * 向下舍入(FE_DOWNWARD)  : std::floor
+// * 向上舍入(FE_UPWARD)    : std::ceil
 // * 向零舍入(FE_TOWARDZERO): std::trunc, 浮点数-->整数
-// * 最近舍入(FE_TONEAREST):  默认舍入模式, 四舍六入五取偶
-// * 四舍五入: std::round
-// * 由舍入模式决定: std::rint, std::nearbyint, printf 等
+// * 最近舍入(FE_TONEAREST) :  默认舍入模式, 四舍六入五取偶
+// * 四舍五入               : std::round
+// * 由舍入模式决定         : std::rint, std::nearbyint, printf 等
+// * 查看舍入模式           : fegetround()
+// * 设置舍入模式           : fesetround(...)
 //
-// 查看舍入模式: fegetround()
-// 设置舍入模式: fesetround(...)
+// 浮点数异常:
+// * 除以 0      : FE_DIVBYZERO
+// * 结果不准确  : FE_INEXACT
+// * 参数非法    : FE_INVALID
+// * 上溢        : FE_OVERFLOW
+// * 下溢        : FE_UNDERFLOW
+// 清空浮点数异常: feclearexcept(FE_ALL_EXCEPT);
+// 测试浮点数异常: fetestexcept(...);
 //
 // 浮点数字符串 --> 浮点数二进制, 可能会损失精度
 // 浮点数二进制 --> 浮点数字符串,   不会损失精度
 //
+// 十进制数字   --> 二进制字符串, 可能有精度损失, bitset<64>( 123 ).to_string()
+// 二进制字符串 --> 十进制数字,   不会有精度损失, bitset<64>("111").to_ulong()
+//
+// 为什么使用偏移量: 方便比较大小
 // TODO: 16 位精度究竟是什么意思?
 
 #include <ctype.h>
@@ -33,10 +46,13 @@
 #include <algorithm>
 #include <bitset>
 #include <cfenv>
+#include <cfloat>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <sstream>
 #include <string>
@@ -50,7 +66,6 @@ using namespace std;
 // 2 的 -1 次 5
 // 2 的 -2 次 25
 map<int, string> dict;
-map<int, string> name;
 void init_dict(int n);
 
 // 移除所有的 空字符
@@ -105,13 +120,18 @@ union Node {
         return result;
     }
 
-    void output(int n = 2) {
-        cout << "计算机   舍入方向: " << name[fegetround()] << endl;
+    void output(const string& str) {
+        cout << str << endl;
         cout << "计算机     二进制: " << get_bit() << endl;
-        cout << "计算机   实际存储: " << get_mem() << endl;
-        cout << "计算机 精确十进制: " << get_str() << endl;
-        cout << fixed << setprecision(n);
-        cout << "计算机     近似值: " << get_double() << endl;
+        //        cout << "计算机   实际存储: " << get_mem() << endl;
+        //        cout << "计算机 精确十进制: " << get_str() << endl;
+        //        cout << fixed << setprecision(2);
+        //        cout << "计算机     近似值: " << get_double() << endl;
+    }
+
+    void output(const string& str, double v) {
+        x = v;
+        cout << str << ":" << get_bit() << endl;
     }
 };
 
@@ -125,18 +145,53 @@ void output_by_double(double x);
 void output_by_bit(const string& bit);
 void output_by_string(const string& str);
 
+void test(const string& str, double v) {
+    Node n;
+    n.output(str, v);
+}
+
 int main() {
     init_dict(2000);
 
-    name[FE_DOWNWARD] = "向下舍入";
-    name[FE_TONEAREST] = "最近舍入";
-    name[FE_TOWARDZERO] = "向零舍入";
-    name[FE_UPWARD] = "向上舍入";
+    map<int, string> m;
+    m[FE_DOWNWARD] = "向下舍入";
+    m[FE_TONEAREST] = "最近舍入";
+    m[FE_TOWARDZERO] = "向零舍入";
+    m[FE_UPWARD] = "向上舍入";
 
-    Node node;
+    cout << "默认舍入方向: " << m[fegetround()] << endl;
 
-    node.set_double(0.125);
-    node.output(2);
+    m.clear();
+    m[FE_DIVBYZERO] = "除以 0";
+    m[FE_INEXACT] = "结果不准确";
+    m[FE_INVALID] = "参数非法";
+    m[FE_OVERFLOW] = "上溢";
+    m[FE_UNDERFLOW] = "下溢";
+
+    feclearexcept(FE_ALL_EXCEPT);
+    double x = 1;
+    x = x / 10;
+    x = x / 0.0;
+    for (auto v : m)
+        if (fetestexcept(v.first)) cout << v.second << endl;
+
+    // Node n;
+
+    // digits10
+    // 能无更改地表示的十进制位数
+    // max_digits10
+    // 区别所有此类型值所需的十进制位数
+    test("最小  规约正数", numeric_limits<double>::min());
+    test("最大  规约正数", numeric_limits<double>::max());
+    test("最小  规约负数", numeric_limits<double>::lowest());
+    test("有异常的非数字", numeric_limits<double>::quiet_NaN());
+    test("无异常的非数字", numeric_limits<double>::signaling_NaN());
+    test("最小非规约正数", numeric_limits<double>::denorm_min());
+    test("        正无穷", numeric_limits<double>::infinity());
+    test("           1.0", 1.0);
+    test("          1.0+", 1.0 + numeric_limits<double>::epsilon());
+    test("          1.0+", nextafter(1.0, numeric_limits<double>::infinity()));
+    test("下个可表示的数与1.0的差值", numeric_limits<double>::epsilon());
 
     return 0;
 }
@@ -288,24 +343,13 @@ string bit_to_double(const string& str) {
 // 补码: 正数: 等于原码, 负数: 在反码的基础上, 加 1
 // 移码: 加上指定数字, 使其全部变正
 //
-// 十进制数字   --> 二进制字符串  bitset<64>( 123 ).to_string()
-// 二进制字符串 --> 十进制数字    bitset<64>("111").to_ulong()
-//
-// 为什么使用偏移量: 方便比较大小
-
-// 大小端
-// 最大, 最小值
-// 0 +0 -0
-// 溢出
-// 精度
-
 //    //    cout << setprecision(2000) << fixed;
-//        cout << "            二进制: " << node.get_bit() << endl;
-//        cout << "    计算机实际存储: " << node.get_real_memory() << endl;
-//        cout << "      有符号的整数: " << node.x << endl;
-//        cout << "      无符号的整数: " << node.y << endl;
-//        cout << "计算机计算的浮点数: " << node.get_double_by_cs() << endl;
-//        cout << "  人工计算的浮点数: " << node.get_double_by_hand() << endl;
+//        cout << "            二进制: " << n.get_bit() << endl;
+//        cout << "    计算机实际存储: " << n.get_real_memory() << endl;
+//        cout << "      有符号的整数: " << n.x << endl;
+//        cout << "      无符号的整数: " << n.y << endl;
+//        cout << "计算机计算的浮点数: " << n.get_double_by_cs() << endl;
+//        cout << "  人工计算的浮点数: " << n.get_double_by_hand() << endl;
 //
 //    //    void output() {
 //    //        cout << "              符号位: " << s_str      << endl;
