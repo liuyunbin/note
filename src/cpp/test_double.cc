@@ -19,7 +19,7 @@
 // * 向零舍入(FE_TOWARDZERO): std::trunc, 浮点数-->整数
 // * 最近舍入(FE_TONEAREST) :  默认舍入模式, 四舍六入五取偶
 // * 四舍五入               : std::round
-// * 由舍入模式决定         : std::rint, std::nearbyint, printf 等
+// * 由舍入模式决定         : std::rint, std::nearbyint, printf, 浮点数的存储 等
 // * 查看舍入模式           : fegetround()
 // * 设置舍入模式           : fesetround(...)
 //
@@ -39,6 +39,7 @@
 // 二进制字符串 --> 十进制数字,   不会有精度损失, bitset<64>("111").to_ulong()
 //
 // 为什么使用偏移量: 方便比较大小
+// 相邻可表示的浮点数的差值是不是一定的: 不是
 // TODO: 16 位精度究竟是什么意思?
 
 #include <ctype.h>
@@ -66,136 +67,6 @@ using namespace std;
 // 2 的 -1 次 5
 // 2 的 -2 次 25
 map<int, string> dict;
-void init_dict(int n);
-
-// 移除所有的 空字符
-string trim(const string& str) {
-    string result;
-    for (char ch : str)
-        if (!isspace(ch)) result += ch;
-    return result;
-}
-
-// 计算机计算的结果
-union Node {
-    double x;
-    uint64_t y;
-    char s[8];
-
-    void set_double(double v) { x = v; }
-    double get_double() { return x; }
-
-    void set_ulong(uint64_t v) { y = v; }
-    uint64_t get_ulong() { return y; }
-
-    void set_str(const string& str) {
-        stringstream tmp(str);
-        tmp >> x;
-    }
-
-    string get_str() {
-        stringstream tmp;
-        tmp << setprecision(2000) << fixed << x;  // TODO: 两千够吗?
-        string result = tmp.str();
-        size_t index = result.find_last_not_of('0');
-
-        if (result[index] == '.') --index;
-        return result.substr(0, index + 1);
-    }
-
-    void set_bit(const string& bit) { y = bitset<64>(trim(bit)).to_ulong(); }
-
-    string get_bit() {
-        string str = bitset<64>(y).to_string();
-        string result;
-        for (int i = 0; i < 64; i += 8) result += str.substr(i, 8) + " ";
-        return result;
-    }
-
-    // 计算机 实际存储
-    string get_mem() {
-        string result;
-        for (int i = 0; i < 8; ++i)
-            result += bitset<8>((unsigned char)s[i]).to_string() + " ";
-        return result;
-    }
-
-    void output(const string& str) {
-        cout << str << endl;
-        cout << "计算机     二进制: " << get_bit() << endl;
-        //        cout << "计算机   实际存储: " << get_mem() << endl;
-        //        cout << "计算机 精确十进制: " << get_str() << endl;
-        //        cout << fixed << setprecision(2);
-        //        cout << "计算机     近似值: " << get_double() << endl;
-    }
-
-    void output(const string& str, double v) {
-        x = v;
-        cout << str << ":" << get_bit() << endl;
-    }
-};
-
-// 手动获取浮点数的精确值
-string get_string_double_by_hand_double(double x);
-string get_string_double_by_hand_str(const string& str);
-string get_string_double_by_hand_bit(const string& bit);
-
-// 输出
-void output_by_double(double x);
-void output_by_bit(const string& bit);
-void output_by_string(const string& str);
-
-void test(const string& str, double v) {
-    Node n;
-    n.output(str, v);
-}
-
-int main() {
-    init_dict(2000);
-
-    map<int, string> m;
-    m[FE_DOWNWARD] = "向下舍入";
-    m[FE_TONEAREST] = "最近舍入";
-    m[FE_TOWARDZERO] = "向零舍入";
-    m[FE_UPWARD] = "向上舍入";
-
-    cout << "默认舍入方向: " << m[fegetround()] << endl;
-
-    m.clear();
-    m[FE_DIVBYZERO] = "除以 0";
-    m[FE_INEXACT] = "结果不准确";
-    m[FE_INVALID] = "参数非法";
-    m[FE_OVERFLOW] = "上溢";
-    m[FE_UNDERFLOW] = "下溢";
-
-    feclearexcept(FE_ALL_EXCEPT);
-    double x = 1;
-    x = x / 10;
-    x = x / 0.0;
-    for (auto v : m)
-        if (fetestexcept(v.first)) cout << v.second << endl;
-
-    // Node n;
-
-    // digits10
-    // 能无更改地表示的十进制位数
-    // max_digits10
-    // 区别所有此类型值所需的十进制位数
-    test("最小  规约正数", numeric_limits<double>::min());
-    test("最大  规约正数", numeric_limits<double>::max());
-    test("最小  规约负数", numeric_limits<double>::lowest());
-    test("有异常的非数字", numeric_limits<double>::quiet_NaN());
-    test("无异常的非数字", numeric_limits<double>::signaling_NaN());
-    test("最小非规约正数", numeric_limits<double>::denorm_min());
-    test("        正无穷", numeric_limits<double>::infinity());
-    test("           1.0", 1.0);
-    test("          1.0+", 1.0 + numeric_limits<double>::epsilon());
-    test("          1.0+", nextafter(1.0, numeric_limits<double>::infinity()));
-    test("下个可表示的数与1.0的差值", numeric_limits<double>::epsilon());
-
-    return 0;
-}
-
 void init_dict(int n) {
     string str;
 
@@ -210,9 +81,7 @@ void init_dict(int n) {
             str += string(1, sum / 2 + '0');
             sum %= 2;
         }
-        if (sum != 0) {
-            str += "5";
-        }
+        if (sum != 0) str += "5";
     }
 
     str = "1";
@@ -226,9 +95,7 @@ void init_dict(int n) {
             str = string(1, sum % 10 + '0') + str;
             sum /= 10;
         }
-        if (sum != 0) {
-            str = string(1, sum + '0') + str;
-        }
+        if (sum != 0) str = string(1, sum + '0') + str;
     }
 }
 
@@ -238,13 +105,10 @@ void init_dict(int n) {
 string add(string x, string y, int type = 0) {
     if (x.size() > y.size()) swap(x, y);
 
-    if (type == 0) {
-        // 整数
-        x = string(y.size() - x.size(), '0') + x;
-    } else {
-        // 小数
-        x = x + string(y.size() - x.size(), '0');
-    }
+    if (type == 0)
+        x = string(y.size() - x.size(), '0') + x; // 整数
+    else
+        x = x + string(y.size() - x.size(), '0'); // 小数
 
     int sum = 0;
     string z;
@@ -314,58 +178,186 @@ string bit_to_double(const string& str) {
 
     // 处理 阶码 的移位
     if (e_int > 0) {
-        if ((int)str_dec.size() < e_int) {
+        if ((int)str_dec.size() < e_int)
             str_dec += string(e_int - str_dec.size(), 0);
-        }
 
         str_int += str_dec.substr(0, e_int);
         str_dec = str_dec.substr(e_int);
     } else if (e_int < 0) {
-        if (!str_int.empty()) {
+        if (!str_int.empty())
             str_dec = string(-e_int - 1, '0') + str_int + str_dec;
-        } else {
+        else
             str_dec = string(-e_int, '0') + str_dec;
-        }
         str_int = "";
     }
     string result = bit_to_double(str_int, str_dec);
-    if (s_str == "1") {
+    if (s_str == "1")
         result = "-" + result;
-    }
     return result;
 }
 
-/////////////////////////////////////////////////////////////////////////////////
+// 移除所有的 空字符
+string trim(const string& str) {
+    string result;
+    for (char ch : str)
+        if (!isspace(ch)) result += ch;
+    return result;
+}
 
-//
-// 原码: 正数: 最高位添加 0, 负数: 最高位添加 1
-// 反码: 正数: 等于原码, 负数: 在原码的基础上, 除符号位外, 各位取反
-// 补码: 正数: 等于原码, 负数: 在反码的基础上, 加 1
-// 移码: 加上指定数字, 使其全部变正
-//
-//    //    cout << setprecision(2000) << fixed;
-//        cout << "            二进制: " << n.get_bit() << endl;
-//        cout << "    计算机实际存储: " << n.get_real_memory() << endl;
-//        cout << "      有符号的整数: " << n.x << endl;
-//        cout << "      无符号的整数: " << n.y << endl;
-//        cout << "计算机计算的浮点数: " << n.get_double_by_cs() << endl;
-//        cout << "  人工计算的浮点数: " << n.get_double_by_hand() << endl;
-//
-//    //    void output() {
-//    //        cout << "              符号位: " << s_str      << endl;
-//    //        cout << "                阶码: " << e_str      << endl;
-//    //        cout << "          十进制阶码: " << e_int      << endl;
-//    //        cout << "    真实的十进制阶码: " << e_int_real << endl;
-//    //        cout << "                尾码: " << f_str      << endl;
-//    //        cout << "          真实的尾码: " << f_str_real << endl;
-//    //        cout << "      二进制完整格式: " << arg        << endl;
-//    //        cout << "计算机实际存储的小数: " << bit_to_double_by_cs(arg) <<
-//    endl;
-//    //        cout << "        手动计算结果: " << result     << endl;
-//    //    }
-//    }
-//
-//    return 0;
-//}
-//
-//
+string bit_to_string(string str) {
+    str = trim(str);
+    if ((int)str.size() < 64)
+        str = str + string(64 - (int)str.size(), '0');
+
+    string s_str = str.substr(0, 1);
+    string e_str = str.substr(1, 11);
+    string f_str = str.substr(12, 52);
+    string left;
+    if (str.size() > 64) left = str.substr(64);
+
+    bitset<11> e_bit(e_str);
+    bitset<52> f_bit(f_str);
+
+    int e_int = e_bit.to_ulong();
+
+    if (e_bit.none() && not f_bit.none())
+        // 非规约数字: 阶码都为 0, 尾码不都为 0
+        e_int -= 1022;
+    else if (not e_bit.all() && not e_bit.none())
+        // 规约数字: 阶码不都为 0, 也不都为 1
+        e_int -= 1023;
+
+    return s_str + " " + e_str + "(" + to_string(e_int) + ") " + f_str + " " + left;
+}
+
+// 计算机计算的结果
+union Node {
+    double x;
+    uint64_t y;
+    char s[8];
+
+    string to_str() {
+        stringstream tmp;
+        tmp << setprecision(2000) << fixed << x;  // TODO: 两千够吗?
+        string result = tmp.str();
+        size_t index = result.find_last_not_of('0');
+
+        if (result[index] == '.') --index;
+        return result.substr(0, index + 1);
+    }
+
+    string to_bit() { return bit_to_string(bitset<64>(y).to_string()); }
+
+    // 计算机 实际存储
+    string get_mem() {
+        string result;
+        for (int i = 0; i < 8; ++i)
+            result += bitset<8>((unsigned char)s[i]).to_string() + " ";
+        return result;
+    }
+};
+
+// 测试舍入模式
+// bit 为 二进制
+void test_round(const string& name, string bit) {
+    bit = trim(bit);
+    if ((int)bit.size() < 64)
+        bit += string(64 - (int)bit.size(), '0');
+
+    Node node;
+
+    string str = bit_to_double(bit);
+
+    stringstream tmp(str);
+    tmp >> node.x;
+
+    cout << endl;
+    cout << "    测试类型: " << name << endl;
+    cout << "测试的二进制: " << bit_to_string(bit) << endl;
+    cout << "存储的二进制: " << node.to_bit() << endl;
+    cout << "      手动值: " << str << endl;
+    cout << "      存储值: " << node.to_str() << "(精确值)";
+    cout << setprecision(2)  << fixed;
+    cout << " --> " << node.x << "(保留两位小数)" << endl;
+}
+
+void test_round(const string& name, double x) {
+    Node node;
+    node.x = x;
+    test_round(name, bitset<64>(node.y).to_string());
+}
+
+// 测试存储
+void test(const string& name, double v) {
+    Node n;
+    n.x = v;
+    cout << name << ": " << n.to_bit() << endl;
+}
+
+// 获取浮点数异常
+string get_double_except() {
+    map<int, string> m;
+    m[FE_DIVBYZERO] = "除以 0";
+    m[FE_INEXACT] = "结果不准确";
+    m[FE_INVALID] = "参数非法";
+    m[FE_OVERFLOW] = "上溢";
+    m[FE_UNDERFLOW] = "下溢";
+
+    string result;
+    for (auto v : m)
+        if (fetestexcept(v.first)) result += v.second + " ";
+    return result;
+}
+
+#define TEST_DOUBLE_EXCEPT(name, y) \
+    feclearexcept(FE_ALL_EXCEPT); \
+    cout << name << "(" << y << "): ";\
+    cout << get_double_except() << endl;
+
+int main() {
+    init_dict(2000);
+
+    map<int, string> m;
+    m[FE_DOWNWARD] = "向下舍入";
+    m[FE_TONEAREST] = "最近舍入";
+    m[FE_TOWARDZERO] = "向零舍入";
+    m[FE_UPWARD] = "向上舍入";
+
+    //fesetround(FE_TOWARDZERO);
+    cout << "    舍入方向: " << m[fegetround()] << endl;
+
+    test_round("测试保留小数时的 五取偶(舍)", 0.125);
+    test_round("测试保留小数时的 五取偶(入)", 0.375);
+    test_round("测试存储小数时的 五取偶(舍)",
+            "0 10000110011 0000 00000000 00000000 00000000 00000000 00000000 00000000 1");
+    test_round("测试存储小数时的 五取偶(入)",
+            "0 10000110011 0000 00000000 00000000 00000000 00000000 00000000 00000001 1");
+
+    // digits10
+    // 能无更改地表示的十进制位数
+    cout << endl;
+    test("      最小  规约正数", numeric_limits<double>::min());
+    test("      最大  规约正数", numeric_limits<double>::max());
+    test("      最小  规约负数", numeric_limits<double>::lowest());
+    test("      最小非规约正数", numeric_limits<double>::denorm_min());
+    test("              正无穷", numeric_limits<double>::infinity());
+    test("      有异常的非数字", numeric_limits<double>::quiet_NaN());
+    test("      无异常的非数字", numeric_limits<double>::signaling_NaN());
+    test("下个可表示的数 - 1.0", numeric_limits<double>::epsilon());
+    test("结果与上一条应该相同", nextafter(1.0, numeric_limits<double>::infinity()) - 1.0);
+
+    double x = 1;
+    cout << endl << "测试浮点数的异常" << endl;
+    TEST_DOUBLE_EXCEPT("测试 1/0.0", x/0.0);
+    TEST_DOUBLE_EXCEPT("测试 1/10.0", x/10.0);
+    x = numeric_limits<double>::quiet_NaN();
+    TEST_DOUBLE_EXCEPT("测试 quiet_NaN/10.0", x/10.0);
+    x = numeric_limits<double>::signaling_NaN();
+    TEST_DOUBLE_EXCEPT("测试 signaling_NaN/10.0", x/10.0);
+    x = numeric_limits<double>::max();
+    TEST_DOUBLE_EXCEPT("测试 最大  规约数 * 2", x * 2);
+    x = numeric_limits<double>::denorm_min();
+    TEST_DOUBLE_EXCEPT("测试 最小正非规约数 / 2", x / 2);
+
+    return 0;
+}
