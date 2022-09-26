@@ -1,27 +1,4 @@
 
-## 作业控制
-sleep 30      # 前台运行
-sleep 30 &    # 后台运行
-ctrl+z        # 前台运行 --> 后台暂停
-fg %jobspec   # 后台暂停 --> 前台运行
-              # 后台运行 --> 前台运行
-              # 作业号有无 % 都成
-bg %jobspec   # 后台暂停 --> 后台运行
-              # 作业号有无 % 都成
-              # 无法在后台运行的命令会失败
-              # 比如 vim
-              #
-jobs          # 列出后台作业
-jobs %jobspec # 作业号有无 % 都成
-jobs -l       #   列出后台作业的 PID
-jobs -p       # 只列出后台作业的 PID
-jobs -n       # 只列出进程改变的作业
-jobs -s       # 只列出停止的作业
-jobs -r       # 只列出运行中的作业
-              #
-kill %jobspec # 使用 bash 内置的 kill 杀死作业
-              # 作业号必须有 %
-
 ## 进程
 ps -ef             # 显示所有进程
 ps -o pid,command  # 只显示进程 ID 和进程名称
