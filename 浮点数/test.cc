@@ -32,8 +32,11 @@ union Node {
 string trim(const string& str);
 
 string to_double_hand(const string& bit);
+string to_double_hand(double v);
 string to_double_cs(const string& bit);
+string to_double_cs(double v);
 string to_bit(const string& bit);
+string to_bit(double v);
 
 // 测试舍入模式
 // bit 为 二进制
@@ -74,13 +77,6 @@ void test_round() {
     test_round("测试存储小数时的 五取偶(入)",
             "0 10000110011 0000 00000000 00000000 00000000 00000000 00000000 00000001 1");
 }
-
-// 测试存储
-//void test(const string& name, double v) {
-//    Node n;
-//    n.x = v;
-//    cout << name << ": " << n.to_bit() << endl;
-//}
 
 // type 为 0 表示除, 为 1 表示 乘, 2 表示小于, 其他表示使用 isless
 void test_except(const string& name,  double x, double y, int type = 0) {
@@ -133,31 +129,45 @@ void test_except() {
     test_except("测试 lrint(signaling_NaN)", x, x, 4);
 }
 
+void test(const string name, double x) {
+    cout << endl;
+    cout << "测试类型: "     << name << endl;
+    cout << "  二进制: "     << to_bit(x) << endl;
+    x = x - nextafter(x, numeric_limits<double>::lowest());
+    cout << "与上一数的差值" << to_bit(x) << endl;
+}
+
+void test() {
+    // digits10
+    // 能无更改地表示的十进制位数
+    test("正无穷", numeric_limits<double>::infinity());
+    test("最小  规约负数", numeric_limits<double>::lowest());
+    test("最大  规约正数", numeric_limits<double>::max());
+    test("最小非规约正数", numeric_limits<double>::min());
+
+    double x = nextafter(numeric_limits<double>::min(), numeric_limits<double>::infinity());
+    test("最小  规约正数的下一个数", x);
+    x = nextafter(x, numeric_limits<double>::lowest());
+    test("最小非规约正数", x);
+    x = nextafter(x, numeric_limits<double>::lowest());
+    test("最大非规约正数", x);
+    x = nextafter(x, numeric_limits<double>::lowest());
+    test("最大非规约正数的上一个", x);
+    test("测试 1.0", 1.0);
+}
+
 int main() {
     init();
 #if 0
     test_round(); // 测试 舍入模式
 #endif
 
-#if 1
-    test_except();
+#if 0
+    test_except(); // 测试浮点数异常
 #endif
 
+    test();
     return 0;
-    // digits10
-    // 能无更改地表示的十进制位数
-//    cout << endl;
-//    test("      最小  规约正数", numeric_limits<double>::min());
-//    test("      最大  规约正数", numeric_limits<double>::max());
-//    test("      最小  规约负数", numeric_limits<double>::lowest());
-//    test("      最小非规约正数", numeric_limits<double>::denorm_min());
-//    test("              正无穷", numeric_limits<double>::infinity());
-//    test("      有异常的非数字", numeric_limits<double>::quiet_NaN());
-//    test("      无异常的非数字", numeric_limits<double>::signaling_NaN());
-//    test("下个可表示的数 - 1.0", numeric_limits<double>::epsilon());
-//    test("结果与上一条应该相同", nextafter(1.0, numeric_limits<double>::infinity()) - 1.0);
-//
-//    return 0;
 }
 
 // 移除所有的 空字符
@@ -227,6 +237,12 @@ string to_double_cs(const string& bit) {
     return result.substr(0, index + 1);
 }
 
+string to_double_cs(double x) {
+    Node node;
+    node.x = x;
+    return to_double_cs(bitset<64>(node.y).to_string());
+}
+
 string to_bit(const string& bit) {
     string s_str = bit.substr(0, 1);
     string e_str = bit.substr(1, 11);
@@ -247,6 +263,12 @@ string to_bit(const string& bit) {
         e_int -= 1023;
 
     return s_str + " " + e_str + "(" + to_string(e_int) + ") " + f_str + " " + other;
+}
+
+string to_bit(double x) {
+    Node node;
+    node.x = x;
+    return to_bit(bitset<64>(node.y).to_string());
 }
 
 // 两个数的加法
@@ -345,3 +367,8 @@ string to_double_hand(const string& str) {
     return result;
 }
 
+string to_double_hand(double x) {
+    Node node;
+    node.x = x;
+    return to_double_hand(bitset<64>(node.y).to_string());
+}
