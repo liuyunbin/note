@@ -82,22 +82,66 @@ void test_round() {
 //    cout << name << ": " << n.to_bit() << endl;
 //}
 
-// 获取浮点数异常
-string get_double_except() {
+// type 为 0 表示除, 为 1 表示 乘, 2 表示小于, 其他表示使用 isless
+void test_except(const string& name,  double x, double y, int type = 0) {
+    feclearexcept(FE_ALL_EXCEPT);
     string result;
+    if (type == 0)
+        result = x / y ? "true" : "false";
+    else if (type == 1)
+        result = x * y ? "true" : "false";
+    else if (type == 2)
+        result = x < y ? "true" : "false";
+    else if (type == 3)
+        result = isless(x, y) ? "true" : "false";
+    else
+        result = lrint(x) ? "true" : "false";
+
+    string except;
     for (auto v : dict_except)
-        if (fetestexcept(v.first)) result += v.second + " ";
-    return result;
+        if (fetestexcept(v.first)) except += v.second + " ";
+
+    if (except.empty()) except = "空";
+    cout << endl;
+    cout << "测试类型: " << name << endl;
+    cout << "测试结果: " << result << endl;
+    cout << "异常信息: " << except << endl;
 }
 
-#define TEST_DOUBLE_EXCEPT(name, y) \
-    feclearexcept(FE_ALL_EXCEPT); \
-    cout << name << "(" << y << "): ";\
-    cout << get_double_except() << endl;
+void test_except() {
+    double x;
+    cout << "测试浮点数的异常" << endl;
+    test_except("测试除以零", 1, 0.0);
+    test_except("测试结果不准确", 1, 10.0);
+    x = numeric_limits<double>::max();
+    test_except("测试上溢", x, 2, 1);
+    x = numeric_limits<double>::denorm_min();
+    test_except("测试下溢", x, 2);
+
+    test_except("测试 NAN < NAN", NAN, NAN, 2);
+    test_except("测试 isless(NAN, NAN)", NAN, NAN, 3);
+    test_except("测试 lrint(NAN)", NAN, NAN, 4);
+
+    x = numeric_limits<double>::quiet_NaN();
+    test_except("测试 quiet_NAN < quiet_NAN", x, x, 2);
+    test_except("测试 isless(quiet_NAN, quiet_NAN)", x, x, 3);
+    test_except("测试 lrint(quiet_NAN)", x, x, 4);
+
+    x = numeric_limits<double>::signaling_NaN();
+    test_except("测试 signaling_NaN < signaling_NaN", x, x, 2);
+    test_except("测试 isless(signaling_NaN, signaling_NaN)", x, x, 3);
+    test_except("测试 lrint(signaling_NaN)", x, x, 4);
+}
 
 int main() {
     init();
+#if 0
     test_round(); // 测试 舍入模式
+#endif
+
+#if 1
+    test_except();
+#endif
 
     return 0;
     // digits10
@@ -112,19 +156,6 @@ int main() {
 //    test("      无异常的非数字", numeric_limits<double>::signaling_NaN());
 //    test("下个可表示的数 - 1.0", numeric_limits<double>::epsilon());
 //    test("结果与上一条应该相同", nextafter(1.0, numeric_limits<double>::infinity()) - 1.0);
-//
-//    double x = 1;
-//    cout << endl << "测试浮点数的异常" << endl;
-//    TEST_DOUBLE_EXCEPT("测试 1/0.0", x/0.0);
-//    TEST_DOUBLE_EXCEPT("测试 1/10.0", x/10.0);
-//    x = numeric_limits<double>::quiet_NaN();
-//    TEST_DOUBLE_EXCEPT("测试 quiet_NaN/10.0", x/10.0);
-//    x = numeric_limits<double>::signaling_NaN();
-//    TEST_DOUBLE_EXCEPT("测试 signaling_NaN/10.0", x/10.0);
-//    x = numeric_limits<double>::max();
-//    TEST_DOUBLE_EXCEPT("测试 最大  规约数 * 2", x * 2);
-//    x = numeric_limits<double>::denorm_min();
-//    TEST_DOUBLE_EXCEPT("测试 最小正非规约数 / 2", x / 2);
 //
 //    return 0;
 }
