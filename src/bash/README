@@ -33,7 +33,7 @@ ps -u lyb          # 有效用户为 lyb 的进程
 ps -U lyb          # 实际用户为 lyb 的进程
 ps -ww             # 不限制输出宽度
                    # 显示完整进程名称
-pwdx pid...        # 列出进程的工作目录
+pwdx pid...        # 列出进程的当前工作目录
                    #
 pgrep vim          # 列出 vim 的进程号
                    # 使用前缀匹配
