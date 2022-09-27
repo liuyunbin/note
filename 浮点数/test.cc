@@ -65,6 +65,16 @@ void test_round(const string& name, double x) {
     test_round(name, bitset<64>(node.y).to_string());
 }
 
+void test_round() {
+    cout << "    舍入方向: " << dict_round[fegetround()] << endl;
+    test_round("测试保留小数时的 五取偶(舍)", 0.125);
+    test_round("测试保留小数时的 五取偶(入)", 0.375);
+    test_round("测试存储小数时的 五取偶(舍)",
+            "0 10000110011 0000 00000000 00000000 00000000 00000000 00000000 00000000 1");
+    test_round("测试存储小数时的 五取偶(入)",
+            "0 10000110011 0000 00000000 00000000 00000000 00000000 00000000 00000001 1");
+}
+
 // 测试存储
 //void test(const string& name, double v) {
 //    Node n;
@@ -87,15 +97,7 @@ string get_double_except() {
 
 int main() {
     init();
-
-    //fesetround(FE_TOWARDZERO);
-    cout << "    舍入方向: " << dict_round[fegetround()] << endl;
-    test_round("测试保留小数时的 五取偶(舍)", 0.125);
-    test_round("测试保留小数时的 五取偶(入)", 0.375);
-    test_round("测试存储小数时的 五取偶(舍)",
-            "0 10000110011 0000 00000000 00000000 00000000 00000000 00000000 00000000 1");
-    test_round("测试存储小数时的 五取偶(入)",
-            "0 10000110011 0000 00000000 00000000 00000000 00000000 00000000 00000001 1");
+    test_round(); // 测试 舍入模式
 
     return 0;
     // digits10
