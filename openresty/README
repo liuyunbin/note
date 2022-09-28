@@ -1,0 +1,24 @@
+
+## 安装
+$ wget https://openresty.org/package/centos/openresty.repo # 获取 openresty 源的仓库
+$ sudo mv openresty.repo /etc/yum.repos.d/                 # 将该源拷入系统目录
+$ sudo yum check-update                                    # 更新软件源索引
+$ sudo yum install -y openresty                            # 安装
+$ sudo yum install -y openresty-resty                      # 安装命令行工具?
+
+## 配置
+$ # 默认配置文件: /usr/local/openresty/nginx/conf/nginx.conf
+$ # 默认命令文件: /usr/local/openresty/nginx/sbin/nginx
+$ echo export PATH=$PATH:/usr/local/openresty/nginx/sbin >> ~/.bashrc # 将路径写入 .bashrc
+$ source ~/.bashrc                                                    # 配置生效
+
+## 开启防火墙
+$ sudo firewall-cmd --add-service=http # 添加 http 服务
+
+## 常用命令
+$ nginx            # 启动
+$ nginx -s stop    # 退出
+$ nginx -s quit    # 工作进程处理完当前请求后, 退出
+$ nginx -s reload  # 重新加载配置
+$ nginx -s reopen  # 重新打开日志文件
+
