@@ -10,7 +10,7 @@
 ## 常用命令
 * nginx -s stop    退出 nginx
 * nginx -s quit    工作进程处理完当前请求后, 退出 nginx
-* nginx -s reload  重新加载配置, 
+* nginx -s reload  重新加载配置,
 * nginx -s reopen  重新打开日志文件
 
 * systemctl start      nginx   启动 nginx
@@ -23,16 +23,7 @@
 * systemctl is-enabled nginx   查看 nginx 是否开机启动
 * systemctl list-unit-files    列出所有可用单元
 
-* firewall-cmd --zone=public --list-ports                       查看所有打开的端口
-* firewall-cmd --zone=public --get-services                     查看所有的服务
-* firewall-cmd --zone=public --permanent --add-service=http     添加服务, 永久生效
-* firewall-cmd --zone=public --permanent --add-service=https    添加服务, 永久生效
-* firewall-cmd --zone=public             --add-service=https    添加服务
-* firewall-cmd --zone=public             --remove-service=http  移除服务
-* firewall-cmd --zone=public --permanent --add-port=8080/tcp    添加端口, 永久生效
-* firewall-cmd --zone=public             --add-port=8080/tcp    添加端口
-* firewall-cmd --zone=public             --remove-port=8080/tcp 移除端口
-* firewall-cmd --reload                                         重新加载配置
+* firewall-cmd --add-service=http     添加服务
 
 ## 常用配置
 * root /usr 指定工作目录
@@ -64,7 +55,7 @@
 请求: http://0.0.0.0/proxy/index.html
 相当于访问:  http://1.2.3.4/proxy/index.html
 
-结论: proxy_pass 的 IP 什么都不跟时, 使用绝对路径, 匹配到的 /proxy/ 也会用到 
+结论: proxy_pass 的 IP 什么都不跟时, 使用绝对路径, 匹配到的 /proxy/ 也会用到
 
 #### 情况二
 

@@ -522,15 +522,14 @@ find . \( -type f -o   -name lyb \)   # 同上
 firewall-cmd --list-ports                       # 查看所有打开的端口
 firewall-cmd --list-services                    # 查看所有打开的服务
 firewall-cmd --get-services                     # 查看所有的服务
-firewall-cmd --permanent --add-service=http     # 添加服务, 永久生效, 需要重新加载配置
-firewall-cmd --permanent --add-service=https    # 添加服务, 永久生效, 需要重新加载配置
-firewall-cmd             --add-service=https    # 添加服务
-firewall-cmd             --remove-service=http  # 移除服务
-firewall-cmd --permanent --add-port=8080/tcp    # 添加端口, 永久生效, 需要重新加载配置
-firewall-cmd             --add-port=8080/tcp    # 添加端口
-firewall-cmd             --remove-port=8080/tcp # 移除端口
 firewall-cmd --reload                           # 重新加载配置
-firewall-cmd --complete-reload                  # 重新加载配置, 重启服务
+firewall-cmd --complete-reload                  # 重启服务
+firewall-cmd             --add-service=http     # 添加 http 服务
+firewall-cmd --permanent --add-service=http     # 添加服务, 永久生效, 需要重新加载配置
+firewall-cmd             --remove-service=http  # 移除服务
+firewall-cmd             --add-port=80/tcp      # 添加端口
+firewall-cmd --permanent --add-port=80/tcp      # 添加端口, 永久生效, 需要重新加载配置
+firewall-cmd             --remove-port=80/tcp   # 移除端口
 firewall-cmd             --query-masquerade     # 检查是否允许伪装IP
 firewall-cmd               --add-masquerade     # 允许防火墙伪装IP
 firewall-cmd --permanent   --add-masquerade     # 允许防火墙伪装IP, 永久生效, 需要重新加载配置
