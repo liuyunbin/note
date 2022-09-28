@@ -31,11 +31,11 @@ union Node {
 // 移除所有的 空字符
 string trim(const string& str);
 
-string to_double_hand(const string& bit);
+string to_double_hand(string bit);
 string to_double_hand(double v);
-string to_double_cs(const string& bit);
+string to_double_cs(string bit);
 string to_double_cs(double v);
-string to_bit(const string& bit);
+string to_bit(string bit);
 string to_bit(double v);
 
 // 测试舍入模式
@@ -142,8 +142,10 @@ void test() {
     // 能无更改地表示的十进制位数
     test("正无穷", numeric_limits<double>::infinity());
     test("最小  规约负数", numeric_limits<double>::lowest());
+    test("最小  规约负数", numeric_limits<double>::lowest());
     test("最大  规约正数", numeric_limits<double>::max());
-    test("最小非规约正数", numeric_limits<double>::min());
+    test("最小  规约正数", numeric_limits<double>::min());
+    test("最小非规约正数", numeric_limits<double>::denorm_min());
 
     double x = nextafter(numeric_limits<double>::min(), numeric_limits<double>::infinity());
     test("最小  规约正数的下一个数", x);
@@ -166,7 +168,36 @@ int main() {
     test_except(); // 测试浮点数异常
 #endif
 
+#if 0
     test();
+#endif
+
+#if 0
+    double x = numeric_limits<double>::denorm_min();
+    string str = to_double_cs(x);
+
+    cout << "最小非规约正数: " << str << endl;
+    cout << "小数点后共有: " << str.size() - 2 << " 位" << endl;
+    cout << endl;
+#endif
+
+    string bit       = "0 01111111011 1001100110011001100110011001100110011001100110011010";
+    string bit_left  = "0 01111111011 1001100110011001100110011001100110011001100110011001 1";
+    string bit_right = "0 01111111011 1001100110011001100110011001100110011001100110011010 1";
+
+    cout << "          类型: " << "测试 0.1" << endl;
+    cout << "上一个可表示数: " << to_double_cs(nextafter(0.1, numeric_limits<double>::lowest())) << endl;
+    cout << "    上限(包含): " << to_double_hand(bit_left)  << endl;
+    cout << "           0.1: " << to_double_hand(bit)  << endl;
+    cout << "      前 20 位: " << to_double_hand(bit).substr(0, 20)  << endl;
+    cout << "  下限(不包含): " << to_double_hand(bit_right)  << endl;
+    cout << "下一个可表示数: " << to_double_cs(nextafter(0.1, numeric_limits<double>::infinity())) << endl;
+
+    bit = "0 01111111111 0000000000000000000000000000000000000000000000000000";
+    cout << to_double_hand(bit) << endl;
+    bit = "0 01111111111 0000000000000000000000000000000000000000000000000001";
+    cout << to_double_hand(bit) << endl;
+
     return 0;
 }
 
@@ -225,11 +256,14 @@ void init() {
     }
 }
 
-string to_double_cs(const string& bit) {
+string to_double_cs(string bit) {
+    bit = trim(bit);
+    if ((int)bit.size() < 64)
+        bit += string(64 - (int)bit.size(), '0');
     Node node;
     node.y = bitset<64>(bit.substr(0, 64)).to_ulong();
     stringstream tmp;
-    tmp << setprecision(2000) << fixed << node.x;  // TODO: 两千够吗?
+    tmp << setprecision(2000) << fixed << node.x;  // 最多 1074 位
     string result = tmp.str();
     size_t index = result.find_last_not_of('0');
 
@@ -243,7 +277,10 @@ string to_double_cs(double x) {
     return to_double_cs(bitset<64>(node.y).to_string());
 }
 
-string to_bit(const string& bit) {
+string to_bit(string bit) {
+    bit = trim(bit);
+    if ((int)bit.size() < 64)
+        bit += string(64 - (int)bit.size(), '0');
     string s_str = bit.substr(0, 1);
     string e_str = bit.substr(1, 11);
     string f_str = bit.substr(12, 52);
@@ -312,10 +349,14 @@ string to_double_hand(const string& str_int, const string& str_dec) {
 }
 
 // 二进制的浮点数转化为 十进制
-string to_double_hand(const string& str) {
-    string s_str = str.substr(0, 1);
-    string e_str = str.substr(1, 11);
-    string f_str = str.substr(12);
+string to_double_hand(string bit) {
+    bit = trim(bit);
+    if ((int)bit.size() < 64)
+        bit += string(64 - (int)bit.size(), '0');
+
+    string s_str = bit.substr(0, 1);
+    string e_str = bit.substr(1, 11);
+    string f_str = bit.substr(12);
 
     bitset<11> e_bit(e_str);
     int e_int = e_bit.to_ulong();
