@@ -1198,3 +1198,34 @@ shift+insert       # 粘贴命令行内容
 
 Esc+.              # 获取上一条命令的最后的部分
 
+redis flushdb
+
+##################################
+### 常用命令
+###################################
+#$ pwdx 进程号 # 输出进程号的启动命令
+#$ pgrep 进程  # 输出进程的进程号
+#$ c++filt     # 可以解析动态库里的符号
+#$ sz          #  虚拟机  向 windows 发送数据
+#$ rz          #  windows 向 虚拟机  发送数据
+#
+#ss -ntp | grep 9100
+#
+#ps aux | grep valgrind
+#
+#ssh localhost -p 7722
+#
+#打包机
+#10.237.105.158
+#root root123
+#
+### Git 使用
+#$ git stash                                            # 保存当前状态
+#$ git stash pop                                        # 恢复保存的状态
+#$ git stash list                                       # 查看已保存的状态
+#$ git push orign feature/tjd2 -f                       # 强推本地分支
+#$ git rebase -i HEAD~6                                 # 之后，使用 f 取消掉不需要的内容，合并提交
+#$ git rebase orign/develop                             # 将 orign/develop 上的内容，变基到 当前分支
+#$ git push origin --delete feature/ykqx-reconstruction # 删除远程分支
+#$ git blame  main.cc                                   # 查看文件每行的最后变更
+#$ git log -p main.cc                                   # 查看文件内容的变更记录
