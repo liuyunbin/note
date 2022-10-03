@@ -37,6 +37,9 @@
 // fgets()           # 读取一行,   包含换行符
 // getline(cin, str) # 读取一行, 不包括换行符
 //
+
+#include <unistd.h>
+
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -45,8 +48,6 @@ using namespace std;
 
 int main() {
     string str = "123";
-    double x = 1.2300000;
-    int n = 18;
 
 #if 0
     // 设置输入的最大宽度
@@ -54,30 +55,68 @@ int main() {
     // 只对下一位有效-不准确
     cin  >> setw(5) >> str;
     cout << str << "end" << endl;
+
+    // skipws-输入跳过前导空白符
+    // noskipws-输入不跳过前导空白符
+
 #endif
 
     str = "123";
     cout << "            字符串: " << str << endl;
-    cout << " 输出的最小宽度(5): " << setw(5) << str
-         << endl;  // 只对下一位有效-不准确
+    // setw 只对下一位有效-不准确
+    cout << " 输出的最小宽度(5): " << setw(5) << str << endl;
     cout << "     填充字符为(*): " << setfill('*') << setw(5) << str << endl;
     cout << "            左对齐: " << left << setw(5) << str << endl;
     cout << "            右对齐: " << right << setw(5) << str << endl;
     cout << "恢复填充字符为空格" << endl << setfill(' ');
+    int n = 18;
     cout << "              整数: " << n << endl;
     cout << "          十六进制: " << hex << n << endl;
     cout << "            八进制: " << oct << n << endl;
     cout << "            十进制: " << dec << n << endl;
-    cout << "      输出进制前缀: " << showbase << hex << n << endl;
-    cout << "恢复不显示进制前缀" << endl << noshowbase;
+    cout << "      显示进制前缀: " << showbase << hex << n << endl;
+    cout << "前缀  使用大写字母: " << uppercase << hex << n << endl;
+    cout << "前缀不使用大写字母: " << nouppercase << hex << n << endl;
+    cout << "    不显示进制前缀: " << noshowbase << hex << n << endl;
+    double x = 1.0;
     cout << "              小数: " << x << endl;
+    cout << "正数包含  前置加号: " << showpos << x << endl;
+    cout << "正数包含不前置加号: " << noshowpos << x << endl;
+    cout << "    始终包含小数点: " << showpoint << x << endl;
+    cout << "  不始终包含小数点: " << noshowpoint << x << endl;
     cout << "  以科学表示法输出: " << scientific << x << endl;
     cout << "不以科学表示法输出: " << fixed << x << endl;
     cout << "    保留 10 位小数: " << setprecision(10) << x << endl;
-    cout << "      默认舍入模式: "
-         << "四舍六入五取偶" << endl;
-    cout << "    输出 bool 类型: " << boolalpha << false << "  " << true
-         << endl;
+    cout << "      默认舍入模式: 四舍六入五取偶" << endl;
+    cout << "   bool 类型 false: " << boolalpha << false << endl;
+    cout << "   bool 类型  true: " << boolalpha << true << endl;
+    cout << "   数值 类型 false: " << noboolalpha << false << endl;
+    cout << "   数值 类型  true: " << noboolalpha << true << endl;
+
+    // 全缓存
+    // * 程序结束
+    // * 缓冲区满
+    // * 手动刷新缓存
+    // * 涉及磁盘文件一般是全缓存
+    // 行缓冲
+    // * 程序结束
+    // * 缓冲区满
+    // * 遇到文件结束符
+    // * 手动刷新缓存
+    // * 涉及终端一般是行缓存
+    // 无缓冲
+    // * 涉及终端输出错误是无缓存
+    cout << endl << "测试  自动刷新缓冲" << endl;
+    cout << unitbuf;  // 每次调用都自动刷新缓冲区
+    cout << "暂停5s...";
+    sleep(5);
+    cout << "完成" << endl;
+
+    cout << endl << "测试不自动刷新缓冲" << endl;
+    cout << nounitbuf;  // 不自动刷新缓冲区
+    cout << "暂停5s...";
+    sleep(5);
+    cout << "完成" << endl;
 
     return 0;
 }
