@@ -24,5 +24,5 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin) # 设置 二进制�
 # 激活测试
 enable_testing()
 
-add_subdirectory(src/cpp)
+add_subdirectory(note/cpp)
 
