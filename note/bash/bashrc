@@ -1,7 +1,17 @@
 
-PS1="\[\e[1;33m\]\$ \[\e[0m\]"
+PS1='\[\e[1;33m\]$(date "+%Y-%m-%d %H:%M:%S") \[\e[0m\]'
+
+alias la='ls -lhrtu --time-style="+%Y-%m-%d %H:%M:%S"' # 使用文件    访问时间显示和排序, 旧 --> 新
+alias lm='ls -lhrt  --time-style="+%Y-%m-%d %H:%M:%S"' # 使用文件    修改时间显示和排序, 旧 --> 新
+alias lc='ls -lhrtc --time-style="+%Y-%m-%d %H:%M:%S"' # 使用文件状态修改时间显示和排序, 旧 --> 新
 
 set -o vi
+
+note=~/GitHub/note
+alias m="cd $note; ./build.sh > /dev/null; cd - > /dev/null"
+export PATH="$PATH:$note/bin"
+
+#### TODO
 
 log=~/log
 
@@ -31,9 +41,3 @@ function log_error() {
     exit -1
 }
 
-# 使用文件访问时间显示和排序, 旧 --> 新
-alias la='ls -lhrtu --time-style="+%Y-%m-%d %H:%M:%S"'
-# 使用文件修改时间显示和排序, 旧 --> 新
-alias lm='ls -lhrt --time-style="+%Y-%m-%d %H:%M:%S"'
-# 使用文件状态修改时间显示和排序, 旧 --> 新
-alias lc='ls -lhrtc --time-style="+%Y-%m-%d %H:%M:%S"'
