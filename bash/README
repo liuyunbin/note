@@ -1215,3 +1215,11 @@ redis flushdb
 #$ git push origin --delete feature/ykqx-reconstruction # 删除远程分支
 #$ git blame  main.cc                                   # 查看文件每行的最后变更
 #$ git log -p main.cc                                   # 查看文件内容的变更记录
+
+## 操作符号链接本身
+
+## 操作符号链接所指的文件
+chmod
+chown
+
+
