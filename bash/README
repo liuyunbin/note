@@ -664,6 +664,14 @@ getopts # -o 短选项, -l 长选项
 
 git config --global core.quotepath false # 引用路径不使用八进制, 中文名不再乱码
 
+git config --global core.autocrlf true  # 提交时: CRLF --> LF, 检出时: LF --> CRLF
+git config --global core.autocrlf input # 提交时: CRLF --> LF, 检出时: 不转换
+git config --global core.autocrlf false # 提交时: 不转换,      检出时: 不转换
+
+git config --global core.safecrlf true  # 拒绝提交包含混合换行符的文件
+git config --global core.safecrlf false # 允许提交包含混合换行符的文件
+git config --global core.safecrlf warn  # 提交包含混合换行符的文件时给出警告
+
 grep -v                   # 输出不匹配的内容
 grep -c                   # 输出匹配的行的次数, 同一行只输出一次
 grep -o                   # 只输出匹配的内容
