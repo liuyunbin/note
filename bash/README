@@ -1223,3 +1223,55 @@ chmod
 chown
 
 
+
+## 三个文件时间
+atime  # 文件内容最后被读取的时间
+       # 出于性能考虑, 只有以下情况会更新
+       #     atime 比 mtime 或 ctime 旧
+       #     atime 比上一次 atime 超过 24 小时
+       #     mount 时, 使用了 strictatime 选项
+mtime  # 文件内容被修改的时间
+ctime  # 状态修改时间
+       #   文件内容修改
+       #   文件名称修改: mv, rename
+       #   所有者, 所属组变化: chown
+       #   权限修改: chmod
+
+## 修改文件时间
+touch        1.c # 修改 atime mtime
+                 # 修改 mtime 会影响 ctime
+touch -a     1.c # 修改 atime
+touch -c     1.c # 文件不存在时, 不创建文件
+touch -d ... 1.c # 指定时间, 而不是当前时间
+touch -h     1.c # 改变符号链接本身, 而不是所指向的文件
+touch -m     1.c # 修改 mtime
+                 # 修改 mtime 会影响 ctime
+touch -r 2.c 1.c # 以 2.c 的时间修改 1.c
+touch -t ... 1.c # 指定时间
+                 # 依次是: 时区-年-月-日-时-分-秒
+
+## 查看文件时间
+ls -c        # 使用 ctime 排序, 新 --> 旧
+ls -cl       # 展示 ctime, 使用文件名排序
+ls -clt      # 使用 ctime 排序 和 展示
+ls -t        # 使用 mtime 排序, 新 --> 旧
+ls -tl       # 使用 mtime 排序 和 展示
+ls -u        # 使用 atime 排序, 新 --> 旧
+ls -ul       # 展示 atime, 使用文件名排序
+ls -ult      # 使用 atime 排序 和 展示
+
+stat       1.c # 列出 birth atime mtime ctime
+stat -c %a 1.c # 查看权限, 644 形式
+stat -c %A 1.c # 查看权限, rwx 形式
+stat -c %g 1.c # 查看文件所属组的 ID
+stat -c %G 1.c # 查看文件所数组的 name
+stat -c %h 1.c # 查看硬链接的个数
+stat -c %m 1.c # 查看挂载点
+stat -c %u 1.c # 查看文件所属用户的 ID
+stat -c %U 1.c # 查看文件所属用户的 name
+stat -c %w 1.c # 查看 birth
+stat -c %x 1.c # 查看 atime
+stat -c %y 1.c # 查看 mtime
+stat -c %z 1.c # 查看 ctime
+stat -L    1.c # 符号链接所指向的文件, 而不是符号链接本身
+
