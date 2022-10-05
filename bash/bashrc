@@ -31,3 +31,9 @@ function log_error() {
     exit -1
 }
 
+# 使用文件访问时间显示和排序, 旧 --> 新
+alias la='ls -lhrtu --time-style="+%Y-%m-%d %H:%M:%S"'
+# 使用文件修改时间显示和排序, 旧 --> 新
+alias lm='ls -lhrt --time-style="+%Y-%m-%d %H:%M:%S"'
+# 使用文件状态修改时间显示和排序, 旧 --> 新
+alias lc='ls -lhrtc --time-style="+%Y-%m-%d %H:%M:%S"'
