@@ -85,102 +85,14 @@ chmod 1755  1.c # 第三位表示 所属组的权限
 chmod 1755  1.c # 第四位表示 其他者的权限
 chmod +x -R 1.c # 递归处理
 
-                # 偏移量使用十六进制
-                # 每行十六个字节
-                # 两个字节显示时, 顺序由大端小端决定
-hexdump     1.c # 显示两个字节一组的十六进制
-hexdump -x  1.c # 显示两个字节一组的十六进制
-hexdump -d  1.c # 显示两个字节一组的  十进制
-hexdump -o  1.c # 显示两个字节一组的  八进制
-hexdump -b  1.c # 显示一个字节一组的  八进制
-hexdump -c  1.c # 显示一个字节一组的    字符
-hexdump -C  1.c # 显示一个字节一组的十六进制
-                # 并显示原字符ASCII
-                # 同 hd 1.c
-hexdump -n2 1.c # 仅显示前 2 个字节, 只支持十进制
-hexdump -s2 1.c # 跳过前两个字节
-                # 支持八进制, 十进制, 十六进制
-                # 后缀 b(512), k(1024) 等
-
-od 1.c --endian=big    # 使用大端存储
-od 1.c --endian=little # 使用小端存储
-
-od 1.c -Ad  #    十进制显示偏移量
-od 1.c -Ao  #    八进制显示偏移量, 默认值
-od 1.c -Ax  #  十六进制显示偏移量
-od 1.c -An  #        不显示偏移量
-
-od 1.c -ta  # 输出单个字节的字符形式
-od 1.c -tc  # 输出单个字节
-od 1.c -td  # 输出有符号的十进制数
-od 1.c -tdC # 单位长度为: sizeof(char)
-od 1.c -tdS # 单位长度为: sizeof(short)
-od 1.c -tdI # 单位长度为: sizeof(int), 默认值
-od 1.c -tdL # 单位长度为: sizeof(long)
-od 1.c -td4 # 单位长度为: 4 字节
-od 1.c -tdz # 行末尾添加原始字符
-od 1.c -tf  # 输出浮点数
-od 1.c -tfF # 单位长度为: sizeof(float), 默认值
-od 1.c -tfD # 单位长度为: sizeof(double)
-od 1.c -tfL # 单位长度为: sizeof(long double)
-od 1.c -to  # 输出无符号的  八进制数, 其他同 -td
-od 1.c -tu  # 输出无符号的  十进制数, 其他同 -td
-od 1.c -tx  # 输出无符号的十六进制数, 其他同 -td
-
-od 1.c -a   # 同 -ta
-od 1.c -b   # 同 -to1
-od 1.c -c   # 同 -tc
-od 1.c -d   # 同 -tu2
-od 1.c -f   # 同 -tfF
-od 1.c -i   # 同 -tdI
-od 1.c -l   # 同 -tdL
-od 1.c -o   # 同 -to2
-od 1.c -s   # 同 -td2
-od 1.c -x   # 同 -tx2
-
-od 1.c -j2    # 跳过前 2      个字节,   十进制
-od 1.c -j02   # 跳过前 2      个字节,   八进制
-od 1.c -j0x2  # 跳过前 2      个字节, 十六进制
-od 1.c -j0X2  # 跳过前 2      个字节, 十六进制
-od 1.c -j2b   # 跳过前 2*512  个字节,   十进制
-od 1.c -j2KB  # 跳过前 2*1000 个字节,   十进制
-od 1.c -j2K   # 跳过前 2*1024 个字节,   十进制
-
-od 1.c -w2    # 一行最多 2    个字节,   十进制
-od 1.c -w02   # 一行最多 2    个字节,   八进制
-od 1.c -w0x2  # 一行最多 2    个字节, 十六进制
-
-od 1.c -N2    # 输入最多 2    个字节,   十进制
-od 1.c -N02   # 输入最多 2    个字节,   八进制
-od 1.c -N0x2  # 输入最多 2    个字节, 十六进制
-
-od 1.c -S ... # TODO-没看懂
-od 1.c -v ... # TODO-没看懂
-
-xxd           1.c # 十六进制输出, 使用大端存储
-xxd       2.c 1.c # 输出文件到 1.c
-xxd -a        1.c # 自动跳过连续的空字符, 用 * 表示
-xxd -b        1.c #   二进制输出, 默认一个字节一组
-xxd -d        1.c # 偏移量使用十进制, 默认是十六进制
-xxd -C        1.c # 与 -i 一起使用, 使用 LEN, 默认 len
-xxd -c2       1.c # 一行显示两个字节, 默认十六个字节
-xxd -E        1.c # 使用 EBCDIC, 默认 ASCII
-xxd -e        1.c # 使用小端存储, 默认四个字节一组
-xxd -g0       1.c # 不分组
-xxd -g1       1.c # 每组一个字节, 默认两个字节
-xxd -i        1.c # 输出 C 风格的数组和长度
-xxd -l3       1.c # 输出最多三个字节
-xxd -o1       1.c # 偏移量增加一个字节
-xxd -ps       1.c # 不要偏移量, 不要空格, 纯粹的十六进制
-xxd -p        1.c # 不要偏移量, 不要空格, 纯粹的十六进制
-xxd -r        1.c # 十六进制 转回 二进制
-xxd -r -s off 1.c # TODO -- 恢复偏移量的重置
-xxd -s8       1.c # 跳过前八个字节,   十进制
-xxd -s08      1.c # 跳过前八个字节,   八进制
-xxd -s0x8     1.c # 跳过前八个字节, 十六进制
-xxd -s+8      1.c # 跳过前八个字节
-xxd -s-8      1.c # 只保留文件最后八个字节
-xxd -u        1.c # 使用大写字母, 默认使用小写字母
+                  # 显示标准形式:
+hexdump -C    1.c #     偏移量使用十六进制
+hd            1.c #     每行十六个字节
+od -Ax  -tx1z 1.c #     每组一个字节
+xxd     -g1   1.c #     显示原字符
+hexdump -c    1.c # 显示字符
+od      -c    1.c # 显示字符
+xxd     -b    1.c # 显示二进制
 
 ################  以下即将删除  ###############
 
