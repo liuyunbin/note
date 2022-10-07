@@ -5,6 +5,55 @@
 #
 ##################################
 
+文件名称建议: 大小写字母 数字 下划线 短横线 点
+
+errno 是线程安全的, 如何检验
+
+## 命令需要注意的问题
+通配符还是基础正则表达式, 还是扩展正则表达式
+如何处理符号链接
+
+## 通配符
+?      # 代表一个字符
+*      # 代表零个或多个字符
+[123]
+[1-5]
+[!a]
+[^a]
+
+## 基础正则表达式
+^     # 开头
+$     # 结尾
+.     # 除换行符以外的任意字符
+[]    # 中括号中      的任意字符
+[^]   # 中括号中字符外的任意字符
+?     # 前面字符出现 0 次 或 一次
+*     # 前面字符出现 0 次 或 多次
+
+## 扩展正则表达式
++      # 前面字符出现 1 次 或 多次
+{n}    # 前面字符出现 n 次
+{n,}   # 前面字符出现 n 次 及以上
+{n, m} # 前面字符出现 n 次 到 m 次
+()     # 将括号内的内容看成一个整体
+|      # 或
+
+#### 查看 Linux 临时端口号的范围
+```
+cat /proc/sys/net/ipv4/ip_local_port_range
+32768   60999
+``
+
+* [0, 1024) 公认端口号, 需要 root 启动, 比如 80
+* [1024, 32768) 注册端口, 可以自己注册一些常用服务
+* [32768, 60990) 动态端口, 进程未指定端口号时, 将从这个范围内获取一个端口号
+* [60990, 65535)
+
+# 查询 域名 对应 的 IP
+* nslookup baidu.com
+
+\command # 忽略别名
+
 ## 文件时间
 atime # 内容读取时间, 更新可能不及时
 mtime # 内容修改时间
@@ -100,6 +149,8 @@ comm 1.c 2.c -3    | tr -d '\t' # B - A 和 A - B
 comm 1.c 2.c -1 -3              # B - A
 comm 1.c 2.c -2 -3              # A - B
 
+c++filt  a.out   # 可以解析动态库里的符号
+
 bash file_name # 执行文件内的命令
 bash -c "ls"   # 将字符串的内容交由 bash 执行, 字符串里可包含重定向和管道
 
@@ -144,9 +195,6 @@ ${!v[@]}  # 获取所有的 key
 declare -A v # 关联数组, map
 v[a]=a
 v[b]=b
-
-source .bashrc # 当前 shell 执行
-     . .bashrc # 同上
 
 $0 # 脚本名称
 $1 # 第一个参数
@@ -276,32 +324,8 @@ du -d 1                 # 最大目录深度
 du -sh                  # 只列出整体使用大小
 du --exclude="*.txt"    # 忽略指定文件, 支持通配符
 
-echo       "123" # 输出换行
-echo    -n "123" # 不换行
-echo -e -n ..... # 解析转义字符
-
-echo -e "\e[1;30m lyb \e[0m" # 文本颜色:   黑色
-echo -e "\e[1;31m lyb \e[0m" # 文本颜色:   红色
-echo -e "\e[1;32m lyb \e[0m" # 文本颜色:   绿色
-echo -e "\e[1;33m lyb \e[0m" # 文本颜色:   黄色
-echo -e "\e[1;34m lyb \e[0m" # 文本颜色:   蓝色
-echo -e "\e[1;35m lyb \e[0m" # 文本颜色: 洋红色
-echo -e "\e[1;36m lyb \e[0m" # 文本颜色:   青色
-echo -e "\e[1;37m lyb \e[0m" # 文本颜色:   白色
-
-echo -e "\e[1;40m lyb \e[0m" # 背景颜色:   黑色
-echo -e "\e[1;41m lyb \e[0m" # 背景颜色:   红色
-echo -e "\e[1;42m lyb \e[0m" # 背景颜色:   绿色
-echo -e "\e[1;43m lyb \e[0m" # 背景颜色:   黄色
-echo -e "\e[1;44m lyb \e[0m" # 背景颜色:   蓝色
-echo -e "\e[1;45m lyb \e[0m" # 背景颜色: 洋红色
-echo -e "\e[1;46m lyb \e[0m" # 背景颜色:   青色
-echo -e "\e[1;47m lyb \e[0m" # 背景颜色:   白色
-
-echo -e "\e[1;37m lyb \e[0m" # 文本加粗
-echo -e "\e[4;37m lyb \e[0m" # 文本下划线
-echo -e "\e[5;37m lyb \e[0m" # 文本闪烁
-echo -e "\e[7;37m lyb \e[0m" # 反向选择
+echo -n "123"                # 不换行
+echo -e "\e[1;33m lyb \e[0m" # 文本黄色 加粗
 
 exec ls      # 替换当前 shell, 执行后不再执行之后的命令
 exec &>1.txt # 打开文件描述符, 然后继续执行之后的命令
@@ -432,15 +456,15 @@ getopts # -o 短选项, -l 长选项
         # 只能区分有参数和无参数的情况
         # 参数带空格也能处理
 
-git stash                                            # 保存当前状态
-git stash pop                                        # 恢复保存的状态
-git stash list                                       # 查看已保存的状态
-git push orign feature/tjd2 -f                       # 强推本地分支
-git rebase -i HEAD~6                                 # 之后，使用 f 取消掉不需要的内容，合并提交
-git rebase orign/develop                             # 将 orign/develop 上的内容，变基到 当前分支
-git push origin --delete feature/ykqx-reconstruction # 删除远程分支
-git blame  main.cc                                   # 查看文件每行的最后变更
-git log -p main.cc                                   # 查看文件内容的变更记录
+git stash                             # 保存当前状态
+git stash pop                         # 恢复保存的状态
+git stash list                        # 查看已保存的状态
+git push orign feature/test -f        # 强推本地分支
+git rebase -i HEAD~6                  # 之后，使用 f 取消掉不需要的内容，合并提交
+git rebase orign/develop              # 将 orign/develop 上的内容，变基到 当前分支
+git push origin --delete feature/test # 删除远程分支
+git blame  main.cc                    # 查看文件每行的最后变更
+git log -p main.cc                    # 查看文件内容的变更记录
 
 git config --global core.quotepath false # 引用路径不使用八进制, 中文名不再乱码
 
@@ -485,6 +509,9 @@ history
 
 iconv
 
+IFS 默认值: " \t\n"
+IFS 包含转义字符时, 需要在开头添加 $, IFS=$'\n'
+
 ip addr
 ip route
 
@@ -528,7 +555,7 @@ ls -clt      # 使用 ctime 排序和展示, 新 -> 旧
 ls -tl       # 使用 mtime 排序和展示, 新 -> 旧
 ls -ult      # 使用 atime 排序和展示, 新 -> 旧
 
-                   ## lsof -- sudo yum install lsof
+                   # lsof -- sudo yum install lsof
 lsof -iTCP         # 查看 TCP 信息
 lsof -i :22        # 查看指定 端口号 的信息
 lsof -i@1.2.3.4:22 # 查看是否连接到指定 IP 和 端口号上
@@ -558,7 +585,7 @@ mv a b # a 是符号链接时, 将使用符号链接本身
        # b 是指向目录  的符号链接时， 相当于 移到 b 最终所指向的目录下
        # b 是指向不存在的符号链接时， 相当于 重命名
 
-nohup sleep 1000 & ## 脱离终端, 在后台运行
+nohup sleep 1000 & # 脱离终端, 在后台运行
 
 ntpdate -s time-b.nist.gov # 使用时间服务器更新时间
 
@@ -567,19 +594,13 @@ patch -p1 1.txt diff.pathc  # 恢复文件, 忽略 diff.pathc 的第一个路径
 
 passwd lyb # 修改密码
 
-readlink symbolic_link_name     # 读取符号链接
-readlink symbolic_link_name -f  # 读取符号链接, 递归
+readlink    1.c.link  # 读取符号链接
+readlink -f 1.c.link  # 读取符号链接, 递归
 
 read name     # 读取, 如果参数值小于字段数, 多余的值放入最后一个字段
-read -p "123" # 指定提示符
-read -t 5     # 指定超时时间
 
 rm -r  a    # 递归删除
 rm -rf a    # 强行删除, 文件不存在时, 忽略
-
-rmdir abc                            # 删除空目录
-rmdir -p a/b/c                       # 递归删除, 相当于依次删除 a/b/c a/b a
-rmdir --ignore-fail-on-non-empty abc # 忽略非空目录
 
 od -Ax  -tx1z 1.c # 每组一个字节, 显示十六进制
 od      -c    1.c # 每组一个字节, 显示字符
@@ -610,6 +631,10 @@ ps -ww             # 不限制输出宽度
                    # 显示完整进程名称
 
 pwdx pid...        # 列出进程的当前工作目录
+
+redis flushdb
+
+rz          #  windows 向 虚拟机  发送数据
 
 sed # 读取一行到模式空间 --> 执行操作 -- 循环
     # i-行前插入, a-行后插入, c-修改行, y-字符转换, = 行号,
@@ -642,21 +667,12 @@ sed -i "s/.*/[&]/g"           1.txt # & 用于表示所匹配到的内容
 sed -i "s/\([0-9]*\).*/\1/g"  1.txt # \1 表示第一个字串
 sed -i "s/\([0-9]\+\).*/\1/g" 1.txt # \1 表示第一个字串, 为什么 + 要转义 * 不用
 
-set -u
-set -o nounset  # 使用未初始化的变量报错
-set -e
-set -o errexit  # 只要发生错误就退出
-                # [[ 1 != 1 ]] 会退出
-                # [[ 1 != 1 ]] && ... 不会退出
-                # 函数返回非 0 值会退出
-                # 建议使用: [[ 1 != 1 ]] && ... || : 的格式
+set -o nounset  # 使用未初始化的变量报错, 同 -u
+set -o errexit  # 只要发生错误就退出, 同 -e
 set -o pipefail # 只要管道发生错误就退出
-set -E
-set -o errtrace # 函数报错时, 也会执行 trap ... ERR 的命令
-set -x
-set -o  xtrace  # 执行前打印命令
-set -v
-set -o verbose  # 读取前打印命令
+set -o errtrace # 函数报错时, 也处理 trap ERR, 同 set -E
+set -o  xtrace  # 执行前打印命令, 同 -x
+set -o verbose  # 读取前打印命令, 同 -v
 set -o vi       # 使用 vi 快捷键
 set -- ....     # 重新排列参数
 
@@ -673,7 +689,6 @@ sort -k 4.1,4.2 # 指定排序的列字段
 sort -h         # 以 K, M, G 排序
 sort -i         # 忽略不可打印字符
 sort -m         # 合并排序过的文件
-sort -M         # 以月份排序
 sort -n         # 以数字进行排序
 sort -r         # 逆序
 sort -t :       # 指定列的分割符
@@ -681,7 +696,8 @@ sort -u         # 重复项只输出一次
 sort -V         # 以版本号排序
 sort lyb -o lyb # 排序并存入原文件
 
-###ssh 常用命令
+ss -ntp | grep 9100
+
 ssh -N -D A_PORT B_IP
             # 功能:
             #   动态端口转发
@@ -760,18 +776,14 @@ GatewayPorts no            # 远程转发时, 是否允许其他主机使改端�
 stat    1.c # 列出 birth atime mtime ctime
 stat -L 1.c # 符号链接所指向的文件, 而不是符号链接本身
 
-sudo                                                 # 权限管理文件: /etc/sudoers, 使用 visudo 编辑
-                                                     # 使用当前用户的密码
-sudo -u USERNAME COMMAND                             # 指定用户执行命令
-echo "654321" | sudo -S date -s "20210722 10:10:10"  # 脚本中免密码使用
+sudo                                          # 权限管理文件: /etc/sudoers, 使用 visudo 编辑
+                                              # 使用当前用户的密码
+sudo -u USERNAME COMMAND                      # 指定用户执行命令
+sudo -S date -s "20210722 10:10:10" <<< "123" # 脚本中免密码使用
 
-## 用户切换
-su              # 切换 root, 输入 root 密码
-su root         # 同 su
-su -            # 切换 root, 更新主目录, 环境变量等等
-su -l           # 同 su -
-su - root       # 同 su -
-su - root -c ls # 使用 root 执行命令 ls
+su         # 切换 root, 输入 root 密码
+su -       # 切换 root, 更新主目录, 环境变量等等
+su - -c ls # 使用 root 执行命令 ls
 
 systemctl start      nginx   # 启动 nginx
 systemctl stop       nginx   # 停止 nginx
@@ -783,22 +795,15 @@ systemctl is-active  nginx   # 查看 nginx 是否启动成功
 systemctl is-failed  nginx   # 查看 nginx 是否启动失败
 systemctl is-enabled nginx   # 查看 nginx 是否开机启动
 
+sz          #  虚拟机  向 windows 发送数据
+
 tail -f * # 动态查看新增内容
 
-tar -cvf  /path/to/foo.tar --exclude=\*.o /path/to/foo/ # foo         --> foo.tar, 忽略 .o 文件
-tar -cvf  /path/to/foo.tar                /path/to/foo/ # foo         --> foo.tar
-tar -czvf /path/to/foo.tgz                /path/to/foo/ # foo         --> foo.tgz
-tar -czvf /path/to/foo.tar.gz             /path/to/foo/ # foo         --> foo.tar.gz
-tar -cjvf /path/to/foo.tar.bz2            /path/to/foo/ # foo         --> foo.tar.bz2
-tar -xvf  /path/to/foo.tar                              # foo.tar     --> foo
-tar -xzvf /path/to/foo.tgz                              # foo.tgz     --> foo
-tar -xzvf /path/to/foo.tar.gz                           # foo.tar.gz  --> foo
-tar -xjvf /path/to/foo.tar.bz2                          # foo.tar.bz2 --> foo
-tar -xjvf /path/to/foo.tar.bz2 -C /path/to/destination/ # foo.tar.bz2 --> foo, 指定工作目录
-tar -acf /path/to/foo.tgz --exclude="*.o" /path/to/foo/ # 根据后缀自动 打包 或 压缩, 并忽略指定文件
-tar -acf /path/to/foo.tgz -X file         /path/to/foo/ # 根据后缀自动 打包 或 压缩, 并忽略 file 内的文件
-tar -xf  /path/to/foo.tgz -C /path/to/destination/      # 根据后缀 解包 或 解压 到指定目录
-tar -tf a.tgz                                           # 列出 tgz 中的文件和目录
+tar acf 1.tgz --exclude="*.o" 12 # 根据后缀压缩, 忽略指定文件
+tar acf 1.tgz -X 1.c          12 # 根据后缀压缩, 忽略 1.c 内的文件
+tar xvf 1.tgz -C                 # 根据后缀解压, 显示解压过程
+tar xf  1.tgz -C /home/          # 根据后缀解压, 解压到指定目录
+tar tf a.tgz                     # 列出压缩包中的文件和目录
 
 tee    1.txt # 管道中把文件拷贝到文件
 tee -a 1.txt # 管道中把文件添加到文件
@@ -820,7 +825,6 @@ touch -r 2.c 1.c # 以 2.c 的时间修改 1.c
 touch -d ... 1.c # 指定时间, 格式同 date
 touch -t ... 1.c # 指定时间
                  # 依次是: 时区-年-月-日-时-分-秒
-
 
 trap ... ERR  # 发生错误退出时, 执行指定命令
 trap ... EXIT # 任意情况退出时, 执行指定命令
@@ -959,27 +963,6 @@ yum erase   package_name # 卸载软件，删除数据和文件
 yum provides /etc/vimrc  # 查看文件由哪个软件使用
 yum repolist             # 列出使用的软件源
 
-#### IFS
-* IFS 的默认值是: " \t\n"
-* 查看 IFS 值: echo -n "$IFS" | hexdump
-* IFS 包含转义字符时, 需要在开头添加 $, IFS=$'\n'
-* IFS 为默认值 或 " \t\n" 时
-    * 整个对象开头和结尾的空字符都将忽略
-        * for 遍历 str="   123 456 789  " 时, 将生成 3 个串: 123 456 789
-    * 对象内部连续的空字符都将当作一个字符
-        * for 遍历 str="123   456    789" 时, 将生成 3 个串: 123 456 789
-* IFS 为其他值时, 假定: IFS="a "
-    * 如果, IFS 包含空字符, 对象内部连续的空字符都将当作一个字符
-        * for 遍历 str="123      456a789" 时, 将生成 3 个串: 123 456 789
-    * 其他字符连续出现时, 将当作多个分隔符
-        * for 遍历 str="123aa456a789" 时, 将生成 4 个串: 123 空字符串 456 789
-    * $*, ${str[*]}: 将使用 IFS 的第一个字符连起来
-        * str=(1 2 3); echo "${str[*]" 将输出: 1a2a3
-    * 对象末尾的分割符将被忽略
-        * for 遍历 str="123aa456a789a" 时, 将生成 4 个串: 123 空字符串 456 789
-
-#### Bash 常用快捷键
-
 Esc+B              # 移动到当前单词的开头(左边)
 Esc+F              # 移动到当前单词的结尾(右边)
 
@@ -994,77 +977,4 @@ Ctrl+insert        # 复制命令行内容
 shift+insert       # 粘贴命令行内容
 
 Esc+.              # 获取上一条命令的最后的部分
-
-redis flushdb
-
-$ c++filt     # 可以解析动态库里的符号
-$ sz          #  虚拟机  向 windows 发送数据
-$ rz          #  windows 向 虚拟机  发送数据
-
-ss -ntp | grep 9100
-
-ps aux | grep valgrind
-
-## 文件名称建议只包含:
-* 大小写字母
-* 数字
-* 下划线(_)
-* 短横线(-)
-* 点(.)
-
-errno 是线程安全的, 如何检验
-
-## 命令需要注意的问题
-通配符还是基础正则表达式, 还是扩展正则表达式
-如何处理符号链接
-
-## 通配符
-?      # 代表一个字符
-*      # 代表零个或多个字符
-[123]
-[1-5]
-[!a]
-[^a]
-
-## 基础正则表达式
-^      # 开头
-$      # 结尾
-.      # 除换行符以外的任意字符
-[]     # 中括号中      的任意字符
-[^]    # 中括号中字符外的任意字符
-?      # 前面字符出现 0 次 或 一次
-*      # 前面字符出现 0 次 或 多次
-
-## 扩展正则表达式
-+      # 前面字符出现 1 次 或 多次
-{n}    # 前面字符出现 n 次
-{n,}   # 前面字符出现 n 次 及以上
-{n, m} # 前面字符出现 n 次 到 m 次
-()     # 将括号内的内容看成一个整体
-|      # 或
-
-## TODO
-* 判断一个进程是否处于后台运行
-
-## Bash 基础
-
-Linux 基础知识
-* 文件名称不能包含 /
-
-#### 查看 Linux 临时端口号的范围
-```
-cat /proc/sys/net/ipv4/ip_local_port_range
-32768   60999
-``
-
-* [0, 1024) 公认端口号, 需要 root 启动, 比如 80
-* [1024, 32768) 注册端口, 可以自己注册一些常用服务
-* [32768, 60990) 动态端口, 进程未指定端口号时, 将从这个范围内获取一个端口号
-* [60990, 65535)
-
-# 查询 域名 对应 的 IP
-* nslookup baidu.com
-
-\command # 忽略别名
-
 
