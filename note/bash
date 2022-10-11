@@ -54,7 +54,6 @@ kill -9   pid # 发送信号 SIGKILL  给指定进程
 kill -l       # 列出所有信号
 
 pidof a.out   # 假设进程的启动命令是 cmd
-              # 如果 cmd 为符号链接, 使用符号链接本身, 而不是所指向的文件
               # 将列出所有的 basename(cmd) == a.out 的进程号
               # 精确匹配, 进程名称长度没有限制
 pidof -x 1.sh # 处理脚本
@@ -75,6 +74,7 @@ killall -r    a.out # 使用扩展的正则表达式
                     # 进程名称长度无限制
 killall -e    a.out # 完全匹配, 没看懂 TODO
 
+kill killall pidof # 仅处理符号链接本身
 
 ## TODO
 
