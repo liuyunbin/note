@@ -1,4 +1,6 @@
 
+## 时间戳 字符串形式 等待
+
 ## 学习一个命令需要注意的点
 * 不需要了解命令的所有选项, 目的是为了使用, 切记切记
 * 支持 通配符, 还是基础的正则表达式 还是 扩展的正则表达式
@@ -15,7 +17,6 @@ uname -m # x86_64 等
 uname -r # 内核版本
 uname -s # Linux 等
 
-
 ######################
 #
 #      进程相关
@@ -25,8 +26,6 @@ uname -s # Linux 等
 进程ID
 进程组ID
 会话ID
-
-
 
 /proc/loadavg    # 系统负载
 /proc/cpuinfo     # cpu 信息
@@ -72,40 +71,69 @@ killall -u    a.out # 指定用户
 killall -r    a.out # 使用扩展的正则表达式
                     # 前缀匹配
                     # 进程名称长度无限制
-killall -e    a.out # 完全匹配, 没看懂 TODO
 
 kill killall pidof # 仅处理符号链接本身
 
-## TODO
-
-pgrep vim          # 列出 vim 的进程号
+pgrep        a.out # 列出进程号
                    # 使用前缀匹配
                    # 使用扩展的正则表达式
                    # 进程名称只能使用前 15 位
-pgrep -a           # 列出进程号和完整的进程名称
-pgrep -c           # 列出进程数目
-pgrep -l           # 列出进程号和进程名称
-pgrep -u lyb       # 有效用户ID
-pgrep -U lyb       # 实际用户ID
+pgrep -x     a.out # 精确匹配
+                   # 进程名称只能使用前 15 位
+pgrep -f     a.out # 使用完整的启动命令匹配
+                   # 没有 15 位限制
+pgrep -l     a.out # 列出进程号和进程名称
+                   # 进程名称只能使用前 15 位
+pgrep -a     a.out # 列出进程号和启动命令
+pgrep -c     a.out # 列出进程数目
+pgrep -n     a.out # 列出最新的进程
+pgrep -o     a.out # 列出最老的进程
+pgrep -v     a.out # 反转匹配结果
+pgrep -w     a.out # 列出线程ID
+pgrep -d ' ' a.out # 指定输出的分割符, 默认换行符
+pgrep -u lyb a.out # 有效用户为 lyb 的进程
+pgrep -U lyb a.out # 实际用户为 lyb 的进程
+pgrep -G lyb a.out #       组为 lyb 的进程
+pgrep -P 123 a.out # 父进程为 123 的的进程
+pgrep -g 123 a.out # 进程组为 123 的的进程
+pgrep -s 123 a.out # 会话ID为 123 的的进程
 
 pkill    vim       # 杀死进程
+                   # 说明和 pgrep 类似
 pkill -9 vim       # 发送指定信号
-                   # 其他参数同 pgrep
 pwdx pid...        # 列出进程的当前工作目录
 
-ps -ef             # 显示所有进程
-ps -o pid,command  # 只显示进程 ID 和进程名称
-ps -o fuser=       # 只显示实际用户
-ps -o euser=       # 只显示有效用户
-ps -o lstart,etime # 只显示启动时间, 耗时
-ps -p 123          #   显示指定进程的信息
-ps -u lyb          # 有效用户为 lyb 的进程
-ps -U lyb          # 实际用户为 lyb 的进程
-ps -ww             # 不限制输出宽度
-                   # 显示完整进程名称
-
-ps aux --sort -pcpu
-ps aux --sort -pmem
+ps -e           # 所有进程
+ps -U RUID      # 实际的 UID
+ps -u EUID      # 有效的 UID
+ps -G RGID      # 实际的 GID
+ps -g EGID      # 有效的 GID
+ps -s 123       # 会话    ID
+ps -p PID       # 进程ID
+ps -C vim       # 进程名称, 全名称 或 前 15 位
+ps -t tty       # 终端
+ps -L           # 线程ID, 线程数
+ps -H           # 输出进程树
+ps -ww          # 不限制输出宽度
+ps --ppid PID   # 父进程ID
+ps --no-headers # 不输出列头部
+ps --sort -pcpu # cpu 使用率逆序
+ps -o ruid,ruser,rgid,rgroup # 真正的用户和组
+ps -o euid,euser,egid,egroup # 有效的用户和组
+ps -o suid,suser,sgid,sgroup # 保存的用户和组
+ps -o fuid,fuser,fgid,fgroup # 创建文件的用户和组
+ps -o supgid,supgrp          # 附属组 ID
+ps -o luid,lsession          # 终端登录的 UID, 会话 ID
+ps -o pid,ppid,pgid,sid      # 进程, 父进程, 进程组, 会话 ID
+ps -o pmem,rsz,vsz           # 内存百分比,内存,内存(含交换分区)
+ps -o pcpu,c,bsdtime,cputime # cpu: 百分比,百分比整数,user+system,system
+ps -o stat,state             # 进程状态
+ps -o lstart,etime,etimes    # 启动时间,运行时间,运行时间(秒)
+ps -o cmd,comm               # 启动命令, 进程名称
+ps -o lwp,nlwp               # 线程ID, 线程数
+ps -o nice,pri,psr,rtprio    # 优先级
+ps -o ouid                   # 会话ID所属用户的 uid
+ps -o tty,tpgid              # 终端, 前台进程的ID
 
 top
 top -n 1 # 刷新次数
@@ -270,6 +298,10 @@ awk          '{print    $0}' 1.c # 当前记录的内容
 awk          '{print    $1}' 1.c # 第一个字段的内容
 awk          '{print    $2}' 1.c # 第二个字段的内容
 awk    '{printf "%s\n", $2}' 1.c # C 风格输出
+
+systime()  -- 获取当前的时间戳
+strftime() -- 时间戳 --> 格式化
+mktime()   -- 年月日等 --> 时间戳
 
 bc <<< "scale=2; 10/2" # 设置使用两位小数, 输出: 5.00
 bc <<< "ibase=2;  100" # 输入使用二进制, 输出: 4
@@ -1085,4 +1117,5 @@ Ctrl+insert        # 复制命令行内容
 shift+insert       # 粘贴命令行内容
 
 Esc+.              # 获取上一条命令的最后的部分
+
 
