@@ -8,6 +8,7 @@ set -o pipefail # 只要管道发生错误就退出
 
 function do_ps() {
     if [[ $# == 0 ]]; then
+        printf "%10s%10s%10s%10s\n" "RUSER" "%CPU" "%MEM" "RSZ(KB)"
         ps --no-header -e -o ruser,pcpu,pmem,rsz | awk '
             {
                 cpu[$1] += $2
@@ -15,10 +16,9 @@ function do_ps() {
                 rsz[$1] += $4
             }
             END {
-            printf "%10s%10s%10s%10s\n","RUSER","%CPU","%MEM","RSZ(KB)"
                 for (key in cpu)
                     printf "%10s%10s%10s%10s\n", key, cpu[key],mem[key],rsz[key]
-            }'
+            }' | sort -k 4 -h
     else
         argv=$(pgrep -d, $@ || log_err "$@ 未找到")
         ps -o comm,pid,ppid,ruser,pcpu,pmem,rsz,nlwp,etime,etimes --sort=-etime -p $argv | awk '
