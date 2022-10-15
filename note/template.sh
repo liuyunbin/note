@@ -4,19 +4,16 @@ set -o errexit  # 只要发生错误就退出
 set -o pipefail # 只要管道发生错误就退出
 
 function log_info() {
-  # 黑色
-  echo -e "\033[37;1m[$(date +'%Y-%m-%d %H:%M:%S') info]: $@\033[0m"
+    echo -e "\033[00m$(date +'%F %T') $@\033[0m" > /dev/tty # 默认颜色
 }
 
 function log_warn() {
-  # 黄色
-  echo -e "\033[33;1m[$(date +'%Y-%m-%d %H:%M:%S') warn]: $@\033[0m"
+    echo -e "\033[33m$(date +'%F %T') $@\033[0m" > /dev/tty # 黄色
 }
 
-function log_fatal() {
-  # 红色
-  echo -e "\033[31;1m[$(date +'%Y-%m-%d %H:%M:%S') fatal]: $@\033[0m"
-  exit -1
+function log_erro() {
+    echo -e "\033[31m$(date +'%F %T') $@\033[0m" > /dev/tty # 红色
+    exit -1
 }
 
 function usage() {
@@ -63,5 +60,5 @@ log_info info
 log_info info
 log_info info
 log_warn warning
-log_fatal fatal
+log_erro fatal
 
