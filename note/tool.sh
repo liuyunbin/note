@@ -16,21 +16,36 @@ function log_erro() {
     exit -1
 }
 
+function do_ps_sum() {
+    if [[ $# == 1 ]]; then
+        argv="-e"
+    else
+        argv="-p $2"
+    fi
+    printf "%16s%10s%10s%10s%10s\n" "KEY" "%CPU" "%MEM" "RSZ(KB)" "NLWP"
+    ps --no-header -o $1,pcpu,pmem,rsz,nlwp $argv | awk '
+        {
+             cpu[$1] += $2
+             mem[$1] += $3
+             rsz[$1] += $4
+            nlwp[$1] += $5
+        }
+        END {
+            for (key in cpu)
+                printf "%16s%10s%10s%10s%10s\n",key,cpu[key],mem[key],rsz[key],nlwp[key]
+        }' | sort -k 4 -h
+}
+
 function do_ps() {
     if [[ $# == 0 ]]; then
-        printf "%10s%10s%10s%10s\n" "RUSER" "%CPU" "%MEM" "RSZ(KB)"
-        ps --no-header -e -o ruser,pcpu,pmem,rsz | awk '
-            {
-                cpu[$1] += $2
-                mem[$1] += $3
-                rsz[$1] += $4
-            }
-            END {
-                for (key in cpu)
-                    printf "%10s%10s%10s%10s\n", key, cpu[key],mem[key],rsz[key]
-            }' | sort -k 4 -h
+        do_ps_sum ruser
     else
-        argv=$(pgrep -d, $@ || log_erro "未找到进程 $@")
+        argv=
+        for key in $@; do
+            [[ "$argv" != "" ]] && argv=${argv},
+            argv=$argv$(pgrep -d, $key || log_erro "未找到进程 $key")
+        done
+
         ps -o comm,pid,ppid,ruser,pcpu,pmem,rsz,nlwp,etime:10,etimes:10 --sort=-etime -p $argv | awk '
             BEGIN {
                 getline
@@ -43,6 +58,8 @@ function do_ps() {
                 start_time = strftime("%Y-%m-%d %H:%M:%S", now-$NF);
                 printf "%s %19s\n", $0, start_time
             }'
+        echo "-------------------------------------------------------------"
+        do_ps_sum comm $argv
     fi
 }
 
