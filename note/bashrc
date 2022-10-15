@@ -1,9 +1,10 @@
 
-note=~/GitHub/note
-
 PS1='\[\e[1;32m\]$(date "+%Y-%m-%d %H:%M:%S") \[\e[0m\]'
-PATH="$PATH:$note:$note/bin"
 
+note=~/GitHub/note
+PATH="$PATH:$note/note:$note/bin"
+
+alias b="cd $note; ./note/build.sh > /dev/null; cd - > /dev/null"
 alias c="cd $note && pwd"
 alias l='ls -lhrt --time-style="+%Y-%m-%d %H:%M:%S"'
 alias p="tool.sh ps"
@@ -15,8 +16,6 @@ alias la='ls -lhrtu --time-style="+%Y-%m-%d %H:%M:%S"' # 使用文件    访问�
 alias lc='ls -lhrtc --time-style="+%Y-%m-%d %H:%M:%S"' # 使用文件状态修改时间显示和排序, 旧 --> 新
 
 set -o vi
-
-alias m="cd $note; ./build.sh > /dev/null; cd - > /dev/null"
 
 function log_err() {
     echo -e "\033[31;1m$(date +'%Y-%m-%d %H:%M:%S') $@ \033[0m" > /dev/tty

@@ -1,10 +1,7 @@
 #!/bin/bash
-set -o nounset  # 使用未初始化的变量报错, 同 -u
-set -o errexit  # 只要发生错误就退出 -e
+set -o nounset  # 使用未初始化的变量报错
+set -o errexit  # 只要发生错误就退出
 set -o pipefail # 只要管道发生错误就退出
-set -E          # 即使意外退出, 也会执行 trap 命令
-
-#set -o xtrace   # 执行前打印命令 同 -x
 
 function log_info() {
   # 黑色
