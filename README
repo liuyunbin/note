@@ -1,6 +1,20 @@
 
-Yunbin Liu's note
+项目说明
+    Yunbin Liu's note
 
-## 注意
-* 本仓库只总结最常见的命令以及参数等等, 详细信息见 man 或 官网, 自勉
+系统要求
+    Ubuntu 20.04 及以后
+
+安装依赖
+    ./note/install_dependency.sh
+
+构建
+    ./note/build.sh
+
+注意
+    本仓库只总结最常见的内容,
+    总结的过程即为学习的过程，
+    着眼点是使用,
+    详细信息见 man 或 官网,
+    自勉
 
