@@ -117,6 +117,7 @@ ps -H           # 输出进程树
 ps -ww          # 不限制输出宽度
 ps --ppid PID   # 父进程ID
 ps --no-headers # 不输出列头部
+ps --headers    #   输出列头部
 ps --sort -pcpu # cpu 使用率逆序
 ps -o ruid,ruser,rgid,rgroup # 真正的用户和组
 ps -o euid,euser,egid,egroup # 有效的用户和组
