@@ -31,17 +31,17 @@ function do_ps() {
             }' | sort -k 4 -h
     else
         argv=$(pgrep -d, $@ || log_erro "未找到进程 $@")
-        ps -o comm,pid,ppid,ruser,pcpu,pmem,rsz,nlwp,etime,etimes --sort=-etime -p $argv | awk '
+        ps -o comm,pid,ppid,ruser,pcpu,pmem,rsz,nlwp,etime:10,etimes:10 --sort=-etime -p $argv | awk '
             BEGIN {
                 getline
-                printf "%-15s %s\n","启动时间",$0
+                printf "%s %23s\n", $0, "启动时间"
             }
 
             {
                 run_time=$NF
                 now=systime();
                 start_time = strftime("%Y-%m-%d %H:%M:%S", now-$NF);
-                printf "%-19s %s\n",start_time,$0
+                printf "%s %19s\n", $0, start_time
             }'
     fi
 }
