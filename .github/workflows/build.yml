@@ -10,6 +10,5 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: cd note
-      - run: ./install_dependency.sh
-      - run: ./build.sh
+      - run: ./note/install_dependency.sh
+      - run: ./note/build.sh
