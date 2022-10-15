@@ -5,7 +5,7 @@ note=~/GitHub/note
 PATH="$PATH:$note/note:$note/bin"
 
 alias b="cd $note; ./note/build.sh > /dev/null; cd - > /dev/null"
-alias c="cd $note && pwd"
+alias c="cd $note/note && pwd"
 alias l='ls -lhrt --time-style="+%Y-%m-%d %H:%M:%S"'
 alias p="tool.sh ps"
 
