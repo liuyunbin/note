@@ -6,12 +6,9 @@ PATH="$PATH:$note/note:$note/bin"
 
 alias b="(cd $note; ./note/build.sh)"
 alias c="cd $note/note && pwd"
-# 文件内容修改时间, 旧 --> 新
-alias l='ls -lhrt --time-style="+%F %T"'
-# 文件访问时间, 旧 --> 新
-alias la='ls -lhrtu --time-style="+%F %T"'
-# 文件状态修改时间, 旧 --> 新
-alias lc='ls -lhrtc --time-style="+%F %T"'
+alias l=' ls -lhrt  --time-style="+%F %T"' # 文件内容修改时间, 旧 --> 新
+alias la='ls -lhrtu --time-style="+%F %T"' # 文件访问时间,     旧 --> 新
+alias lc='ls -lhrtc --time-style="+%F %T"' # 文件状态修改时间, 旧 --> 新
 alias m="g++ test.cc -std=c++11"
 alias p="tool.sh ps"
 alias t="./a.out"
