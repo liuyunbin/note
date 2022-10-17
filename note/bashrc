@@ -4,16 +4,17 @@ PS1='\[\e[32m\]$(date "+%F %T") \[\e[0m\]'
 note=~/GitHub/note
 PATH="$PATH:$note/note:$note/bin"
 
-alias b="cd $note; ./note/build.sh > /dev/null; cd - > /dev/null"
+alias b="(cd $note; ./note/build.sh)"
 alias c="cd $note/note && pwd"
-alias l='ls -lhrt --time-style="+%Y-%m-%d %H:%M:%S"'
-alias p="tool.sh ps"
-
+# 文件内容修改时间, 旧 --> 新
+alias l='ls -lhrt --time-style="+%F %T"'
+# 文件访问时间, 旧 --> 新
+alias la='ls -lhrtu --time-style="+%F %T"'
+# 文件状态修改时间, 旧 --> 新
+alias lc='ls -lhrtc --time-style="+%F %T"'
 alias m="g++ test.cc -std=c++11"
+alias p="tool.sh ps"
 alias t="./a.out"
-
-alias la='ls -lhrtu --time-style="+%Y-%m-%d %H:%M:%S"' # 使用文件    访问时间显示和排序, 旧 --> 新
-alias lc='ls -lhrtc --time-style="+%Y-%m-%d %H:%M:%S"' # 使用文件状态修改时间显示和排序, 旧 --> 新
 
 set -o vi
 
