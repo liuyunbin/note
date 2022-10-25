@@ -1,22 +1,4 @@
 
-## 用户管理
-用户 组
-用户名称 组名称
-UID GID
-
-登录用户 登录组: 不受 su 影响
-实际用户 实际组:   受 su 影响
-有效用户 有效组
-文件用户 文件组
-
-RUID RGID # 真正的用户和组
-EUID EGID # 有效的用户和组
-SUID SGID # 保存的用户和组
-FUID FGID # 文件的用户和组
-SUPGID    # 附属组 ID
-LUID      # 终端登录的用户
-OUID      # 会话 ID 所属用户
-
 ## 为什么存在用户?
 * 要登录一个系统, 肯定需要一个名称, 用以区分不同的用户
 
@@ -45,9 +27,18 @@ OUID      # 会话 ID 所属用户
 * 必须大于等于 0
 * 0 一般是 root 使用
 
-## 常用命令
+## 当前终端的登录用户
+* 经过终端或伪终端登录后, 不会再变化
+* users  # 列出所有登陆用户
+* w      # 列出谁登录, 以及目前在干什么
+* who    # 列出谁登录
+* who -m # 列出当前终端登录的用户
 
-## 常用详情
+## 当前终端的有效用户
+* 经过终端或伪终端登录后, 通过 su 可再变化
+* whoami # 列出当前终端的有效用户
+
+## 添加用户
 useradd           lyb # 添加用户
 useradd -D            # 查看默认配置
 useradd -D ...        # 修改默认配置
@@ -63,6 +54,9 @@ useradd -m        lyb # 自动创建主目录
 useradd -M        lyb #   不创建主目录
 useradd -s ...    lyb # 指明 shell
 
+newusers  # 批量新增用户
+
+## 修改用户
 usermod               # 修改用户
 usermod -g ...    lyb # 修改主组
 usermod -G ...    lyb # 修改附组
@@ -81,7 +75,7 @@ chage -l        lyb   # 列出用户密码信息
 chage -m ...   [lyb]  # 设置密码修改的最小间隔,  0 表示无限制
 chage -M ...   [lyb]  # 设置密码修改的最大间隔, -1 表示移除限制
 chage -W ...   [lyb]  # 设置密码警告的天数, -1 表示移除限制
-                      #
+
 chsh  -s ...   [lyb]  # 修改登录的 shell
 chsh  -l       [lyb]  # 列出支持的 shell
 
@@ -89,15 +83,19 @@ passwd ...     [lyb]  # 修改密码
 passwd -in 1.c [lyb]  # 修改密码, 从文件中读取
 passwd -stdin  [lyb]  # 修改密码, 从标准输入读取
 
-su           # 切到 root, 输入 root 密码
-su -         # 切到 root, 更新主目录, 环境变量等, 同 -l, --login
-su -c ls     # 切到 root, 执行命令, 再切回来
-su       lyb # 切到 lyb,  输入 lyb 密码
-
-userdel   # 删除用户
-newusers  # 批量新增用户
 chfn      # 修改个人信息, 手机号之类
 
+## 切换用户
+su       # 切到 root, 输入 root 密码
+su -     # 切到 root, 更新主目录, 环境变量等, 同 -l, --login
+su   lyb # 切到 lyb,  输入 lyb 密码
+
+## 删除用户
+userdel     lyb # 删除用户
+userdel -r  lyb # 删除用户, 以及相关文件
+
+## 组命令
+groups    # 列出用户所属的组名称
 groupadd  # 添加组
 groupmod  # 修改组信息, 包括组的ID和组名称
 groupdel  # 删除组
@@ -106,15 +104,11 @@ gpasswd   # 管理组, 新增或删除成员, 删除密码, 设置组管理人�
 newgrp    # 切换组
 sg        # 使用其他组执行命令
 
-who       # 列出谁登录
-w         # 列出谁登录, 以及目前在干什么
-users     # 输出所有登陆的用户
-whoami    # 输出当前终端的有效用户
+## 列出系统启动时间
+* uptime -s
+* who -b
 
-who -m         # 输出当前终端登录的用户
-
-uptime -s    # 列出系统启动时间
-
+## 查看用户的 uid gid 等信息
 id           # 输出有效用户的用户和组信息
 id       lyb # 输出指定用户的用户和组信息
 id    -u lyb # 输出 EUID
@@ -125,22 +119,16 @@ id    -G lyb # 输出所有的组ID
 id -n -G lyb # 输出所有的组ID 对应的名称
 id -r -G lyb # 输出真正的ID, 而不是有效的ID
 
-groups [lyb] # 列出用户所属的组名称
-
+## 查看登录信息
 last   [lyb] # 列出最近保存的登录的信息
 lastb  [lyb] # 列出最近保存的登录的信息, 包括失败情况
 
 lastlog           # 列出最近一次的登录信息
 lastlog -b 10     # 最近一次的登录在 10 天前的信息
+lastlog -t 10     # 最近一次的登录在 10 天内的信息
 lastlog -C -u lyb # 清除 lyb 最近一次的登录信息
 lastlog -S -u lyb # 设置 lyb 最近一次的登录信息
 lastlog    -u lyb # 查看 lyb 最近一次的登录信息
-lastlog -t 10     # 最近一次的登录在 10 天内的信息
-
-ps -o ruid,euid,suid,fuid,luid,ouid,      # 查看进程 UID, 数字
-ps -o ruser,euser,suser,fuser,luid,ouid,  # 查看进程 UID, 字符串
-ps -o rgid,egid,sgid,fgid,supgid,         # 查看进程 GID, 数字
-ps -o rgroup,egroup,sgroup,fgroup,supgrp, # 查看进程 GID, 字符串
 
 ## 提高权限
 sudo                                          # 权限管理文件: /etc/sudoers, 使用 visudo 编辑
@@ -158,17 +146,16 @@ sudoedit ...                                  # 编辑文件
 * /etc/skel/           # 默认主目录模板
 * /etc/subgid          # 用户隶属的 GID
 * /etc/subuid          # 用户隶属的 UID
-* /etc/login.defs      # 有关密码的配置信息
+* /etc/login.defs      # 有关登录的配置信息
 
 ## 默认配置: /etc/login.defs
-MAIL_DIR	    # 邮件目录
+MAIL_DIR        # 邮件目录
 MAIL_FILE       # 邮件文件名, 相对于主目录
                 #
 PASS_MAX_DAYS	# 密码被使用的最大天数
 PASS_MIN_DAYS	# 密码被更改的最小间隔
 PASS_MIN_LEN	# 密码的最小长度
 PASS_WARN_AGE	# 密码过期前开始警告的天数
-                #
     UID_MIN     # 新普通用户自动创建 UID 的最小值
     UID_MAX     # 新普通用户自动创建 UID 的最大值
 SYS_UID_MIN     # 新系统用户自动创建 UID 的最小值
