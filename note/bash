@@ -2,12 +2,10 @@
 ## 时间戳 字符串形式 等待
 
 ## 学习一个命令需要注意的点
-* 不需要了解命令的所有选项, 目的是为了使用, 切记切记
+* 不需要了解命令的所有选项, 目的是为了使用, 有一些命令一辈子也用不到, 切记切记
 * 支持 通配符, 还是基础的正则表达式 还是 扩展的正则表达式
 * 各个选项之间是 且 还是 或
 * 如何处理符号连接
-
-##
 
 free -h    # 内存使用情况
 df   -Th   # 查看磁盘挂载情况
@@ -16,137 +14,6 @@ uname -a # 全部信息
 uname -m # x86_64 等
 uname -r # 内核版本
 uname -s # Linux 等
-
-######################
-#
-#      进程相关
-#
-#####################
-
-进程ID
-进程组ID
-会话ID
-
-/proc/loadavg    # 系统负载
-/proc/cpuinfo     # cpu 信息
-/proc/uptime      # 运行时间
-/proc/sys
-
-/proc/PID/cmdline # 完整的启动命令
-/proc/PID/comm    # 进程名称, 不包含路径名称, 最多 15 位
-                  # 如果以符号链接启动, 将存储符号链接
-/proc/PID/cwd     # 进程当前的目录
-/proc/PID/exe     # 符号链接, 指向运行的进程
-/proc/PID/environ # 进程使用的环境变量
-/proc/PID/fd      # 进程所打开的文件描述符
-/proc/PID/limits  # 进程对各种资源的限制
-/proc/PID/task    # 进程使用的线程情况
-
-kill      pid # 发送信号 TERM 给指定进程
-kill        0 # 发送信号 TERM 给当前进程组的所有进程
-kill       -1 # 发送信号 TERM 给 PID 大于 1 的进程
-kill     -pid # 发送信号 TERM 给进程组 PID 的所有进程
-kill       %1 #    bash 内置的 kill, 杀死作业
-kill    a.out # 非 bash 内置的 kill, 杀死进程
-kill -p a.out # 非 bash 内置的 kill, 只列出进程号
-kill -9   pid # 发送信号 SIGKILL  给指定进程
-kill -l       # 列出所有信号
-
-pidof a.out   # 假设进程的启动命令是 cmd
-              # 将列出所有的 basename(cmd) == a.out 的进程号
-              # 精确匹配, 进程名称长度没有限制
-pidof -x 1.sh # 处理脚本
-
-killall       a.out # 发送 TREM 给进程
-                    # 进程名称长度无限制
-killall -I    a.out # 忽略大小写
-killall -g    a.out # 发送给进程组
-killall -i    a.out # 删除之前确认
-killall -l          # 列出所有信号
-killall -o 2m a.out # 发给 2 分钟前启动的 a.out
-killall -y 2m a.out # 发给 2 分钟内启动的 a.out
-killall -9    a.out # 发送信号 SIGKILL
-killall -w    a.out # 等待进程结束
-killall -u    a.out # 指定用户
-killall -r    a.out # 使用扩展的正则表达式
-                    # 前缀匹配
-                    # 进程名称长度无限制
-
-kill killall pidof # 仅处理符号链接本身
-
-pgrep        a.out # 列出进程号
-                   # 使用前缀匹配
-                   # 使用扩展的正则表达式
-                   # 进程名称只能使用前 15 位
-pgrep -x     a.out # 精确匹配
-                   # 进程名称只能使用前 15 位
-pgrep -f     a.out # 使用完整的启动命令匹配
-                   # 没有 15 位限制
-pgrep -l     a.out # 列出进程号和进程名称
-                   # 进程名称只能使用前 15 位
-pgrep -a     a.out # 列出进程号和启动命令
-pgrep -c     a.out # 列出进程数目
-pgrep -n     a.out # 列出最新的进程
-pgrep -o     a.out # 列出最老的进程
-pgrep -v     a.out # 反转匹配结果
-pgrep -w     a.out # 列出线程ID
-pgrep -d ' ' a.out # 指定输出的分割符, 默认换行符
-pgrep -u lyb a.out # 有效用户为 lyb 的进程
-pgrep -U lyb a.out # 实际用户为 lyb 的进程
-pgrep -G lyb a.out #       组为 lyb 的进程
-pgrep -P 123 a.out # 父进程为 123 的的进程
-pgrep -g 123 a.out # 进程组为 123 的的进程
-pgrep -s 123 a.out # 会话ID为 123 的的进程
-
-pkill    vim       # 杀死进程
-                   # 说明和 pgrep 类似
-pkill -9 vim       # 发送指定信号
-pwdx pid...        # 列出进程的当前工作目录
-
-ps -e           # 所有进程
-ps -U RUID      # 实际的 UID
-ps -u EUID      # 有效的 UID
-ps -G RGID      # 实际的 GID
-ps -g EGID      # 有效的 GID
-ps -s 123       # 会话    ID
-ps -p PID       # 进程ID
-ps -C vim       # 进程名称, 全名称 或 前 15 位
-ps -t tty       # 终端
-ps -L           # 线程ID, 线程数
-ps -H           # 输出进程树
-ps -ww          # 不限制输出宽度
-ps --ppid PID   # 父进程ID
-ps --no-headers # 不输出列头部
-ps --headers    #   输出列头部
-ps --sort -pcpu # cpu 使用率逆序
-ps -o ruid,ruser,rgid,rgroup # 真正的用户和组
-ps -o euid,euser,egid,egroup # 有效的用户和组
-ps -o suid,suser,sgid,sgroup # 保存的用户和组
-ps -o fuid,fuser,fgid,fgroup # 创建文件的用户和组
-ps -o supgid,supgrp          # 附属组 ID
-ps -o luid,lsession          # 终端登录的 UID, 会话 ID
-ps -o pid,ppid,pgid,sid      # 进程, 父进程, 进程组, 会话 ID
-ps -o pmem,rsz,vsz           # 内存百分比,内存,内存(含交换分区)
-ps -o pcpu,c,bsdtime,cputime # cpu: 百分比,百分比整数,user+system,system
-ps -o stat,state             # 进程状态
-ps -o lstart,etime,etimes    # 启动时间,运行时间,运行时间(秒)
-ps -o cmd,comm               # 启动命令, 进程名称
-ps -o lwp,nlwp               # 线程ID, 线程数
-ps -o nice,pri,psr,rtprio    # 优先级
-ps -o ouid                   # 会话ID所属用户的 uid
-ps -o tty,tpgid              # 终端, 前台进程的ID
-
-top
-top -n 1 # 刷新次数
-top -b # 方便写入文件
-top        # 使用 CPU 排序 -- TODO
-top -u lyb # M 内存排序
-           # P CPU 排序
-           # T 时间排序
-           # m 显示内存信息
-           # t 显示进程 或 CPU状态信息
-           # c 显示命令名称 或 完整命令行
-
 
                    # lsof -- sudo yum install lsof
 lsof -iTCP         # 查看 TCP 信息
@@ -175,8 +42,6 @@ rpm -qf /usr/sbin/pidof        # 查看 命令所属的包
 yumdownloader --source ...     # 下载源码包
 rpm2cpio ...src.rpm | cpio -id # 转换
 tar xvf ...                    # 解压
-
-
 
 ##################################
 #
@@ -661,11 +526,6 @@ grep ... --inclue "*.c"   # 指定文件
 grep ... --exclue "*.c"   # 忽略文件
 grep ... --exclue-dir src # 忽略目录
 
-groupadd               # 添加组
-groupdel               # 删除组
-groupdel               # 修改组
-groups                 # 查看所属的组
-
 hd            1.c # 每组一个字节, 显示十六进制
 hexdump -C    1.c # 每组一个字节, 显示十六进制
 hexdump -c    1.c # 每组一个字节, 显示字符
@@ -925,15 +785,6 @@ GatewayPorts no            # 远程转发时, 是否允许其他主机使改端�
 stat    1.c # 列出 birth atime mtime ctime
 stat -L 1.c # 符号链接所指向的文件, 而不是符号链接本身
 
-sudo                                          # 权限管理文件: /etc/sudoers, 使用 visudo 编辑
-                                              # 使用当前用户的密码
-sudo -u USERNAME COMMAND                      # 指定用户执行命令
-sudo -S date -s "20210722 10:10:10" <<< "123" # 脚本中免密码使用
-
-su         # 切换 root, 输入 root 密码
-su -       # 切换 root, 更新主目录, 环境变量等等
-su - -c ls # 使用 root 执行命令 ls
-
 systemctl start      nginx   # 启动 nginx
 systemctl stop       nginx   # 停止 nginx
 systemctl restart    nginx   # 重启 nginx
@@ -989,13 +840,6 @@ unix2doc 1.txt # \n --> \r\n
 
 unzip -l a.zip # 列出 zip 的内容
 unzip -j a.zip # 解压时, 不要路径
-
-useradd               # 添加用户
-userdel               # 删除用户
-usermod               # 修改用户
-usermod    -g lyb kds # 将 kds 的主组变为 lyb
-usermod    -G lyb kds # 将 kds 的附组变为 lyb
-usermod -a -G lyb kds # 将 kds 的附组添加 lyb
 
 vim
 Ctrl+F 下翻一屏
