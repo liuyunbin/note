@@ -9,8 +9,13 @@ alias c="cd $note/note && pwd"
 alias l=' ls -lhrt  --time-style="+%F %T"' # 文件内容修改时间, 旧 --> 新
 alias la='ls -lhrtu --time-style="+%F %T"' # 文件访问时间,     旧 --> 新
 alias lc='ls -lhrtc --time-style="+%F %T"' # 文件状态修改时间, 旧 --> 新
+alias lastlog="tool.sh lastlog"
 alias m="g++ test.cc -std=c++11"
 alias p="tool.sh ps"
+alias puid="ps -o ruid,euid,suid,fuid,luid,ouid,"
+alias puser="ps -o ruser,euser,suser,fuser,luid,ouid,"
+alias pgid="ps -o rgid,egid,sgid,fgid,supgid,"
+alias pgroup="ps -o rgroup,egroup,sgroup,fgroup,supgrp,"
 alias t="./a.out"
 
 set -o vi

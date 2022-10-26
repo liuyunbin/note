@@ -82,6 +82,30 @@ function do_ps() {
     fi
 }
 
+function do_lastlog() {
+    lastlog $@ | awk '
+        BEGIN {
+            max_user_len = 0
+        }
+
+        NR > 1 && NF > 6 {
+            user = $1
+            user_len = length(user)
+            if (user_len > max_user_len)
+               max_user_len = user_len
+            time = $(NF-5) FS $(NF-4) FS $(NF-3) FS $(NF-2) FS $(NF-1) FS $NF
+            cmd = "date -d\""time"\" +\"%F %T\""
+            cmd | getline time
+            close(cmd)
+            arr[user] = time
+        }
+
+        END {
+            for (user in arr)
+                printf "%*s\t%s\n", max_user_len + 1, user, arr[user]
+        }' | sort -k 2,3
+}
+
 cmd=$1
 shift
 do_$cmd $@
