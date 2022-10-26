@@ -38,63 +38,28 @@
 * 经过终端或伪终端登录后, 通过 su 可再变化
 * whoami # 列出当前终端的有效用户
 
-## 添加用户
-useradd           lyb # 添加用户
-useradd -D            # 查看默认配置
-useradd -D ...        # 修改默认配置
-useradd -b ...    lyb # 指定主目录的目录, 目录必须存在
-useradd -b ... -m lyb # 指定主目录的目录, 目录可以不存在, 会自动创建
-useradd -d ...    lyb # 指定主目录, 目录可以不存在, 不会自动创建
-useradd -e ...    lyb # 指明用户过期的日期
-useradd -g ...    lyb # 指明主组, 组必须存在
-useradd -G ...    lyb # 指明附属组, 默认只包括主组
-useradd -k ...    lyb # 指定主目录的模板
-useradd -K ...    lyb # 更新默认配置
-useradd -m        lyb # 自动创建主目录
-useradd -M        lyb #   不创建主目录
-useradd -s ...    lyb # 指明 shell
+## 其他常用命令
+useradd        # 添加用户
+               #   可查看或修改默认配置
+               #   可指定主目录, 主目录模板, 用户ID, 主组ID, 附属组ID, shell, 用户过期日期等
+newusers       # 批量新增用户
+usermod        # 修改用户
+               #   可修改用户名, 添加附属组, 锁定用户, 解锁用户, 移动主目录
+               #   其他选项同 useradd
+chage          # 修改密码相关信息
+               #   包括列出密码相关信息
+               #   包括用户过期日期, 密码修改的最大最小间隔, 警告天数
+chage -d 0 lyb # 下次登录必须修改密码
+chsh           # 列出或修改支 shell
+chfn           # 修改个人信息, 手机号之类
+passwd         # 修改密码
+passwd -stdin  # 修改密码, 从标准输入读取
+passwd    lyb  # 修改密码
+userdel        # 删除用户
+su             # 切到 root
+su -           # 切到 root, 更新主目录, 环境变量等, 相当于重新登录
+su   lyb       # 切到 lyb
 
-newusers  # 批量新增用户
-
-## 修改用户
-usermod               # 修改用户
-usermod -g ...    lyb # 修改主组
-usermod -G ...    lyb # 修改附组
-usermod -G ... -a lyb # 添加附组
-usermod -d ...    lyb # 修改主目录, 不会自动创建新目录
-usermod -d ... -m lyb # 修改主目录,   会自动创建新目录, 将旧目录的内容拷到新目录
-usermod -l ...    lyb # 修改用户名
-usermod -L        lyb # 锁定用户密码
-usermod -U        lyb # 解锁用户密码
-                      # 其他参数 和 useradd 类似
-
-chage          [lyb]  # 修改用户的密码修改信息
-chage -d 0     [lyb]  # 下次登录必须修改密码
-chage -E ...   [lyb]  # 设置用户过期的日期 或 距离 1970-01-01 的天数, -1 表示移除过期日期
-chage -l        lyb   # 列出用户密码信息
-chage -m ...   [lyb]  # 设置密码修改的最小间隔,  0 表示无限制
-chage -M ...   [lyb]  # 设置密码修改的最大间隔, -1 表示移除限制
-chage -W ...   [lyb]  # 设置密码警告的天数, -1 表示移除限制
-
-chsh  -s ...   [lyb]  # 修改登录的 shell
-chsh  -l       [lyb]  # 列出支持的 shell
-
-passwd ...     [lyb]  # 修改密码
-passwd -in 1.c [lyb]  # 修改密码, 从文件中读取
-passwd -stdin  [lyb]  # 修改密码, 从标准输入读取
-
-chfn      # 修改个人信息, 手机号之类
-
-## 切换用户
-su       # 切到 root, 输入 root 密码
-su -     # 切到 root, 更新主目录, 环境变量等, 同 -l, --login
-su   lyb # 切到 lyb,  输入 lyb 密码
-
-## 删除用户
-userdel     lyb # 删除用户
-userdel -r  lyb # 删除用户, 以及相关文件
-
-## 组命令
 groups    # 列出用户所属的组名称
 groupadd  # 添加组
 groupmod  # 修改组信息, 包括组的ID和组名称
@@ -104,24 +69,12 @@ gpasswd   # 管理组, 新增或删除成员, 删除密码, 设置组管理人�
 newgrp    # 切换组
 sg        # 使用其他组执行命令
 
-## 列出系统启动时间
-* uptime -s
-* who -b
+uptime -s # 列出系统启动时间
 
-## 查看用户的 uid gid 等信息
-id           # 输出有效用户的用户和组信息
-id       lyb # 输出指定用户的用户和组信息
-id    -u lyb # 输出 EUID
-id -n -u lyb # 输出 EUID 对应的名称
-id    -g lyb # 输出 EGID
-id -n -g lyb # 输出 EGID 对应的名称
-id    -G lyb # 输出所有的组ID
-id -n -G lyb # 输出所有的组ID 对应的名称
-id -r -G lyb # 输出真正的ID, 而不是有效的ID
+id        # 输出实际或有效用户的用户和组信息
 
-## 查看登录信息
-last   [lyb] # 列出最近保存的登录的信息
-lastb  [lyb] # 列出最近保存的登录的信息, 包括失败情况
+last      # 列出最近保存的登录的信息
+lastb     # 列出最近保存的登录的信息, 包括失败情况
 
 lastlog           # 列出最近一次的登录信息
 lastlog -b 10     # 最近一次的登录在 10 天前的信息
@@ -130,9 +83,7 @@ lastlog -C -u lyb # 清除 lyb 最近一次的登录信息
 lastlog -S -u lyb # 设置 lyb 最近一次的登录信息
 lastlog    -u lyb # 查看 lyb 最近一次的登录信息
 
-## 提高权限
 sudo                                          # 权限管理文件: /etc/sudoers, 使用 visudo 编辑
-                                              # 使用当前用户的密码
 sudo -u USERNAME COMMAND                      # 指定用户执行命令
 sudo -S date -s "20210722 10:10:10" <<< "123" # 脚本中免密码使用
 sudoedit ...                                  # 编辑文件
@@ -147,37 +98,4 @@ sudoedit ...                                  # 编辑文件
 * /etc/subgid          # 用户隶属的 GID
 * /etc/subuid          # 用户隶属的 UID
 * /etc/login.defs      # 有关登录的配置信息
-
-## 默认配置: /etc/login.defs
-MAIL_DIR        # 邮件目录
-MAIL_FILE       # 邮件文件名, 相对于主目录
-                #
-PASS_MAX_DAYS	# 密码被使用的最大天数
-PASS_MIN_DAYS	# 密码被更改的最小间隔
-PASS_MIN_LEN	# 密码的最小长度
-PASS_WARN_AGE	# 密码过期前开始警告的天数
-    UID_MIN     # 新普通用户自动创建 UID 的最小值
-    UID_MAX     # 新普通用户自动创建 UID 的最大值
-SYS_UID_MIN     # 新系统用户自动创建 UID 的最小值
-SYS_UID_MAX     # 新系统用户自动创建 UID 的最大值
-                #
-    GID_MIN     # 新普通用户自动创建 GID 的最小值
-    GID_MAX     # 新普通用户自动创建 GID 的最大值
-SYS_GID_MIN     # 新系统用户自动创建 GID 的最小值
-SYS_GID_MAX     # 新系统用户自动创建 GID 的最大值
-                #
-CREATE_HOME	    # 新用户是否自动创建主目录
-UMASK           # 新用户的默认权限掩码
-USERGROUPS_ENAB # 新用户是否自动创建组, 还是和其他用户公用一个组
-                       #
-MAX_MEMBERS_PER_GROUP  # 每个组的最大成员数
-
-## 默认配置: /etc/default/useradd
-* GROUP=100             # 组ID的默认值
-* HOME=/home            # 主目录的目录的默认值
-* INACTIVE=-1           # 密码过期后多少天用户临时不可以, -1 表示不使用此属性
-* EXPIRE=               # 用户过期日期
-* SHELL=/bin/bash       # 默认 shell
-* SKEL=/etc/skel        # 默认新用户主目录模板
-* CREATE_MAIL_SPOOL=yes # 是否启用邮件
 
