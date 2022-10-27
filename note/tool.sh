@@ -82,7 +82,7 @@ function do_ps() {
     fi
 }
 
-function do_lastlog() {
+function do_last_login() {
     lastlog $@ | awk '
         BEGIN {
             max_user_len = 0
