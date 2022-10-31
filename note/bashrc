@@ -1,14 +1,20 @@
 
 PS1='\[\e[32m\]$(date "+%F %T") \[\e[0m\]'
 
+alias ls='ls --color=auto --time-style="+%F %T %z"'
+
 note=~/GitHub/note
 PATH="$PATH:$note/note:$note/bin"
 
 alias b="(cd $note; ./note/build.sh)"
 alias c="cd $note/note && pwd"
-alias l=' ls -lhrt  --time-style="+%F %T"' # 文件内容修改时间, 旧 --> 新
-alias la='ls -lhrtu --time-style="+%F %T"' # 文件访问时间,     旧 --> 新
-alias lc='ls -lhrtc --time-style="+%F %T"' # 文件状态修改时间, 旧 --> 新
+alias l="lsm"
+alias lsa='ls -l --human-readable --reverse --sort=time --time=atime'
+alias lsc='ls -l --human-readable --reverse --sort=time --time=ctime'
+alias lsd='ls -l --human-readable --reverse --sort=time --directory'
+alias lsm='ls -l --human-readable --reverse --sort=time'
+alias lss='ls -l --human-readable --reverse --sort=size'
+alias lsv='ls -l --human-readable --reverse --sort=version'
 alias m="g++ test.cc -std=c++11"
 alias p="tool.sh ps"
 alias pll="tool.sh last_login"
