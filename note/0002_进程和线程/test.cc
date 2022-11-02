@@ -117,7 +117,7 @@ int main() {
     }
 #endif
 
-#if 1
+#if 0
     // 测试信号处理的顺序
     std::cout << "注册信号" << std::endl;
     set_signal(true);
@@ -136,6 +136,11 @@ int main() {
     for (;;)
         ;
 #endif
+
+    int x = 0;
+
+    std::cout << 1/ x  << std::endl;
+
     return 0;
 }
 
