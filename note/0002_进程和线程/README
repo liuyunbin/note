@@ -196,6 +196,19 @@ pstree  -l [PID] # 使用长行, 方便写入文件
 nohup  # 忽略信号 SIGHUP
 setsid # 以新的 session 执行命令
 
+strace               # 追踪进程的系统调用和信号处理
+strace cmd argv      # strace 和命令 同时启动
+strace -p pid        # 追踪正在运行的程序, 多个进程, 指定 -p 多次
+strace -c            # 统计系统调用的时间, 次数
+strace -o ...        # 输出到指定的文件
+strace -tt           # 显示调用时间 时分秒.毫秒
+strace -T            # 显示系统调用的耗时
+strace -f            # 跟踪子进程, 不包括 vfork
+strace -F            # 跟踪 vfork
+strace -e trace=...  # 跟踪指定信号调用
+strace -s ...        # 参数是字符串时, 最大输出长度, 默认是32个字节
+strace -e signal=... # 跟踪指定信号
+
 ## 常用信号
  1) SIGHUP    # 退出进程, 控制终端断开
  2) SIGINT    # 退出进程, 键盘中断(ctrl+c)
