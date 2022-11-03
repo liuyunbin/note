@@ -9,9 +9,9 @@ std::map<int, std::string> m;
 
 void handle_signal(int sig, siginfo_t* sig_info, void * ) {
     std::cout << getpid() << " 捕获信号 " << m[sig] << " 来自 " << sig_info->si_pid << std::endl;
-    std::cout << getpid() << " 处理信号 " << m[sig] << " 中..." << std::endl;
-    sleep(2);
-    std::cout << getpid() << " 处理完成 " << m[sig] << std::endl;
+//    std::cout << getpid() << " 处理信号 " << m[sig] << " 中..." << std::endl;
+//    sleep(2);
+//    std::cout << getpid() << " 处理完成 " << m[sig] << std::endl;
 }
 
 void set_signal(bool block = false) {
@@ -137,9 +137,17 @@ int main() {
         ;
 #endif
 
+#if 0
     int x = 0;
 
     std::cout << 1/ x  << std::endl;
+#endif
+
+    set_signal();
+    std::cout << "父进程: " << getppid() << std::endl;
+    std::cout << "  进程: " << getpid()  << std::endl;
+    for (;;)
+        ;
 
     return 0;
 }
