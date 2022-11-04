@@ -151,6 +151,21 @@ int main() {
 #endif
 
 #if 1
+    // 测试僵尸进程
+    pid_t fd = fork();
+
+    if (fd == 0) {
+        // 子进程
+        std::cout << getpid() << " 子进程退出" << std::endl;
+    } else {
+        // 父进程
+        for (;;)
+            ;
+    }
+#endif
+
+
+#if 0
     set_signal();
     std::cout << "父进程: " << getppid() << std::endl;
     std::cout << "  进程: " << getpid()  << std::endl;
