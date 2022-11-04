@@ -150,7 +150,7 @@ int main() {
     std::cout << 1 / x  << std::endl;
 #endif
 
-#if 1
+#if 0
     // 测试僵尸进程
     pid_t fd = fork();
 
@@ -164,6 +164,28 @@ int main() {
     }
 #endif
 
+#if 1
+    // 测试孤儿进程
+    pid_t fd = fork();
+
+    if (fd == 0) {
+        // 子进程
+        std::cout << getpid() << " 子进程已启动" << std::endl;
+        std::cout << getpid() << " 父进程为: " << getppid() << std::endl;
+        std::cout << getpid() << " 进程组为: " << getpgrp() << std::endl;
+        std::cout << getpid() << "   会话为: " << getsid(0) << std::endl;
+        sleep(2); // 保证父进程退出
+        std::cout << getpid() << " 父进程为: " << getppid() << std::endl;
+        std::cout << getpid() << " 进程组为: " << getpgrp() << std::endl;
+        std::cout << getpid() << "   会话为: " << getsid(0) << std::endl;
+        for (;;)
+            ;
+    } else {
+        // 父进程
+        sleep(1); // 保证子进程已启动
+        std::cout << getpid() << " 父进程退出" << std::endl;
+    }
+#endif
 
 #if 0
     set_signal();
