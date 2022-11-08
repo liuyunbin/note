@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <map>
+#include <setjmp.h>
 
 std::map<int, std::string> m;
 void init() {
@@ -41,18 +42,23 @@ void init() {
     m[SIGSYS   ] = "31-SIGSYS ";
 }
 
-
 void log(const std::string& msg) {
     std::cout << "进程(" << getpid() <<  "): " << msg << std::endl;
 }
 
+jmp_buf buf;
+
 void handle_signal(int sig, siginfo_t* sig_info, void * ) {
-    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + m[sig]);
+    log("信号处理函数捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + m[sig]);
     // 对 SIGUSR1 SIGUSR2 特殊处理
     if (sig == SIGUSR1 || sig == SIGUSR2) {
-        log("处理来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + m[sig] + " 中...");
+        log("信号处理函数处理来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + m[sig] + " 中...");
         sleep(2);
-        log("处理来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + m[sig] + " 完成");
+        log("信号处理函数处理来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + m[sig] + " 完成");
+    }
+    // 保证 SIGABRT 不退出
+    if (sig == SIGABRT) {
+        longjmp(buf, 1);
     }
 }
 
@@ -70,16 +76,18 @@ void set_signal(bool block = false) {
 }
 
 int main() {
-    log("初始化");
+    log("主函数初始化");
     init();
 
-    log("注册信号处理函数");
+    log("主函数注册信号处理");
     set_signal();
 
-    log("调用 abort()");
-    abort();
+    if (setjmp(buf) == 0) {
+        log("主函数调用 abort()");
+        abort();
+    }
 
-    log("退出");
+    log("主函数退出");
 
     return 0;
 }
