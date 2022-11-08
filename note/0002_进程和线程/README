@@ -62,40 +62,6 @@
 * 脱离终端的进程的父进程不一定是 1, 也可能是其他脱离终端的进程
 * 脱离终端可以忽略 SIGHUP 或 新建会话
 
-## 信号处理
-* sleep() 暂停n秒, 或者一个未被忽略的信号到达
-* signal
-    第一次处理后, 信号处理函数可能被重置, Linux 不会重置
-    可能中断系统调用, Linux 会自动重启
-    信号不排队, 相同的信号出现多次时, 只当作一次处理
-    信号处理时:
-        相同的信号来了会被阻塞, 此时, 如果再来相同的信号将被抛弃
-        不同的信号来了会被直接执行, 执行完之后, 在继续执行之前的信号
-* sigaction
-    * sa_mask 可以指明被阻塞的信号
-    * sa_flags-->SA_NOCLDSTOP 对于 SIGCHLD, 不接收子进程暂停或继续的信号
-    * sa_flags-->SA_NOCLDWAIT 对于 SIGCHLD, 不让子进程变为僵尸进程
-    * sa_flags-->SA_NODEFER   信号处理时, 不阻止自己的信号
-    * sa_flags-->SA_ONSTACK   使用信号栈处理,
-    * sa_flags-->SA_RESETHAND 第一次调用后, 重置信号处理函数为默认值
-    * sa_flags-->SA_RESTART   自动重启被中断的系统调用
-    * sa_flags-->SA_SIGINFO   指明信号处理函数
-    相比 signal 改进的地方
-        * 可以选择是否自动重启被中断的系统调用
-        * 可以选择第一次调用以后, 信号处理函数是否恢复成默认值
-        * 可以选择信号处理过程中, 是否阻塞自身, 或这阻塞指定信号集
-        * 可以指明对子进程状态变化的处理
-        * 可以获取到发送信号一端的一些信息
-    还存在的问题
-        * 信号不排队, 会丢失信号
-* SIGKILL 和 SIGSTOP 不能被捕获或忽略
-* 多个信号待处理时, 优先级
-    * SIGILL(4),SIGTRAP(5),SIGBUS(7),SIGFPE(8),SIGSEGV(11),SIGSYS(31) 优先处理, 从左到右
-    * 其他情况按数字的大小顺序处理
-* 相同信号多次发送时, 不会排队, 可能会丢失信号
-* fork() 会继承信号处理函数, 未处理的信号被忽略(执行 exec 之前)
-* 多线程和信号处理会很麻烦
-
 ulimit              # 限制资源使用, 包括:
                     #   内存, 虚拟内存, CPU
                     #   进程数, 线程数
@@ -210,39 +176,6 @@ strace -F            # 跟踪 vfork
 strace -e trace=...  # 跟踪指定信号调用
 strace -s ...        # 参数是字符串时, 最大输出长度, 默认是32个字节
 strace -e signal=... # 跟踪指定信号
-
-## 常用信号
- 1) SIGHUP    # 退出进程, 控制终端断开
- 2) SIGINT    # 退出进程, 键盘中断(ctrl+c)
- 3) SIGQUIT   # 退出进程, 产生core, 键盘退出(ctrl+\)
- 4) SIGILL    # 退出进程, 产生core, 非法指令, 一般是可执行文件发生错误
- 5) SIGTRAP   # 退出进程, 产生core, 断点, debug 产生
- 6) SIGABRT   # 退出进程, 产生core, 由 abort() 产生
- 7) SIGBUS    # 退出进程, 产生core, 指针非法地址, 比如, 不符合对齐要求
- 8) SIGFPE    # 退出进程, 产生core, 浮点数异常
- 9) SIGKILL   # 退出进程, 不能被捕获和忽略
-10) SIGUSR1   # 退出进程, 用户自定义信号
-11) SIGSEGV   # 退出进程, 产生core, 指针地址合法, 但无权限访问, 比如其他进程的地址
-12) SIGUSR2   # 退出进程, 用户自定义信号
-13) SIGPIPE   # 退出进程, 对端退出时, 写管道
-14) SIGALRM   # 退出进程, 由 alarm() 产生的超时
-15) SIGTERM   # 退出进程, 可以被捕获和忽略, kill 默认信号
-16) SIGSTKFLT # 退出进程, 栈错误, 未使用
-17) SIGCHLD   # 忽略信号, 子进程状态变化时, 向父进程发送
-18) SIGCONT   # 继续进程
-19) SIGSTOP   # 暂停进程, 不能被捕获和忽略
-20) SIGTSTP   # 暂停进程, 可以被捕获和忽略
-21) SIGTTIN   # 暂停进程, 后台进程读取终端输入
-22) SIGTTOU   # 暂停进程, 后台进程输出到终端
-23) SIGURG    # 忽略信号, 带外数据
-24) SIGXCPU   # 退出进程, 产生core, cpu 使用超出限制
-25) SIGXFSZ   # 退出进程, 产生core, 文件大小超出限制
-26) SIGVTALRM # 退出进程, 虚拟的超时信号
-27) SIGPROF   # 退出进程, setitimer 到期
-28) SIGWINCH  # 忽略信号, 终端大小发生变化
-29) SIGIO     # 退出进程, 异步IO就绪
-30) SIGPWR    # 退出进程, 电池问题
-31) SIGSYS    # 退出进程, 产生core, 非法的系统调用
 
 ## proc 文件
 /proc/loadavg     # 系统负载
