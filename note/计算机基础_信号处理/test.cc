@@ -120,6 +120,26 @@ int main() {
         }
     }
     sleep(10);
+
+    log();
+    log("主函数测试信号处理函数执行过程中, 不同的信号到达多个");
+    fd = fork();
+
+    if (fd == 0) {
+        // 子进程
+        sleep(5);
+        return 0;
+    } else {
+        // 父进程
+        log("父进程发送信号 " + m[SIGUSR1]);
+        kill(fd, SIGUSR1);
+        sleep(1);
+        for (int i = 1; i < 5; ++i) {
+            log("父进程发送信号 " + m[SIGUSR2]);
+            kill(fd, SIGUSR2);
+        }
+    }
+    sleep(10);
 #if 0
     // 测试信号处理的顺序
     std::cout << "注册信号" << std::endl;
@@ -148,34 +168,6 @@ int main() {
 
     return 0;
 }
-
-
-#if 0
-    // 测试信号处理函数执行过程中, 不同的信号到达多个的情况
-    // 结论: 信号处理过程中, 不同信号到来会直接处理, 多个不同信号后续只处理一个, 多余的会丢弃
-    //       处理完成以后, 再处理之前的信号
-    pid_t fd = fork();
-
-    if (fd == 0) {
-        // 子进程
-        set_signal();
-        std::cout << getpid() << " 设置信号处理函数完成" << std::endl;
-        for (;;)
-            ;
-    } else {
-        // 父进程
-        sleep(2); // 保证子进程已设置信号处理
-        std::cout << getpid() << " 发送信号 " << m[SIGUSR1] << std::endl;
-        kill(fd, SIGUSR1);
-        sleep(1);
-        for (int i = 1; i < 5; ++i) {
-            std::cout << getpid() << " 发送信号 " << m[SIGUSR2] << std::endl;
-            kill(fd, SIGUSR2);
-        }
-        for (;;)
-            ;
-    }
-#endif
 
 #if 0
     // 测试信号处理的顺序
