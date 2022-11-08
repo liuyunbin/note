@@ -56,8 +56,8 @@ void handle_signal(int sig, siginfo_t* sig_info, void * ) {
         sleep(2);
         log("信号处理函数处理来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + m[sig] + " 完成");
     }
-    // 保证 SIGABRT 不退出
-    if (sig == SIGABRT) {
+    // 保证 SIGABRT SIGSEGV 不退出
+    if (sig == SIGABRT || sig == SIGSEGV) {
         longjmp(buf, 1);
     }
 }
@@ -85,6 +85,12 @@ int main() {
     if (setjmp(buf) == 0) {
         log("主函数调用 abort()");
         abort();
+    }
+
+    if (setjmp(buf) == 0) {
+        log("主函数测试空指针异常");
+        int* p = NULL;
+        *p = 10;
     }
 
     log("主函数退出");
