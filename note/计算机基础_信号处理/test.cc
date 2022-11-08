@@ -140,29 +140,30 @@ int main() {
         }
     }
     sleep(10);
-#if 0
-    // 测试信号处理的顺序
-    std::cout << "注册信号" << std::endl;
+
+    log();
+    log("主函数-测试信号处理的顺序");
+    log("主函数-注册信号-函数处理过程中阻塞所有信号");
     set_signal(true);
-    std::cout << "阻塞所有信号" << std::endl;
+    log("主函数-阻塞所有信号");
     sigset_t mask;
     sigfillset(&mask);
     sigprocmask(SIG_SETMASK, &mask, NULL);
-    std::cout << "开始发送信号" << std::endl;
+    log("主函数开始发送信号");
     for (auto key : m)
-        if (key.first != SIGKILL && key.first != SIGSTOP && key.first != SIGUSR1 && key.first != SIGUSR2)
+        if (key.first != SIGKILL &&
+            key.first != SIGSTOP &&
+            key.first != SIGUSR1 &&
+            key.first != SIGUSR2 &&
+            key.first != SIGABRT &&
+            key.first != SIGSEGV &&
+            key.first != SIGFPE)
             kill(getpid(), key.first);
-    std::cout << "发送信号完成" << std::endl;
-    std::cout << "解除信号阻塞" << std::endl;
+    log("主函数-发送信号完成");
+    log("主函数-解除信号阻塞");
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
 
-    for (;;)
-        ;
-#endif
-
-
-
-
+    sleep(10);
 
     log("主函数退出");
 
@@ -187,20 +188,6 @@ int main() {
 
     for (;;)
         ;
-#endif
-
-#if 0
-    // 测试僵尸进程
-    pid_t fd = fork();
-
-    if (fd == 0) {
-        // 子进程
-        std::cout << getpid() << " 子进程退出" << std::endl;
-    } else {
-        // 父进程
-        for (;;)
-            ;
-    }
 #endif
 
 #if 0
