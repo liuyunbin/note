@@ -114,7 +114,7 @@ int main() {
     system(cmd.data());
 
     log("");
-    log("测试子进程已退出, 父进程正确处理的情况, 简化操作");
+    log("使用 sigaction 简化对僵尸进程的处理");
     set_signal_3();
     for (int i = 0; i < 5; ++i) {
         fd = fork();
@@ -129,7 +129,21 @@ int main() {
     log("子进程状态");
     system(cmd.data());
 
+    log("");
+    log("使用 signal 简化对僵尸进程的处理");
+    signal(SIGCHLD, SIG_IGN);
+    for (int i = 0; i < 5; ++i) {
+        fd = fork();
+        if (fd == 0) {
+            // 子进程
+            log("子进程启动");
+            return 0;
+        }
+    }
+    // 父进程
     sleep(1);
+    log("子进程状态");
+    system(cmd.data());
 
     return 0;
 }
