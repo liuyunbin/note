@@ -165,16 +165,33 @@ int main() {
 
     sleep(10);
 
+    log();
+    log("主函数-测试子进程状态变化对父进程的影响");
+    set_signal();
+    fd = fork();
+
+    if (fd == 0) {
+        // 子进程
+        signal(SIGTSTP, SIG_DFL);
+        signal(SIGCONT, SIG_DFL);
+        log("子进程启动");
+        sleep(5);
+        log("子进程退出");
+        return 0;
+    } else {
+        // 父进程
+        sleep(1);
+        log("子进程暂停");
+        kill(fd, SIGTSTP);
+        sleep(1);
+        log("子进程继续");
+        kill(fd, SIGCONT);
+        sleep(1);
+        sleep(5);
+    }
+
     log("主函数-退出");
 
     return 0;
 }
-
-#if 0
-    set_signal();
-    std::cout << "父进程: " << getppid() << std::endl;
-    std::cout << "  进程: " << getpid()  << std::endl;
-    for (;;)
-        ;
-#endif
 
