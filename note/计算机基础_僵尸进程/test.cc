@@ -28,7 +28,7 @@ void handle_signal_2(int sig, siginfo_t* sig_info, void * ) {
     log("信号处理函数-捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
     for (;;) {
         int fd = waitpid(-1, NULL, WNOHANG);
-        if (fd == -1)
+        if (fd <= 0)
             break;
         log("已退出的子进程是: " + std::to_string(fd));
     }
@@ -80,35 +80,32 @@ int main() {
     log("子进程状态");
     std::string cmd = "ps -o pid,ppid,state,comm -C a.out,ps";
     system(cmd.data());
-/*
-    log("");
-    log("");
+
+    sleep(1);
+
     log("");
     log("测试子进程已退出, 父进程正确处理的情况");
-    log("恢复 SIGCHLD 的默认处理");
-    signal(SIGCHLD, SIG_DFL);
-    fd = fork();
-
-    if (fd == 0) {
-        // 子进程
-        log("子进程启动");
-        log("子进程退出");
-        return 0;
-    } else {
-        // 父进程
-        sleep(1);
-        log("子进程状态");
-        std::string cmd = "ps -o pid,ppid,state,comm -C a.out,ps";
-        system(cmd.data());
-        sleep(3);
-        log("设置 SIGCHLD 处理函数");
-        set_signal_2();
-        sleep(3);
-        log("子进程状态");
-        system(cmd.data());
-        sleep(2);
+    set_signal_2();
+    for (int i = 0; i < 5; ++i) {
+        fd = fork();
+        if (fd == 0) {
+            // 子进程
+            log("子进程启动");
+            return 0;
+        }
     }
-*/
+    // 父进程
+    log("子进程状态");
+    system(cmd.data());
+    sleep(1);
+    sleep(1);
+    sleep(1);
+    sleep(1);
+    sleep(1);
+    sleep(1);
+    log("子进程状态");
+    system(cmd.data());
+
     return 0;
 }
 
