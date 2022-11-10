@@ -190,6 +190,9 @@ int main() {
         sleep(5);
     }
 
+    log("主函数-无限循环");
+    for (;;)
+        ;
     log("主函数-退出");
 
     return 0;
