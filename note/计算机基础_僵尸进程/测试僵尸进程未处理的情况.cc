@@ -13,8 +13,9 @@ void log(const std::string& msg) {
 }
 
 int main() {
-    log("测试僵尸进程");
-    log("测试子进程已退出, 父进程未处理的情况");
+    std::string cmd = "ps -o comm,pid,ppid,state -C a.out,ps";
+
+    log("测试僵尸进程未处理的情况");
     pid_t fd = fork();
 
     if (fd == 0) {
@@ -27,9 +28,8 @@ int main() {
         // 父进程
         sleep(1);
         log("子进程状态");
-        std::string cmd = "ps -o pid,ppid,state -p " + std::to_string(fd);
         system(cmd.data());
-        log("父进程未捕获或忽略任何信号");
+        log("父进程未处理任何信号");
         sleep(2);
         log("子进程状态");
         system(cmd.data());
