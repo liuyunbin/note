@@ -2,6 +2,7 @@
 PS1='\[\e[32m\]$(date "+%F %T") \[\e[0m\]'
 
 alias ls='ls --color=auto --time-style="+%F %T"'
+alias g++='g++ -std=c++11'
 
 note=~/GitHub/note
 PATH="$PATH:$note/note:$note/bin"
