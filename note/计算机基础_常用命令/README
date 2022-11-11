@@ -1,0 +1,64 @@
+
+ulimit    # 限制资源使用, 包括:
+          #   内存, 虚拟内存, CPU
+          #   进程数, 线程数
+          #   文件锁数, 文件描述符数, 写入文件大小
+          #   待处理的信号数
+          #   core 文件大小
+          # 也可指定是硬限制还是软限制
+ulimit -a # 列出资源的限制
+ulimit -c unlimited # 允许 core 文件
+
+* pkill # 杀死进程, 参数和 pgrep 类似
+* pwdx  # 列出进程的当前工作目录
+* pidof # 列出进程名称对应的 PID, 精确匹配, 没有长度限制
+* kill        # 通过进程ID发送信号给进程或进程组
+* killall     # 通过进程名称发送信号给进程或进程组, 进程名称精确匹配
+* kill    -l  # 列出所有信号
+* killall -l  # 列出所有信号
+* kill    %1  # bash 内置的 kill, 杀死作业
+* killall -o 2m a.out # 发给 2 分钟前启动的 a.out
+* killall -y 2m a.out # 发给 2 分钟内启动的 a.out
+* killall -w    a.out # 等待进程结束
+
+* free -h    # 内存使用情况
+* df   -Th   # 查看磁盘挂载情况
+
+uname -a # 全部信息
+uname -m # x86_64 等
+uname -r # 内核版本
+
+top
+top -n 1 # 刷新次数
+top -b # 方便写入文件
+top        # 使用 CPU 排序 -- TODO
+top -u lyb # M 内存排序
+           # P CPU 排序
+           # T 时间排序
+           # m 显示内存信息
+           # t 显示进程 或 CPU状态信息
+           # c 显示命令名称 或 完整命令行
+
+pstree     [PID] # 以进程 PID 为根画进程树, 默认为 1
+pstree  -c [PID] # 展示所有子树
+pstree  -p [PID] # 展示进程ID
+pstree  -g [PID] # 展示进程组ID
+pstree  -n [PID] # 使用 PID 排序而不是 进程名称
+pstree  -l [PID] # 使用长行, 方便写入文件
+
+nohup  # 忽略信号 SIGHUP
+setsid # 以新的 session 执行命令
+
+strace               # 追踪进程的系统调用和信号处理
+strace cmd argv      # strace 和命令 同时启动
+strace -p pid        # 追踪正在运行的程序, 多个进程, 指定 -p 多次
+strace -c            # 统计系统调用的时间, 次数
+strace -o ...        # 输出到指定的文件
+strace -tt           # 显示调用时间 时分秒.毫秒
+strace -T            # 显示系统调用的耗时
+strace -f            # 跟踪子进程, 不包括 vfork
+strace -F            # 跟踪 vfork
+strace -e trace=...  # 跟踪指定信号调用
+strace -s ...        # 参数是字符串时, 最大输出长度, 默认是32个字节
+strace -e signal=... # 跟踪指定信号
+
