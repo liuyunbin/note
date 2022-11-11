@@ -27,7 +27,7 @@ int main() {
     std::string cmd = "ps -o pid,ppid,state,comm -C a.out,ps";
 
     log("测试僵尸进程");
-    log("测试子进程已退出, 父进程正确处理_使用SA_NOCLDWAIT");
+    log("测试子进程已退出, 父进程正确处理_使用sigaction_SA_NOCLDWAIT");
     log("设置信号 SIGCHLD 处理函数");
     set_signal();
     log("阻塞信号 SIGCHLD");
