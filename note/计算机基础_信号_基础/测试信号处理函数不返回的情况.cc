@@ -1,57 +1,58 @@
 
-#include <iostream>
-#include <string>
+#include <setjmp.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <signal.h>
+
+#include <iostream>
 #include <map>
-#include <setjmp.h>
+#include <string>
 
 std::map<int, std::string> m;
 void init() {
-    m[SIGHUP   ] = " 1-SIGHUP ";
-    m[SIGINT   ] = " 2-SIGINT ";
-    m[SIGQUIT  ] = " 3-SIGQUIT";
-    m[SIGILL   ] = " 4-SIGILL ";
-    m[SIGTRAP  ] = " 5-SIGTRAP";
-    m[SIGABRT  ] = " 6-SIGABRT";
-    m[SIGBUS   ] = " 7-SIGBUS ";
-    m[SIGFPE   ] = " 8-SIGFPE ";
-    m[SIGKILL  ] = " 9-SIGKILL";
-    m[SIGUSR1  ] = "10-SIGUSR1";
-    m[SIGSEGV  ] = "11-SIGSEGV";
-    m[SIGUSR2  ] = "12-SIGUSR2";
-    m[SIGPIPE  ] = "13-SIGPIPE";
-    m[SIGALRM  ] = "14-SIGALRM";
-    m[SIGTERM  ] = "15-SIGTERM";
-    m[SIGSTKFLT] = "16-SIGSTKF";
-    m[SIGCHLD  ] = "17-SIGCHLD";
-    m[SIGCONT  ] = "18-SIGCONT";
-    m[SIGSTOP  ] = "19-SIGSTOP";
-    m[SIGTSTP  ] = "20-SIGTSTP";
-    m[SIGTTIN  ] = "21-SIGTTIN";
-    m[SIGTTOU  ] = "22-SIGTTOU";
-    m[SIGURG   ] = "23-SIGURG ";
-    m[SIGXCPU  ] = "24-SIGXCPU";
-    m[SIGXFSZ  ] = "25-SIGXFSZ";
-    m[SIGVTALRM] = "26-SIGVTAL";
-    m[SIGPROF  ] = "27-SIGPROF";
-    m[SIGWINCH ] = "28-SIGWINC";
-    m[SIGIO    ] = "29-SIGIO  ";
-    m[SIGPWR   ] = "30-SIGPWR ";
-    m[SIGSYS   ] = "31-SIGSYS ";
+    m[SIGHUP] = " 1-SIGHUP";
+    m[SIGINT] = " 2-SIGINT";
+    m[SIGQUIT] = " 3-SIGQUIT";
+    m[SIGILL] = " 4-SIGILL";
+    m[SIGTRAP] = " 5-SIGTRAP";
+    m[SIGABRT] = " 6-SIGABRT";
+    m[SIGBUS] = " 7-SIGBUS";
+    m[SIGFPE] = " 8-SIGFPE";
+    m[SIGKILL] = " 9-SIGKILL";
+    m[SIGUSR1] = "10-SIGUSR1";
+    m[SIGSEGV] = "11-SIGSEGV";
+    m[SIGUSR2] = "12-SIGUSR2";
+    m[SIGPIPE] = "13-SIGPIPE";
+    m[SIGALRM] = "14-SIGALRM";
+    m[SIGTERM] = "15-SIGTERM";
+    m[SIGSTKFLT] = "16-SIGSTKFLT";
+    m[SIGCHLD] = "17-SIGCHLD";
+    m[SIGCONT] = "18-SIGCONT";
+    m[SIGSTOP] = "19-SIGSTOP";
+    m[SIGTSTP] = "20-SIGTSTP";
+    m[SIGTTIN] = "21-SIGTTIN";
+    m[SIGTTOU] = "22-SIGTTOU";
+    m[SIGURG] = "23-SIGURG";
+    m[SIGXCPU] = "24-SIGXCPU";
+    m[SIGXFSZ] = "25-SIGXFSZ";
+    m[SIGVTALRM] = "26-SIGVTALRM";
+    m[SIGPROF] = "27-SIGPROF";
+    m[SIGWINCH] = "28-SIGWINCH";
+    m[SIGIO] = "29-SIGIO";
+    m[SIGPWR] = "30-SIGPWR";
+    m[SIGSYS] = "31-SIGSYS";
 }
 
 void log(const std::string& msg = "") {
-    std::cout << "进程(" << getpid() <<  "): " << msg << std::endl;
+    std::cout << "进程(" << getpid() << "): " << msg << std::endl;
 }
 
 jmp_buf buf;
 
-void handle_signal(int sig, siginfo_t* sig_info, void * ) {
-    log("信号处理函数-捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + m[sig]);
-    if (sig == SIGABRT || sig == SIGSEGV || sig == SIGFPE)
-        longjmp(buf, 1);
+void handle_signal(int sig, siginfo_t* sig_info, void*) {
+    log("信号处理函数-捕获来自 " + std::to_string(sig_info->si_pid) +
+        " 的信号 " + m[sig]);
+    if (sig == SIGABRT || sig == SIGSEGV || sig == SIGFPE) longjmp(buf, 1);
 }
 
 void set_signal() {
@@ -59,8 +60,7 @@ void set_signal() {
     act.sa_sigaction = handle_signal;
     sigemptyset(&act.sa_mask);
     act.sa_flags = SA_SIGINFO;
-    for (auto key : m)
-        sigaction(key.first, &act, NULL);
+    for (auto key : m) sigaction(key.first, &act, NULL);
 }
 
 int main() {
@@ -89,7 +89,7 @@ int main() {
     if (setjmp(buf) == 0) {
         log();
         log("主函数-测试浮点数异常");
-        int a = 1/0;
+        int a = 1 / 0;
     }
     log("测试完成");
 
@@ -97,4 +97,3 @@ int main() {
 
     return 0;
 }
-
