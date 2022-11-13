@@ -1,5 +1,5 @@
 
-## 测试信号 SIGABRT
+## 信号 SIGABRT
 * 由 abort() 触发
     * SIG_DFL                     退出进程
     * SIG_IGN                     退出进程
