@@ -68,7 +68,7 @@ int main() {
     sigset_t mask;
     sigfillset(&mask);
     sigprocmask(SIG_SETMASK, &mask, NULL);
-    log("发送所有信号, 除了" + m[SIGKILL] + " 和 " + m[SIGSTOP]);
+    log("发送除 " + m[SIGKILL] + " 和 " + m[SIGSTOP] + " 外的所有信号");
     for (auto key : m)
         if (key.first != SIGKILL && key.first != SIGSTOP)
             kill(getpid(), key.first);
