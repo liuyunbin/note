@@ -1,6 +1,8 @@
 
+#include <setjmp.h>
 #include <signal.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include <iostream>
@@ -21,10 +23,12 @@ void set_signal(bool reset = false) {
     struct sigaction act;
     act.sa_sigaction = handle_signal;
     sigemptyset(&act.sa_mask);
-    if (reset)
+    if (reset) {
+        log("设置信号触发后被重置");
         act.sa_flags = SA_SIGINFO | SA_RESETHAND;
-    else
+    } else {
         act.sa_flags = SA_SIGINFO;
+    }
     sigaction(SIGUSR1, &act, NULL);
 }
 
@@ -33,10 +37,8 @@ int main() {
 
     log();
     log("测试信号丢失");
-
-    log("注册信号 SIGUSR1 处理函数");
+    log("注册信号处理函数");
     set_signal();
-
     log("阻塞信号 SIGUSR1");
     sigset_t mask;
     sigemptyset(&mask);
@@ -50,7 +52,6 @@ int main() {
 
     log("解除信号 SIGUSR1 阻塞");
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
-
     sleep(1);
 
     log();
@@ -59,9 +60,8 @@ int main() {
 
     log();
     log("测试信号处理函数被重置");
-    log("注册信号 SIGUSR1 处理函数, 并设置重置信号处理");
+    log("注册信号处理函数");
     set_signal(true);
-
     log("发送信号 SIGUSR1 第 1 次");
     kill(getpid(), SIGUSR1);
     sleep(1);
