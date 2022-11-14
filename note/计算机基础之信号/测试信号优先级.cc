@@ -1,6 +1,8 @@
 
+#include <setjmp.h>
 #include <signal.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include <iostream>
@@ -53,8 +55,9 @@ void handle_signal(int sig, siginfo_t* sig_info, void*) {
 void set_signal() {
     struct sigaction act;
     act.sa_sigaction = handle_signal;
+    log("设置信号处理过程中阻塞所有信号");
     sigfillset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO;
+    act.sa_flags = SA_RESTART | SA_SIGINFO;
     for (auto key : m) sigaction(key.first, &act, NULL);
 }
 
@@ -62,7 +65,7 @@ int main() {
     init();
 
     log("测试信号优先级");
-    log("注册所有信号处理, 并设置信号处理过程中阻塞所有信号");
+    log("注册信号处理");
     set_signal();
     log("阻塞所有信号");
     sigset_t mask;
