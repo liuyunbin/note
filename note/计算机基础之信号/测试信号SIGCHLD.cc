@@ -107,8 +107,6 @@ int main() {
             sleep(1);
             log("发送信号使子进程继续");
             kill(fd, SIGCONT);
-            sleep(1);
-            sleep(2);
             wait(NULL);
         }
     }
@@ -134,11 +132,11 @@ int main() {
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
     sleep(1);
     system(cmd.data());
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
 
     log();
     log("测试父进程 SIGCHLD => SIG_IGN");
@@ -157,11 +155,11 @@ int main() {
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
     sleep(1);
     system(cmd.data());
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
 
     log();
     log("测试父进程 SIGCHLD => 捕获, 然后返回");
@@ -180,11 +178,11 @@ int main() {
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
     sleep(1);
     system(cmd.data());
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
 
     log();
     log("测试父进程 SIGCHLD => 捕获, 调用 waitpid() 一次");
@@ -203,11 +201,11 @@ int main() {
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
     sleep(1);
     system(cmd.data());
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
 
     log();
     log("测试父进程 SIGCHLD => 捕获, 调用 waitpid() 循环");
@@ -226,11 +224,11 @@ int main() {
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
     sleep(1);
     system(cmd.data());
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
 
     log();
     log("测试父进程 SIGCHLD => 使用 SA_NOCLDWAIT 参数");
@@ -249,11 +247,11 @@ int main() {
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
     sleep(1);
     system(cmd.data());
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
-    waitpid(-1, NULL, WNOHANG);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
 
     return 0;
 }
