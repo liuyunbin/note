@@ -12,20 +12,20 @@ void log(const std::string& msg = "") {
     std::cout << "进程(" << getpid() << "): " << msg << std::endl;
 }
 
-void handle_signal(int sig, siginfo_t* sig_info, void*) {
+void handle_signal_1(int sig, siginfo_t* sig_info, void*) {
     log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
 }
 
-void handle_signal_1(int sig) { log("捕获信号 SIGCHLD"); }
-
-void handle_signal_2(int sig) {
-    log("捕获信号 SIGCHLD");
+void handle_signal_2(int sig, siginfo_t* sig_info, void*) {
+    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
     int fd = waitpid(-1, NULL, WNOHANG);
-    if (fd > 0) log("已退出的子进程是: " + std::to_string(fd));
+    if (fd > 0) {
+        log("已退出的子进程是: " + std::to_string(fd));
+    }
 }
 
-void handle_signal_3(int sig) {
-    log("捕获信号 SIGCHLD");
+void handle_signal_3(int sig, siginfo_t* sig_info, void*) {
+    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
     for (;;) {
         int fd = waitpid(-1, NULL, WNOHANG);
         if (fd <= 0) break;
@@ -33,162 +33,84 @@ void handle_signal_3(int sig) {
     }
 }
 
-void set_signal(int flag = 0) {
+void set_signal(int type) {
     struct sigaction act;
-    act.sa_sigaction = handle_signal;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
-    if (flag == 1) {
-        log("设置不接受子进程暂停继续产生的 SIGCHLD");
-        act.sa_flags |= SA_NOCLDSTOP;
+
+    switch (type) {
+        case 0:
+            log("测试信号 SIGCHLD 处理为: SIG_DFL");
+            act.sa_handler = SIG_DFL;
+            act.sa_flags = SA_RESTART;
+            break;
+        case 1:
+            log("测试信号 SIGCHLD 处理为: SIG_IGN");
+            act.sa_handler = SIG_IGN;
+            act.sa_flags = SA_RESTART;
+            break;
+        case 2:
+            log("测试信号 SIGCHLD 处理为: 只输出捕获的信号");
+            act.sa_sigaction = handle_signal_1;
+            act.sa_flags = SA_SIGINFO;
+            break;
+        case 3:
+            log("测试信号 SIGCHLD 处理为: 捕获信号, 调用waitpid()一次");
+            act.sa_sigaction = handle_signal_2;
+            act.sa_flags = SA_SIGINFO;
+            break;
+        case 4:
+            log("测试信号 SIGCHLD 处理为: 捕获信号, 调用waitpid()循环, "
+                "直到报错");
+            act.sa_sigaction = handle_signal_3;
+            act.sa_flags = SA_SIGINFO;
+            break;
+        case 5:
+            log("测试信号 SIGCHLD 处理为: 设置 SA_RESTART");
+            act.sa_sigaction = handle_signal_1;
+            act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
+            break;
     }
+
+    sigemptyset(&act.sa_mask);
     sigaction(SIGCHLD, &act, NULL);
+}
+
+void test_SIGCHLD() {
+    std::string cmd = "ps -o pid,comm,state -C a.out";
+
+    log("阻塞信号 SIGCHLD");
+    sigset_t mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGCHLD);
+    sigprocmask(SIG_SETMASK, &mask, NULL);
+
+    for (int i = 1; i <= 5; ++i)
+        if (fork() == 0) {
+            log("第 " + std::to_string(i) + " 个子进程启动后退出");
+            exit(-1);
+        } else {
+            sleep(1);
+        }
+
+    log("解除信号 SIGCHLD 的阻塞");
+    sigprocmask(SIG_UNBLOCK, &mask, NULL);
+    sleep(1);
+    log("此时, 所有 a.out 的进程状态");
+    system(cmd.data());
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
 }
 
 int main() {
     log("测试僵尸进程");
 
-    std::string cmd = "ps -o pid,comm,state -C a.out";
-    sigset_t mask;
-    sigfillset(&mask);
-
-    log();
-    log("测试父进程 SIGCHLD => SIG_DFL");
-    signal(SIGCHLD, SIG_DFL);
-    log("阻塞所有信号");
-    sigprocmask(SIG_SETMASK, &mask, NULL);
-    for (int i = 1; i <= 5; ++i)
-        if (fork() == 0) {
-            log("第 " + std::to_string(i) + " 个子进程启动并退出");
-            exit(-1);
-        } else {
-            sleep(1);
-        }
-
-    log("解除信号阻塞");
-    sigprocmask(SIG_UNBLOCK, &mask, NULL);
-    sleep(1);
-    system(cmd.data());
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-
-    log();
-    log("测试父进程 SIGCHLD => SIG_IGN");
-    signal(SIGCHLD, SIG_IGN);
-    log("阻塞所有信号");
-    sigprocmask(SIG_SETMASK, &mask, NULL);
-    for (int i = 1; i <= 5; ++i)
-        if (fork() == 0) {
-            log("第 " + std::to_string(i) + " 个子进程启动并退出");
-            exit(-1);
-        } else {
-            sleep(1);
-        }
-
-    log("解除信号阻塞");
-    sigprocmask(SIG_UNBLOCK, &mask, NULL);
-    sleep(1);
-    system(cmd.data());
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-
-    log();
-    log("测试父进程 SIGCHLD => 捕获, 然后返回");
-    signal(SIGCHLD, handle_signal_1);
-    log("阻塞所有信号");
-    sigprocmask(SIG_SETMASK, &mask, NULL);
-    for (int i = 1; i <= 5; ++i)
-        if (fork() == 0) {
-            log("第 " + std::to_string(i) + " 个子进程启动并退出");
-            exit(-1);
-        } else {
-            sleep(1);
-        }
-
-    log("解除信号阻塞");
-    sigprocmask(SIG_UNBLOCK, &mask, NULL);
-    sleep(1);
-    system(cmd.data());
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-
-    log();
-    log("测试父进程 SIGCHLD => 捕获, 调用 waitpid() 一次");
-    signal(SIGCHLD, handle_signal_2);
-    log("阻塞所有信号");
-    sigprocmask(SIG_SETMASK, &mask, NULL);
-    for (int i = 1; i <= 5; ++i)
-        if (fork() == 0) {
-            log("第 " + std::to_string(i) + " 个子进程启动并退出");
-            exit(-1);
-        } else {
-            sleep(1);
-        }
-
-    log("解除信号阻塞");
-    sigprocmask(SIG_UNBLOCK, &mask, NULL);
-    sleep(1);
-    system(cmd.data());
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-
-    log();
-    log("测试父进程 SIGCHLD => 捕获, 调用 waitpid() 循环");
-    signal(SIGCHLD, handle_signal_3);
-    log("阻塞所有信号");
-    sigprocmask(SIG_SETMASK, &mask, NULL);
-    for (int i = 1; i <= 5; ++i)
-        if (fork() == 0) {
-            log("第 " + std::to_string(i) + " 个子进程启动并退出");
-            exit(-1);
-        } else {
-            sleep(1);
-        }
-
-    log("解除信号阻塞");
-    sigprocmask(SIG_UNBLOCK, &mask, NULL);
-    sleep(1);
-    system(cmd.data());
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-
-    log();
-    log("测试父进程 SIGCHLD => 使用 SA_NOCLDWAIT 参数");
-    set_signal();
-    log("阻塞所有信号");
-    sigprocmask(SIG_SETMASK, &mask, NULL);
-    for (int i = 1; i <= 5; ++i)
-        if (fork() == 0) {
-            log("第 " + std::to_string(i) + " 个子进程启动并退出");
-            exit(-1);
-        } else {
-            sleep(1);
-        }
-
-    log("解除信号阻塞");
-    sigprocmask(SIG_UNBLOCK, &mask, NULL);
-    sleep(1);
-    system(cmd.data());
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
-    wait(NULL);
+    for (int i = 0; i < 6; ++i) {
+        log();
+        set_signal(i);
+        test_SIGCHLD();
+    }
 
     return 0;
 }
