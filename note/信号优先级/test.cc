@@ -58,14 +58,16 @@ void set_signal() {
     log("设置信号处理过程中阻塞所有信号");
     sigfillset(&act.sa_mask);
     act.sa_flags = SA_RESTART | SA_SIGINFO;
-    for (auto key : m) sigaction(key.first, &act, NULL);
+    for (auto key : m) {
+        sigaction(key.first, &act, NULL);
+    }
 }
 
 int main() {
     init();
 
     log("测试信号优先级");
-    log("注册信号处理");
+    log("注册所有的信号处理");
     set_signal();
     log("阻塞所有信号");
     sigset_t mask;
