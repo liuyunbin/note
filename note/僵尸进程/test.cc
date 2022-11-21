@@ -64,7 +64,7 @@ void set_signal(int type) {
             act.sa_flags = SA_SIGINFO;
             break;
         case 5:
-            log("测试信号 SIGCHLD 处理为: 设置 SA_RESTART");
+            log("测试信号 SIGCHLD 处理为: 设置 SA_NOCLDWAIT");
             act.sa_sigaction = handle_signal_1;
             act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
             break;
