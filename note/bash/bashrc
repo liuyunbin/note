@@ -5,9 +5,9 @@ alias ls='ls --color=auto --time-style="+%F %T"'
 alias g++='g++ -std=c++11'
 
 note=~/GitHub/note
-PATH="$PATH:$note/note:$note/bin"
+PATH="$PATH:$note/note/bash:$note/bin"
 
-alias b="(cd $note; ./note/build.sh)"
+alias b="(cd $note; ./note/cpp/build.sh)"
 alias c="cd $note/note && pwd"
 alias l="lsm"
 alias lsa='ls -l --human-readable --reverse --sort=time --time=atime'
