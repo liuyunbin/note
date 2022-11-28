@@ -10,5 +10,5 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: ./note/install_dependency.sh
-      - run: ./note/build.sh
+      - run: ./note/cpp/install_dependency.sh
+      - run: ./note/cpp/build.sh

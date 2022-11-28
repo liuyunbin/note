@@ -5,7 +5,7 @@ set -o pipefail # 只要管道发生错误就退出
 
 mkdir -p build
 cd build
-cmake ../note
+cmake ../note/cpp
 make
 make test
 
