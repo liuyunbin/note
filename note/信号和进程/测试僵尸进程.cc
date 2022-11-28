@@ -75,7 +75,7 @@ void set_signal(int type) {
 }
 
 void test_SIGCHLD() {
-    std::string cmd = "ps -o pid,comm,state -C a.out";
+    std::string cmd = "ps -o pid,comm,state -p ";
 
     log("阻塞信号 SIGCHLD");
     sigset_t mask;
@@ -83,18 +83,23 @@ void test_SIGCHLD() {
     sigaddset(&mask, SIGCHLD);
     sigprocmask(SIG_SETMASK, &mask, NULL);
 
-    for (int i = 1; i <= 5; ++i)
-        if (fork() == 0) {
+    for (int i = 1; i <= 5; ++i) {
+        pid_t fd = fork();
+        if (fd == 0) {
             log("第 " + std::to_string(i) + " 个子进程启动后退出");
             exit(-1);
         } else {
+            cmd += std::to_string(fd) + ",";
             sleep(1);
         }
+    }
+
+    cmd.pop_back();
 
     log("解除信号 SIGCHLD 的阻塞");
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
     sleep(1);
-    log("此时, 所有 a.out 的进程状态");
+    log("此时, 子进程的状态");
     system(cmd.data());
     wait(NULL);
     wait(NULL);
