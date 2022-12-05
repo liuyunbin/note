@@ -53,13 +53,12 @@ void set_signal(int type) {
             act.sa_flags = SA_SIGINFO;
             break;
         case 3:
-            log("测试信号 SIGCHLD 处理为: 捕获信号, 调用waitpid()一次");
+            log("测试信号 SIGCHLD 处理为: 调用 waitpid() 一次");
             act.sa_sigaction = handle_signal_2;
             act.sa_flags = SA_SIGINFO;
             break;
         case 4:
-            log("测试信号 SIGCHLD 处理为: 捕获信号, 调用waitpid()循环, "
-                "直到报错");
+            log("测试信号 SIGCHLD 处理为: 循环调用 waitpid()");
             act.sa_sigaction = handle_signal_3;
             act.sa_flags = SA_SIGINFO;
             break;
