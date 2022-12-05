@@ -1,3 +1,4 @@
+
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -15,12 +16,13 @@ void log(const std::string& msg = "") {
 std::map<int, std::string> m;
 void init() {
     m[SIGHUP] = " 1-SIGHUP ";
+    m[SIGCHLD] = "17-SIGCHLD";
     m[SIGCONT] = "18-SIGCONT";
 }
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("信号处理函数-捕获来自 " + std::to_string(sig_info->si_pid) +
-        " 的信号 " + m[sig]);
+    if (sig == SIGCHLD) return;
+    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + m[sig]);
 }
 
 void set_signal() {
@@ -36,31 +38,32 @@ int main() {
 
     log("测试孤儿进程和孤儿进程组");
 
+    log();
+    log("设置信号处理");
     set_signal();
 
-    std::string cmd = "ps -o pid,ppid,pgid,state,comm -p ";
-    cmd += std::to_string(getpid()) + ",";
-    cmd += std::to_string(getppid()) + ",";
+    std::string cmd = "ps -o pid,ppid,pgid,sid,state,comm -p ";
     if (fork() == 0) {
         // 子进程
         log();
         log("测试孤儿进程");
         if (fork() == 0) {
             // 子进程
-            log("进程状态");
             std::string commond = cmd;
             commond += std::to_string(getpid()) + ",";
             commond += std::to_string(getppid());
+            log("进程状态");
             system(commond.data());
             log("杀死父进程 " + std::to_string(getppid()));
             kill(getppid(), SIGKILL);
             sleep(1);
             log("进程状态");
+            commond = cmd;
             commond += std::to_string(getpid()) + ",";
             commond += std::to_string(getppid());
             system(commond.data());
-            sleep(2);
-            log("进程退出");
+            sleep(1);
+            log("子进程退出");
             return 0;
         } else {
             // 父进程
@@ -71,12 +74,15 @@ int main() {
     }
 
     sleep(5);
+    sleep(5);
 
+    cmd += std::to_string(getpid()) + ",";
     if (fork() == 0) {
         // 子进程
-        setpgid(getpid(), getpid());
         log();
         log("测试孤儿进程组");
+        log("设置新的进程组 " + std::to_string(getpid()));
+        setpgid(getpid(), getpid());
         pid_t child_1 = fork();
         if (child_1 == 0) {
             // 子进程
@@ -100,6 +106,7 @@ int main() {
             kill(getppid(), SIGKILL);
             sleep(2);
             log("进程状态");
+            commond = cmd;
             commond += std::to_string(child_1) + ",";
             commond += std::to_string(getpid()) + ",";
             commond += std::to_string(getppid());
@@ -116,6 +123,7 @@ int main() {
         }
     }
 
+    sleep(6);
     sleep(6);
     log("主进程退出");
 
