@@ -20,15 +20,17 @@ int main() {
 
     if (child == 0) {
         // 子进程
+        log("子进程启动");
         for (;;)
             ;
     } else {
+        // 父进程
         sleep(1);
         std::string cmd = "ps -o pid,comm,state -p ";
         cmd += std::to_string(child);
         log("子进程状态");
         system(cmd.data());
-        log("杀死子进程");
+        log("杀死子进程 " + std::to_string(child));
         kill(child, SIGKILL);
         sleep(1);
         log("子进程状态");
