@@ -86,6 +86,41 @@ int main() {
         test_SIGCHLD();
     }
 
+    log();
+    log("测试杀死父进程以避免僵尸进程的产生");
+
+    log("设置 SIGCHLD 为默认处理");
+    signal(SIGCHLD, SIG_DFL);
+
+    if (fork() == 0) {
+        pid_t child = fork();
+        std::string cmd = "ps -o pid,ppid,comm,state -p ";
+        cmd += std::to_string(child);
+        if (child == 0) {
+            log("子进程启动");
+            for (;;)
+                ;
+        } else if (fork() == 0) {
+            sleep(1);
+            log("杀手父进程");
+            kill(getppid(), SIGKILL);
+            log("杀手子进程");
+            kill(child, SIGKILL);
+            sleep(1);
+            log("子进程状态");
+            system(cmd.data());
+            exit(-1);
+        } else {
+            log("父进程启动");
+            for (;;)
+                ;
+        }
+    }
+
+    sleep(1);
+    sleep(1);
+    sleep(1);
+
     log("主进程退出");
 
     return 0;
