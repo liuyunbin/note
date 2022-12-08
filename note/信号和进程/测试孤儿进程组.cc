@@ -36,51 +36,14 @@ void set_signal() {
 int main() {
     init();
 
-    log("测试孤儿进程和孤儿进程组");
-
-    log();
-    log("设置信号处理");
-    set_signal();
-
     std::string cmd = "ps -o pid,ppid,pgid,sid,state,comm -p ";
+    pid_t main_pid = getpid();
     if (fork() == 0) {
         // 子进程
-        log();
-        log("测试孤儿进程");
-        if (fork() == 0) {
-            // 子进程
-            std::string commond = cmd;
-            commond += std::to_string(getpid()) + ",";
-            commond += std::to_string(getppid());
-            log("进程状态");
-            system(commond.data());
-            log("杀死父进程 " + std::to_string(getppid()));
-            kill(getppid(), SIGKILL);
-            sleep(1);
-            log("进程状态");
-            commond = cmd;
-            commond += std::to_string(getpid()) + ",";
-            commond += std::to_string(getppid());
-            system(commond.data());
-            sleep(1);
-            log("子进程退出");
-            return 0;
-        } else {
-            // 父进程
-            for (;;)
-                ;
-            return 0;
-        }
-    }
-
-    sleep(5);
-    sleep(5);
-
-    cmd += std::to_string(getpid()) + ",";
-    if (fork() == 0) {
-        // 子进程
-        log();
         log("测试孤儿进程组");
+        log();
+        log("设置信号处理");
+        set_signal();
         log("设置新的进程组 " + std::to_string(getpid()));
         setpgid(getpid(), getpid());
         pid_t child_1 = fork();
@@ -89,7 +52,7 @@ int main() {
             log("第一个子进程");
             log("使自己暂停");
             kill(getpid(), SIGSTOP);
-            sleep(2);
+            sleep(1);
             log("第一个子进程退出");
             return 0;
         } else if (fork() == 0) {
@@ -98,21 +61,22 @@ int main() {
             log("第二个子进程");
             log("进程状态");
             std::string commond = cmd;
+            commond += std::to_string(main_pid) + ",";
             commond += std::to_string(child_1) + ",";
             commond += std::to_string(getpid()) + ",";
             commond += std::to_string(getppid());
             system(commond.data());
             log("杀死父进程 " + std::to_string(getppid()));
             kill(getppid(), SIGKILL);
-            sleep(2);
+            sleep(1);
             log("进程状态");
             commond = cmd;
             commond += std::to_string(child_1) + ",";
             commond += std::to_string(getpid()) + ",";
             commond += std::to_string(getppid());
             system(commond.data());
-            sleep(2);
-            sleep(2);
+            sleep(1);
+            sleep(1);
             log("第二个子进程退出");
             return 0;
         } else {
@@ -123,8 +87,8 @@ int main() {
         }
     }
 
-    sleep(6);
-    sleep(6);
+    sleep(3);
+    sleep(3);
     log("主进程退出");
 
     return 0;
