@@ -13,7 +13,7 @@ void log(const std::string& msg = "") {
 }
 
 int main() {
-    log("测试僵尸进程之僵尸进程消除");
+    log("测试销毁僵尸进程");
     log();
 
     if (fork() == 0) {
@@ -37,7 +37,7 @@ int main() {
             sleep(1);
             log("子进程状态");
             system(cmd.data());
-            log("杀死父进程");
+            log("杀死父进程 " + std::to_string(getppid()));
             kill(getppid(), SIGKILL);
             sleep(1);
             log("子进程状态");
@@ -51,8 +51,8 @@ int main() {
         }
     }
 
-    sleep(2);
-    sleep(2);
+    sleep(4);
+    log();
     log("主进程退出");
 
     return 0;
