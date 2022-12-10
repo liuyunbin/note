@@ -27,9 +27,9 @@ void set_signal() {
 }
 
 int main() {
-    log("测试僵尸进程之父进程未正确处理");
-
+    log("测试产生僵尸进程之父进程未正确处理子进程退出的状态信息");
     log();
+
     log("设置 SIGCHLD 处理为: 调用 waitpid() 一次");
     set_signal();
 
@@ -41,7 +41,7 @@ int main() {
 
     std::string cmd = "ps -o pid,comm,state -p ";
 
-    for (int i = 1; i <= 3; ++i) {
+    for (int i = 1; i <= 5; ++i) {
         pid_t fd = fork();
         if (fd == 0) {
             // 子进程
@@ -61,6 +61,9 @@ int main() {
     sleep(1);
     log("此时, 子进程的状态");
     system(cmd.data());
+
+    log();
+    log("主进程退出");
 
     return 0;
 }
