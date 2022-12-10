@@ -14,13 +14,13 @@ void log(const std::string& msg = "") {
 }
 
 int main() {
-    std::string cmd = "ps -o pid,ppid,pgid,sid,state,comm -p ";
+    log("测试孤儿进程");
+    log();
+
     if (fork() == 0) {
-        // 子进程
-        log("测试孤儿进程");
-        log();
         if (fork() == 0) {
-            // 子进程
+            // 测试的子进程
+            std::string cmd = "ps -o pid,ppid,pgid,sid,state,comm -p ";
             std::string commond = cmd;
             commond += std::to_string(getpid()) + ",";
             commond += std::to_string(getppid());
@@ -36,16 +36,15 @@ int main() {
             system(commond.data());
             return 0;
         } else {
-            // 父进程
+            // 测试的父进程
             for (;;)
                 ;
-            return 0;
         }
     }
 
-    sleep(1);
-    sleep(1);
+    sleep(2);
 
+    log();
     log("主进程退出");
 
     return 0;
