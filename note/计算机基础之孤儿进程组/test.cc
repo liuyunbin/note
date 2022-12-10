@@ -29,36 +29,36 @@ void set_signal() {
     struct sigaction act;
     act.sa_sigaction = handle_signal;
     sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_RESTART | SA_SIGINFO | SA_NOCLDWAIT;
+    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
     for (auto key : m) sigaction(key.first, &act, NULL);
 }
 
 int main() {
     init();
 
+    log("测试孤儿进程组");
+    log();
+    log("设置信号处理");
+    set_signal();
+
     std::string cmd = "ps -o pid,ppid,pgid,sid,state,comm -p ";
     pid_t main_pid = getpid();
     if (fork() == 0) {
-        // 子进程
-        log("测试孤儿进程组");
-        log();
-        log("设置信号处理");
-        set_signal();
+        // 测试的父进程
         log("设置新的进程组 " + std::to_string(getpid()));
         setpgid(getpid(), getpid());
         pid_t child_1 = fork();
         if (child_1 == 0) {
-            // 子进程
-            log("第一个子进程");
-            log("使自己暂停");
+            // 测试的第一个子进程
+            log("第一个子进程使自己暂停");
             kill(getpid(), SIGSTOP);
             sleep(1);
             log("第一个子进程退出");
             return 0;
         } else if (fork() == 0) {
-            // 子进程
+            // 测试的第二个子进程
             sleep(1);
-            log("第二个子进程");
+            log("第二个子进程启动");
             log("进程状态");
             std::string commond = cmd;
             commond += std::to_string(main_pid) + ",";
@@ -83,12 +83,12 @@ int main() {
             // 父进程
             for (;;)
                 ;
-            return 0;
         }
     }
 
     sleep(3);
     sleep(3);
+    log();
     log("主进程退出");
 
     return 0;
