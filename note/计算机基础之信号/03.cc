@@ -19,24 +19,18 @@ void handle_signal(int sig, siginfo_t* sig_info, void*) {
     log("捕获信号 SIGUSR1 第 " + std::to_string(++count) + " 次");
 }
 
-void set_signal(bool reset = false) {
+void set_signal() {
     struct sigaction act;
     act.sa_sigaction = handle_signal;
     sigemptyset(&act.sa_mask);
-    if (reset) {
-        log("设置信号触发后被重置");
-        act.sa_flags = SA_SIGINFO | SA_RESETHAND;
-    } else {
-        act.sa_flags = SA_SIGINFO;
-    }
+    act.sa_flags = SA_SIGINFO;
     sigaction(SIGUSR1, &act, NULL);
 }
 
 int main() {
-    log("测试信号不可靠");
+    log("测试多个信号处于待决状态信号会丢失");
 
     log();
-    log("测试信号丢失");
     log("注册信号处理函数");
     set_signal();
     log("阻塞信号 SIGUSR1");
@@ -55,19 +49,6 @@ int main() {
     sleep(1);
 
     log();
-    log("重置信号处理函数的计数器");
-    count = 0;
-
-    log();
-    log("测试信号处理函数被重置");
-    log("注册信号处理函数");
-    set_signal(true);
-    log("发送信号 SIGUSR1 第 1 次");
-    kill(getpid(), SIGUSR1);
-    sleep(1);
-    log("发送信号 SIGUSR1 第 2 次");
-    kill(getpid(), SIGUSR1);
-    sleep(1);
     log("主进程退出");
 
     return 0;
