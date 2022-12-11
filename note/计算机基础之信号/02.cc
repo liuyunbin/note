@@ -67,6 +67,7 @@ int main() {
     init();
 
     log("测试信号优先级");
+    log();
     log("注册所有的信号处理");
     set_signal();
     log("阻塞所有信号");
@@ -82,6 +83,7 @@ int main() {
 
     sleep(1);
 
+    log();
     log("主进程退出");
 
     return 0;
