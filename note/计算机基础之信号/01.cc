@@ -48,32 +48,18 @@ void log(const std::string& msg = "") {
     std::cout << "进程(" << getpid() << "): " << msg << std::endl;
 }
 
-void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获信号 " + m[sig]);
-}
-
-void set_signal() {
-    struct sigaction act;
-    act.sa_sigaction = handle_signal;
-    log("设置信号处理过程中阻塞所有信号");
-    sigfillset(&act.sa_mask);
-    act.sa_flags = SA_RESTART | SA_SIGINFO;
-    for (auto key : m) {
-        sigaction(key.first, &act, NULL);
-    }
-}
-
 int main() {
     init();
 
-    log("测试信号优先级");
-    log("注册所有的信号处理");
-    set_signal();
+    log("测试信号阻塞");
+    log();
+
     log("阻塞所有信号");
     sigset_t mask;
     sigfillset(&mask);
     sigprocmask(SIG_SETMASK, &mask, NULL);
 
+    log("查看阻塞的信号");
     sigset_t old_mask;
     sigprocmask(SIG_SETMASK, NULL, &old_mask);
 
@@ -81,23 +67,21 @@ int main() {
         if (sigismember(&old_mask, key.first))
             log("已被阻塞的信号: " + m[key.first]);
 
+    log();
     log("发送除 " + m[SIGKILL] + " 和 " + m[SIGSTOP] + " 外的所有信号");
+    log();
+
     for (auto key : m)
         if (key.first != SIGKILL && key.first != SIGSTOP)
             kill(getpid(), key.first);
 
     sigset_t new_mask;
-    sigsuspend(&new_mask);
+    sigpending(&new_mask);
     for (auto key : m)
         if (sigismember(&new_mask, key.first))
             log("待决的信号: " + m[key.first]);
 
-    //    log("解除信号阻塞");
-    //    sigprocmask(SIG_UNBLOCK, &mask, NULL);
-
-    // sleep(1);
-    sleep(10);
-
+    log();
     log("主进程退出");
 
     return 0;
