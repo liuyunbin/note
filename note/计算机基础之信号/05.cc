@@ -9,6 +9,8 @@
 #include <map>
 #include <string>
 
+int count = 0;
+
 std::map<int, std::string> m;
 void init() {
     m[SIGHUP] = " 1-SIGHUP";
@@ -49,32 +51,27 @@ void log(const std::string& msg = "") {
 }
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    std::string msg = sig == SIGUSR1 ? "SIGUSR1" : "SIGUSR2";
-    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + msg);
-    log("处理来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + msg + " 中...");
+    ++count;
+    log("捕获信号 " + m[sig] + " 第 " + std::to_string(count) + " 次");
+    log("处理信号 " + m[sig] + " 中...");
     sleep(2);
-    log("处理来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + msg + " 完成");
+    log("处理信号 " + m[sig] + " 完成");
 }
 
-void set_signal(bool block = false) {
+void set_signal() {
     struct sigaction act;
     act.sa_sigaction = handle_signal;
     sigemptyset(&act.sa_mask);
-    if (block) {
-        log("设置信号处理过程中阻塞 SIGUSR2");
-        sigaddset(&act.sa_mask, SIGUSR2);
-    }
-    act.sa_flags = SA_SIGINFO|SA_NOCLDWAIT|SA_NOCLDSTOP;
+    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
     sigaction(SIGUSR1, &act, NULL);
-    sigaction(SIGUSR2, &act, NULL);
 }
 
 int main() {
-    log("测试信号处理过程中信号到达");
     init();
 
+    log("测试信号处理过程中相同的信号到达");
     log();
-    log("测试信号处理过程中相同信号到达");
+
     log("设置信号处理函数");
     set_signal();
     pid_t fd = fork();
@@ -84,55 +81,18 @@ int main() {
             ;
     } else {
         sleep(1);
-        log("发送信号 SIGUSR1");
+        log("发送信号 SIGUSR1 第一次");
         kill(fd, SIGUSR1);
         sleep(1);
-        log("发送信号 SIGUSR1");
+        log("发送信号 SIGUSR1 第二次");
+        kill(fd, SIGUSR1);
+        log("发送信号 SIGUSR1 第三次");
         kill(fd, SIGUSR1);
         sleep(5);
         kill(fd, SIGKILL);
     }
 
     log();
-    log("测试信号处理过程中不同信号到达");
-    log("设置信号处理函数");
-    set_signal();
-    fd = fork();
-    if (fd == 0) {
-        log("子进程启动");
-        for (;;)
-            ;
-    } else {
-        sleep(1);
-        log("发送信号 SIGUSR1");
-        kill(fd, SIGUSR1);
-        sleep(1);
-        log("发送信号 SIGUSR2");
-        kill(fd, SIGUSR2);
-        sleep(5);
-        kill(fd, SIGKILL);
-    }
-
-    log();
-    log("测试信号处理过程中阻塞其他信号");
-    log("设置信号处理函数");
-    set_signal(true);
-    fd = fork();
-    if (fd == 0) {
-        log("子进程启动");
-        for (;;)
-            ;
-    } else {
-        sleep(1);
-        log("发送信号 SIGUSR1");
-        kill(fd, SIGUSR1);
-        sleep(1);
-        log("发送信号 SIGUSR2");
-        kill(fd, SIGUSR2);
-        sleep(5);
-        kill(fd, SIGKILL);
-    }
-
     log("主进程退出");
 
     return 0;
