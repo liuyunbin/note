@@ -1,4 +1,89 @@
 
+###################
+#
+#  用户和组
+#
+###################
+
+## 为什么存在用户?
+要登录一个系统, 需要一个名称, 用以区分不同的用户
+
+## 为什么存在组?
+为了多个用户共享数据
+
+## 用户, 用户名称, 组, 组名称, 之间的关系
+* 用户和用户名称一一对应
+* 组和组名称一一对应
+
+## 用户名称和组名称有什么限制?
+* 只能包含 大小写字母 数字 下划线 短横线 小数点, 末尾可以有 $
+* 短横线不能在开头, 用以区分可选项和名称
+* . 和 .. 不允许
+* 不能重复
+* 不能是纯数字, 因为一些命令同时接受 ID 和名称的形式
+* 长度最多 32 位
+
+## 为什么存在用户ID和组ID?
+* 节省空间
+* 提高比较的效率
+
+## 用户ID和组ID有什么限制
+* 必须大于等于 0
+* 0 一般是 root 使用
+
+## 用户, 用户ID, 组, 组ID之间的关系
+* 一个用户只能对应一个用户ID, 一个组只能对应一个组ID
+* 多个用户可以对应一个用户ID, 多个组可以对应一个组ID
+* 一个用户可以对应多个组, 但只能有一个主组
+
+## 用户的常见属性
+* 用户名称, 用户ID, 组名称, 组ID, 附属组ID
+* 主目录
+* 默认 shell
+* 用户过期日期
+* 密码过期到临时不可用的时间
+* 密码修改的最小最大间隔, 警告天数
+
+## 当前终端的登录用户
+* 经过终端或伪终端登录后, 不会再变化
+
+## 当前终端的有效用户
+* 经过终端或伪终端登录后, 通过 su 可再变化
+
+## 相关配置文件
+* /etc/passwd          # 用户基本信息
+* /etc/shadow          # 用户密码信息
+* /etc/group           # 组基本信息
+* /etc/gshadow         # 组密码信息
+* /etc/default/useradd # useradd 默认配置
+* /etc/skel/           # 默认主目录模板
+* /etc/subgid          # 用户隶属的 GID
+* /etc/subuid          # 用户隶属的 UID
+* /etc/login.defs      # 有关登录的配置信息
+
+## 相关常用命令
+useradd           # 添加用户或修改默认配置
+useradd -e ...    #   指定用户过期日期
+useradd -f ...    #   指定用户密码过期到账户临时不可用的时间
+useradd -k ...    #   指定主目录模板
+useradd -s ...    #   指定shell
+useradd -D        #   查看默认配置
+useradd -m -b ..  #   指明主目录的父目录, 不存在的话新建
+useradd -m -d ..  #   指明主目录,         不存在的话新建
+userdel           # 删除用户
+usermod           # 修改用户
+usermod -a -G ... #   添加附属组
+usermod -m ...    #   移动主目录
+usermod -L ...    #   锁定用户
+usermod -U ...    #   解锁用户
+                  #   其他选项同 useradd
+
+newusers          # 批量新增用户
+
+passwd            # 修改 root 密码
+passwd -stdin     # 修改 root 密码, 从标准输入读取
+passwd        lyb # 修改 lyb  密码
+
 chage            # 修改密码相关信息
 chage -d ... lyb # 设置上次密码修改的日期
 chage -d 0   lyb # 下次登录必须修改密码
@@ -9,21 +94,499 @@ chage -M ... lyb # 设置密码修改的最大间隔
 chage -W ... lyb # 设置密码过期前的警告的天数
 chage -l     lyb # 列出密码相关信息
 
-chfn        # 修改个人信息, 手机号之类
-chsh -s ... # 修改默认的 shell
+chfn             # 修改个人信息, 手机号之类
+chsh -s ...      # 修改默认的 shell
+
+groups    # 列出用户所属的组名称
+groupadd  # 添加组
+groupmod  # 修改组信息, 包括组的ID和组名称
+groupdel  # 删除组
+groupmems # 管理当前用户的主组, 新增或删除成员
+gpasswd   # 管理组, 新增或删除成员, 删除密码, 设置组管理人员等
+newgrp    # 切换组
+sg        # 使用其他组执行命令
+
+su        # 切到 root
+su -      # 切到 root, 更新主目录, 环境变量等, 相当于重新登录
+su   lyb  # 切到 lyb
+
+sudo                                          # 权限管理文件: /etc/sudoers, 使用 visudo 编辑
+sudo -u USERNAME COMMAND                      # 指定用户执行命令
+sudo -S date -s "20210722 10:10:10" <<< "123" # 脚本中免密码使用
+
+sudoedit ...                                  # 编辑文件
+
+users  # 列出所有登陆用户
+
+w      # 列出谁登录, 以及目前在干什么
+who    # 列出谁登录
+who -m # 列出当前终端登录的用户
+whoami # 列出当前终端的有效用户
+
+id        # 输出实际或有效的用户和组信息
+
+last      # 列出最近保存的登录的信息
+lastb     # 列出最近保存的登录的信息, 包括失败情况
+
+lastlog           # 列出最近一次的登录信息
+lastlog -b 10     # 最近一次的登录在 10 天前的信息
+lastlog -t 10     # 最近一次的登录在 10 天内的信息
+lastlog -C -u lyb # 清除 lyb 最近一次的登录信息
+lastlog -S -u lyb # 设置 lyb 最近一次的登录信息
+lastlog    -u lyb # 查看 lyb 最近一次的登录信息
+
+###################
+#
+#  网络相关
+#
+###################
+
+lsof
+netstat
+nc
+ss
+
+
+---------------------------------
+
+
+
+
+
+
+
+apt show    vim # 列出软件包的信息
+apt install vim # 安装软件包
+apt remove  vim # 卸载软件包
+apt purge   vim # 卸载软件包, 删除数据和配置文件
+apt update      # 更新软件源
+apt upgrade     # 更新软件
+
+crontab -l # 查询任务表
+crontab -e # 编辑任务表
+crontab -r # 删除任务表
+           # 格式为: 分钟 小时 日 月 星期 执行的程序
+           # *     : 每分钟执行
+           # 1-3   : 1 到 3分钟内执行
+           # */3   : 每 3 分钟执行一次
+           # 1-10/3: 1-10 分钟内, 每 3 分钟执行
+           # 1,3,5 : 1,3,5 分钟执行
+           # crontab 不会自动执行 .bashrc, 如果需要, 需要在脚本中手动执行
+
+df   -Th   # 查看磁盘挂载情况
+
+docker run ubuntu:15.10 -d --name "lyb"           # 启动 docker, 给起一个名字
+docker run ubuntu:15.10 -d --net=host             # 主机和 docker 共享 IP 和 端口号
+docker run ubuntu:15.10 -d -P                     # docke 内使用随机端口映射主机端口
+docker run ubuntu:15.10 -d -p 2000:3000           # 本机:2000 绑定 docker:3000
+docker run ubuntu:15.10 -d -v /home/123:/home/456 # 本机:/home/123 绑定 docker:/home/456
+
+docker port     容器ID     # 查看端口号映射
+docker ps                  # 列出当前运行的容器
+docker ps -a               # 列出所有容器
+docker start    容器ID     # 启动容器
+docker stop     容器ID     # 停止容器
+docker restart  容器ID     # 重新启动容器
+docker rm -f    容器ID     # 删除容器
+docker exec     容器ID ls  # 对于在后台运行的容器, 执行命令
+
+dos2unix 1.txt # 换行符转换
+
+dpkg -L vim        # 列出 vim 软件包安装的全部文件
+dpkg --search /... # 查看该文件是哪个软件包安装的, 使用绝对路径
+
+du                      # 列出目录大小
+du -a                   # 列出目录和文件大小
+du -d 1                 # 最大目录深度
+du -sh                  # 只列出整体使用大小
+du --exclude="*.txt"    # 忽略指定文件, 支持通配符
+
+free -h    # 内存使用情况
+
+netstat #TODO
+
+
+                   # lsof -- sudo yum install lsof
+lsof -iTCP         # 查看 TCP 信息
+lsof -i :22        # 查看指定 端口号 的信息
+lsof -i@1.2.3.4:22 # 查看是否连接到指定 IP 和 端口号上
+lsof -p 1234       # 指定 进程号
+lsof -d 0,1,2,3    # 指定 文件描述符
+lsof -t            # 仅获取进程ID
+
+ulimit              # 限制资源使用, 包括:
+                    #   内存, 虚拟内存, CPU
+                    #   进程数, 线程数
+                    #   文件锁数, 文件描述符数, 写入文件大小
+                    #   待处理的信号数
+                    #   core 文件大小
+                    # 也可指定是硬限制还是软限制
+ulimit -a           # 列出资源的限制
+ulimit -c unlimited # 允许 core 文件
+
+uname -a # 全部信息
+uname -m # x86_64 等
+uname -r # 内核版本
+
+uptime -s # 列出系统启动时间
+
+
+## 常用命令
+kill         pid # 通过进程ID发送信号给进程或进程组
+kill -signal pid # 指定信号，默认值为 SIGTERM
+kill  -l         # 列出所有信号
+kill        %jid # bash 内置的 kill, 杀死作业
+
+killall             # 通过进程名称发送信号给进程或进程组, 进程名称精确匹配
+killall -l          # 列出所有信号
+killall -o 2m a.out # 发给 2 分钟前启动的 a.out
+killall -y 2m a.out # 发给 2 分钟内启动的 a.out
+killall -w    a.out # 等待进程结束
+
+nohup  # 忽略信号 SIGHUP
+
+pidof  # 列出进程名称对应的 PID, 精确匹配, 没有长度限制
+
+pkill         ... # 杀死进程, 参数和 pgrep 类似
+pkill -signal ... # 指定信号，默认值为 SIGTERM
+
+pgrep         # 使用进程名称查找, 使用扩展的正则表达式
+pgrep -f  ... # 使用启动命令匹配, 默认使用进程名称匹配(最多15位)
+pgrep -c  ... # 输出匹配到的进程数目
+pgrep -d，... # 设置输出的分割符，默认是换行符
+pgrep -i  ... # 忽略大小写
+pgrep -l  ... # 列出进程名称(最多15位)
+pgrep -a  ... # 列出启动命令
+pgrep -n  ... # 仅列出最新的进程
+pgrep -o  ... # 仅列出最旧的进程
+pgrep -g  ... # 指定进程组ID
+pgrep -G  ... # 指定实际组ID
+pgrep -P  ... # 指定父进程ID
+pgrep -s  ... # 指定会话ID
+pgrep -t  ... # 指定终端
+pgrep -u  ... # 指定有效用户ID
+pgrep -U  ... # 指定实际用户ID
+pgrep -v  ... # 反转结果
+pgrep -x  ... # 精确匹配，默认前缀匹配
+pgrep -w  ... # 列出线程ID
+
+ps -U RUID -G RGID           # 实际的用户和组
+ps -u EUID -g EGID           # 有效的用户和组
+ps -p PID                    # 进程ID
+ps -s SID                    # 会话ID
+ps --ppid PPID               # 父进程ID
+ps -t ...                    # 终端
+ps -C vim                    # 进程名称, 全名称 或 前 15 位
+
+ps -o ruid,ruser,rgid,rgroup # 实际的用户和组
+ps -o euid,euser,egid,egroup # 有效的用户和组
+ps -o suid,suser,sgid,sgroup # 保存的用户和组
+ps -o fuid,fuser,fgid,fgroup # 文件的用户和组, 一般和有效的相同
+ps -o supgid,supgrp          # 附属组ID
+ps -o pid,ppid,pgid,sid      # 进程ID, 父进程ID, 进程组ID, 会话ID
+ps -o ouid                   # 会话ID所属用户ID
+ps -o tty                    # 终端
+ps -o tpgid                  # 输出前台进程的ID
+ps -o luid,lsession          # 终端登录的用户ID和会话ID
+ps -o stat,state             # 进程状态
+                             # R 正在运行
+                             # S 正在休眠
+                             # T 后台暂停的作业
+                             # t debug 调试中
+                             # Z 僵尸进程
+ps -o pmem,rsz,vsz           # 内存百分比,内存,内存(含交换分区)
+ps -o pcpu,c,bsdtime,cputime # cpu: 百分比,百分比整数,user+system,system
+ps -o lstart,etime,etimes    # 启动时间,运行时间,运行时间(秒)
+ps -o nice,pri,psr,rtprio    # 优先级
+ps -o wchan                  # 进程休眠, 返回当前使用的内核函数
+                             # 进程运行, 返回 -
+                             # 列出线程, 返回 *
+ps -o cmd                    # 启动命令
+ps -o comm                   # 进程名称
+ps -o fname                  # 进程名称的前 8 位
+
+ps -e           # 所有进程
+ps -H           # 输出进程树
+ps -ww          # 不限制输出宽度
+ps --no-headers # 不输出列头部
+ps --headers    #   输出列头部
+ps --sort -pcpu # cpu 使用率逆序
+
+ps -o lwp,nlwp # 线程ID, 线程数
+ps -L          # 列每一个线程
+
+pstree     [PID] # 以进程 PID 为根画进程树, 默认为 1
+pstree  -c [PID] # 展示所有子树
+pstree  -p [PID] # 展示进程ID
+pstree  -g [PID] # 展示进程组ID
+pstree  -n [PID] # 使用 PID 排序而不是 进程名称
+pstree  -l [PID] # 使用长行, 方便写入文件
+
+pwdx pid # 列出进程的当前工作目录
+
+
+setsid # 以新的 session 执行命令
+
+strace               # 追踪进程的系统调用和信号处理
+strace cmd argv      # strace 和命令 同时启动
+strace -p pid        # 追踪正在运行的程序, 多个进程, 指定 -p 多次
+strace -c            # 统计系统调用的时间, 次数
+strace -o ...        # 输出到指定的文件
+strace -tt           # 显示调用时间 时分秒.毫秒
+strace -T            # 显示系统调用的耗时
+strace -f            # 跟踪子进程, 不包括 vfork
+strace -F            # 跟踪 vfork
+strace -e trace=...  # 跟踪指定信号调用
+strace -s ...        # 参数是字符串时, 最大输出长度, 默认是32个字节
+strace -e signal=... # 跟踪指定信号
+
+top     # 第一行 系统时间 运行时间 用户数 平均负载
+        # 第二行 进程总结
+        # 第三行 CPU 总结
+        # 第四行 物理内存总结
+        # 第五行 虚拟内存总结
+        # 交互命令
+        #   空格 或 回车 刷新
+        #   l 切换负载的显示
+        #   t 切换任务的显示
+        #   m 切换内存的显示
+        #   f 选择展示的字段
+        #   R 反向排序
+        #   c 显示命令名称 或 完整命令行
+        #   i 显示空闲任务
+        #   u 显示特定用户的进程
+        #   k 结束任务
+        #   h 帮助
+        #   L 搜索字符串
+        #   H 显示线程
+        #   0 不显示统计值为 0 的项
+        #   1   显示所有的cpu信息
+        #   < 排序字段左移
+        #   > 排序字段右移
+        #   M 内存排序
+        #   P CPU 排序
+        #   T 时间排序
+top -n 1   # 刷新次数
+top -b     # 方便写入文件
+top -c     # 显示完整命令行
+top -p ... # 指定 PID
+top -u lyb # 指定用户
+
+
+date "+%Y-%m-%d %H:%M:%S"   # 输出: 年-月-日 时-分-秒
+date "+%Y-%m-%d %H:%M"      # 输出: 年-月-日 时-分
+date "+%s"                  # 输出: 时间戳
+date -d "20200202 01:01:01" # 使用: 指定输入日期
+date -d "@...."             # 使用: 时间戳
+date -r 1.c                 # 使用: 文件的 mtime
+date -s "20200202 10:10:10" # 更新系统时间, 需要 root
+
+
+awk 'BEGIN   { getline     } # 读取一行
+     pattern { commands    }
+     END     { print "end" }' 1.c
+* awk 使用扩展的正则表达式
+* BEGIN 和 END 都是可选的
+* 只能用单引号
+awk 'NR < 5'                 1.c # 行号 [1,4] 的行
+awk 'NR==1,NR==4'            1.c # 行号 [1,4] 的行
+awk '/linux/'                1.c #   包含 linux 的行
+awk '!/linux/'               1.c # 不包含 linux 的行
+awk '/start/,/end/'          1.c # [] 区间匹配
+awk '$1  ~ /lyb.*/'          1.c #     字段匹配
+awk '$1 !~ /lyb.*/'          1.c # 排除字段匹配
+awk '$1 == 123'              1.c # $1 如果能转化为数字
+                             1.c # 将使用数字匹配
+awk -F:      '{print    $2}' 1.c # 输入字段分割符
+awk -F123    '{print    $2}' 1.c # 字符串 123 作为分割符
+awk -F[123]  '{print    $2}' 1.c # 字符 1 2 3 作为分割符
+awk -v  FS=: '{print    $2}' 1.c # 定义变量
+awk -v OFS=- '{print $1,$2}' 1.c # 输出字段分割符
+awk -f 1.awk                 1.c # 从文件中读取操作
+awk          '{print    NF}' 1.c # 字段数量
+awk          '{print    NR}' 1.c # 所有文件中的行号
+awk          '{print   FNR}' 1.c # 当前文件中的行号
+awk          '{print    $0}' 1.c # 当前记录的内容
+awk          '{print    $1}' 1.c # 第一个字段的内容
+awk          '{print    $2}' 1.c # 第二个字段的内容
+awk    '{printf "%s\n", $2}' 1.c # C 风格输出
+
+cat -n 1.txt # 显示行号
+cat -b 1.txt # 显示行号, 不包括空行
+cat -s 1.txt # 去掉多余的连续的空行
+cat -T 1.txt # 显示 TAB
+cat -E 1.txt # 列出行尾标识
+
+chattr +i 1.c # 设置文件不可修改
+chattr -i 1.c # 取消文件不可修改
+
+chmod  755    1.c # 设置权限, 不足四位时, 补前缀 0
+chmod  644 -R 1.c # 递归
+chmod 4755    1.c # 设置 SUID(4)
+chmod 2755    1.c # 设置 SGID(2)
+chmod 1755    1.c # 设置 SBIT(1)
+
+chown lyb:lyb 1.c # 修改文件所属的组和用户
+
+comm 1.c 2.c       | tr -d '\t' # 全集
+comm 1.c 2.c -1 -2 | tr -d '\t' # 交集
+comm 1.c 2.c -3    | tr -d '\t' # B - A 和 A - B
+comm 1.c 2.c -1 -3              # B - A
+comm 1.c 2.c -2 -3              # A - B
+
+cp    123 456      # 拷贝文件时, 使用符号链接所指向的文件
+                   # 拷贝目录时, 使用符号链接本身
+                   # 456 只使用符号链接所指向的文件
+cp -r 123 456      # 递归复制
+cp -P 123 456      # 总是拷贝符号链接本身
+cp -L 123 456      # 总是拷贝符号链接所指的文件
+cp --parents a/b t # 全路径复制, 将生成 t/a/b
+
+
+## 常用命令
+kill         pid # 通过进程ID发送信号给进程或进程组
+kill -signal pid # 指定信号，默认值为 SIGTERM
+kill  -l         # 列出所有信号
+kill        %jid # bash 内置的 kill, 杀死作业
+
+killall             # 通过进程名称发送信号给进程或进程组, 进程名称精确匹配
+killall -l          # 列出所有信号
+killall -o 2m a.out # 发给 2 分钟前启动的 a.out
+killall -y 2m a.out # 发给 2 分钟内启动的 a.out
+killall -w    a.out # 等待进程结束
+
+nohup  # 忽略信号 SIGHUP
+
+pidof  # 列出进程名称对应的 PID, 精确匹配, 没有长度限制
+
+pkill         ... # 杀死进程, 参数和 pgrep 类似
+pkill -signal ... # 指定信号，默认值为 SIGTERM
+
+pgrep         # 使用进程名称查找, 使用扩展的正则表达式
+pgrep -f  ... # 使用启动命令匹配, 默认使用进程名称匹配(最多15位)
+pgrep -c  ... # 输出匹配到的进程数目
+pgrep -d，... # 设置输出的分割符，默认是换行符
+pgrep -i  ... # 忽略大小写
+pgrep -l  ... # 列出进程名称(最多15位)
+pgrep -a  ... # 列出启动命令
+pgrep -n  ... # 仅列出最新的进程
+pgrep -o  ... # 仅列出最旧的进程
+pgrep -g  ... # 指定进程组ID
+pgrep -G  ... # 指定实际组ID
+pgrep -P  ... # 指定父进程ID
+pgrep -s  ... # 指定会话ID
+pgrep -t  ... # 指定终端
+pgrep -u  ... # 指定有效用户ID
+pgrep -U  ... # 指定实际用户ID
+pgrep -v  ... # 反转结果
+pgrep -x  ... # 精确匹配，默认前缀匹配
+pgrep -w  ... # 列出线程ID
+
+ps -U RUID -G RGID           # 实际的用户和组
+ps -u EUID -g EGID           # 有效的用户和组
+ps -p PID                    # 进程ID
+ps -s SID                    # 会话ID
+ps --ppid PPID               # 父进程ID
+ps -t ...                    # 终端
+ps -C vim                    # 进程名称, 全名称 或 前 15 位
+
+ps -o ruid,ruser,rgid,rgroup # 实际的用户和组
+ps -o euid,euser,egid,egroup # 有效的用户和组
+ps -o suid,suser,sgid,sgroup # 保存的用户和组
+ps -o fuid,fuser,fgid,fgroup # 文件的用户和组, 一般和有效的相同
+ps -o supgid,supgrp          # 附属组ID
+ps -o pid,ppid,pgid,sid      # 进程ID, 父进程ID, 进程组ID, 会话ID
+ps -o ouid                   # 会话ID所属用户ID
+ps -o tty                    # 终端
+ps -o tpgid                  # 输出前台进程的ID
+ps -o luid,lsession          # 终端登录的用户ID和会话ID
+ps -o stat,state             # 进程状态
+                             # R 正在运行
+                             # S 正在休眠
+                             # T 后台暂停的作业
+                             # t debug 调试中
+                             # Z 僵尸进程
+ps -o pmem,rsz,vsz           # 内存百分比,内存,内存(含交换分区)
+ps -o pcpu,c,bsdtime,cputime # cpu: 百分比,百分比整数,user+system,system
+ps -o lstart,etime,etimes    # 启动时间,运行时间,运行时间(秒)
+ps -o nice,pri,psr,rtprio    # 优先级
+ps -o wchan                  # 进程休眠, 返回当前使用的内核函数
+                             # 进程运行, 返回 -
+                             # 列出线程, 返回 *
+ps -o cmd                    # 启动命令
+ps -o comm                   # 进程名称
+ps -o fname                  # 进程名称的前 8 位
+
+ps -e           # 所有进程
+ps -H           # 输出进程树
+ps -ww          # 不限制输出宽度
+ps --no-headers # 不输出列头部
+ps --headers    #   输出列头部
+ps --sort -pcpu # cpu 使用率逆序
+
+ps -o lwp,nlwp # 线程ID, 线程数
+ps -L          # 列每一个线程
+
+pstree     [PID] # 以进程 PID 为根画进程树, 默认为 1
+pstree  -c [PID] # 展示所有子树
+pstree  -p [PID] # 展示进程ID
+pstree  -g [PID] # 展示进程组ID
+pstree  -n [PID] # 使用 PID 排序而不是 进程名称
+pstree  -l [PID] # 使用长行, 方便写入文件
+
+pwdx pid # 列出进程的当前工作目录
+
+
+setsid # 以新的 session 执行命令
+
+strace               # 追踪进程的系统调用和信号处理
+strace cmd argv      # strace 和命令 同时启动
+strace -p pid        # 追踪正在运行的程序, 多个进程, 指定 -p 多次
+strace -c            # 统计系统调用的时间, 次数
+strace -o ...        # 输出到指定的文件
+strace -tt           # 显示调用时间 时分秒.毫秒
+strace -T            # 显示系统调用的耗时
+strace -f            # 跟踪子进程, 不包括 vfork
+strace -F            # 跟踪 vfork
+strace -e trace=...  # 跟踪指定信号调用
+strace -s ...        # 参数是字符串时, 最大输出长度, 默认是32个字节
+strace -e signal=... # 跟踪指定信号
+
+top     # 第一行 系统时间 运行时间 用户数 平均负载
+        # 第二行 进程总结
+        # 第三行 CPU 总结
+        # 第四行 物理内存总结
+        # 第五行 虚拟内存总结
+        # 交互命令
+        #   空格 或 回车 刷新
+        #   l 切换负载的显示
+        #   t 切换任务的显示
+        #   m 切换内存的显示
+        #   f 选择展示的字段
+        #   R 反向排序
+        #   c 显示命令名称 或 完整命令行
+        #   i 显示空闲任务
+        #   u 显示特定用户的进程
+        #   k 结束任务
+        #   h 帮助
+        #   L 搜索字符串
+        #   H 显示线程
+        #   0 不显示统计值为 0 的项
+        #   1   显示所有的cpu信息
+        #   < 排序字段左移
+        #   > 排序字段右移
+        #   M 内存排序
+        #   P CPU 排序
+        #   T 时间排序
+top -n 1   # 刷新次数
+top -b     # 方便写入文件
+top -c     # 显示完整命令行
+top -p ... # 指定 PID
+top -u lyb # 指定用户
 
 df   -Th   # 查看磁盘挂载情况
 
 free -h    # 内存使用情况
-
-gpasswd   # 管理组, 新增或删除成员, 删除密码, 设置组管理人员等
-groupadd  # 添加组
-groupdel  # 删除组
-groupmems # 管理当前用户的主组, 新增或删除成员
-groupmod  # 修改组信息, 包括组的ID和组名称
-groups    # 列出用户所属的组名称
-
-id        # 输出实际或有效用户的用户和组信息
 
 kill         pid # 通过进程ID发送信号给进程或进程组
 kill -signal pid # 指定信号，默认值为 SIGTERM
@@ -36,24 +599,7 @@ killall -o 2m a.out # 发给 2 分钟前启动的 a.out
 killall -y 2m a.out # 发给 2 分钟内启动的 a.out
 killall -w    a.out # 等待进程结束
 
-last      # 列出最近保存的登录的信息
-lastb     # 列出最近保存的登录的信息, 包括失败情况
-
-lastlog           # 列出最近一次的登录信息
-lastlog -b 10     # 最近一次的登录在 10 天前的信息
-lastlog -t 10     # 最近一次的登录在 10 天内的信息
-lastlog -C -u lyb # 清除 lyb 最近一次的登录信息
-lastlog -S -u lyb # 设置 lyb 最近一次的登录信息
-lastlog    -u lyb # 查看 lyb 最近一次的登录信息
-
-newgrp   # 切换组
-newusers # 批量新增用户
-
 nohup  # 忽略信号 SIGHUP
-
-passwd           # 修改 root 密码
-passwd -stdin    # 修改 root 密码, 从标准输入读取
-passwd    lyb    # 修改 lyb  密码
 
 pidof  # 列出进程名称对应的 PID, 精确匹配, 没有长度限制
 
@@ -136,18 +682,6 @@ pwdx pid # 列出进程的当前工作目录
 
 setsid # 以新的 session 执行命令
 
-sg     # 使用其他组执行命令
-
-su               # 切到 root
-su -             # 切到 root, 更新主目录, 环境变量等, 相当于重新登录
-su   lyb         # 切到 lyb
-
-sudo                                          # 权限管理文件: /etc/sudoers, 使用 visudo 编辑
-sudo -u USERNAME COMMAND                      # 指定用户执行命令
-sudo -S date -s "20210722 10:10:10" <<< "123" # 脚本中免密码使用
-
-sudoedit ...                                  # 编辑文件
-
 ulimit              # 限制资源使用, 包括:
                     #   内存, 虚拟内存, CPU
                     #   进程数, 线程数
@@ -163,33 +697,6 @@ uname -m # x86_64 等
 uname -r # 内核版本
 
 uptime -s # 列出系统启动时间
-
-users  # 列出所有登陆用户
-
-useradd          # 添加用户或修改默认配置
-useradd -e ...   # 指定用户过期日期
-useradd -f ...   # 指定用户密码过期到账户临时不可用的时间
-useradd -k ...   # 指定主目录模板
-useradd -s ...   # 指定shell
-useradd -D       # 查看默认配置
-useradd -m -b .. # 指明主目录的父目录, 不存在的话新建
-useradd -m -d .. # 指明主目录,         不存在的话新建
-
-userdel          # 删除用户
-
-usermod           # 修改用户
-usermod -a -G ... # 添加附属组
-usermod -m ...    # 移动主目录
-usermod -L ...    #   锁定用户
-usermod -U ...    #   解锁用户
-                  #   其他选项同 useradd
-
-w      # 列出谁登录, 以及目前在干什么
-
-who    # 列出谁登录
-who -m # 列出当前终端登录的用户
-
-whoami # 列出当前终端的有效用户
 
 ------------------------------------------
 
@@ -1175,4 +1682,5 @@ Ctrl+insert        # 复制命令行内容
 shift+insert       # 粘贴命令行内容
 
 Esc+.              # 获取上一条命令的最后的部分
+
 
