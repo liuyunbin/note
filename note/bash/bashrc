@@ -26,5 +26,5 @@ alias pgroup="ps -o rgroup,egroup,sgroup,fgroup,supgrp,"
 alias t="./a.out"
 alias v="vim test.cc"
 
-set -o vi
+#set -o vi
 
