@@ -20,3 +20,311 @@ ctime # 状态修改时间: 内容 名称 权限 所属者 所属组
                 对所属主也将判断为无权限
 * 在目录下新增或删除文件时, 至少拥有此目录的写和执行权限
 
+## 相关命令
+awk 'BEGIN   { getline     } # 读取一行
+     pattern { commands    }
+     END     { print "end" }' 1.c
+* awk 使用扩展的正则表达式
+* BEGIN 和 END 都是可选的
+* 只能用单引号
+awk 'NR < 5'                 1.c # 行号 [1,4] 的行
+awk 'NR==1,NR==4'            1.c # 行号 [1,4] 的行
+awk '/linux/'                1.c #   包含 linux 的行
+awk '!/linux/'               1.c # 不包含 linux 的行
+awk '/start/,/end/'          1.c # [] 区间匹配
+awk '$1  ~ /lyb.*/'          1.c #     字段匹配
+awk '$1 !~ /lyb.*/'          1.c # 排除字段匹配
+awk '$1 == 123'              1.c # $1 如果能转化为数字
+                                 # 将使用数字匹配
+awk -F:      '{print    $2}' 1.c # 输入字段分割符
+awk -F123    '{print    $2}' 1.c # 字符串 123 作为分割符
+awk -F[123]  '{print    $2}' 1.c # 字符 1 2 3 作为分割符
+awk -v  FS=: '{print    $2}' 1.c # 定义变量
+awk -v OFS=- '{print $1,$2}' 1.c # 输出字段分割符
+awk -f 1.awk                 1.c # 从文件中读取操作
+awk          '{print    NF}' 1.c # 字段数量
+awk          '{print    NR}' 1.c # 所有文件中的行号
+awk          '{print   FNR}' 1.c # 当前文件中的行号
+awk          '{print    $0}' 1.c # 当前记录的内容
+awk          '{print    $1}' 1.c # 第一个字段的内容
+awk          '{print    $2}' 1.c # 第二个字段的内容
+awk    '{printf "%s\n", $2}' 1.c # C 风格输出
+
+systime()  -- 获取当前的时间戳
+strftime() -- 时间戳 --> 格式化
+mktime()   -- 年月日等 --> 时间戳
+
+cat -n 1.txt # 显示行号
+cat -b 1.txt # 显示行号, 不包括空行
+cat -s 1.txt # 去掉多余的连续的空行
+cat -T 1.txt # 显示 TAB
+cat -E 1.txt # 列出行尾标识
+
+chattr +i 1.c # 设置文件不可修改
+chattr -i 1.c # 取消文件不可修改
+
+chmod  755    1.c # 设置权限, 不足四位时, 补前缀 0
+chmod  644 -R 1.c # 递归
+chmod 4755    1.c # 设置 SUID(4)
+chmod 2755    1.c # 设置 SGID(2)
+chmod 1755    1.c # 设置 SBIT(1)
+
+chown lyb:lyb 1.c # 修改文件所属的组和用户
+
+comm 1.c 2.c       | tr -d '\t' # 全集
+comm 1.c 2.c -1 -2 | tr -d '\t' # 交集
+comm 1.c 2.c -3    | tr -d '\t' # B - A 和 A - B
+comm 1.c 2.c -1 -3              # B - A
+comm 1.c 2.c -2 -3              # A - B
+
+cp    123 456      # 拷贝文件时, 使用符号链接所指向的文件
+                   # 拷贝目录时, 使用符号链接本身
+                   # 456 只使用符号链接所指向的文件
+cp -r 123 456      # 递归复制
+cp -P 123 456      # 总是拷贝符号链接本身
+cp -L 123 456      # 总是拷贝符号链接所指的文件
+cp --parents a/b t # 全路径复制, 将生成 t/a/b
+
+cut -f 1,2  # 按列切割
+cut -d ":"  # 设置分割符
+
+echo -n "123"                # 不换行
+echo -e "\e[1;33m lyb \e[0m" # 文本黄色 加粗
+
+diff    1.txt 2.txt              # 比较两个文件的不同
+diff -u 1.txt 2.txt              # 一体化输出, 比较两个文件的不同
+diff    1.txt 2.txt > diff.pathc # TODO
+
+basename $(readlink -f $0) # 获取脚本的名称
+dirname  $(readlink -f $0) # 获取脚本的目录
+
+du                      # 列出目录大小
+du -a                   # 列出目录和文件大小
+du -d 1                 # 最大目录深度
+du -sh                  # 只列出整体使用大小
+du --exclude="*.txt"    # 忽略指定文件, 支持通配符
+
+df   -Th                # 查看磁盘挂载情况
+
+dos2unix 1.txt # 换行符转换
+unix2doc 1.txt # \n --> \r\n
+
+dd if=/dev/zero of=junk.data bs=1M count=1
+
+find . -name  lyb                     # 以文件名查找文件, 不包括路径, 可以使用通配符
+find . -iname lyb                     # 同上, 忽略大小写
+find . -path   "*/bash/*"             # 以全路径名查找文件, 可包括文件名, 可以使用通配符
+find . -ipath  "*/bash/*"             # 同上, 忽略大小写
+find . -regex ".*p+"                  # 同上, 使用正则表达式
+find . -iregex ".*p+"                 # 同上, 忽略大小写
+find . -maxdepth 5 –mindepth 2 -name lyb # 使用目录深度过滤
+find . -L -name lyb                   # 是否跟着符号链接跳
+find . -type  f                       # 以类型查找文件
+find . -type f -atime -7              #     7天内访问过的文件
+find . -type f -mtime  7              # 恰好7天前修改过的文件
+find . -type f -ctime +7              #     7天前变化过的文件
+find . -type f -newer file.txt        # 查找修改时间比 file.txt 新的文件
+find . -type f -size +2G              # 以文件大小查找
+find . -type f -perm 644              # 以权限查找
+find . -type f -user lyb              # 以用户查找
+find . -name '.git' -prune -o -type f # -prune 将前面匹配到的文件 或 目录 忽略掉
+find . ! -type f -o   -name lyb       # ! 只否定最近的条件
+find . \( -type f -and -name lyb \)   # 且, 多个条件必须同时成立
+find . \( -type f -a   -name lyb \)   # 同上
+find .    -type f      -name lyb      # 同上, 默认多个条件同时成立
+find . \( -type f -or  -name lyb \)   # 或, 多个条件成立一个即可
+find . \( -type f -o   -name lyb \)   # 同上
+
+grep -v                   # 输出不匹配的内容
+grep -c                   # 输出匹配的行的次数, 同一行只输出一次
+grep -o                   # 只输出匹配的内容
+grep -n                   # 输出匹配的行号
+grep -l                   # 输出匹配的文件
+grep -f                   # 从文件中读取匹配模式
+grep -i                   # 忽略大小写
+grep -h                   # 不输出文件名
+grep -q                   # 静默输出
+grep -A 5                 # 输出之前的行
+grep -B 5                 # 输出之后的行
+grep -C 5                 # 输出之前之后的行
+grep -e .. -e ..          # 多个模式取或
+grep -E ..                # 使用扩展的正则表达式, 同 egrep
+grep -W ..                # 单词匹配
+grep -X ..                # 行匹配
+grep ... --inclue "*.c"   # 指定文件
+grep ... --exclue "*.c"   # 忽略文件
+grep ... --exclue-dir src # 忽略目录
+
+less # 空格   : 下一页
+     # ctrl+F : 下一页
+     # b      : 上一页
+     # ctrl+b : 上一页
+     # 回车   : 下一行
+     # =      : 当前行号
+     # y      : 上一行
+
+ln -s target symbolic_link_name # 创建符号链接
+
+ls -a        # 列出当前目录中的元素, 包括隐藏的文件
+ls -S        # 使用 文件大小 排序, 大 --> 小
+ls -v        # 使用 版本号 排序
+ls -X        # 使用 扩展名 排序
+ls -d        # 只列出目录本身，而不列出目录内元素
+ls -l        # 列出当前目录中的元素的详细信息
+ls -h        # 使用人类可读的形式
+ls -F        # 在目录后添加 /，在可执行文件后添加 *
+ls -r        # 逆序
+ls -R        # 递归
+ls -1        # 在每一行列出文件名
+ls -L        # 符号链接所指向的文件, 而不是符号链接本身
+ls -I "*.sh" # 忽略文件, 使用通配符
+ls -clt      # 使用 ctime 排序和展示, 新 -> 旧
+ls -tl       # 使用 mtime 排序和展示, 新 -> 旧
+ls -ult      # 使用 atime 排序和展示, 新 -> 旧
+
+md5sum 1.txt # MD5 检验
+
+mkdir    abc   # 创建目录
+mkdir -p a/b/c # 递归创建目录, 目录已存在时不报错
+
+mktemp         # 临时文件
+mktemp -d      # 临时目录
+
+more    # 空格   : 下一页
+        # ctrl+F : 下一页
+        # b      : 上一页
+        # ctrl+b : 上一页
+        # 回车   : 下一行
+        # =      : 当前行号
+
+mv a b # a 是符号链接时, 将使用符号链接本身
+       # b 是指向目录  的符号链接时， 相当于 移到 b 本身
+       # b 是指向目录  的符号链接时， 相当于 移到 b 最终所指向的目录下
+       # b 是指向不存在的符号链接时， 相当于 重命名
+
+patch     1.txt diff.pathc  # 恢复文件
+patch -p1 1.txt diff.pathc  # 恢复文件, 忽略 diff.pathc 的第一个路径
+
+readlink    1.c.link  # 读取符号链接
+readlink -f 1.c.link  # 读取符号链接, 递归
+
+rm -r  a    # 递归删除
+rm -rf a    # 强行删除, 文件不存在时, 忽略
+
+sed # 读取一行到模式空间 --> 执行操作 -- 循环
+    # n 读取下一行到模式空间 N 将下一行添加到模式空间内容后
+    # d 删除模式空间的内容   D 删除模式空间的第一行内容, 之后跳到开头
+    # p 打印模式空间的内容   P 打印模式空间的第一行内容
+    # h 将模式空间复制到保持空间
+    # H 将模式空间附加到保持空间
+    # g 将保持空间复制到模式空间
+    # G 将保持空间附加到模式空间
+    # x 交换模式空间和保持空间的内容
+    # :abc 定义标签
+    # b abc 跳到指定标签
+    # t abc 前一个命令成功会跳转
+
+sed  -e "p" -e "d"   1.txt # 指定多个命令
+sed  -f 1.sed        1.txt # 从文件读取命令
+sed  -n "1p"         1.txt #   打印第一行
+sed  -n "1!p"        1.txt # 不打印第一行
+sed  -n "1,5p"       1.txt #   打印 [1,5] 行
+sed  -n "1,+4p"      1.txt #   使用相对位置
+sed  -n "1,$p"       1.txt #   打印整个文件
+sed  -n "p"          1.txt #   打印整个文件
+sed  -n "/1/p"       1.txt #   打印 包含 1 的行
+sed  -n "/1/,/2/p"   1.txt #   打印 [包含1, 包含2] 的行
+                           #   包含1 和 包含2 的不能是同一行
+sed  -n "/1/,+1p"    1.txt #   使用相对位置
+sed -rn "/1+/p"  <<< "111" #   使用扩展的正则表达式
+                           #   默认使用基础的正则表达式
+sed  -n "/1/,+1p"    1.txt #   使用相对位置
+
+sed  -n  "=;p"       1.txt # 输出行号
+
+sed     "1l"         1.txt # 打印不可打印字符
+sed     "1r1.c"      1.txt # 第一行后插入文件的内容
+sed     "1w1.c"      1.txt # 第一行行保存到文件
+
+sed     "1a..."      1.txt # 行后插入
+sed     "1i..."      1.txt # 行前插入
+sed     "1c..."      1.txt # 行替换
+sed     "1d"         1.txt # 行删除
+
+sed     "s/123/456/"   1.txt # 替换第一处
+sed     "s/123/456/2"  1.txt # 替换第二处
+sed     "s/123/456/2g" 1.txt # 替换第二处及以后
+sed     "s/123/456/g"  1.txt # 替换所有
+sed -i  "s/123/456/g"  1.txt # 直接在原文件上修改
+sed -i  "s|123|456|g"  1.txt # 使用不同的分割符
+sed -i  "s/.*/[&]/g"   1.txt # & 用于表示所匹配到的内容
+sed -ir "s/(1)/[\1]/g" 1.txt # \1 表示第一个字串
+
+sed     "y/123/456/"   1.txt # 字符替换
+
+sort            # 排序
+sort -b         # 忽略前置空白
+sort -c         # 检查是否已排序
+sort -d         # 字典序排序
+sort -f         # 忽略大小写
+sort -k 4       # 指定排序的列字段
+sort -k 4.1,4.2 # 指定排序的列字段
+sort -h         # 以 K, M, G 排序
+sort -i         # 忽略不可打印字符
+sort -m         # 合并排序过的文件
+sort -n         # 以数字进行排序
+sort -r         # 逆序
+sort -t :       # 指定列的分割符
+sort -u         # 重复项只输出一次
+sort -V         # 以版本号排序
+sort lyb -o lyb # 排序并存入原文件
+
+
+stat    1.c # 列出 birth atime mtime ctime
+stat -L 1.c # 符号链接所指向的文件, 而不是符号链接本身
+
+tail -f * # 动态查看新增内容
+
+tar acf 1.tgz --exclude="*.o" 12 # 根据后缀压缩, 忽略指定文件
+tar acf 1.tgz -X 1.c          12 # 根据后缀压缩, 忽略 1.c 内的文件
+tar xvf 1.tgz                    # 根据后缀解压, 显示解压过程
+tar xf  1.tgz -C /home/          # 根据后缀解压, 解压到指定目录
+tar tf a.tgz                     # 列出压缩包中的文件和目录
+
+tee    1.txt # 管道中把文件拷贝到文件
+tee -a 1.txt # 管道中把文件添加到文件
+
+tree -p "*.cc"       # 只显示  匹配到的文件
+tree -I "*.cc"       # 只显示没匹配到的文件
+tree -H . -o 1.html  # 指定目录生成 html 文件
+
+tr    'a-z' 'A-Z' # 小写转大写
+tr -d 'a-z'       # 删除字符
+tr -s ' '         # 压缩字符
+
+touch        1.c # 修改 atime mtime ctime
+touch -a     1.c # 修改 atime
+touch -m     1.c # 修改       mtime ctime
+touch -c     1.c # 文件不存在时, 不创建文件
+touch -h     1.c # 改变符号链接本身, 而不是所指向的文件
+touch -r 2.c 1.c # 以 2.c 的时间修改 1.c
+touch -d ... 1.c # 指定时间, 格式同 date
+touch -t ... 1.c # 指定时间
+                 # 依次是: 时区-年-月-日-时-分-秒
+
+uniq    # 删除重复的行
+uniq -c # 输出统计的次数
+uniq -d # 只输出重复的行, 重复的项只输出一次
+uniq -D # 只输出重复的行, 重复的项只输出多次
+uniq -i # 忽略大小写
+uniq -u # 只输出没重复的行
+
+unzip -l a.zip # 列出 zip 的内容
+unzip -j a.zip # 解压时, 不要路径
+
+wc    # 输出 换行符数 字符串数 字节数
+wc -l #   行数
+wc -w # 字符串数
+wc -c # 字节数
+wc -m # 字符数
+
