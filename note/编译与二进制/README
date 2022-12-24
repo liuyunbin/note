@@ -1,0 +1,48 @@
+
+g++ -0g main.cc
+g++ -01 main.cc
+g++ -02 main.cc
+g++ -03 main.cc
+g++ main.cc -g     # 生成 gdb 的文件
+
+gdb [a.out] [pid]         # 启动 gdb
+gdb> file a.out           # 设置可执行文件
+gdb> r   [arguments]      # 运行程序
+gdb> attach pid           # gdb 正在运行的程序
+gdb> info breakpoints     # 列出断点信息
+gdb> b file:line          # 在指定行设置断点
+gdb> b function           # 在制定函数设置断点
+gdb> b function if b==0   # 根据条件设置断点
+gdb> disable [num]        # 忽略断点 num
+gdb>  enable [num]        # 使断点 num 生效
+gdb>  delete [num]        # 删除断点 num
+gdb> clear   line         # 清除指定行的断点
+gdb> c       [num]        # 继续运行到指定断点
+gdb> u       line         # 运行到指定行
+gdb> n       [num]        # 继续运行多次
+gdb> s                    # 进入函数
+gdb> finish               # 退出函数
+gdb> p v                  # 输出变量的值
+gdb> p *pointer           # 输出指针指向的值
+gdb> p/x var              # 按十六进制格式显示变量。
+gdb> p/d var              # 按十进制格式显示变量。
+gdb> p/u var              # 按十六进制格式显示无符号整型。
+gdb> p/o var              # 按八进制格式显示变量。
+gdb> p/t var              # 按二进制格式显示变量。
+gdb> p/a var              # 按十六进制格式显示变量。
+gdb> p/c var              # 按字符格式显示变量。
+gdb> p/f var              # 按浮点数格式显示变量
+gdb> x/8xb &v              # 输出 double 的二进制表示
+gdb> x/nfu  v              # n 表示打印多少个内存单元
+                           # f 打印格式, x d u o t a c f
+                           # u 内存单元, b=1 h=2 w=4 g=8
+gdb> l                     # 显示当前行之后的源程序
+gdb> l -                   # 显示当前行之前的源程序
+gdb> list 2,10             # 显示 2 - 10 行的源程序
+gdb>  set listsize 20      # 设置列出源码的行数
+gdb> show listsize         # 输出列出源码的行数
+gdb> set  print elements 0 # 设置打印变量长度不受限制
+gdb> show print elements
+gdb> bt                    # 显示堆栈信息
+gdb> f     n               # 查看指定层的堆栈信息
+
