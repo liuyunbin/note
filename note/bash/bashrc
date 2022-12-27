@@ -4,7 +4,12 @@ PS1='\[\e[32m\]$(date "+%F %T") \[\e[0m\]'
 note=~/GitHub/note
 PATH="$PATH:$note/note/bash:$note/bin"
 
+alias addeol="tool.sh addeol"
+alias deleol="tool.sh deleol"
 alias lastlog="tool.sh lastlog"
+alias p="tool.sh ps"
+
+
 alias ls='ls --color=auto --time-style="+%F %T"'
 alias g++='g++ -std=c++11'
 
@@ -18,7 +23,6 @@ alias lsm='ls -l --human-readable --reverse --sort=time'
 alias lss='ls -l --human-readable --reverse --sort=size'
 alias lsv='ls -l --human-readable --reverse --sort=version'
 alias m="g++ test.cc -g -std=c++11"
-alias p="tool.sh ps"
 alias puid="ps -o ruid,euid,suid,fuid,luid,ouid,"
 alias puser="ps -o ruser,euser,suser,fuser,luid,ouid,"
 alias pgid="ps -o rgid,egid,sgid,fgid,supgid,"
