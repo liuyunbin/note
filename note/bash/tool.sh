@@ -24,7 +24,7 @@ function do_ps() {
         argv=$argv$(pgrep -d, $key || log_erro "未找到进程 $key")
     done
 
-    ps -o etimes,ruser:10,pid,nlwp,cmd --sort=etimes --no-headers -p $argv | awk '
+    ps -o etimes,ruser:10,pid,nlwp,cmd --sort=-etime --no-headers -p $argv | awk '
         {
             $1 = strftime("%Y-%m-%d %H:%M:%S", systime() - $1)
             cmd = ""

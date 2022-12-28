@@ -95,7 +95,7 @@ ps -o stat,state             # 进程状态
                              # Z 僵尸进程
 ps -o pmem,rsz,vsz           # 内存百分比,内存,内存(含交换分区)
 ps -o pcpu,c,bsdtime,cputime # cpu: 百分比,百分比整数,user+system,system
-ps -o lstart,etime,etimes    # 启动时间,运行时间,运行时间(秒)
+ps -o lstart,etime,etimes    # 启动时间,运行时间,运行时间(秒), 无法对 etimes 进行排序
 ps -o nice,pri,psr,rtprio    # 优先级
 ps -o wchan                  # 进程休眠, 返回当前使用的内核函数
                              # 进程运行, 返回 -
