@@ -69,6 +69,7 @@
 /proc/PID/task    # 进程使用的线程情况
 
 ## 相关命令
+                             # 多个命令之间取 或
 ps -U RUID -G RGID           # 实际的用户和组
 ps -u EUID -g EGID           # 有效的用户和组
 ps -p PID                    # 进程ID
@@ -121,6 +122,7 @@ pstree  -g [PID] # 展示进程组ID
 pstree  -n [PID] # 使用 PID 排序而不是 进程名称
 pstree  -l [PID] # 使用长行, 方便写入文件
 
+              # 多个命令之间取且
 pgrep         # 使用进程名称查找, 使用扩展的正则表达式
 pgrep -f  ... # 使用启动命令匹配, 默认使用进程名称匹配(最多15位)
 pgrep -c  ... # 输出匹配到的进程数目
@@ -141,7 +143,7 @@ pgrep -v  ... # 反转结果
 pgrep -x  ... # 精确匹配，默认前缀匹配
 pgrep -w  ... # 列出线程ID
 
-pidof  # 列出进程名称对应的 PID, 精确匹配, 没有长度限制
+pidof  # 进程名称 => PID, 精确匹配, 没有长度限制
 pwdx pid # 列出进程的当前工作目录
 
 nohup  # 忽略信号 SIGHUP
