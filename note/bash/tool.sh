@@ -46,21 +46,6 @@ function do_lastlog() {
         }' | sort
 }
 
-function do_deleol() {
-    : ${1:?use $0 1.txt}
-
-    for key in $@; do
-        vim -c 'set binary noeol' -c 'wq!' $key
-    done
-}
-
-function do_addeol() {
-    : ${1:?use $0 1.txt}
-
-    for key in $@; do
-        vim -c 'set eol' -c 'wq!' $key
-    done
-}
 
 cmd=$1
 shift

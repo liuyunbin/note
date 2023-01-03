@@ -1,0 +1,28 @@
+
+PS1='\[\e[32m\]$(date "+%F %T") \[\e[0m\]'
+
+note=~/GitHub/note
+PATH="$PATH:$note/note/bash"
+
+alias c="cd $note && pwd"
+
+alias lastlog="tool.sh lastlog" # 列出用户的最后一次登录
+alias p="tool.sh ps"            # 列出进程的常用信息
+
+alias addeol="vim -c 'set eol'       -c 'wq!'"  # 文件末尾 无换行符 => 有换行符
+alias deleol="vim -c 'set bin noeol' -c 'wq!'"  # 文件末尾 有换行符 => 无换行符
+
+alias ls='ls --color=auto --time-style="+%F %T"'
+alias lsa='ls -lhrtu' # 以 文件访问时间     排序, 不准确
+alias lsc='ls -lhrtc' # 以 文件属性修改时间 排序
+alias lsm='ls -lhrt'  # 以 文件内容修改时间 排序
+alias lsd='ls -lhrtd' # 以 文件内容修改时间 排序, 只列出目录本身
+alias lss='ls -lhrS'  # 以 文件大小         排序
+alias lsv='ls -lhrv'  # 以 文件名为版本号   排序
+alias l="lsm"
+
+alias g++='g++ -std=c++11'
+alias v="vim test.cc"
+alias m="g++ test.cc -g"
+alias t="./a.out"
+
