@@ -4,7 +4,7 @@ PS1='\[\e[32m\]$(date "+%F %T") \[\e[0m\]'
 note=~/GitHub/note
 PATH="$PATH:$note/note/bash"
 
-alias c="cd $note && pwd"
+alias c="cd $note/note && pwd"
 
 alias lastlog="tool.sh lastlog" # 列出用户的最后一次登录
 alias p="tool.sh ps"            # 列出进程的常用信息
