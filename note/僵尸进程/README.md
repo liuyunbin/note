@@ -14,7 +14,7 @@
 
 ## 寻找僵尸进程
 * top 查看是否有僵尸进程
-* 获取僵尸进程的进程号: ps --no-header -fe -o state,pid | awk '$1 == "Z" {print $2}'
+* 获取僵尸进程的进程号: `ps --no-header -fe -o state,pid | awk '$1 == "Z" {print $2}'`
 
 ## 产生僵尸进程
 ### 父进程未处理子进程退出的状态信息 => 01.cc
