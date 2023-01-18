@@ -3,7 +3,7 @@
 * 要登录一个系统, 肯定需要一个名称, 用以区分不同的用户
 
 ## 为什么存在组?
-* 为了多个用户共享数据
+* 为了多个用户之间共享数据
 
 ## 用户, 用户名称, 用户ID, 组, 组名称, 组ID之间的关系
 * 用户和用户名称一一对应, 组和组名称一一对应
@@ -54,18 +54,38 @@
 * /etc/login.defs      # 有关登录的配置信息
 
 ## 相关命令
+* UID GID 的值一般默认即可, 不需要特殊设置
+
 useradd           # 添加用户或修改默认配置
-useradd -e ...    #   指定用户过期日期
-useradd -f ...    #   指定用户密码过期到账户临时不可用的时间
-useradd -k ...    #   指定主目录模板
+useradd -c ...    #   指定关于用户的一段描述
+useradd -e ...    #   指定用户过期日期, YYYY-MM-DD
+useradd -f ...    #   指定用户密码过期到账户临时不可用的天数
+useradd -g ...    #   指定主组, 主组必须存在
+useradd -G ...    #   指定附属组, 附属组必须存在, 可以多个, 以逗号分割
+useradd -k ...    #   指定主目录模板, 如果主目录由 useradd 创建, 模板目录中的文件将拷贝到新的主目录中
+useradd -K ...    #   修改默认参数
 useradd -s ...    #   指定shell
 useradd -D        #   查看默认配置
-useradd -m -b ..  #   指明主目录的父目录, 不存在的话新建
-useradd -m -d ..  #   指明主目录,         不存在的话新建
-userdel           # 删除用户
+useradd -D ...    #   修改默认配置
+useradd    -b ... #   指明主目录的父目录, 父目录必须存在
+useradd -m -b ... #   指明主目录的父目录, 父目录不必存在, 会自动新建
+useradd    -d ... #   指明主目录, 主目录可以不存在, 不存在的话不会新建
+useradd -m -d ... #   指明主目录, 主目录可以不存在, 不存在的话会自动新建
+useradd -m ...    #   用户主目录不存在的话自动新建
+useradd -M ...    #   用户主目录不会新建
+useradd -N ...    #   不创建和用户同名的组
+useradd -o ...    #   允许 UID 重复
+useradd -r ...    #   创建系统用户
+useradd -u ...    #   指定 UID 的值
+useradd -U ...    #   创建和用户同名的组
+
+userdel    ...    # 删除用户
+userdel -r ...    #   删除用户及其主目录
+
 usermod           # 修改用户
 usermod -a -G ... #   添加附属组
 usermod -m ...    #   移动主目录
+usermod -l ...    #   修改登录名
 usermod -L ...    #   锁定用户
 usermod -U ...    #   解锁用户
                   #   其他选项同 useradd
@@ -88,6 +108,7 @@ chage -l     lyb # 列出密码相关信息
 
 chfn             # 修改个人信息, 手机号之类
 chsh -s ...      # 修改默认的 shell
+chsh -l          # 列出所有支持的 shell
 
 groups    # 列出用户所属的组名称
 groupadd  # 添加组
