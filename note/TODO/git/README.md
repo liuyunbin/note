@@ -1,3 +1,20 @@
+
+
+## Git 和换行符
+git config --global core.eol     lf # 设置工作目录的换行符为   \n
+git config --global core.eol   crlf # 设置工作目录的换行符为 \r\n
+git config --global core.eol native # 设置工作目录的换行符为 native, 使用平台默认的换行符 == 默认值
+
+git config --global core.autocrlf true  # 提交时: CRLF --> LF, 检出时: LF --> CRLF
+git config --global core.autocrlf input # 提交时: CRLF --> LF, 检出时: 不转换
+git config --global core.autocrlf false # 提交时: 不转换,      检出时: 不转换 == Linux 下的默认值
+
+git config --global core.safecrlf true  # 拒绝提交包含混合换行符的文件
+git config --global core.safecrlf false # 允许提交包含混合换行符的文件  == Linux 下的默认值
+git config --global core.safecrlf warn  # 提交包含混合换行符的文件时给出警告
+
+
+
 ## 简介
 * Git 是一个分布式版本管理的工具
 * 本文只列举 Git 最常用的功能
