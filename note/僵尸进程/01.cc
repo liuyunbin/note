@@ -1,20 +1,19 @@
 
-#include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 #include <iostream>
-#include <map>
 #include <string>
 
+using namespace std;
+
 void log(const std::string& msg = "") {
-    std::cout << "进程(" << getpid() << "): " << msg << std::endl;
+    cout << msg << endl;
 }
 
 int main() {
-    log("测试产生僵尸进程之父进程未处理子进程退出的状态信息");
-    log();
+    log("测试父进程未处理子进程退出的状态信息");
     pid_t child = fork();
 
     if (child == 0) {
@@ -33,7 +32,6 @@ int main() {
     log("子进程状态");
     system(cmd.data());
 
-    log();
     log("主进程退出");
     return 0;
 }
