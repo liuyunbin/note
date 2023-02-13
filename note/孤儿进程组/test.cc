@@ -52,9 +52,8 @@ int main() {
             // 测试的第一个子进程
             log("第一个子进程使自己暂停");
             kill(getpid(), SIGSTOP);
-            sleep(1);
-            log("第一个子进程退出");
-            return 0;
+            for (;;)
+                ;
         } else if (fork() == 0) {
             // 测试的第二个子进程
             sleep(1);
@@ -69,14 +68,15 @@ int main() {
             log("杀死父进程 " + std::to_string(getppid()));
             kill(getppid(), SIGKILL);
             sleep(1);
+            sleep(1);
             log("进程状态");
             commond = cmd;
             commond += std::to_string(child_1) + ",";
             commond += std::to_string(getpid()) + ",";
             commond += std::to_string(getppid());
             system(commond.data());
-            sleep(1);
-            sleep(1);
+            log("杀死第一个子进程 " + std::to_string(child_1));
+            kill(child_1, SIGKILL);
             log("第二个子进程退出");
             return 0;
         } else {
