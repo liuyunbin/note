@@ -25,6 +25,8 @@ int main() {
     std::string cmd = "ps -o pid,comm,state -p " + std::to_string(child);
     system(cmd.data());
 
+    log();
+    log("主进程死循环, 不退出");
     for (;;)
         ;
 

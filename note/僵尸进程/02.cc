@@ -15,7 +15,9 @@ void log(const std::string& msg = "") {
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
     log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
     int fd = waitpid(-1, NULL, WNOHANG);
-    if (fd > 0) log("已退出的子进程是: " + std::to_string(fd));
+    if (fd > 0) {
+        log("已退出的子进程是: " + std::to_string(fd));
+    }
 }
 
 void set_signal() {
@@ -27,7 +29,8 @@ void set_signal() {
 }
 
 int main() {
-    log("测试产生僵尸进程之父进程未正确处理子进程退出的状态信息");
+    log("测试僵尸进程");
+    log("测试父进程未正确处理子进程退出的状态信息");
     log();
 
     log("设置 SIGCHLD 处理为: 调用 waitpid() 一次");
@@ -54,7 +57,7 @@ int main() {
         }
     }
 
-    cmd.pop_back();
+    cmd.pop_back();  // 删除多余的逗号
 
     log("解除信号 SIGCHLD 的阻塞");
     sigprocmask(SIG_UNBLOCK, &mask, NULL);

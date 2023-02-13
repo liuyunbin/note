@@ -6,14 +6,15 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 void log(const std::string& msg = "") {
-    cout << msg << endl;
+    std::cout << "进程(" << getpid() << "): " << msg << std::endl;
 }
 
 int main() {
+    log("测试僵尸进程");
     log("测试父进程未处理子进程退出的状态信息");
+    log();
+
     pid_t child = fork();
 
     if (child == 0) {
@@ -32,6 +33,7 @@ int main() {
     log("子进程状态");
     system(cmd.data());
 
+    log();
     log("主进程退出");
     return 0;
 }

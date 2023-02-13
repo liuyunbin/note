@@ -21,7 +21,8 @@ void set_signal() {
 }
 
 int main() {
-    log("测试预防僵尸进程产生之设置 SIGCHLD 处理为 SIG_IGN");
+    log("测试预防僵尸进程");
+    log("测试设置 SIGCHLD 处理为 SIG_IGN");
     log();
 
     log("设置 SIGCHLD 的信号处理");

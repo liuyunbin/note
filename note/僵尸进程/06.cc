@@ -13,7 +13,8 @@ void log(const std::string& msg = "") {
 }
 
 int main() {
-    log("测试预防僵尸进程产生之杀死父进程");
+    log("测试预防僵尸进程");
+    log("测试杀死父进程");
     log();
 
     if (fork() == 0) {
@@ -21,10 +22,12 @@ int main() {
         std::string cmd = "ps -o pid,ppid,comm,state -p ";
         cmd += std::to_string(child);
         if (child == 0) {
+            // 测试的子进程
             log("子进程启动");
             for (;;)
                 ;
         } else if (fork() == 0) {
+            // 测试的控制进程
             sleep(1);
             log("子进程状态");
             system(cmd.data());
@@ -40,6 +43,7 @@ int main() {
             system(cmd.data());
             exit(-1);
         } else {
+            // 测试的父进程
             log("父进程启动");
             for (;;)
                 ;

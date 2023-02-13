@@ -17,7 +17,6 @@ int main() {
     log();
 
     if (fork() == 0) {
-        // 父进程
         pid_t child = fork();
 
         if (child == 0) {
