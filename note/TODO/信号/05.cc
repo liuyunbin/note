@@ -81,12 +81,12 @@ int main() {
             ;
     } else {
         sleep(1);
-        log("发送信号 SIGUSR1 第一次");
+        log("发送信号 " + m[SIGUSR1] + " 第 1 次");
         kill(fd, SIGUSR1);
         sleep(1);
-        log("发送信号 SIGUSR1 第二次");
+        log("发送信号 " + m[SIGUSR1] + " 第 2 次");
         kill(fd, SIGUSR1);
-        log("发送信号 SIGUSR1 第三次");
+        log("发送信号 " + m[SIGUSR1] + " 第 3 次");
         kill(fd, SIGUSR1);
         sleep(5);
         kill(fd, SIGKILL);

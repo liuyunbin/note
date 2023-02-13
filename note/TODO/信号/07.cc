@@ -59,7 +59,9 @@ void set_signal() {
     struct sigaction act;
     act.sa_sigaction = handle_signal;
     sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
+    log("设置信号处理过程中阻塞 SIGUSR2");
+    sigaddset(&act.sa_mask, SIGUSR2);
+    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT | SA_NOCLDSTOP;
     sigaction(SIGUSR1, &act, NULL);
     sigaction(SIGUSR2, &act, NULL);
 }
@@ -67,22 +69,20 @@ void set_signal() {
 int main() {
     init();
 
-    log("测试信号处理过程中不同的信号到达");
+    log("测试信号处理过程中阻塞其他信号");
     log();
-
     log("设置信号处理函数");
     set_signal();
     pid_t fd = fork();
     if (fd == 0) {
-        log("子进程启动");
         for (;;)
             ;
     } else {
         sleep(1);
-        log("发送信号 SIGUSR1");
+        log("发送信号 " + m[SIGUSR1]);
         kill(fd, SIGUSR1);
         sleep(1);
-        log("发送信号 SIGUSR2");
+        log("发送信号 " + m[SIGUSR2]);
         kill(fd, SIGUSR2);
         sleep(5);
         kill(fd, SIGKILL);
