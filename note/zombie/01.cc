@@ -6,8 +6,16 @@
 #include <iostream>
 #include <string>
 
+std::string get_time() {
+    time_t now = time(NULL);
+    struct tm* info = localtime(&now);
+    char buf[1024];
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", info);
+    return buf;
+}
+
 void log(const std::string& msg = "") {
-    std::cout << "进程(" << getpid() << "): " << msg << std::endl;
+    std::cout << get_time() << " " << getpid() << " " << msg << std::endl;
 }
 
 int main() {
@@ -35,5 +43,6 @@ int main() {
 
     log();
     log("主进程退出");
+
     return 0;
 }
