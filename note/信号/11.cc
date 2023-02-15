@@ -8,12 +8,23 @@
 #include <map>
 #include <string>
 
-void log(const std::string& msg = "") {
-    std::cout << "进程(" << getpid() << "): " << msg << std::endl;
+std::string get_time() {
+    time_t now = time(NULL);
+    struct tm* info = localtime(&now);
+    char buf[1024];
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", info);
+    return buf;
 }
+
+void log(const std::string& msg = "") {
+    std::cout << get_time() << " " << getpid() << " " << msg << std::endl;
+}
+
+jmp_buf buf;
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
     log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGABRT");
+    longjmp(buf, 1);
 }
 
 void set_signal() {
@@ -25,14 +36,15 @@ void set_signal() {
 }
 
 int main() {
-    log("测试 SIGABRT 处理为 捕获信号并返回");
+    log("测试信号 SIGABRT 处理为 捕获信号不返回");
     log();
-
-    log("设置 SIGABRT 处理为 捕获信号并返回");
+    log("设置 SIGABRT 处理为 捕获信号不返回");
     set_signal();
 
-    log("调用 abort()");
-    abort();
+    if (setjmp(buf) == 0) {
+        log("调用 abort()");
+        abort();
+    }
 
     log();
     log("主进程正常退出");

@@ -44,8 +44,16 @@ void init() {
     m[SIGSYS] = "31-SIGSYS";
 }
 
+std::string get_time() {
+    time_t now = time(NULL);
+    struct tm* info = localtime(&now);
+    char buf[1024];
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", info);
+    return buf;
+}
+
 void log(const std::string& msg = "") {
-    std::cout << "进程(" << getpid() << "): " << msg << std::endl;
+    std::cout << get_time() << " " << getpid() << " " << msg << std::endl;
 }
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
@@ -56,17 +64,18 @@ void set_signal() {
     struct sigaction act;
     act.sa_sigaction = handle_signal;
     sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
+    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT | SA_NOCLDSTOP;
     sigaction(SIGCHLD, &act, NULL);
 }
 
 int main() {
     init();
 
-    log("测试子进程暂停, 继续, 退出时, 向父进程发送 SIGCHLD, 父进程的处理");
+    log("测试不接受子进程暂停继续产生的 SIGCHLD");
     log();
 
     log("注册信号处理");
+    log("设置不接受子进程暂停继续产生的 SIGCHLD");
     set_signal();
     pid_t fd = fork();
     if (fd == 0) {
