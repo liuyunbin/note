@@ -27,7 +27,7 @@ ps --no-header -fe -o state,pid | awk '$1 == "Z" {print $2}'
 4. 杀死子进程
 5. 此时, 可以看到子进程处于僵尸状态
 
-测试文件: [01.cc][01]
+测试文件: [01.cc][./01.cc]
 
 ### 场景二: 父进程未正确处理子进程退出的状态信息
 1. 父进程设置捕捉 SIGCHLD 时, 调用一次 waitpid()
@@ -36,20 +36,20 @@ ps --no-header -fe -o state,pid | awk '$1 == "Z" {print $2}'
 4. 父进程解除信号 SIGCHLD 阻塞
 5. 此时, 由于有的 SIGCHLD 信号丢失, 所以有的子进程处于僵尸状态
 
-测试文件: [02.cc][02]
+测试文件: [02.cc][./02.cc]
 
 ## 预防僵尸进程
 ### 方法一: 父进程设置忽略 SIGCHLD
 
-测试文件: [03.cc][03]
+测试文件: [03.cc][./03.cc]
 
 ### 方法二: 父进程设置捕捉 SIGCHLD 时, 循环调用 waitpid(...WNOHANG)
 
-测试文件: [04.cc][04]
+测试文件: [04.cc][./04.cc]
 
 ### 方法三: 父进程设置捕捉 SIGCHLD 时, 使用 sigaction() 设置 `SA_NOCLDWAIT`, 表示不产生僵尸进程
 
-测试文件: [05.cc][05]
+测试文件: [05.cc][./05.cc]
 
 ### 方法四: 父进程退出, 使子进程变成孤儿进程, 子进程的父进程将变为 systemd, 后者会处理僵尸进程
 1. 进程产生子进程作为测试的父进程
@@ -59,7 +59,7 @@ ps --no-header -fe -o state,pid | awk '$1 == "Z" {print $2}'
 5. 通过测试的控制进程杀死测试的子进程
 6. 通过测试的控制进程可以看到测试的子进程并未处于僵尸状态
 
-测试文件: [06.cc][06]
+测试文件: [06.cc][./06.cc]
 
 ## 销毁僵尸进程
 ### 方法
@@ -75,7 +75,7 @@ ps --no-header -fe -o state,pid | awk '$1 == "Z" {print $2}'
 7. 通过测试的控制进程杀死测试的父进程
 8. 通过测试的控制进程可以看到测试的子进程消失了
 
-测试文件: [07.cc][07]
+测试文件: [07.cc][./07.cc]
 
 ## 其他测试文件
 ### 产生僵尸进程不退出
@@ -84,18 +84,9 @@ ps --no-header -fe -o state,pid | awk '$1 == "Z" {print $2}'
 3. 此时, 可以看到子进程处于僵尸状态
 4. 父进程死循环
 
-测试文件: [08.cc][08]
+测试文件: [08.cc][./08.cc]
 
 ## 注意事项
 1. 设置 SIGCHLD 为 `SIG_IGN` 和 `SIG_DFL`(默认会忽略信号), 是不同的, 前者不会产生僵尸进程, 后者会
 2. 发送 SIGCHLD 的子进程与 waitpid() 得到的子进程不一定相同
-
-[01]: https://github.com/liuyunbin/note/tree/master/note/zombie/01.cc
-[02]: https://github.com/liuyunbin/note/tree/master/note/zombie/02.cc
-[03]: https://github.com/liuyunbin/note/tree/master/note/zombie/03.cc
-[04]: https://github.com/liuyunbin/note/tree/master/note/zombie/04.cc
-[05]: https://github.com/liuyunbin/note/tree/master/note/zombie/05.cc
-[06]: https://github.com/liuyunbin/note/tree/master/note/zombie/06.cc
-[07]: https://github.com/liuyunbin/note/tree/master/note/zombie/07.cc
-[08]: https://github.com/liuyunbin/note/tree/master/note/zombie/08.cc
 
