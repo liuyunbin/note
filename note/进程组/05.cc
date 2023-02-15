@@ -10,8 +10,16 @@
 #include <map>
 #include <string>
 
+std::string get_time() {
+    time_t now = time(NULL);
+    struct tm* info = localtime(&now);
+    char buf[1024];
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", info);
+    return buf;
+}
+
 void log(const std::string& msg = "") {
-    std::cout << "进程(" << getpid() << "): " << msg << std::endl;
+    std::cout << get_time() << " " << getpid() << " " << msg << std::endl;
 }
 
 void log(pid_t pid) {
@@ -36,15 +44,13 @@ void test(pid_t pid, pid_t pgid) {
 }
 
 int main() {
-    log("测试新建子进程对应的进程组(子进程调用exec之后)");
+    log("测试新建子进程对应的进程组(其他情况)");
     log();
 
     pid_t child = fork();
     if (child == 0) {
-        log("子进程调用exec");
-        execl("/usr/bin/sleep", "sleep", "3", NULL);
-        log("子进程失败");
-        exit(-1);
+        for (;;)
+            ;
     }
     sleep(1);
     log("新建子进程(" + std::to_string(child) + ")的进程组");
