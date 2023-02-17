@@ -1,20 +1,4 @@
 
-
-## Git 和换行符
-git config --global core.eol     lf # 设置工作目录的换行符为   \n
-git config --global core.eol   crlf # 设置工作目录的换行符为 \r\n
-git config --global core.eol native # 设置工作目录的换行符为 native, 使用平台默认的换行符 == 默认值
-
-git config --global core.autocrlf true  # 提交时: CRLF --> LF, 检出时: LF --> CRLF
-git config --global core.autocrlf input # 提交时: CRLF --> LF, 检出时: 不转换
-git config --global core.autocrlf false # 提交时: 不转换,      检出时: 不转换 == Linux 下的默认值
-
-git config --global core.safecrlf true  # 拒绝提交包含混合换行符的文件
-git config --global core.safecrlf false # 允许提交包含混合换行符的文件  == Linux 下的默认值
-git config --global core.safecrlf warn  # 提交包含混合换行符的文件时给出警告
-
-
-
 ## 简介
 * Git 是一个分布式版本管理的工具
 * 本文只列举 Git 最常用的功能
@@ -51,45 +35,24 @@ $ sudo apt install git
 9. `?` 匹配任意单个字符
 
 ## 使用
-### 配置用户名
+### 常用配置
 ```
-$ git config user.name liuyunbin --system # 整个系统中的项目配置
-$ git config user.name liuyunbin --global # 某个用户下的项目配置
-$ git config user.name liuyunbin --local  #   单独的某个项目配置
-$ git config user.name liuyunbin          #   单独的某个项目配置
+# --system  为整个系统中的项目配置
+# --global  为某个用户下的项目配置
+# --local   为单独的某个项目配置 -- 这个是默认行为
+$
+$ git config --global user.name  liuyunbin                # 配置用户名
+$ git config --global user.email yunbinliu@outlook.com    # 配置邮箱
+$
+$ git config --global core.editor vim                     # 配置默认编辑器
+$
+$ git config --global log.date iso # 日志使用 年月日 时分秒 时区 的格式
+$
+$ git config --global --list                           # 检查配置信息
+$ git config --global --list --show-origin             # 检查配置信息 以及 所属文件
+$ git config --global               user.name          # 检查某一项配置
+$ git config --global --show-origin user.name          # 检查某一项配置 及其 所属文件
 ```
-
-### 配置邮箱
-```
-$ git config user.email yunbinliu@outlook.com --system # 整个系统中的项目配置
-$ git config user.email yunbinliu@outlook.com --global # 某个用户下的项目配置
-$ git config user.email yunbinliu@outlook.com --local  #   单独的某个项目配置
-$ git config user.email yunbinliu@outlook.com          #   单独的某个项目配置
-```
-
-### 配置默认编辑器
-```
-$ git config core.editor vim --system # 整个系统中的项目配置
-$ git config core.editor vim --global # 某个用户下的项目配置
-$ git config core.editor vim --local  #         某个项目配置
-$ git config core.editor vim          #         某个项目配置
-```
-
-### 检查配置信息
-```
-$ git config --list --system # 整个系统中的项目配置
-$ git config --list --global # 某个用户下的项目配置
-$ git config --list --local  #         某个项目配置
-$ git config --list          #         某个项目配置
-```
-
-### 生成密钥
-```
-$ ssh-keygen -t rsa -b 4096 -C yunbinliu@outlook.com
-```
-
-### 复制公钥到 GitHub, 到此可以免密码使用 GitHub
-将文件 `~/.ssh/id_rsa.pub` 里的公钥添加到：https://github.com/settings/keys
 
 ### 其他常用命令
 ```
@@ -103,9 +66,50 @@ $
 $ git add README # 未跟踪 或 已修改 --> 已暂存
 $ git add README # 合并时把有冲突的文件标记为已解决状态
 $
+$ git status         # 列出文件状态
+$ git status  -s     # 显示简短信息
+$ git status --short # 显示简短信息
+$
+                       # 有参数比较 已修改 与 Git 仓库的区别吗? TODO
+$ git diff             # 暂存区域 和 已修改   的差异
+$ git diff --staged    # 暂存区域 和 Git 仓库 的差异
+$ git diff --cached    # 暂存区域 和 Git 仓库 的差异
+$ git diff --submodule # 获取子模块的修改
+$
 $ git commit -a -m "message" # 已修改 --> 已暂存 --> 已提交
 $ git commit    -m "message" #            已暂存 --> 已提交
+$ git commit --amend         # 将要修改的内容合并到最后一次提交中, 并修改提交信息, 旧的提交将删除
+$ git commit --amend -m ...  # 将要修改的内容合并到最后一次提交中, 并修改提交信息, 旧的提交将删除
 $
+$ git rm          README # 从 暂存区域 和 本地目录 中移除文件
+$ git rm  -f      README # 强行删除已修改过的文件
+$ git rm --cached README # 从 暂存区域 中移除文件, 本地目录保留
+$
+$ git mv file_from file_to # 移动文件或目录
+$
+$ git checkout    -- README             # 使用暂存区域内的 README 替换当前目录的 README
+$ git checkout HEAD~ README             # 使用 HEAD~ 的 README 替换当前目录 和 暂存区域 中的 README
+$ git checkout test-branch              # 切换分支
+$ git checkout -b test-branch           # 新建并切换分支
+$ git checkout --orphan test-branch     # 新建并切换到独立分支
+$ git checkout --track origin/serverfix # 新建并关联到远程分支
+$ git checkout serverfix                # 本地分支不存在, 且 远程分支存在, 新建并关联到远程分支
+$
+$ git restore                     README # 使用 暂存区 的 README 覆盖 当前目录 中 的 README
+$                                        # 和 git checkout -- README 意思相同
+$ git restore --staged            README # 使用 HEAD   的 README 覆盖 暂存区 的 README
+$                                        # 和 git reset -- README 意思相同
+$ git restore --staged --worktree README # 使用 HEAD   的 README 覆盖 暂存区 和 当前目录 中的 README
+$                                        # 和 git checkout HEAD README 意思相同
+$ git restore --staged --worktree --source HEAD~2 README
+$                                        # 使用 HEAD~2 的 README 覆盖 暂存区 和 当前目录 中的 README
+$                                        # 如果 指定提交 或 暂存区域不含 README, 则删除对应的 README
+$                                        # 和 git checkout HEAD~2 README 意思相同
+$
+$ git reset HEAD -- README       # 将暂存区域 的 README 恢复到 和 HEAD 的 README 相同
+
+
+
 $ git reset HEAD~ --soft  # 已提交 --> 已暂存
 $                         # 行为:
 $                         #     * 将 HEAD 指针指向 HEAD~
@@ -144,58 +148,33 @@ $                                #      * HEAD~ 的 README 和 暂存区中的 R
 $                                #
 $                                # git reset -- README  和 git reset HEAD README 等价
 $
-$ git checkout    -- README             # 使用暂存区域内的 README 替换当前目录的 README
-$ git checkout HEAD~ README             # 使用 HEAD~ 的 README 替换当前目录 和 暂存区域 中的 README
-$ git checkout test-branch              # 切换分支
-$ git checkout -b test-branch           # 新建并切换分支
-$ git checkout --orphan test-branch     # 新建并切换到独立分支
-$ git checkout --track origin/serverfix # 新建并关联到远程分支
-$ git checkout serverfix                # 本地分支不存在, 且 远程分支存在, 新建并关联到远程分支
-$
-$ git restore                     README # 使用 暂存区 的 README 覆盖 当前目录 中 的 README
-$                                        # 和 git checkout -- README 意思相同
-$ git restore --staged            README # 使用 HEAD   的 README 覆盖 暂存区 的 README
-$                                        # 和 git reset -- README 意思相同
-$ git restore --staged --worktree README # 使用 HEAD   的 README 覆盖 暂存区 和 当前目录 中的 README
-$                                        # 和 git checkout HEAD README 意思相同
-$ git restore --staged --worktree --source HEAD~2 README
-$                                        # 使用 HEAD~2 的 README 覆盖 暂存区 和 当前目录 中的 README
-$                                        # 如果 指定提交 或 暂存区域不含 README, 则删除对应的 README
-$                                        # 和 git checkout HEAD~2 README 意思相同
-$
-$ git rm          README # 从 暂存区域 和 本地目录 中移除文件
-$ git rm  -f      README # 强行删除
-$ git rm --cached README # 从 暂存区域 中移除文件, 本地目录保留
-$
-$ git mv file_from file_to # 移动文件或目录
-$
-$ git commit --amend # 修改最后一次的提交信息，或增加提交的文件
-$
-$ git status         # 列出文件状态
-$ git status  -s     # 显示简短信息
-$ git status --short # 显示简短信息
-$
-$ git diff             # 暂存区域 和 已修改   的差异
-$ git diff --staged    # 暂存区域 和 Git 仓库 的差异
-$ git diff --cached    # 暂存区域 和 Git 仓库 的差异
-$ git diff --submodule # 获取子模块的修改
-$
 $ git log
 $ git log --stat              # 显示简略统计信息
 $ git log --shortstat         # 只显示添加移除信息
 $ git log  -p                 # 显示修改的内容
 $ git log --patch
 $ git log  -2                 # 显示近两次的提交
-$ git log --oneline           # 每个提交一行
+$ git log --oneline           # 每个提交一行, 相当于 --pretty=oneline --abbrev-commit
 $ git log --pretty=oneline    # 每个提交一行
-$ git log --graph --oneline   # 显示分支的合并
+$ git log --pretty=short      # 只有作者, 没有日期
+$ git log --pretty=full       # 显示作者和提交者
+$ git log --pretty=fuller     # 显示作者 作者提交的日期和提交者 提交者提交的日期
+$ git log --pretty=format:"." # 指定显示格式
+$ git log --graph             # 显示分支的合并
 $ git log --name-only         # 显示修改的文件清单
+$ git log --name-status       # 显示修改的文件信息, 增删改
+$ git log --abbrev-commit     # 只显示提交hash的前几个字符
 $ git log --name-status       # 显示修改的文件信息, 增删改
 $ git log --after=2021-07-16
 $ git log --since=2021-07-16
 $ git log --before=2021-07-16
-$ git log --after=2021-07-16
+$ git log --until=2021-07-16
 $ git log --author=liuyunbin
+$ git log --committer=54c7cd09          # 指定配到的提交号
+$ git log --grep=liuyunbin              # 搜索提交说明中包含该关键字的提交
+$ git log --grep=A --grep=B             # 搜索提交说明中包含 A 或 B 的提交
+$ git log --grep=A --grep=B --all-match # 搜索提交说明中包含 A 且 B 的提交
+$ git log --no-merges                  # 不显示提交合并
 $ git log a..b                         # 不在 a 中, 在 b 中的提交
 $ git log ^a b                         # 不在 a 中, 在 b 中的提交
 $ git log --not a b                    # 不在 a 中, 在 b 中的提交
@@ -203,7 +182,9 @@ $ git log a...b                        # 在 a 或 b 中, 但不同时在 a 且 
 $ git log -L :main:main.cpp            # 查询某一函数的变更记录
 $ git log -L :10:main.cpp              # 查询某一行的变更记录
 $ git log -L 8,10:main.cpp             # 查询某几行的变更记录
-$ git log -S doRzrqPtywHqzqdmxx        # 搜索字符串的增加 删除
+$ git log -S main                      # 搜索字符串的增加 删除
+$ git log -- ...                       # 指定路径
+$ git log --decorate                   # 查看 HEAD 分支 tag 所属的提交
 $
 $ git branch                # 列出所有的本地分支
 $ git branch -v             # 列出所有的本地分支, 以及最后一次提交
@@ -222,6 +203,7 @@ $ git merge test-branch # 将 test-branch 合并到 当前分支
 $
 $ git rebase master server-branch # 将 server-branch 分支变基到 master
 $
+$ git remote                          # 查看远程仓库
 $ git remote -v                       # 查看远程仓库
 $ git remote add <shortname> <url>    # 添加远程仓库
 $ git remote rm     origin            # 删除远程仓库
@@ -234,6 +216,7 @@ $
 $ git pull                                        # 从远程仓库获取数据, 然后合并
 $
 $ git push origin master                          # 推送提交到远程仓库
+$ git push origin A:B                             # 推送本地分支A到远程分支B
 $ git push origin --delete serverfix              # 删除远程分支
 $ git push origin --set-upstream-to=orgin/develop # 本地分支和远程分支关联
 $ git push origin -u orgin/develop                # 本地分支和远程分支关联
@@ -282,133 +265,13 @@ Git 是一个分布式版本管理的工具
 * Ubuntu 18.04 LTS
 * Git 2.17.1
 
-## 安装
-```
-$ sudo apt install git
-```
-
-## 配置
-#### 配置用户名
-```
-$ git config --global user.name liuyunbin
-```
-
-#### 配置邮箱
-```
-$ git config --global user.email yunbinliu@outlook.com
-```
-
-#### 配置默认编辑器
-```
-$ git config --global core.editor vim
-```
-
-#### 检查配置信息
-```
-$ git config --list
-```
-
-#### 生成密钥
-```
-$ ssh-keygen -t rsa -b 4096 -C yunbinliu@outlook.com
-```
-
-#### 复制公钥到 GitHub
-将文件 ~/.ssh/id_rsa.pub 里的公钥添加到：https://github.com/settings/keys
-
-## 使用
-### 三个工作区域：
-1. Git 仓库
-2. 暂存区域
-3. 工作目录
-
-### 文件和目录的分类：
-1. 未跟踪的（untracked），位于工作目录
-2. 已暂存的（staged），属于暂存区域，位于 Git 仓库目录
-3. 已提交的（committed），位于 Git 仓库目录
-4. 已修改的（modified），位于工作目录
-5. 已忽略的文件或目录，位于工作目录
-
-### 忽略文件或目录
-在文件 .gitignore 中添加要忽略的文件或目录，规则如下：
-1. 空行或以 `#` 开头的行将被忽略
-2. 以 `/` 开头防止递归
-3. 以 `/` 结尾表示目录
-4. 以 `!` 开头，表示不忽略文件或目录
-5. `*` 匹配任意字符（不包括 `/`）
-6. `**` 匹配任意字符
-7. `[abc]` 表示匹配方括号内的任意单个字符
-8. `[0-9]` 表示匹配范围 [0, 9] 内的任意单个个字符
-9. `?` 匹配任意单个字符
-
 ### Git 常用命令
 **注意：以下说明中均不包含被忽略的文件和目录**
 
-#### 初始化仓库
-```
-$ git init
-```
-
-#### 克隆仓库
-```
-$ git clone git@github.com:liuyunbin/liuyunbin-toys
-```
-
-#### 添加内容到下一次提交当中
-未跟踪状态 ----> 已暂存状态 或 已修改状态 ----> 已暂存状态
-```
-$ git add README
-```
-
-#### 提交
-```
-$ git commit -m "message"
-```
-
-#### 跳过使用暂存区域，直接提交
-```
-$ git commit -a -m "message"
-```
 
 #### 修改提交信息，或增加提交的文件或目录
 ```
 $ git commit --amend
-```
-
-#### 列出处于未跟踪 或 已修改 或 已暂存的文件的状态
-```
-$ git status
-```
-
-#### 查看工作目录中已修改的文件和暂存区域内的文件的差异
-```
-$ git diff
-```
-
-#### 查看暂存区域内下一次要提交的内容
-查看暂存区域内的文件和 Git 仓库内的文件的差异
-```
-$ git diff --staged
-```
-
-#### 从暂存区域内移除文件或目录，同时在工作目录中删除
-```
-$ git rm README
-```
-
-#### 仅仅从暂存区域内移除文件或目录，工作目录中的文件保留
-```
-$ git rm --cached README
-```
-
-#### 移动文件或目录
-```
-$ git mv file_from file_to
-```
-
-#### 查看提交历史
-```
-$ git log
 ```
 
 #### 取消暂存的文件
@@ -520,7 +383,17 @@ $  git push origin --delete serverfix
 $  $ git rebase master server-branch
 ```
 
-## 参考资源
-1. https://help.github.com/en/articles/set-up-git
-2. https://git-scm.com/book/zh/v2
+## Git 和换行符
+git config --global core.eol     lf # 设置工作目录的换行符为   \n
+git config --global core.eol   crlf # 设置工作目录的换行符为 \r\n
+git config --global core.eol native # 设置工作目录的换行符为 native, 使用平台默认的换行符 == 默认值
+
+git config --global core.autocrlf true  # 提交时: CRLF --> LF, 检出时: LF --> CRLF
+git config --global core.autocrlf input # 提交时: CRLF --> LF, 检出时: 不转换
+git config --global core.autocrlf false # 提交时: 不转换,      检出时: 不转换 == Linux 下的默认值
+
+git config --global core.safecrlf true  # 拒绝提交包含混合换行符的文件
+git config --global core.safecrlf false # 允许提交包含混合换行符的文件  == Linux 下的默认值
+git config --global core.safecrlf warn  # 提交包含混合换行符的文件时给出警告
+
 
