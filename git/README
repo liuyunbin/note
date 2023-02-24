@@ -1,4 +1,6 @@
 
+# restore checkout reset
+
 # 未跟踪
 # 已修改
 # 已暂存
@@ -10,33 +12,31 @@ git add README # 合并时把有冲突的文件标记为已解决状态
 
 git blame  main.cc        # 查看文件每行的最后变更
 
-git branch                # 列出所有的本地分支
-git branch -v             # 列出所有的本地分支, 以及最后一次提交
-git branch --merged       # 列出已合并到本分支的本地分支
-git branch --no-merged    # 列出未合并到本分支的本地分支
-git branch    test-branch # 新建分支, 并不会切换分支
-git branch -d test-branch # 删除分支
-git branch -D test-branch # 强制删除分支
-git branch -r             # 查看远程分支
+git branch                                 # 列出所有的本地分支
+git branch -v                              # 列出所有的本地分支, 以及最后一次提交
+git branch -vv                             # 列出所有的本地分支, 以及最后一次提交, 跟踪的远程分支
+git branch --merged                        # 列出已合并到本分支的本地分支
+git branch --no-merged                     # 列出未合并到本分支的本地分支
+git branch --merged     develop            # 列出已合并到 develop 的本地分支
+git branch --no-merged  develop            # 列出未合并到 develop 的本地分支
+git branch              test-branch        # 新建分支, 并不会切换分支
+git branch -d           test-branch        #       删除分支, 如果该分支还未合并到当前分支,   会报错
+git branch -D           test-branch        #   强制删除分支, 如果该分支还未合并到当前分支, 不会报错
+git branch -m            new-branch        # 重命名当前分支, 如果新分支名已存在,   会报错
+git branch -M            new-branch        # 重命名当前分支, 如果新分支名已存在, 不会报错
+git branch -m old-branch new-branch        # 重命名指定分支, 如果新分支名已存在,   会报错
+git branch -M old-branch new-branch        # 重命名指定分支, 如果新分支名已存在, 不会报错
+git branch -r                              # 查看远程分支
 git branch --set-upstream-to=orgin/develop # 本地分支和远程分支关联
 git branch -u orgin/develop                # 本地分支和远程分支关联
 
-git checkout    -- README             # 使用暂存区域内的 README 替换当前目录的 README
-git checkout HEAD~ README             # 使用 HEAD~ 的 README 替换当前目录 和 暂存区域 中的 README
-git checkout test-branch              # 切换分支
+git checkout    -- README             # 使用暂存区的 README 替换当前目录的 README
+git checkout HEAD~ README             # 使用 HEAD~ 的 README 替换当前目录和暂存区域 的 README
+git checkout    test-branch           #       切换分支
 git checkout -b test-branch           # 新建并切换分支
 git checkout --orphan test-branch     # 新建并切换到独立分支
 git checkout --track origin/serverfix # 新建并关联到远程分支
 git checkout serverfix                # 本地分支不存在, 且 远程分支存在, 新建并关联到远程分支
-#### 撤销对文件的修改
-已修改状态 ----> 已提交状态
-$  git checkout -- README
-#### 切换分支
-$ git checkout test-branch
-#### 新建并切换分支
-$ git checkout -b test-branch
-#### 新建并切换到独立分支
-$ git checkout --orphan test-branch
 
 git clone https://github.com/liuyunbin/note # 克隆仓库
 git clone git@github.com:liuyunbin/note     # ssh 协议
@@ -47,8 +47,6 @@ git commit -a -m "message" # 已修改 --> 已暂存 --> 已提交
 git commit    -m "message" #            已暂存 --> 已提交
 git commit --amend         # 将要修改的内容合并到最后一次提交中, 并修改提交信息, 旧的提交将删除
 git commit --amend -m ...  # 将要修改的内容合并到最后一次提交中, 并修改提交信息, 旧的提交将删除
-#### 修改提交信息，或增加提交的文件或目录
-$ git commit --amend
 
 --system  为整个系统中的项目配置
 --global  为某个用户下的项目配置
@@ -80,8 +78,6 @@ git config --global core.safecrlf false # 允许提交包含混合换行符的�
 git config --global core.safecrlf warn  # 提交包含混合换行符的文件时给出警告
 git config --global core.quotepath false # 引用路径不使用八进制, 中文名不再乱码
 
-
-
                      # 有参数比较 已修改 与 Git 仓库的区别吗? TODO
 git diff             # 暂存区域 和 已修改   的差异
 git diff --staged    # 暂存区域 和 Git 仓库 的差异
@@ -89,8 +85,6 @@ git diff --cached    # 暂存区域 和 Git 仓库 的差异
 git diff --submodule # 获取子模块的修改
 
 git fetch [remote-name]                         # 从远程仓库获取数据
-#### 从远程仓库获取数据
-$ git fetch [remote-name]
 
 git init                                    # 初始化仓库
 
@@ -106,17 +100,17 @@ git log --pretty=short      # 只有作者, 没有日期
 git log --pretty=full       # 显示作者和提交者
 git log --pretty=fuller     # 显示作者 作者提交的日期和提交者 提交者提交的日期
 git log --pretty=format:"." # 指定显示格式
+git log --pretty=format:"%ad %an %h %s"
 git log --graph             # 显示分支的合并
 git log --name-only         # 显示修改的文件清单
 git log --name-status       # 显示修改的文件信息, 增删改
 git log --abbrev-commit     # 只显示提交hash的前几个字符
-git log --name-status       # 显示修改的文件信息, 增删改
 git log --after=2021-07-16
 git log --since=2021-07-16
 git log --before=2021-07-16
 git log --until=2021-07-16
-git log --author=liuyunbin
-git log --committer=54c7cd09          # 指定配到的提交号
+git log --author=liuyunbin            # 指定作者
+git log --committer=54c7cd09          # 指定提交者
 git log --grep=liuyunbin              # 搜索提交说明中包含该关键字的提交
 git log --grep=A --grep=B             # 搜索提交说明中包含 A 或 B 的提交
 git log --grep=A --grep=B --all-match # 搜索提交说明中包含 A 且 B 的提交
@@ -131,21 +125,14 @@ git log -L 8,10:main.cpp             # 查询某几行的变更记录
 git log -S main                      # 搜索字符串的增加 删除
 git log -- ...                       # 指定路径
 git log --decorate                   # 查看 HEAD 分支 tag 所属的提交
-git log -p main.cc                    # 查看文件内容的变更记录
 
 git ls-remote (remote)    # 查看远程分支
-$ git ls-remote (remote)
 
 git merge test-branch # 将 test-branch 合并到 当前分支
-#### 合并分支
-$ git merge test-branch
-
 
 git mv file_from file_to # 移动文件或目录
 
 git pull                                        # 从远程仓库获取数据, 然后合并
-#### 拉取并合并数据
-$ git pull
 
 git push origin master                          # 推送提交到远程仓库
 git push origin A:B                             # 推送本地分支A到远程分支B
@@ -163,15 +150,12 @@ $  git push origin --delete serverfix
 #### 推送数据到远程仓库
 $ git push origin master
 
-
-
 git rebase master server-branch # 将 server-branch 分支变基到 master
 git rebase -i HEAD~6                  # 之后，使用 f 取消掉不需要的内容，合并提交
 git rebase orign/develop              # 将 orign/develop 上的内容，变基到 当前分支
 #### 变基
 将 server-branch 分支变基到 master 分支
 $  $ git rebase master server-branch
-
 
 git remote                          # 查看远程仓库
 git remote -v                       # 查看远程仓库
@@ -184,10 +168,8 @@ git remote show   origin            # 查看远程仓库的详细信息
 $ git remote show origin
 #### 查看远程仓库
 $ git remote -v
-
 #### 添加远程仓库
 $ git remote add <shortname> <url>
-
 
 #### 重命名远程仓库
 $ git remote rename pb paul
@@ -207,51 +189,27 @@ git restore --staged --worktree --source HEAD~2 README
                                        # 如果 指定提交 或 暂存区域不含 README, 则删除对应的 README
                                        # 和 git checkout HEAD~2 README 意思相同
 
-git reset HEAD -- README       # 将暂存区域 的 README 恢复到 和 HEAD 的 README 相同
-git reset HEAD~ --soft  # 已提交 --> 已暂存
-                        # 行为:
-                        #     * 将 HEAD 指针指向 HEAD~
-                        #     * 暂存区域 和 工作目录 的数据不变
-                        # 结果:
-                        #     * HEAD~ 之后的数据 已提交 --> 已暂存
-                        #     * 之前 已暂存 的数据保持不变
-git reset HEAD~ --mixed # 已提交 或 已暂存 --> 已修改
-git reset HEAD~         #
-                        # 行为:
-                        #     * 将 HEAD 指针指向 HEAD~
-                        #     * 使用 HEAD 指针的数据重置暂存区
-                        #     * 工作目录 的数据不变
-                        # 结果:
-                        #     * 之前 已暂存 的数据 --> 已修改
-                        #     * HEAD~ 之后的数据 已提交 --> 已修改
-                        #     * 执行此命令后, Git 仓库 和 暂存区域 数据相同
-git reset HEAD~ --hard  # 已提交 --> 上次提交
-                        # 行为:
-                        #     * 将 HEAD 指针指向 HEAD~
-                        #     * 使用 HEAD 所指向的数据重置 暂存区域 和 工作目录
-                        # 结果:
-                        #     * 将 Git 仓库, 暂存区域 和 工作目录中 HEAD~ 之后的数据 都删除
-                        #     * 会丢失之前 已修改 或 已暂存 的数据
-
-git reset HEAD~ README         # 使用 HEAD~ 的 README 替换 暂存区域 中的 README
-git reset HEAD~ README --mixed
-                               # 行为:
-                               #      * 将 Git 仓库 HEAD~ 的 README 替换 暂存区中的 README
-                               #      * Git 仓库 和 工作目录 保持不变
-                               # 结果:
-                               #      * 之前 已暂存 的 README --> 已修改
-                               #      * HEAD~ 的 README 和 暂存区中的 README 相同
-                               #
-                               # git reset -- README  和 git reset HEAD README 等价
-#### 取消暂存的文件
-已暂存状态 ----> 已修改状态
-$  git reset HEAD README
-
+git reset --soft  HEAD~           # 将 HEAD 指到 HEAD~, 暂存区和工作目录不变
+                                  # 有可能会丢失 HEAD~ 之后的数据
+                                  # 已提交 => 已暂存
+git reset         HEAD~           #
+git reset --mixed HEAD~           # 将 HEAD 指到 HEAD~, 使用 HEAD 指向的数据重置暂存区, 工作目录保持不变
+                                  # 有可能会丢失 HEAD~ 之后的数据, 以及已暂存的数据
+                                  # 已提交 => 已修改
+git reset --hard  HEAD~           # 将 HEAD 指到 HEAD~, 使用 HEAD 指向的数据重置暂存区和工作目录
+                                  # 会丢失 HEAD~ 之后的数据, 以及已暂存, 已修改的数据
+                                  # 已提交 => 已删除
+git reset --soft  HEAD~ -- README # 非法
+git reset         HEAD~ -- README # 使用 HEAD~ 的 README 替换 暂存区 的 README, Git 仓库 和 工作目录保持不变
+                                  # 有可能会丢失已暂存的数据, 有取消暂存的效果
+git reset               -- README # 和 git reset HEAD~ -- README 等价
+git reset --mixed HEAD~ -- README # 同上一个, 但已过时
+git reset --hard  HEAD~ -- README # 非法
 
 git revert -m 1 HEAD # 撤销提交
 
-git rm          README # 从 暂存区域 和 本地目录 中移除文件
-git rm  -f      README # 强行删除已修改过的文件
+git rm          README # 从 暂存区域 和 本地目录 中移除文件, 如果该文件已修改 或 已暂存,   会失败
+git rm  -f      README # 从 暂存区域 和 本地目录 中移除文件, 如果该文件已修改 或 已暂存, 也会成功
 git rm --cached README # 从 暂存区域 中移除文件, 本地目录保留
 
 git stash                     # 贮藏工作
@@ -281,6 +239,9 @@ git submodule update --init --recursive      # 递归获取子模块的远程数
 git submodule update --remote DbConnector    # 在主目录更新子模块, 远程子模块仓库的最新数据
 git submodule update --remote --merge        # 合并远程修改到本地
 git submodule update --remote --rebase       # 变基远程修改到本地
+
+git switch    test-branch #       切换到 test-branch
+git switch -c test-branch # 创建并切换到 test-branch
 
 git tag                       # 列出 标签
 git tag -l "v*"               # 列出 标签
