@@ -280,26 +280,6 @@ getopts # -o 短选项, -l 长选项
         # 只能区分有参数和无参数的情况
         # 参数带空格也能处理
 
-git stash                             # 保存当前状态
-git stash pop                         # 恢复保存的状态
-git stash list                        # 查看已保存的状态
-git push orign feature/test -f        # 强推本地分支
-git rebase -i HEAD~6                  # 之后，使用 f 取消掉不需要的内容，合并提交
-git rebase orign/develop              # 将 orign/develop 上的内容，变基到 当前分支
-git push origin --delete feature/test # 删除远程分支
-git blame  main.cc                    # 查看文件每行的最后变更
-git log -p main.cc                    # 查看文件内容的变更记录
-
-git config --global core.quotepath false # 引用路径不使用八进制, 中文名不再乱码
-
-git config --global core.autocrlf true  # 提交时: CRLF --> LF, 检出时: LF --> CRLF
-git config --global core.autocrlf input # 提交时: CRLF --> LF, 检出时: 不转换
-git config --global core.autocrlf false # 提交时: 不转换,      检出时: 不转换
-
-git config --global core.safecrlf true  # 拒绝提交包含混合换行符的文件
-git config --global core.safecrlf false # 允许提交包含混合换行符的文件
-git config --global core.safecrlf warn  # 提交包含混合换行符的文件时给出警告
-
 hd            1.c # 每组一个字节, 显示十六进制
 hexdump -C    1.c # 每组一个字节, 显示十六进制
 hexdump -c    1.c # 每组一个字节, 显示字符
