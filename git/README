@@ -1,6 +1,4 @@
 
-# restore checkout reset
-
 # 未跟踪
 # 已修改
 # 已暂存
@@ -15,9 +13,9 @@ git blame  main.cc        # 查看文件每行的最后变更
 git branch                                 # 列出所有的本地分支
 git branch -v                              # 列出所有的本地分支, 以及最后一次提交
 git branch -vv                             # 列出所有的本地分支, 以及最后一次提交, 跟踪的远程分支
-git branch --merged                        # 列出已合并到本分支的本地分支
-git branch --no-merged                     # 列出未合并到本分支的本地分支
+git branch --merged                        # 列出已合并到 本分支  的本地分支
 git branch --merged     develop            # 列出已合并到 develop 的本地分支
+git branch --no-merged                     # 列出未合并到 本分支  的本地分支
 git branch --no-merged  develop            # 列出未合并到 develop 的本地分支
 git branch              test-branch        # 新建分支, 并不会切换分支
 git branch -d           test-branch        #       删除分支, 如果该分支还未合并到当前分支,   会报错
@@ -40,7 +38,7 @@ git checkout serverfix                # 本地分支不存在, 且 远程分支�
 
 git clone https://github.com/liuyunbin/note # 克隆仓库
 git clone git@github.com:liuyunbin/note     # ssh 协议
-git clone git@github.com:liuyunbin/note.git #
+git clone git@github.com:liuyunbin/note.git # TODO: 和上一个有什么区别
 git clone --recurse-submodules https://github.com...  # 克隆包含子模块的项目
 
 git commit -a -m "message" # 已修改 --> 已暂存 --> 已提交
@@ -48,23 +46,18 @@ git commit    -m "message" #            已暂存 --> 已提交
 git commit --amend         # 将要修改的内容合并到最后一次提交中, 并修改提交信息, 旧的提交将删除
 git commit --amend -m ...  # 将要修改的内容合并到最后一次提交中, 并修改提交信息, 旧的提交将删除
 
---system  为整个系统中的项目配置
---global  为某个用户下的项目配置
---local   为单独的某个项目配置 -- 这个是默认行为
-
-git config --global user.name  liuyunbin                # 配置用户名
-git config --global user.email yunbinliu@outlook.com    # 配置邮箱
-
-git config --global core.editor vim                     # 配置默认编辑器
-
-git config --global log.date iso # 日志使用 年月日 时分秒 时区 的格式
-
+# --system  为整个系统中的项目配置
+# --global  为某个用户下的项目配置
+# --local   为单独的某个项目配置 -- 这个是默认行为
+git config --global user.name  liuyunbin             # 配置用户名
+git config --global user.email yunbinliu@outlook.com # 配置邮箱
+git config --global core.editor vim                  # 配置默认编辑器
+git config --global log.date iso                     # 日志使用 年月日 时分秒 时区 的格式
 git config --global --list                           # 检查配置信息
 git config --global --list --show-origin             # 检查配置信息 以及 所属文件
 git config --global               user.name          # 检查某一项配置
 git config --global --show-origin user.name          # 检查某一项配置 及其 所属文件
 
-## Git 和换行符
 git config --global core.eol     lf # 设置工作目录的换行符为   \n
 git config --global core.eol   crlf # 设置工作目录的换行符为 \r\n
 git config --global core.eol native # 设置工作目录的换行符为 native, 使用平台默认的换行符 == 默认值
@@ -142,20 +135,12 @@ git push origin -u orgin/develop                # 本地分支和远程分支关
 git push origin v1.0                            # 将指定 标签 推送到远程
 git push origin --tags                          # 将所有 标签 推送到远程
 git push origin --delete v1.0                   # 删除远程 标签
-git push orign feature/test -f        # 强推本地分支
-git push origin --delete feature/test # 删除远程分支
-#### 删除远程分支
-$  git push origin --delete serverfix
-
-#### 推送数据到远程仓库
-$ git push origin master
+git push orign feature/test -f                  # 强推本地分支
+git push origin --delete feature/test           # 删除远程分支
 
 git rebase master server-branch # 将 server-branch 分支变基到 master
-git rebase -i HEAD~6                  # 之后，使用 f 取消掉不需要的内容，合并提交
-git rebase orign/develop              # 将 orign/develop 上的内容，变基到 当前分支
-#### 变基
-将 server-branch 分支变基到 master 分支
-$  $ git rebase master server-branch
+git rebase -i HEAD~6            # 之后，使用 f 取消掉不需要的内容，合并提交
+git rebase orign/develop        # 将 orign/develop 上的内容，变基到 当前分支
 
 git remote                          # 查看远程仓库
 git remote -v                       # 查看远程仓库
@@ -164,30 +149,6 @@ git remote rm     origin            # 删除远程仓库
 git remote remove origin            # 删除远程仓库
 git remote rename origin new-origin # 重命名远程仓库
 git remote show   origin            # 查看远程仓库的详细信息
-#### 查看某个远程仓库的详细信息
-$ git remote show origin
-#### 查看远程仓库
-$ git remote -v
-#### 添加远程仓库
-$ git remote add <shortname> <url>
-
-#### 重命名远程仓库
-$ git remote rename pb paul
-
-#### 删除远程仓库
-$ git remote rm paul
-
-
-git restore                     README # 使用 暂存区 的 README 覆盖 当前目录 中 的 README
-                                       # 和 git checkout -- README 意思相同
-git restore --staged            README # 使用 HEAD   的 README 覆盖 暂存区 的 README
-                                       # 和 git reset -- README 意思相同
-git restore --staged --worktree README # 使用 HEAD   的 README 覆盖 暂存区 和 当前目录 中的 README
-                                       # 和 git checkout HEAD README 意思相同
-git restore --staged --worktree --source HEAD~2 README
-                                       # 使用 HEAD~2 的 README 覆盖 暂存区 和 当前目录 中的 README
-                                       # 如果 指定提交 或 暂存区域不含 README, 则删除对应的 README
-                                       # 和 git checkout HEAD~2 README 意思相同
 
 git reset --soft  HEAD~           # 将 HEAD 指到 HEAD~, 暂存区和工作目录不变
                                   # 有可能会丢失 HEAD~ 之后的数据
@@ -206,6 +167,18 @@ git reset               -- README # 和 git reset HEAD~ -- README 等价
 git reset --mixed HEAD~ -- README # 同上一个, 但已过时
 git reset --hard  HEAD~ -- README # 非法
 
+git restore                     README # 使用 暂存区 的 README 覆盖 当前目录 中 的 README
+                                       # 和 git checkout -- README 意思相同
+git restore --staged            README # 使用 HEAD   的 README 覆盖 暂存区 的 README
+                                       # 和 git reset -- README 意思相同
+git restore --staged --worktree README # 使用 HEAD   的 README 覆盖 暂存区 和 当前目录 中的 README
+                                       # 和 git checkout HEAD README 意思相同
+git restore --staged --worktree --source HEAD~2 README
+                                       # 使用 HEAD~2 的 README 覆盖 暂存区 和 当前目录 中的 README
+                                       # 如果 指定提交 或 暂存区域不含 README, 则删除对应的 README
+                                       # 和 git checkout HEAD~2 README 意思相同
+git restore --source HEAD~2 README     # 使用 HEAD~2 的 README 覆盖当前目录 中的 README, 暂存区的内容保持不变
+
 git revert -m 1 HEAD # 撤销提交
 
 git rm          README # 从 暂存区域 和 本地目录 中移除文件, 如果该文件已修改 或 已暂存,   会失败
@@ -223,9 +196,9 @@ git stash apply               # 恢复已贮藏的工作
 git stash apply --index       # 恢复已贮藏的工作, 同时恢复暂存区
 git stash drop                # 丢弃贮藏区的工作
 git stash pop                 # 恢复已贮藏的工作, 并丢弃贮藏区的工作
-git stash                             # 保存当前状态
-git stash pop                         # 恢复保存的状态
-git stash list                        # 查看已保存的状态
+git stash                     # 保存当前状态
+git stash pop                 # 恢复保存的状态
+git stash list                # 查看已保存的状态
 
 git status         # 列出文件状态
 git status  -s     # 显示简短信息
