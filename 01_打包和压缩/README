@@ -1,0 +1,135 @@
+
+## 需要考虑的问题
+1. 能否压缩目录, 符号链接
+2. 是否删除原文件
+3. 目标文件已存在时, 删除还是更新
+
+打包: 多个文件打包成一个文件
+压缩: 是否只能对单个文件压缩
+
+## zip unzip
+文件名称参数说明
+* 可以使用多个
+* 使用具体的文件名称时, 需要从顶层文件算起
+* 不带引号的通配符
+    * 先通配符匹配, 如果匹配成功, 就变成了具体的文件名 (*不能跨目录)
+    * 否则, 压缩包内通配, 如果匹配成功, 就变成了具体的文件名 (*可以跨目录)
+    * 否则, 报错
+* 带引号的通配符
+    * 先在当前目录匹配, 完整匹配, 如果成功, 就变成了具体的文件名
+    * 否则, 压缩包内通配, 如果匹配成功, 就变成了具体的文件名 (*可以跨目录)
+    * 否则, 报错
+
+zip      1.zip    ...        # 压缩文件, 如果 1.zip 已存在, 不会删除旧的 1.zip, 只会添加或更新 1.zip 中的文件
+zip -r   1.zip    ...        # 压缩目录
+zip -r   1.zip    ... -x ... # 跳过指定文件
+                             # 跳过指定目录 TODO
+zip -d   1.zip    ...        # 删除 1.zip 里的文件
+                             # 删除 1.zip 里的目录 TODO
+zip -j   1.zip    ...        # 所有文件都移到顶层目录
+zip -l   1.zip    ...        # 压缩 LF -> LF+CR
+zip -ll  1.zip    ...        # 压缩 LF+CR -> LF
+zip -m   1.zip    ...        # 压缩, 删除原始文件
+zip -q   1.zip    ...        # 不显示指令执行过程
+zip -f   1.zip    ...        # 更新 1.zip 里的文件, 不添加
+zip -u   1.zip    ...        # 更新 1.zip 里的文件, 不存在时添加, 感觉和默认行为没什么区别
+zip -v   1.zip    ...        # 显示执行过程
+zip -y   1.zip    ...        # 保存符号链接本身, 默认将保存符号链接所指向的文件
+unzip    1.zip               # 解压缩
+unzip    1.zip    ...        # 解压缩指定文件
+unzip    1.zip -x ...        # 解压缩, 跳过指定文件
+                             # 解压缩, 跳过指定目录 TODO
+unzip    1.zip -d ...        # 解压缩到指定目录
+unzip -l 1.zip               # 列出 1.zip 的目录结构, 简单
+unzip -v 1.zip               # 列出 1.zip 的目录结构, 详细点
+unzip -j 1.zip               # 解压时, 文件都移到顶层路径
+unzip -o 1.zip               # 解压时, 直接覆盖重复的文件, 不提醒
+unzip -n 1.zip               # 解压时,   不覆盖重复的文件
+
+## bzip2 bunzip2
+只能压缩文件, 不能压缩目录和符号链接
+
+bzip    -k filename      # 不删除源文件
+bzip    -v filename      # 显示压缩或解压缩过程
+bzip    -q filename      # 不显示压缩或解压缩过程
+bzip2      filename      # 将删除 filename, 生成 filename.bz2, filename.bz2 已存在时报错
+bzip2   -f filename      # 将删除 filename, 生成 filename.bz2, filename.bz2 已存在时覆盖
+bzip2   -d filename.bz2  # 将删除 filename.bz2 , 生成 filename
+bunzip2    filename.bz2  # 将删除 filename.bz2 , 生成 filename
+bunzip2    filename.bz   # 将删除 filename.bz  , 生成 filename
+bunzip2    filename.tbz2 # 将删除 filename.tbz2, 生成 filename.tar
+bunzip2    filename.tbz  # 将删除 filename.tbz , 生成 filename.tar
+
+## gzip gunzip
+只能压缩文件, 不能压缩目录和符号链接
+
+gzip     1.gz 1   # 删除 1    生成 1.gz, 1.gz  已存在时, 会提醒是否覆盖
+gzip  -d 1.gz     # 删除 1.gz 生成 1
+gzip  -r ....     # 递归压缩
+gzip  -l 1.gz     # 列出 gzip 内文件
+gunzip   1.gz     # 删除 1.gz 生成 1
+gunzip   1-gz     # 删除 1-gz 生成 1
+gunzip   1.z      # 删除 1.z  生成 1
+gunzip   1-z      # 删除 1-z  生成 1
+gunzip   1_z      # 删除 1_z  生成 1
+gunzip   1.tgz    # 删除 1.tgz 生成 1.tar
+gunzip   1.taz    # 删除 1.tag 生成 1.tar
+
+## rar unrar
+可以压缩文件, 目录, 对于符号链接, 默认压缩符号链接所指向的文件(见 -ol)
+
+rar   a 1.rar ...  #   压缩, 如果 1.rar 已存在, 不会删除, 只会更新和添加
+unrar l 1.rar ...  # 列出压缩包信息, 简易
+unrar v 1.rar ...  # 列出压缩包信息, 详细
+unrar e 1.rar ...  # 解压缩到指定路径, 忽略压缩包内的路径
+unrar x 1.rar ...  # 解压缩到指定路径, 使用完整的压缩包路径
+
+## compress uncompress
+只能压缩文件, 不能压缩目录和符号链接
+
+compress    1.txt   #   压缩, 删除 1.txt 生成 1.txt.Z, 1.txt.Z 已存在时可选择是否覆盖
+compress -f 1.txt   #   压缩, 删除 1.txt 生成 1.txt.Z, 1.txt.Z 已存在时覆盖
+compress -r 1.txt   #   压缩, 递归
+compress -d 1.txt.Z # 解压缩, 删除 1.txt.Z 生成 1.txt
+uncompress  1.txt.Z # 解压缩, 删除 1.txt.Z 生成 1.txt
+
+## tar
+tar  acf 1.tgz                       ... # 打包并压缩, 根据后缀自动选择压缩类型, 1.tgz 已存在时, 会删除旧的
+tar vacf 1.tgz                       ... # 打包并压缩, 显示压缩过程
+tar  acf 1.tgz -X 1.txt              ... # 打包并压缩, 忽略 1.txt 内的文件
+tar  acf 1.tgz --exclude "1.txt"     ... # 打包并压缩, 忽略所有的 1.txt 文件
+tar  acf 1.tgz --exclude "*.txt"     ... # 打包并压缩, 忽略所有的  .txt 结尾的文件, 使用通配符
+tar  acf 1.tgz --exclude "123/1.txt" ... # 打包并压缩, 忽略所有的 123 目录下的 1.txt, 包括 test/123 目录下的 1.txt
+tar  acf 1.tgz --exclude "123"       ... # 打包并压缩, 忽略所有的 123 目录, 包括 test/ 目录下的 123 目录
+tar   xf 1.tgz                           # 解压, 根据后缀自动选择压缩类型
+tar  vxf 1.tgz                           # 解压, 显示解压过程
+tar   xf 1.tgz -C ...                    # 解压, 指定解压目录
+tar   xf 1.tgz 1.txt                     # 解压部分文件, 需要从顶层路径开始
+tar   tf 1.tgz                           # 列出压缩包中的文件和目录, 根据后缀自动选择压缩类型
+tar  vtf 1.tgz                           # 列出压缩包中的文件和目录, 包括权限, 所属用户等, 类似 ls -l
+tar   tf 1.tgz 1.txt                     # 列出压缩包中的指定文件, 需要从顶层目录开始
+tar  --wildcards -xf 1.tgz "*.txt"       # 解压压缩包中的部分文件或目录, 使用通配符, * 可以匹配路径
+tar  --wildcards -tf 1.tgz "*.txt"       # 列出压缩包中的部分文件或目录, 使用通配符, * 可以匹配路径
+
+tar cf 1.tar ... # 打包
+tar xf 1.tar     # 解包
+tar tf 1.tar     # 查看包
+tar rf 1.tar ... # 添加包
+tar uf 1.tar ... # 更新包
+
+tar zcf 1.tgz ... # 打包并压缩 gzip
+tar zxf 1.tgz     # 解压并解包 gzip
+tar ztf 1.tgz     # 查看
+
+tar zcf 1.tar.gz ... # 打包并压缩 gzip
+tar zxf 1.tar.gz     # 解压并解包 gzip
+tar ztf 1.tar.gz     # 查看
+
+tar jcf 1.tar.bz2 ... # 打包并压缩 bz2
+tar jxf 1.tar.bz2     # 解压并解包 bz2
+tar jtf 1.tar.bz2     # 查看
+
+tar Zcf 1.Z ... # 打包并压缩 compress
+tar Zxf 1.Z     # 解压并解包 compress
+tar Ztf 1.Z     # 查看
+
