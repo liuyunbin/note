@@ -303,9 +303,6 @@ redis flushdb
 
 rz          #  windows 向 虚拟机  发送数据
 
-od -Ax  -tx1z 1.c # 每组一个字节, 显示十六进制
-od      -c    1.c # 每组一个字节, 显示字符
-
 set -o nounset  # 使用未初始化的变量报错, 同 -u
 set -o errexit  # 只要发生错误就退出, 同 -e
 set -o pipefail # 只要管道发生错误就退出
@@ -322,9 +319,6 @@ trap ... ERR  # 发生错误退出时, 执行指定命令
 trap ... EXIT # 任意情况退出时, 执行指定命令
 
 cat lyb | xargs -i vim {} # 以此编辑 lyb 中的每一个文件
-
-xxd -g1 1.c # 每组一个字节, 显示十六进制
-xxd -b  1.c # 每组一个字节, 显示  二进制
 
 c++filt  a.out   # 可以解析动态库里的符号
 
@@ -415,10 +409,6 @@ getopts # -o 短选项, -l 长选项
         # 只能解析 -k, -k val, 不能解析 --bug, -kval
         # 只能区分有参数和无参数的情况
         # 参数带空格也能处理
-
-hd            1.c # 每组一个字节, 显示十六进制
-hexdump -C    1.c # 每组一个字节, 显示十六进制
-hexdump -c    1.c # 每组一个字节, 显示字符
 
 history
 

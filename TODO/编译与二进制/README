@@ -46,5 +46,3 @@ gdb> show print elements
 gdb> bt                    # 显示堆栈信息
 gdb> f     n               # 查看指定层的堆栈信息
 
-xxd -g1 1.c # 每组一个字节, 显示十六进制
-xxd -b  1.c # 每组一个字节, 显示  二进制
