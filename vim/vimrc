@@ -21,3 +21,5 @@ endfunction
 
 autocmd BufWritePre *.h,*.cc,*.cpp,*.c call Formatonsave()
 
+set fileencodings=ucs-bom,utf-8,gbk,big5,gb18030,latin1
+
