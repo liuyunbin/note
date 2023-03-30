@@ -4,4 +4,4 @@ PS1='\[\e[32m\]$(date "+%Y-%m-%d %H:%m:%S %z") \[\e[0m\]'
 note=~/GitHub/note
 
 alias c="cd $note && pwd"
-alias v='vim "+e ++enc=utf-8"'
+alias v=vim
