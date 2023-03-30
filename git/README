@@ -28,13 +28,14 @@ git branch -r                              # 查看远程分支
 git branch --set-upstream-to=orgin/develop # 本地分支和远程分支关联
 git branch -u orgin/develop                # 本地分支和远程分支关联
 
-git checkout    -- README             # 使用暂存区的 README 替换当前目录的 README
-git checkout HEAD~ README             # 使用 HEAD~ 的 README 替换当前目录和暂存区域 的 README
-git checkout    test-branch           #       切换分支
-git checkout -b test-branch           # 新建并切换分支
-git checkout --orphan test-branch     # 新建并切换到独立分支
-git checkout --track origin/serverfix # 新建并关联到远程分支
-git checkout serverfix                # 本地分支不存在, 且 远程分支存在, 新建并关联到远程分支
+git checkout    -- README                       # 使用暂存区的 README 替换当前目录的 README
+git checkout HEAD~ README                       # 使用 HEAD~ 的 README 替换当前目录和暂存区域 的 README
+git checkout    test-branch                     #       切换分支
+git checkout -b test-branch                     # 新建并切换分支
+git checkout --orphan test-branch               # 新建并切换到独立分支
+git checkout -b      serverfix origin/serverfix # 新建并关联到远程分支
+git checkout --track           origin/serverfix # 新建并关联到远程分支
+git checkout         serverfix                  # 本地分支不存在, 且 远程分支存在, 新建并关联到远程分支
 
 git clone https://github.com/liuyunbin/note # 克隆仓库
 git clone git@github.com:liuyunbin/note     # ssh 协议
@@ -138,9 +139,10 @@ git push origin --delete v1.0                   # 删除远程 标签
 git push orign feature/test -f                  # 强推本地分支
 git push origin --delete feature/test           # 删除远程分支
 
-git rebase master server-branch # 将 server-branch 分支变基到 master
-git rebase -i HEAD~6            # 之后，使用 f 取消掉不需要的内容，合并提交
-git rebase orign/develop        # 将 orign/develop 上的内容，变基到 当前分支
+git rebase master server-branch        # 将 server-branch 分支变基到 master
+git rebase -i HEAD~6                   # 之后，使用 f 取消掉不需要的内容，合并提交
+git rebase orign/develop               # 将 orign/develop 上的内容，变基到 当前分支
+git rebase --onto master server client # 将在 server 上存在, 不在 client 上的内容变基到 master
 
 git remote                          # 查看远程仓库
 git remote -v                       # 查看远程仓库
@@ -185,6 +187,14 @@ git rm          README # 从 暂存区域 和 本地目录 中移除文件, 如�
 git rm  -f      README # 从 暂存区域 和 本地目录 中移除文件, 如果该文件已修改 或 已暂存, 也会成功
 git rm --cached README # 从 暂存区域 中移除文件, 本地目录保留
 
+git show HEAD   # 展示指定提交
+git show HEAD^  # 展示指定提交的第一父提交
+git show HEAD^^ # 展示指定提交的第一父提交的第一父提交
+git show HEAD^2 # 展示指定提交的第二父提交, 用于 merge
+git show HEAD~  # 展示指定提交的第一父提交
+git show HEAD~~ # 展示指定提交的第一父提交的第一父提交
+git show HEAD~2 # 展示指定提交的第一父提交的第一父提交
+
 git stash                     # 贮藏工作
 git stash --keep-index        # 贮藏工作, 同时将暂存的内容存在索引内
 git stash --include-untracked # 贮藏工作, 同时贮藏未跟踪的文件, 不包括忽略的文件
@@ -197,8 +207,6 @@ git stash apply --index       # 恢复已贮藏的工作, 同时恢复暂存区
 git stash drop                # 丢弃贮藏区的工作
 git stash pop                 # 恢复已贮藏的工作, 并丢弃贮藏区的工作
 git stash                     # 保存当前状态
-git stash pop                 # 恢复保存的状态
-git stash list                # 查看已保存的状态
 
 git status         # 列出文件状态
 git status  -s     # 显示简短信息
