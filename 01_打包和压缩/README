@@ -1,5 +1,38 @@
 
-## 需要考虑的问题
+## 总结 -- 常用操作
+* 压缩时, 优先使用 tar, 其他命令的压缩一般用不到
+    * tar acf 1.tgz     ... # 根据后缀名称自动推测压缩算法
+    * tar zcf 1.tar.gz  ... # 打包并压缩 gzip
+    * tar jcf 1.tar.bz2 ... # 打包并压缩 bz2
+* 压缩时, 可以跳过指定文件
+    * tar acf 1.tgz --exclude  1.txt  ... # 跳过所有的   1.txt, 包括子目录里的
+    * tar acf 1.tgz --exclude "*.txt" ... # 跳过所有的以  .txt 结尾的文件, 包括子目录里的
+* 解压缩时, 可以指定解压缩的目录
+    * tar    xf 1.tgz     -C ... # 根据后缀名称自动推测压缩算法
+    * tar   zxf 1.tgz     -C ... # 解压缩 gzip
+    * tar   jxf 1.tar.bz2 -C ... # 解压缩 bz2
+    * unrar  x  1.rar        ... # rar
+    * unzip     1.zip     -d ... # zip
+* 解压缩时, 可以指定部分文件
+    * tar               xf 1.tgz      1.txt  # 只解压顶层路径的 1.txt
+    * tar  --wildcards -xf 1.tgz     "*.txt" # 解压所有以 .txt 结尾的文件, 包括子目录里的
+    * unzip                1.zip      1.txt  # 只解压顶层路径的 1.txt
+    * unzip                1.zip     "*.txt" # 解压所有以 .txt 结尾的文件, 包括子目录里的
+    * unrar              x 1.rar ...  1.txt  # 只解压顶层路径的 1.txt
+    * unrar              x 1.rar ... "*.txt" # 解压所有以 .txt 结尾的文件, 包括子目录里的
+* 查看压缩时, 可以指定部分文件
+    * tar               tf 1.tgz  1.txt  # 只查看顶层路径的 1.txt
+    * tar  --wildcards -tf 1.tgz "*.txt" # 解压所有以 .txt 结尾的文件, 包括子目录里的
+    * unzip             -l 1.zip  1.txt  # 只解压顶层路径的 1.txt
+    * unzip             -l 1.zip "*.txt" # 解压所有以 .txt 结尾的文件, 包括子目录里的
+    * unrar              l 1.rar  1.txt  # 只解压顶层路径的 1.txt
+    * unrar              l 1.rar "*.txt" # 解压所有以 .txt 结尾的文件, 包括子目录里的
+* tar xf 不一定所有情况都有效, 有些后缀不完全合法需要指定解压缩的格式
+    * tar zxf 1.tar.gz     # 解压并解包 gzip
+    * tar jxf 1.tar.bz2    # 解压并解包 bz2
+* tar 会覆盖旧文件, unzip 和 unrar 会让用户选择
+
+## 学习压缩命令需要考虑的问题
 1. 能否压缩目录, 符号链接
 2. 是否删除原文件
 3. 目标文件已存在时, 删除还是更新
@@ -78,11 +111,11 @@ gunzip   1.taz    # 删除 1.tag 生成 1.tar
 ## rar unrar
 可以压缩文件, 目录, 对于符号链接, 默认压缩符号链接所指向的文件(见 -ol)
 
-rar   a 1.rar ...  #   压缩, 如果 1.rar 已存在, 不会删除, 只会更新和添加
-unrar l 1.rar ...  # 列出压缩包信息, 简易
-unrar v 1.rar ...  # 列出压缩包信息, 详细
-unrar e 1.rar ...  # 解压缩到指定路径, 忽略压缩包内的路径
-unrar x 1.rar ...  # 解压缩到指定路径, 使用完整的压缩包路径
+rar   a 1.rar ...      #   压缩, 如果 1.rar 已存在, 不会删除, 只会更新和添加
+unrar l 1.rar ...      # 列出压缩包信息, 简易
+unrar v 1.rar ...      # 列出压缩包信息, 详细
+unrar e 1.rar ... ...  # 解压缩到指定路径, 忽略压缩包内的路径
+unrar x 1.rar ... ...  # 解压缩到指定路径, 使用完整的压缩包路径
 
 ## compress uncompress
 只能压缩文件, 不能压缩目录和符号链接
