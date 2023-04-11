@@ -10,7 +10,7 @@ set shiftwidth=4                      # 自动缩进使用的空格数量
 set softtabstop=4                     # 调整 缩进的 表现, 开启 expandtab 的时候, 此选项没用
 autocmd FileType make set noexpandtab # Makefile 不扩展 Tab
 
-set nobomb                            #  去掉 bomb
+set nobomb                            #  去掉 bomb, 在 vimrc 中不生效
 set   bomb                            #  添加 bomb
 
 set     encoding=utf-8     # vim 内部使用的编码, 一般用不到
