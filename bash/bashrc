@@ -4,7 +4,7 @@ PS1='\[\e[32m\]$(date "+%Y-%m-%d %H:%m:%S %z") \[\e[0m\]'
 note=~/GitHub/note
 
 alias c="cd $note && pwd"
-alias g="g++ -g -std=c++11 test.cc"
+alias g="g++ -g -std=c++11 "
 alias t="./a.out"
 alias v='vim -c "e ++enc=utf-8" -c "set nobomb"'
 alias x='tar zxf'
