@@ -1,6 +1,11 @@
 
 ## 大小端
-单元大小是多字节的类型, 存储的时候是先存储高字节, 还是低字节
+在内存和文件中存储单元大小是多字节类型的二进制时, 先存储高字节, 还是低字节
+
+## 涉及类型
+*   整形: short, int, long, long long
+* 浮点型: float, double, long double
+* 字符类: wchar_t, char16_t, char32_t
 
 ## 说明
 * 大端存储(网络字节序)
@@ -11,8 +16,8 @@
     * 高字节存储在内存的高字节
     * 方便类型转换, 比如 int => short
 
-## 涉及类型
-*   整形: short, int, long, long long
-* 浮点型: float, double, long double
-* 字符类: wchar_t, char16_t, char32_t
+## 应用场景
+* 网络传送, 需要网络字节序和本地字节序之间转换
+* 查看底层存储的字节
+* 使用共同体或类似的方法进行类型转换
 
