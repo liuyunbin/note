@@ -24,7 +24,7 @@
 测试: test.cc
 
 ## BOM
-* UTF-8 : 不需要 BOM
+* UTF-8 : 不需要 BOM (使用 vim 的 set nobomb 可以去掉 BOM)
 * UTF-16: 由 BOM 指定
 * UTF-32: 由 BOM 指定
 *    GBK: 不需要 BOM
