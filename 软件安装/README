@@ -1,5 +1,4 @@
 
-
 apt show    vim # 列出软件包的信息
 apt install vim # 安装软件包
 apt remove  vim # 卸载软件包
@@ -30,5 +29,4 @@ yum makecache            # 新建软件源缓存
 
 dpkg -L vim        # 列出 vim 软件包安装的全部文件
 dpkg --search /... # 查看该文件是哪个软件包安装的, 使用绝对路径
-
 
