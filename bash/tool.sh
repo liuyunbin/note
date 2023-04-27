@@ -4,15 +4,15 @@ set -o errexit  # 只要发生错误就退出
 set -o pipefail # 只要管道发生错误就退出
 
 function log_info() {
-    echo -e "\033[00m$(date +'%F %T') $@\033[0m" > /dev/tty # 默认颜色
+    echo -e "\033[00m$(date +'%Y-%m-%d %H:%m:%S %z') $@\033[0m" > /dev/tty # 默认颜色
 }
 
 function log_warn() {
-    echo -e "\033[33m$(date +'%F %T') $@\033[0m" > /dev/tty # 黄色
+    echo -e "\033[33m$(date +'%Y-%m-%d %H:%m:%S %z') $@\033[0m" > /dev/tty # 黄色
 }
 
 function log_erro() {
-    echo -e "\033[31m$(date +'%F %T') $@\033[0m" > /dev/tty # 红色
+    echo -e "\033[31m$(date +'%Y-%m-%d %H:%m:%S %z') $@\033[0m" > /dev/tty # 红色
     exit -1
 }
 
@@ -26,7 +26,7 @@ function do_ps() {
 
     ps -o etimes,ruser:10,pid,nlwp,cmd --sort=-etime --no-headers -p $argv | awk '
         {
-            $1 = strftime("%Y-%m-%d %H:%M:%S", systime() - $1)
+            $1 = strftime("%Y-%m-%d %H:%M:%S %z", systime() - $1)
             cmd = ""
             for (i = 5; i <= NF; ++i)
                 cmd=cmd" "$i
@@ -39,7 +39,7 @@ function do_lastlog() {
         NR > 1 && NF > 6 {
             user = $1
             time = $(NF-5) FS $(NF-4) FS $(NF-3) FS $(NF-2) FS $(NF-1) FS $NF
-            cmd = "date -d\""time"\" +\"%F %T\""
+            cmd = "date -d\""time"\" +\"%Y-%m-%d %H:%M:%S %z\""
             cmd | getline time
             close(cmd)
             printf "%s => %s\n", time, user
