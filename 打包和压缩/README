@@ -7,7 +7,7 @@
     * tar acf 1.tgz     ... # 根据后缀名称自动推测压缩算法
     * tar zcf 1.tar.gz  ... # 打包并压缩 gzip
     * tar jcf 1.tar.bz2 ... # 打包并压缩 bz2
-* 压缩时, 可以跳过指定文件
+* 压缩时, 可以跳过指定文件或目录
     * tar acf 1.tgz --exclude  1.txt  ... # 跳过所有的   1.txt, 包括子目录里的
     * tar acf 1.tgz --exclude "*.txt" ... # 跳过所有的以  .txt 结尾的文件, 包括子目录里的(不存在文件名 *.txt)
 * 解压缩时, 可以指定解压缩的目录
