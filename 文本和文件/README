@@ -206,12 +206,12 @@ ls -clt      # 使用 ctime 排序和展示, 新 -> 旧
 ls -tl       # 使用 mtime 排序和展示, 新 -> 旧
 ls -ult      # 使用 atime 排序和展示, 新 -> 旧
 
-ls --time-style='+%Y-%m-%d %H:%m:%S %z' -lhrtu # 以 文件访问时间     排序, 不准确
-ls --time-style='+%Y-%m-%d %H:%m:%S %z' -lhrtc # 以 文件属性修改时间 排序
-ls --time-style='+%Y-%m-%d %H:%m:%S %z' -lhrt  # 以 文件内容修改时间 排序
-ls --time-style='+%Y-%m-%d %H:%m:%S %z' -lhrtd # 以 文件内容修改时间 排序, 只列出目录本身
-ls --time-style='+%Y-%m-%d %H:%m:%S %z' -lhrS  # 以 文件大小         排序
-ls --time-style='+%Y-%m-%d %H:%m:%S %z' -lhrv  # 以 文件名为版本号   排序
+ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtu # 以 文件访问时间     排序, 不准确
+ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtc # 以 文件属性修改时间 排序
+ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrt  # 以 文件内容修改时间 排序
+ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtd # 以 文件内容修改时间 排序, 只列出目录本身
+ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrS  # 以 文件大小         排序
+ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrv  # 以 文件名为版本号   排序
 
 md5sum 1.txt # MD5 检验
 
