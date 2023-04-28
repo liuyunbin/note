@@ -1,9 +1,7 @@
 
-rz          #  windows 向 虚拟机  发送数据
-
+## 定期执行命令
 crontab -l # 查询任务表
 crontab -e # 编辑任务表
-crontab -r # 删除任务表
            # 格式为: 分钟 小时 日 月 星期 执行的程序
            # *     : 每分钟执行
            # 1-3   : 1 到 3分钟内执行
@@ -11,8 +9,55 @@ crontab -r # 删除任务表
            # 1-10/3: 1-10 分钟内, 每 3 分钟执行
            # 1,3,5 : 1,3,5 分钟执行
            # crontab 不会自动执行 .bashrc, 如果需要, 需要在脚本中手动执行
+crontab -r # 删除任务表
 
-curl -I ... # 只打印头部信息
+flock    1.c ls # 设置文件互斥锁 执行命令, 设置锁失败, 等待
+flock -n 1.c ls # 设置文件互斥锁 执行命令, 设置锁失败, 退出
+
+脚本内使用, 保证脚本最多执行一次
+[[ "$FLOCKER" != "$0" ]] && exec env FLOCKER="$0" flock -en "$0" "$0" "$@" || :
+
+解释:
+1. 第一次进入脚本, 由于变量未设置, 会执行 exec
+2. 调用 exec, 使用 env 设置 变量名
+3. 执行 flock, 重新执行这个脚本, 执行完脚本后会退出, 不会执行之后的命令
+    * 使用脚本名作为 文件锁, 脚本名使用绝对路径, 所以不会重复
+4. 第二次进入脚本, 由于变量已设置, 直接往下执行就可以了
+5. 在此期间, 如果, 有其他脚本进入, 文件锁获取失败, 就直接退出了
+
+## 系统
+df   -Th    # 文件系统挂载情况
+du   -sh .  # 目录整体大小
+free -h     # 内存使用情况
+
+ulimit              # 限制资源使用, 包括:
+                    #   内存, 虚拟内存, CPU
+                    #   进程数, 线程数
+                    #   文件锁数, 文件描述符数, 写入文件大小
+                    #   待处理的信号数
+                    #   core 文件大小
+                    # 也可指定是硬限制还是软限制
+ulimit -a           # 列出资源的限制
+ulimit -c unlimited # 允许 core 文件
+
+uname -a # 全部信息
+uname -m # x86_64 等
+uname -r # 内核版本
+
+uptime -s # 列出系统启动时间
+
+rz          #  windows 向 虚拟机  发送数据
+sz          #  虚拟机  向 windows 发送数据
+
+systemctl start      nginx   # 启动 nginx
+systemctl stop       nginx   # 停止 nginx
+systemctl restart    nginx   # 重启 nginx
+systemctl status     nginx   # 查看 nginx 状态
+systemctl enable     nginx   # 开机自动启动 nginx
+systemctl disable    nginx   # 开机禁止启动 nginx
+systemctl is-active  nginx   # 查看 nginx 是否启动成功
+systemctl is-failed  nginx   # 查看 nginx 是否启动失败
+systemctl is-enabled nginx   # 查看 nginx 是否开机启动
 
 docker run ubuntu:15.10 -d --name "lyb"           # 启动 docker, 给起一个名字
 docker run ubuntu:15.10 -d --net=host             # 主机和 docker 共享 IP 和 端口号
@@ -28,6 +73,75 @@ docker stop     容器ID     # 停止容器
 docker restart  容器ID     # 重新启动容器
 docker rm -f    容器ID     # 删除容器
 docker exec     容器ID ls  # 对于在后台运行的容器, 执行命令
+
+## 网络
+* [0, 1024)      公认端口号, 需要 root 启动, 比如 80
+* [1024, 32768)  注册端口, 可以自己注册一些常用服务
+* [32768, 60990) 动态端口, 进程未指定端口号时, 将从这个范围内获取一个端口号
+                 可通过文件 /proc/sys/net/ipv4/ip_local_port_range 获取
+* [60990, 65535)
+
+netstat  -- 已过时, 被 ss       替代
+ifconfig -- 已过时, 被 ip addr  替代
+route    -- 已过时, 被 ip route 替代
+
+ss       # 显示已连接的 UDP, TCP, unix domain sockets
+ss -x    # unix domain sockets
+ss -u    #          UDP
+ss -t    # 已连接的 TCP
+ss -tl   #   监听的 TCP
+ss -ta   # 已连接和监听的 TCP
+ss -tln  # 服务使用数字而不是名称
+ss -tlnp # 列出监听的服务, 需要 root 权限
+ss -s    # 显示统计
+ss src   192.168.198.128:22  # 通过源  IP和端口号筛选信息
+ss dst   192.168.198.1:51932 # 通过目的IP和端口号筛选信息
+ss sport OP 22               # 通过源  端口号过滤数据
+ss dport OP 22               # 通过目的端口号过滤数据
+                             # OP 可以是空, >(gt) >=(ge) <(lt) <=(le) ==(eq) !=(ne), 注意转义
+
+ip a                     # 显示网卡信息
+ip addr    show          # 显示指定网卡信息
+ip address show dev   lo # 显示指定网卡信息
+ip address add 192.268.1.10 dev eth0 # 添加 IP 地址
+ip address del 192.268.1.10 dev eth0 # 删除 IP 地址
+
+ip link set dev eth0 multicast on  # 启用组播
+ip link set dev eth0 multicast off # 禁用组播
+ip link set dev eth0 up            # 启用网卡
+ip link set dev eth0 down          # 禁用网卡
+ip link set dev eth0 arp       on  # 启用 arp 解析
+ip link set dev eth0 arp       off # 禁用 arp 解析
+ip link set dev eth0 mtu      1500 # 设置最大传输单元
+ip link set dev eth0 address  ...  # 设置 MAC 地址
+
+ip route       # 路由信息
+ip route show  # 路由信息
+ip route get   # 查看指定 IP 的路由信息
+ip route add   # 添加路由
+ip route chage # 修改路由
+ip route flush # 情况路由信息
+
+ip neighbour  # 查看 arp 协议
+
+ip -s link         # 查看统计信息
+ip -s link ls eth0 # 查看统计信息, 指定网卡
+
+ip maddr  # 广播
+ip rule   # 路由策略, 和网卡有关
+ip tunnel # 隧道
+
+nc
+                   # lsof -- sudo yum install lsof
+lsof -iTCP         # 查看 TCP 信息
+lsof -i :22        # 查看指定 端口号 的信息
+lsof -i@1.2.3.4:22 # 查看是否连接到指定 IP 和 端口号上
+lsof -p 1234       # 指定 进程号
+lsof -d 0,1,2,3    # 指定 文件描述符
+lsof -t            # 仅获取进程ID
+
+# 查询 域名 对应 的 IP
+* nslookup baidu.com
 
 firewall-cmd --list-ports                       # 查看所有打开的端口
 firewall-cmd --list-services                    # 查看所有打开的服务
@@ -50,157 +164,5 @@ firewall-cmd --add-forward-port=proto=80:proto=tcp:toaddr=192.168.0.1:toport=808
                                                 # 端口转发, 永久生效, 需要重新加载配置
 firewall-cmd --runtime-to-permanent             # 将当前防火墙的规则永久保存
 
-free -h                 # 内存使用情况
+curl -I ... # 只打印头部信息
 
-ss -ntp | grep 9100
-
-ssh -N -D A_PORT B_IP
-            # 功能:
-            #   动态端口转发
-            #   将本地到 A_PORT 的请求转发到 B_IP
-            #   使用 SOCKS5 协议
-ssh -N -L A_PORT:C_IP:C_PORT B_IP
-            # 功能:
-            #   本地端口转发
-            # 目标:
-            #    A_IP:A_PORT --> C_IP:C_PORT
-            # 现状:
-            #    A_IP --> C_IP 失败
-            #    B_IP --> C_IP 成功
-            #    A_IP --> B_IP 成功
-            #    B_IP --> A_IP 成功 或 失败都行
-            # 实现:
-            #   * 在 A_IP 机器上执行: ssh -N -L A_PORT:C_IP:C_PORT B_IP
-            #   * 发往 A_IP 机器的端口号 A_PORT 的请求, 经由 B_IP 机器, 转发到 C_IP 机器的 C_PORT 端口
-            #   * 即: A_IP:A_PORT --> B_IP --> C_IP:C_PORT
-ssh -N -R A_PORT:C_IP:C_PORT A_IP
-            # 功能:
-            #   远程端口转发
-            # 目标:
-            #    A_IP:A_PORT --> C_IP:C_PORT
-            # 现状:
-            #    A_IP --> C_IP 失败
-            #    B_IP --> C_IP 成功
-            #    A_IP --> B_IP 成功 或 失败都行
-            #    B_IP --> A_IP 成功
-            # 实现:
-            #   * 在 B_IP 机器上执行: ssh -N -R A_PORT:C_IP:C_PORT A_IP
-            #   * 发往 A_IP 机器的端口号 A_PORT 的请求, 经由 B_IP 机器, 转发到 C_IP 机器的 C_PORT 端口
-            #   * 即: A_IP:A_PORT --> B_IP --> C_IP:C_PORT
-            #   * 如果要支持其他主机通过 A_IP 访问 C_IP, 需要在 A_IP 的 ssh 配置 GatewayPorts
-ssh -N             # 不登录 shell, 只用于端口转发
-ssh -p port        # 指定服务器端口号
-ssh -f             # 在后台运行
-ssh -t             # 开启交互式 shell
-ssh -C             # 压缩数据
-ssh -F             # 指定配置文件
-ssh -q             # 不输出任何警告信息
-ssh -l lyb 1.2.3.4
-ssh        1.2.3.4
-ssh    lyb@1.2.3.4
-ssh -i ~/.ssh/id_rsa lyb # 指定私钥文件名
-
-ssh-keygen -t rsa              # 指定密钥算法, 默认就是 rsa
-ssh-keygen -b 1024             # 指定密钥的二进制位数
-ssh-keygen -C username@host    # 指定注释
-ssh-keygen -f lyb              # 指定密钥的文件
-ssh-keygen -R username@host    # 将 username@host 的公钥移出 known_hosts 文件
-
-ssh-copy-id -i ~/id_rsa username@host # 添加公钥到服务器中的 ~/.ssh/authorized_keys
-                                      # -i 未指定时, 将使用 ~/.ssh/id_rsa.pub
-
-#### ssh 客户端的常见配置: ~/.ssh/config, /etc/ssh/ssh_config, man ssh_config
-Host *                          # 对所有机器都生效, 使用 通配符, 配置直到下一个 host
-Host 123                        # 可以起一个别名
-HostName 1.2.3.4                # 远程主机
-Port 2222                       # 远程端口号
-BindAddress 192.168.10.235      # 本地 IP
-User lyb                        # 用户名
-IdentityFile ~/.ssh/id.rsa      # 密钥文件
-                                # 此时, 使用 ssh 123 相当于使用 ssh -p 2222 lyb@1.2.3.4
-DynamicForward 1080             # 指定动态转发端口
-LocalForward  1234 1.2.3.4:5678 # 指定本地端口转发
-RemoteForward 1234 1.2.3.4:5678 # 指定远程端口转发
-
-#### ssh 服务端的常见配置: /etc/ssh/sshd_config, man sshd_config
-AllowTcpForwarding yes     # 是否允许端口转发, 默认允许
-ListenAddress 1.2.3.4      # 监听地址
-PasswordAuthentication     # 指定是否允许密码登录，默认值为 yes
-Port 22                    # 监听端口号
-GatewayPorts no            # 远程转发时, 是否允许其他主机使改端口号, 默认不允许
-
-systemctl start      nginx   # 启动 nginx
-systemctl stop       nginx   # 停止 nginx
-systemctl restart    nginx   # 重启 nginx
-systemctl status     nginx   # 查看 nginx 状态
-systemctl enable     nginx   # 开机自动启动 nginx
-systemctl disable    nginx   # 开机禁止启动 nginx
-systemctl is-active  nginx   # 查看 nginx 是否启动成功
-systemctl is-failed  nginx   # 查看 nginx 是否启动失败
-systemctl is-enabled nginx   # 查看 nginx 是否开机启动
-
-sz          #  虚拟机  向 windows 发送数据
-
-netstat
-nc
-ss
-                   # lsof -- sudo yum install lsof
-lsof -iTCP         # 查看 TCP 信息
-lsof -i :22        # 查看指定 端口号 的信息
-lsof -i@1.2.3.4:22 # 查看是否连接到指定 IP 和 端口号上
-lsof -p 1234       # 指定 进程号
-lsof -d 0,1,2,3    # 指定 文件描述符
-lsof -t            # 仅获取进程ID
-
-ulimit              # 限制资源使用, 包括:
-                    #   内存, 虚拟内存, CPU
-                    #   进程数, 线程数
-                    #   文件锁数, 文件描述符数, 写入文件大小
-                    #   待处理的信号数
-                    #   core 文件大小
-                    # 也可指定是硬限制还是软限制
-ulimit -a           # 列出资源的限制
-ulimit -c unlimited # 允许 core 文件
-
-uname -a # 全部信息
-uname -m # x86_64 等
-uname -r # 内核版本
-
-uptime -s # 列出系统启动时间
-
-nohup sleep 1000 & # 脱离终端, 在后台运行
-read name     # 读取, 如果参数值小于字段数, 多余的值放入最后一个字段
-redis flushdb
-
-rz          #  windows 向 虚拟机  发送数据
-
-#### 查看 Linux 临时端口号的范围
-```
-cat /proc/sys/net/ipv4/ip_local_port_range
-32768   60999
-``
-
-* [0, 1024) 公认端口号, 需要 root 启动, 比如 80
-* [1024, 32768) 注册端口, 可以自己注册一些常用服务
-* [32768, 60990) 动态端口, 进程未指定端口号时, 将从这个范围内获取一个端口号
-* [60990, 65535)
-
-# 查询 域名 对应 的 IP
-* nslookup baidu.com
-
-flock    1.c ls # 设置文件互斥锁 执行命令, 设置锁失败, 等待
-flock -n 1.c ls # 设置文件互斥锁 执行命令, 设置锁失败, 退出
-
-脚本内使用, 保证脚本最多执行一次
-[[ "$FLOCKER" != "$0" ]] && exec env FLOCKER="$0" flock -en "$0" "$0" "$@" || :
-
-解释:
-1. 第一次进入脚本, 由于变量未设置, 会执行 exec
-2. 调用 exec, 使用 env 设置 变量名
-3. 执行 flock, 重新执行这个脚本, 执行完脚本后会退出, 不会执行之后的命令
-    * 使用脚本名作为 文件锁, 脚本名使用绝对路径, 所以不会重复
-4. 第二次进入脚本, 由于变量已设置, 直接往下执行就可以了
-5. 在此期间, 如果, 有其他脚本进入, 文件锁获取失败, 就直接退出了
-
-ip addr
-ip route
