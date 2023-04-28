@@ -1,0 +1,4 @@
+{
+    getline str;
+    print str
+}

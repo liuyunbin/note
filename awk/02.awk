@@ -1,0 +1,4 @@
+{
+    getline;
+    print $0
+}
