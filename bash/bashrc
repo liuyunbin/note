@@ -1,16 +1,16 @@
 
-PS1='\[\e[32m\]$(date "+%Y-%m-%d %H:%m:%S %z") \[\e[0m\]'
+PS1='\[\e[32m\]$(date "+%Y-%m-%d %H:%M:%S %z") \[\e[0m\]'
 
 note=~/GitHub/note
 
 PATH="$PATH:$note/bash"
 
-alias lsa="ls --time-style='+%Y-%m-%d %H:%m:%S %z' -lhrtu" # 以 文件访问时间     排序, 不准确
-alias lsc="ls --time-style='+%Y-%m-%d %H:%m:%S %z' -lhrtc" # 以 文件属性修改时间 排序
-alias lsm="ls --time-style='+%Y-%m-%d %H:%m:%S %z' -lhrt"  # 以 文件内容修改时间 排序
-alias lsd="ls --time-style='+%Y-%m-%d %H:%m:%S %z' -lhrtd" # 以 文件内容修改时间 排序, 只列出目录本身
-alias lss="ls --time-style='+%Y-%m-%d %H:%m:%S %z' -lhrS"  # 以 文件大小         排序
-alias lsv="ls --time-style='+%Y-%m-%d %H:%m:%S %z' -lhrv"  # 以 文件名为版本号   排序
+alias lsa="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtu" # 以 文件访问时间     排序, 不准确
+alias lsc="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtc" # 以 文件属性修改时间 排序
+alias lsm="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrt"  # 以 文件内容修改时间 排序
+alias lsd="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtd" # 以 文件内容修改时间 排序, 只列出目录本身
+alias lss="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrS"  # 以 文件大小         排序
+alias lsv="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrv"  # 以 文件名为版本号   排序
 
 alias c="cd $note && pwd"
 alias g="g++ -g -std=c++11 "
