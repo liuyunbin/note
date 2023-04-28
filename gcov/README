@@ -4,30 +4,28 @@
 ### 使用
 
 #### 1. 设置环境变量
-* 修改 `*.gcda` 的输出路径, 将 路径中的前 `GCOV_PREFIX_STRIP` 层删掉
-* 并用 `GCOV_PREFIX` 作为前缀补充
+* 修改 *.gcda 的输出路径, 将 路径中的前 GCOV_PREFIX_STRIP 层删掉
+* 并用 GCOV_PREFIX 作为前缀补充
 
-```
 export GCOV_PREFIX=$(pwd)
 export GCOV_PREFIX_STRIP=6
-```
 
 #### 2. 编译
-	g++ -fprofile-arcs -ftest-coverage -o test_gcov -lgcov main.cc
+g++ -fprofile-arcs -ftest-coverage -o test_gcov -lgcov main.cc
 
-此步, 将生成 `*.gcno`
+此步, 将生成 *.gcno
 
 #### 3. 重置统计数据
-    lcov --zerocounters
+lcov --zerocounters
 
 #### 4. 执行可执行文件
-此步, 将生成 `*.gcda`
+此步, 将生成 *.gcda
 
 #### 5. 生成 info 文件
-	lcov --directory . --capture --output-file gcov.info
+lcov --directory . --capture --output-file gcov.info
 
 #### 6. 生成 html 文件
-	genhtml -o html gcov.info
+genhtml -o html gcov.info
 
 ### lcov 常见命令
 * -c, --capture     收集统计信息
