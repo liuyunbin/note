@@ -1,27 +1,7 @@
 
-#include <setjmp.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
-#include <iostream>
-#include <map>
-#include <string>
+#include "log.h"
 
 int count = 0;
-
-std::string get_time() {
-    time_t now = time(NULL);
-    struct tm* info = localtime(&now);
-    char buf[1024];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", info);
-    return buf;
-}
-
-void log(const std::string& msg = "") {
-    std::cout << get_time() << " " << getpid() << " " << msg << std::endl;
-}
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
     log("捕获信号 SIGUSR1 第 " + std::to_string(++count) + " 次");
