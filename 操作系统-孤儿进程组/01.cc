@@ -1,25 +1,5 @@
 
-#include <signal.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
-#include <iostream>
-#include <map>
-#include <string>
-
-std::string get_time() {
-    time_t now = time(NULL);
-    struct tm* info = localtime(&now);
-    char buf[1024];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", info);
-    return buf;
-}
-
-void log(const std::string& msg = "") {
-    std::cout << get_time() << " " << getpid() << " " << msg << std::endl;
-}
+#include "log.h"
 
 std::map<int, std::string> m;
 void init() {
@@ -38,7 +18,9 @@ void set_signal() {
     act.sa_sigaction = handle_signal;
     sigemptyset(&act.sa_mask);
     act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
-    for (auto key : m) sigaction(key.first, &act, NULL);
+    for (auto key : m) {
+        sigaction(key.first, &act, NULL);
+    }
 }
 
 int main() {
