@@ -1,40 +1,5 @@
 
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
-#include <iostream>
-#include <map>
-#include <string>
-
-std::string get_time() {
-    time_t now = time(NULL);
-    struct tm* info = localtime(&now);
-    char buf[1024];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", info);
-    return buf;
-}
-
-void log(const std::string& msg = "") {
-    std::cout << get_time() << " " << getpid() << " " << msg << std::endl;
-}
-
-void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
-    int fd = waitpid(-1, NULL, WNOHANG);
-    if (fd > 0) {
-        log("已退出的子进程是: " + std::to_string(fd));
-    }
-}
-
-void set_signal() {
-    struct sigaction act;
-    act.sa_sigaction = handle_signal;
-    act.sa_flags = SA_SIGINFO;
-    sigemptyset(&act.sa_mask);
-    sigaction(SIGCHLD, &act, NULL);
-}
+#include "log.h"
 
 int main() {
     log("测试僵尸进程");
@@ -42,7 +7,7 @@ int main() {
     log();
 
     log("设置 SIGCHLD 处理为: 调用 waitpid() 一次");
-    set_signal();
+    set_signal(handle_signal_2);
 
     log("阻塞信号 SIGCHLD");
     sigset_t mask;

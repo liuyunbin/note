@@ -1,24 +1,5 @@
 
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
-#include <iostream>
-#include <map>
-#include <string>
-
-std::string get_time() {
-    time_t now = time(NULL);
-    struct tm* info = localtime(&now);
-    char buf[1024];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", info);
-    return buf;
-}
-
-void log(const std::string& msg = "") {
-    std::cout << get_time() << " " << getpid() << " " << msg << std::endl;
-}
+#include "log.h"
 
 int main() {
     log("测试预防僵尸进程");
@@ -36,6 +17,7 @@ int main() {
                 ;
         } else if (fork() == 0) {
             // 测试的控制进程
+            log("控制进程启动");
             sleep(1);
             log("子进程状态");
             system(cmd.data());

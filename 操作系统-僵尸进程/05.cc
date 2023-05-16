@@ -1,36 +1,5 @@
 
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
-#include <iostream>
-#include <map>
-#include <string>
-
-std::string get_time() {
-    time_t now = time(NULL);
-    struct tm* info = localtime(&now);
-    char buf[1024];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", info);
-    return buf;
-}
-
-void log(const std::string& msg = "") {
-    std::cout << get_time() << " " << getpid() << " " << msg << std::endl;
-}
-
-void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
-}
-
-void set_signal() {
-    struct sigaction act;
-    act.sa_sigaction = handle_signal;
-    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
-    sigemptyset(&act.sa_mask);
-    sigaction(SIGCHLD, &act, NULL);
-}
+#include "log.h"
 
 int main() {
     log("测试预防僵尸进程");
@@ -38,7 +7,7 @@ int main() {
     log();
 
     log("设置 SIGCHLD 的信号处理");
-    set_signal();
+    set_signal(handle_signal_1, SA_SIGINFO | SA_NOCLDWAIT);
 
     log("阻塞信号 SIGCHLD");
     sigset_t mask;
