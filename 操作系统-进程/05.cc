@@ -1,24 +1,5 @@
 
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
-#include <iostream>
-#include <map>
-#include <string>
-
-std::string get_time() {
-    time_t now = time(NULL);
-    struct tm* info = localtime(&now);
-    char buf[1024];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", info);
-    return buf;
-}
-
-void log(const std::string& msg = "") {
-    std::cout << get_time() << " " << getpid() << " " << msg << std::endl;
-}
+#include "log.h"
 
 void handle_signal(int sig) { log("捕捉到信号 SIGUSR1"); }
 
@@ -33,7 +14,7 @@ int main() {
         for (;;)
             ;
     } else {
-        sleep(2);
+        sleep(1);
         log("使子进程暂停");
         kill(fd, SIGSTOP);
         sleep(1);
