@@ -25,25 +25,6 @@ atime # 内容读取时间, 更新可能不及时
 mtime # 内容修改时间
 ctime # 状态修改时间: 内容 名称 权限 所属者 所属组
 
-## 查看文件时间
-stat -c %w # 列出 birth 人类可读形式
-stat -c %W # 列出 birth 距离 Epoch 的秒数
-stat -c %x # 列出 atime 人类可读形式
-stat -c %X # 列出 atime 距离 Epoch 的秒数
-stat -c %y # 列出 mtime 人类可读形式
-stat -c %Y # 列出 mtime 距离 Epoch 的秒数
-stat -c %z # 列出 ctime 人类可读形式
-stat -c %Z # 列出 ctime 距离 Epoch 的秒数
-
-## 修改文件时间
-touch        1.c # 修改 atime mtime ctime
-touch -a     1.c # 修改 atime
-touch -m     1.c # 修改       mtime ctime
-touch -r 2.c 1.c # 以 2.c 的时间修改 1.c
-touch -d ... 1.c # 指定时间, 格式同 date
-touch -t ... 1.c # 指定时间
-                 # 依次是: 时区-年-月-日-时-分-秒
-
 ## 文件权限
 * 读, 写, 执行
 * SUID:
@@ -259,19 +240,29 @@ sort -u         # 重复项只输出一次
 sort -V         # 以版本号排序
 sort lyb -o lyb # 排序并存入原文件
 
-stat    1.c # 列出 birth atime mtime ctime
-stat -L 1.c # 符号链接所指向的文件, 而不是符号链接本身
+               # 查看文件时间
+stat       1.c # 列出 birth atime mtime ctime
+stat -L    1.c # 符号链接所指向的文件, 而不是符号链接本身
+stat -c %w 1.c # 列出 birth 人类可读形式
+stat -c %W 1.c # 列出 birth 距离 Epoch 的秒数
+stat -c %x 1.c # 列出 atime 人类可读形式
+stat -c %X 1.c # 列出 atime 距离 Epoch 的秒数
+stat -c %y 1.c # 列出 mtime 人类可读形式
+stat -c %Y 1.c # 列出 mtime 距离 Epoch 的秒数
+stat -c %z 1.c # 列出 ctime 人类可读形式
+stat -c %Z 1.c # 列出 ctime 距离 Epoch 的秒数
 
 tail -f * # 动态查看新增内容
 
 tee    1.txt # 管道中把文件拷贝到文件
 tee -a 1.txt # 管道中把文件添加到文件
 
+                 # 修改文件时间
 touch        1.c # 修改 atime mtime ctime
 touch -a     1.c # 修改 atime
-touch -m     1.c # 修改       mtime ctime
 touch -c     1.c # 文件不存在时, 不创建文件
 touch -h     1.c # 改变符号链接本身, 而不是所指向的文件
+touch -m     1.c # 修改       mtime ctime
 touch -r 2.c 1.c # 以 2.c 的时间修改 1.c
 touch -d ... 1.c # 指定时间, 格式同 date
 touch -t ... 1.c # 指定时间
