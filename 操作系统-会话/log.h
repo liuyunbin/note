@@ -14,7 +14,7 @@ std::string get_time() {
     time_t now = time(NULL);
     struct tm* info = localtime(&now);
     char buf[1024];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", info);
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
     return buf;
 }
 
@@ -38,19 +38,4 @@ void test() {
     }
     log(msg);
     log(getpid());
-}
-
-int main() {
-    signal(SIGCHLD, SIG_IGN);
-
-    log("测试会话");
-    log();
-
-    log("测试进程组的首进程建立新会话");
-    test();
-    log();
-
-    log("主进程退出");
-
-    return 0;
 }
