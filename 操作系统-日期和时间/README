@@ -39,34 +39,35 @@
 * 总共 24 个时区
 * 相邻时区相差一个小时
 
-
-
-
-
+## 配置
 /etc/default/locale -- 修改系统显示
 
-
-ntpdate -s time-b.nist.gov # 使用时间服务器更新时间
-date "+%Y-%m-%d %H:%M:%S"   # 输出: 年-月-日 时-分-秒
-date "+%Y-%m-%d %H:%M"      # 输出: 年-月-日 时-分
-date "+%s"                  # 输出: 时间戳
-date -d "20200202 01:01:01" # 使用: 指定输入日期
-date -d "@...."             # 使用: 时间戳
-date -r 1.c                 # 使用: 文件的 mtime
-date -s "20200202 10:10:10" # 更新系统时间, 需要 root
-
-
-### 基本函数
-* time(time_t*) 计算 基于 1970-01-01 00:00:00 +0000 utc 的时间戳
+## 常用函数
+* time(time_t*)  计算 基于 1970-01-01 00:00:00 +0000 utc 的时间戳 -- 常用
 * struct tm*    gmtime(const time_t*)                           时间戳   --> 时间元组, +0000 utc
 * struct tm* localtime(const time_t*)                           时间戳   --> 时间元组, 本地时间
 * char *         ctime(const time_t*)                           时间戳   --> 字符串
 * char *  asctime(const struct tm *tm)                          时间元组 --> 字符串
-* size_t strftime(char*, size_t, const char*, const struct tm*) 时间元组 --> 字符串, 可以指的格式
+* size_t strftime(char*, size_t, const char*, const struct tm*) 时间元组 --> 字符串, 可以指定格式
 * time     mktime(struct tm *tm)                                时间元组 --> 字符戳
 * char *strptime(const char*, const char*, struct tm*)          字符串   --> 时间元组
+* double difftime(time_t time1, time_t time0);                  两个时间戳的差值
 
+time() => localtime() => strftime(): 时间戳 => 时间元组 => 字符串形式
+strptime() => mktime()             : 字符串形式 => 时间元组 => 时间戳
 
+## 常用命令
+* ntpdate -s time-b.nist.gov # 使用时间服务器更新时间
+* date "+%Y-%m-%d %H:%M:%S %z"   # 输出: 年-月-日 时-分-秒 时区
+* date "+%s"                  # 输出: 时间戳
+* date -d "20200202 01:01:01" # 使用: 指定输入日期
+* date -d "10 years"          # 十年以后
+* date -d "10 year"           # 十年以后
 
+* date -d "10 days"           # 十天以后
+* date -d "10 day"            # 十天以后
 
-double difftime(time_t time1, time_t time0);
+* date -d "@...."             # 使用: 时间戳
+* date -r 1.c                 # 使用: 文件的 mtime
+* date -s "20200202 10:10:10" # 更新系统时间, 需要 root
+
