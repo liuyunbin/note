@@ -1,5 +1,5 @@
 
-# 进程(PID)(任务控制的基本单位)
+# 操作系统-进程(PID)(任务控制的基本单位)
 ## 新建进程
 * fork(): 父子进程的执行顺序不确定
 * vfork(): 在子进程退出或执行exec之前, 父进程处于不可被信号打断的休眠状态
@@ -96,7 +96,6 @@
 * 退出(X)
 
 ## proc 文件
-```
 /proc/loadavg     # 系统负载
 /proc/cpuinfo     # cpu 信息
 /proc/uptime      # 运行时间
@@ -112,10 +111,8 @@
 /proc/PID/fd      # 进程所打开的文件描述符
 /proc/PID/limits  # 进程对各种资源的限制
 /proc/PID/task    # 进程使用的线程情况
-```
 
 ## 常用命令
-```
 kill         pid # 通过进程ID发送信号给进程或进程组
 kill -signal pid # 指定信号，默认值为 SIGTERM
 kill -l          # 列出所有信号
@@ -242,7 +239,6 @@ top -b     # 方便写入文件
 top -c     # 显示完整命令行
 top -p ... # 指定 PID
 top -u lyb # 指定用户
-```
 
 ## 建议
 * 使用 pgrep 获取进程ID, 使用 ps 列出详细信息
