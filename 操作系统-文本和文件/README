@@ -1,25 +1,4 @@
 
-## 换行符
-Linux/iOS => \n
-windows   => \r\n
-
-## 换行符转换
-dos2unix 1.txt
-unix2doc 1.txt
-
-## 查看换行符
-file 1.txt
-
-## 移除文件末尾的换行符
-#### 方法一 == 建议
-vim -c 'set binary noeol' -c 'wq!' 1.txt
-
-#### 方法二 == 不建议, 只适用于只有一行且换行符为 \n 的情况
-echo -n $(cat 1.txt | tr -d '\n') > 1.txt
-
-## 添加文件末尾的换行符
-vim -c 'set eol' -c 'wq!' 1.txt
-
 ## 文件时间
 atime # 内容读取时间, 更新可能不及时
 mtime # 内容修改时间
@@ -109,12 +88,17 @@ dd if=/dev/zero of=junk.data bs=1M count=1
 
 df   -Th                # 查看磁盘挂载情况
 
+dos2unix 1.txt # \r\n (windows) => \n (Linux/iOS)
+unix2doc 1.txt # \n (Linux/iOS) => \r\n (windows)
+
 du                      # 列出目录大小
 du -0                   # 输出以 \0 分割, 默认是换行符
 du -a                   # 列出目录和文件大小
 du -d 1                 # 最大目录深度
 du -sh                  # 只列出整体使用大小
 du --exclude="*.txt"    # 忽略指定文件, 支持通配符
+
+file 1.txt # 查看换行符等
 
 find . -name  lyb                     # 以文件名查找文件, 不包括路径, 可以使用通配符
 find . -iname lyb                     # 同上, 忽略大小写
@@ -279,7 +263,7 @@ tree -H . -o 1.html  # 指定目录生成 html 文件
 uniq    # 删除重复的行
 uniq -c # 输出统计的次数
 uniq -d # 只输出重复的行, 重复的项只输出一次
-uniq -D # 只输出重复的行, 重复的项只输出多次
+uniq -D # 只输出重复的行, 重复的项输出多次
 uniq -i # 忽略大小写
 uniq -u # 只输出没重复的行
 
