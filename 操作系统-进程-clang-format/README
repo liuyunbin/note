@@ -33,13 +33,13 @@ $ clang-format -style=file main.cc                         # 使用自定义代�
 
 说明：
   1. 上述的内容表示：当使用 Vim 保存文件时，
-    会按照当前目录 或 任一父目录的文件 .clang-format 或 _clang-format 指定的规范来规范代码
+     会按照当前目录 或 任一父目录的文件 .clang-format 或 _clang-format 指定的规范来规范代码
     （如果未找到文件，使用默认代码规范）
   2. 上述 `<path-to-this-file>` 指的是 clang-format.py 的目录
   3. `let l:formatdiff = 1` 的意思是只规范修改过的部分，可以用 `let l:lines = "all"` 取代，表示规范所有的内容
   4. 在 Ubuntu 18.04 LTS 下，clang-format 的默认版本为 clang-format-6.0，
-    clang-format-6.0 的 clang-format.py 使用的是 Python 3，
-    而 Ubuntu 18.04 LTS 默认的 Python 版本为 Python 2.7，所以上面使用的是 py3f 而不是 pyf
+     clang-format-6.0 的 clang-format.py 使用的是 Python 3，
+     而 Ubuntu 18.04 LTS 默认的 Python 版本为 Python 2.7，所以上面使用的是 py3f 而不是 pyf
 
 # 参考资源
 * clang-format  -> https://clang.llvm.org/docs/ClangFormat.html
