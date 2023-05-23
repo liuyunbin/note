@@ -7,7 +7,6 @@ make                              # 4. 编译
 make test                         # 5. 测试（可选）
 make install                      # 6. 安装（可选）
 
-
 ## CMake 常用命令, 命令不区分大小写
 
 message(STATUS      "message to display")   # 向用户输出提示信息
