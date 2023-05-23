@@ -1,35 +1,5 @@
 
-vim -c "...." 1.txt # vim 启动时执行命令
-vim    "+..." 1.txt # vim 启动时执行命令
-
-set number                            # 默认显示行号
-set cindent                           # 使用 C 风格的自动缩进
-set expandtab                         # 自动扩展 Tab
-set tabstop=4                         # 设置 Tab 所占的宽度
-set shiftwidth=4                      # 自动缩进使用的空格数量
-set softtabstop=4                     # 调整 缩进的 表现, 开启 expandtab 的时候, 此选项没用
-autocmd FileType make set noexpandtab # Makefile 不扩展 Tab
-
-set nobomb                            #  去掉 bomb, 在 vimrc 中不生效
-set   bomb                            #  添加 bomb
-
-set     encoding=utf-8     # vim 内部使用的编码, 一般用不到
-set fileencoding=utf-8     # 编辑文件时, 设置文档保存时的编码
-                           # 文件无乱码时, 可以使用此选项转换编码规则
-set fileencodings=ucs-bom,utf-8,gbk,big5,gb18030,latin1
-                           # 探测文件编码格式的顺序
-set termencoding=utf-8     # 和终端显示有关, 一般不需要修改
-
-set nohlsearch # 去掉高亮
-
-edit ++enc=utf-8 ... # 以 utf-8 重新打开文件
-
-w! ++enc=utf8 # 使用 utf-8 重新加载该文件, 使用 utf-8 保存该文件
-
-vim
-Ctrl+F 下翻一屏
-Ctrl+B 上翻一屏
-
+## 模式类别
 #### 普通模式
 h      # 左移一个字符
 j      # 下移一行
@@ -107,4 +77,39 @@ Esc -- Ctrl+[ # 回到 普通模式
 :r !ls      # 将外部命令的执行结果插入到下一行
 :1,5w !ls   # 将指定行作为命令的输入
 :1,5  !ls   # 将指定行作为命令的输入, 删除这些行, 然后将外部命令的插入到这些行
+
+
+vim -c 'set binary noeol' -c 'wq!' 1.txt # 移除文件末尾的换行符
+vim -c 'set eol'          -c 'wq!' 1.txt # 添加文件末尾的换行符
+
+vim -c "...." 1.txt # vim 启动时执行命令
+vim    "+..." 1.txt # vim 启动时执行命令
+
+set number                            # 默认显示行号
+set cindent                           # 使用 C 风格的自动缩进
+set expandtab                         # 自动扩展 Tab
+set tabstop=4                         # 设置 Tab 所占的宽度
+set shiftwidth=4                      # 自动缩进使用的空格数量
+set softtabstop=4                     # 调整 缩进的 表现, 开启 expandtab 的时候, 此选项没用
+autocmd FileType make set noexpandtab # Makefile 不扩展 Tab
+
+set nobomb                            #  去掉 bomb, 在 vimrc 中不生效
+set   bomb                            #  添加 bomb
+
+set     encoding=utf-8     # vim 内部使用的编码, 一般用不到
+set fileencoding=utf-8     # 编辑文件时, 设置文档保存时的编码
+                           # 文件无乱码时, 可以使用此选项转换编码规则
+set fileencodings=ucs-bom,utf-8,gbk,big5,gb18030,latin1
+                           # 探测文件编码格式的顺序
+set termencoding=utf-8     # 和终端显示有关, 一般不需要修改
+
+set nohlsearch # 去掉高亮
+
+edit ++enc=utf-8 ... # 以 utf-8 重新打开文件
+
+w! ++enc=utf8 # 使用 utf-8 重新加载该文件, 使用 utf-8 保存该文件
+
+vim
+Ctrl+F 下翻一屏
+Ctrl+B 上翻一屏
 
