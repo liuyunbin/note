@@ -21,7 +21,7 @@
 * 地球转的快了, 一天就短, 一秒也变短, 慢了, 一天就长, 一秒也变长
 
 ## UTC(正在用)
-* 原子时间: 一秒是精确的, 一天也是精确的(有误差, 但很小)
+* 原子时间: 一秒是精确的, 一天也是精确的(原子时间有误差, 但很小)
 * 由于, 地球自转速度的变化, 导致和 GMT 的时间对不上, 由此, 产生了闰秒
 * 好消息是: 2035 年要取消闰秒了
 
@@ -94,29 +94,29 @@ strptime() => mktime()             : 字符串形式 => 时间元组 => 时间�
 * date -d "10   years ago"            # 十年以前, 除年外, 其他也可以
 * date -d "tomorrow"                  # 明天
 * date -d "now"                       # 现在
-* date -s "20200202 10:10:10"         # 更新系统时间, 需要 root, 格式见 -d 选项
+* date -s "2020-02-02 10:10:10"       # 更新系统时间, 需要 root, 格式见 -d 选项
 * date -r 1.c                         # 使用: 文件的 mtime
 
        %A        %a
-星期日 Sunday    SUN
-星期一 Monday    MON
-星期二 Tuesday   TUE
-星期三 Wednesday WED
-星期四 Thursday  THU
-星期五 Friday    FRI
-星期六 Saturday  SAT
+星期日 sunday    sun
+星期一 monday    mon
+星期二 tuesday   tue
+星期三 wednesday wed
+星期四 thursday  thu
+星期五 friday    fri
+星期六 saturday  sat
 
        %B         %b
-一月   January    Jan
-二月   February   Feb
-三月   March      Mar
-四月   April      Apr
-五月   May        May
-六月   June       Jun
-七月   July       Jul
-八月   August     Aug
-九月   September  Sep
-十月   October    Oct
-十一月 November   Nov
-十二月 December   Dec
+一月   january    jan
+二月   february   feb
+三月   march      mar
+四月   april      apr
+五月   may        may
+六月   june       jun
+七月   july       jul
+八月   august     aug
+九月   september  sep
+十月   october    oct
+十一月 november   nov
+十二月 december   dec
 
