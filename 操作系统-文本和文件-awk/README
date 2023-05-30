@@ -1,7 +1,6 @@
 
 ## 简介
 * awk 以行为单位，切割成列，处理数据
-* awk 是一门编程语言
 
 ## 常用命令行参数
 awk            script 1.txt
@@ -68,7 +67,6 @@ ORS 输出记录分隔符 默认值为换行符
 ARGC       当前命令行参数个数
 ARGIND     当前文件在ARGV中的位置
 ARGV       包含命令行参数的数组
-
 
 CONVFMT    数字的转换格式（参见printf语句），默认值为%.6 g
 ENVIRON    当前shell环境变量及其值组成的关联数组
