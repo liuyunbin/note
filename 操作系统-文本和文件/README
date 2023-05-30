@@ -24,7 +24,7 @@ ctime # 状态修改时间: 内容 名称 权限 所属者 所属组
 basename $(readlink -f $0) # 获取脚本的名称
 dirname  $(readlink -f $0) # 获取脚本的目录
 
-bc <<< "scale=2; 10/2" # 设置使用两位小数, 输出: 5.00
+bc <<< "scale=2; 10/2" # 使用两位小数, 输出: 5.00
 bc <<< "ibase=2;  100" # 输入使用二进制, 输出: 4
 bc <<< "obase=2;   10" # 输出使用二进制, 输出: 1010
 
@@ -51,6 +51,10 @@ chmod 2755    1.c # 设置 SGID(2)
 chmod 1755    1.c # 设置 SBIT(1)
 
 chown lyb:lyb 1.c # 修改文件所属的组和用户
+
+
+column -t # 列对齐
+
                                                        # 文件如果是符号链接, 将使用符号链接对应的文件
 comm                        1.c 2.c                    # 要求文件已排序, 以行比较
 comm --check-order          1.c 2.c                    #   检测文件是否已排序
