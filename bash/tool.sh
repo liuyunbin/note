@@ -30,7 +30,7 @@ function do_ps() {
             cmd = ""
             for (i = 5; i <= NF; ++i)
                 cmd=cmd" "$i
-            printf "%s %10s %6s %4s => %s\n", $1, $2, $3, $4, cmd
+            printf("%s %10s %6s %4s => %s\n", $1, $2, $3, $4, cmd)
         }'
 }
 
@@ -42,7 +42,7 @@ function do_lastlog() {
             cmd = "date -d\""time"\" +\"%Y-%m-%d %H:%M:%S %z\""
             cmd | getline time
             close(cmd)
-            printf "%s => %s\n", time, user
+            printf("%s => %s\n", time, user)
         }' | sort
 }
 
