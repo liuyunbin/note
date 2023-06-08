@@ -142,6 +142,7 @@ grep -B 5                 # 输出之后的行
 grep -C 5                 # 输出之前之后的行
 grep -e .. -e ..          # 多个模式取或
 grep -E ..                # 使用扩展的正则表达式, 同 egrep
+grep -P ..                # 使用 perl 风格的正则表达式
 grep -W ..                # 单词匹配
 grep -X ..                # 行匹配
 grep ... --inclue "*.c"   # 指定文件
