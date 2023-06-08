@@ -118,3 +118,5 @@ awk '{ "ls" | getline str; close("ls"); print str }' 1.txt -- 07.awk
 awk '{ getine     < "README"; print $0  }' 1.txt -- 08.awk # 从文件中读取, 貌似只能读取一次
 awk '{ getine str < "README"; print str }' 1.txt -- 09.awk # 从文件中读取, 貌似只能读取一次
 
+awk -f 11.awk 2.txt # 测试执行系统命令
+
