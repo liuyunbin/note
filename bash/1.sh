@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -ueo pipefail
 
 function log_info() { echo -e "\033[00m$(date +'%Y-%m-%d %H:%M:%S %z') $@\033[0m" > /dev/tty;          }
@@ -9,7 +10,7 @@ cmd=$(basename $0)
 
 function usage() {
   log_info "说明:"
-  log_info "    这是一个脚本模板"
+  log_info "    测试命令行参数"
   log_info "使用例如:"
   log_info "    $cmd -h     # 帮助文档"
   log_info "    $cmd -a 123 # 测试"
@@ -38,13 +39,5 @@ done
 
 shift $(($OPTIND - 1))
 
-log_info info
-log_info info
-log_info info
-log_info info
-log_info info
-log_info info
-log_info info
-log_warn warning
-log_erro fatal
+log_info "测试参数"
 

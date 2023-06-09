@@ -1,20 +1,9 @@
 #!/bin/bash
-set -o nounset  # 使用未初始化的变量报错
-set -o errexit  # 只要发生错误就退出
-set -o pipefail # 只要管道发生错误就退出
+set -ueo pipefail
 
-function log_info() {
-    echo -e "\033[00m$(date +'%Y-%m-%d %H:%M:%S %z') $@\033[0m" > /dev/tty # 默认颜色
-}
-
-function log_warn() {
-    echo -e "\033[33m$(date +'%Y-%m-%d %H:%M:%S %z') $@\033[0m" > /dev/tty # 黄色
-}
-
-function log_erro() {
-    echo -e "\033[31m$(date +'%Y-%m-%d %H:%M:%S %z') $@\033[0m" > /dev/tty # 红色
-    exit -1
-}
+function log_info() { echo -e "\033[00m$(date +'%Y-%m-%d %H:%M:%S %z') $@\033[0m" > /dev/tty;          }
+function log_warn() { echo -e "\033[33m$(date +'%Y-%m-%d %H:%M:%S %z') $@\033[0m" > /dev/tty;          }
+function log_erro() { echo -e "\033[31m$(date +'%Y-%m-%d %H:%M:%S %z') $@\033[0m" > /dev/tty; exit -1; }
 
 function do_ps() {
     : ${1:?use $0 pattern}
