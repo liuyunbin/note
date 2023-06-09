@@ -1,64 +1,64 @@
 
-## °²×°¿â
+## å®‰è£…åº“
 # install.packages("openxlsx")
 # install.packages("ggplot2")
 # install.packages("reshape2")
 # install.packages("dplyr")
 
-## Ê¹ÓÃ¿â
+## ä½¿ç”¨åº“
 library(openxlsx)
 library(ggplot2)
 library(reshape2)
 library(dplyr)
 
-## ´ÓÎÄ¼ş»ñÈ¡Êı¾İ
-setwd("D:/ÎÄµµ-ÁõÔÆ±ö")
-df = read.xlsx("ECIÅÅÃû.xlsx")
+## ä»æ–‡ä»¶è·å–æ•°æ®
+setwd("D:/æ–‡æ¡£-åˆ˜äº‘å®¾")
+df = read.xlsx("ECIæ’å.xlsx")
 
-## ½« year ÁĞ×ª»¯Îª ÈÕÆÚ¸ñÊ½
+## å°† year åˆ—è½¬åŒ–ä¸º æ—¥æœŸæ ¼å¼
 # df$year = as.Date(df$year,"%Y")
 
-## ĞŞ¸ÄÁĞÃû
+## ä¿®æ”¹åˆ—å
 df = rename(df,
- AH="°²»Õ",
- BJ="±±¾©",
- CQ="ÖØÇì",
- FJ="¸£½¨",
- GD="¹ã¶«",
- GS="¸ÊËà",
- GX="¹ãÎ÷",
- GZ="¹óÖİ",
- HA="ºÓÄÏ",
- HB="ºş±±",
- HE="ºÓ±±",
- HI="º£ÄÏ",
- HL="ºÚÁú½­",
- HN="ºşÄÏ",
- JL="¼ªÁÖ",
- JS="½­ËÕ",
- JX="½­Î÷",
- LN="ÁÉÄş",
- NM="ÄÚÃÉ¹Å",
- NX="ÄşÏÄ",
- QH="Çàº£",
- SC="ËÄ´¨",
- SD="É½¶«",
- SH="ÉÏº£",
- SN="ÉÂÎ÷",
- SX="É½Î÷",
- TJ="Ìì½ò",
- XJ="ĞÂ½®",
- XZ="Î÷²Ø",
- YN="ÔÆÄÏ",
- ZJ="Õã½­")
+ AH="å®‰å¾½",
+ BJ="åŒ—äº¬",
+ CQ="é‡åº†",
+ FJ="ç¦å»º",
+ GD="å¹¿ä¸œ",
+ GS="ç”˜è‚ƒ",
+ GX="å¹¿è¥¿",
+ GZ="è´µå·",
+ HA="æ²³å—",
+ HB="æ¹–åŒ—",
+ HE="æ²³åŒ—",
+ HI="æµ·å—",
+ HL="é»‘é¾™æ±Ÿ",
+ HN="æ¹–å—",
+ JL="å‰æ—",
+ JS="æ±Ÿè‹",
+ JX="æ±Ÿè¥¿",
+ LN="è¾½å®",
+ NM="å†…è’™å¤",
+ NX="å®å¤",
+ QH="é’æµ·",
+ SC="å››å·",
+ SD="å±±ä¸œ",
+ SH="ä¸Šæµ·",
+ SN="é™•è¥¿",
+ SX="å±±è¥¿",
+ TJ="å¤©æ´¥",
+ XJ="æ–°ç–†",
+ XZ="è¥¿è—",
+ YN="äº‘å—",
+ ZJ="æµ™æ±Ÿ")
 
-## ÖØĞÂ×éÖ¯Êı¾İ
-col_names = colnames(df) # ÁĞÃû³Æ
+## é‡æ–°ç»„ç»‡æ•°æ®
+col_names = colnames(df) # åˆ—åç§°
 
-col_nums = ncol(df) # ÁĞµÄ¸öÊı
-row_nums = nrow(df) # ĞĞµÄ¸öÊı, ¼´ Äê·ÖÊı
+col_nums = ncol(df) # åˆ—çš„ä¸ªæ•°
+row_nums = nrow(df) # è¡Œçš„ä¸ªæ•°, å³ å¹´åˆ†æ•°
 
-### ´¦Àí ºá±êÖáµÄ¿Ì¶ÈÃû³Æ, Ã¿ n ¸ö Õ¹Ê¾Ò»¸ö 
+### å¤„ç† æ¨ªæ ‡è½´çš„åˆ»åº¦åç§°, æ¯ n ä¸ª å±•ç¤ºä¸€ä¸ª 
 n = 5
 year_len = length(df[,1])
 scale_x_names = vector(mode='character',length=year_len)
@@ -68,7 +68,7 @@ for (i in 1:year_len) {
 	}
 }
 
-### ´¦Àí ×İ±êÖáµÄ¿Ì¶ÈÃû³Æ, Ã¿ n ¸ö Õ¹Ê¾Ò»¸ö 
+### å¤„ç† çºµæ ‡è½´çš„åˆ»åº¦åç§°, æ¯ n ä¸ª å±•ç¤ºä¸€ä¸ª 
 n = 10
 scale_y_names = vector(mode='character', length=31)
 for (i in 1:31) {
@@ -81,30 +81,30 @@ df = melt(df, id = "year", variable.name = "city", value.name = "data")
 
 #df$data = factor(as.character(df$data))
 
-## »­Í¼
+## ç”»å›¾
 
-# ggplot()     ´æÈëÊı¾İ
+# ggplot()     å­˜å…¥æ•°æ®
 ggplot(data = df, 
        mapping = aes(x = year, 
                      y = data,
                      group=city,
                      colour=city)) +
-geom_line() +                           # »­Ïß
-geom_point(size=3, show.legend = TRUE)+                     # »­µã
-theme_bw() +                            # È¥µô±³¾°
-theme(panel.grid=element_blank(),       # È¥µôÍø¸ñ
-	axis.ticks.x = element_blank(),   # È¥µô x ÖáµÄ¿Ì¶È
-      axis.ticks.y = element_blank(),   # È¥µô y ÖáµÄ¿Ì¶È
-      panel.border = element_blank()    # È¥µôÍâ±ß¿ò    
+geom_line() +                           # ç”»çº¿
+geom_point(size=3, show.legend = TRUE)+                     # ç”»ç‚¹
+theme_bw() +                            # å»æ‰èƒŒæ™¯
+theme(panel.grid=element_blank(),       # å»æ‰ç½‘æ ¼
+	axis.ticks.x = element_blank(),   # å»æ‰ x è½´çš„åˆ»åº¦
+      axis.ticks.y = element_blank(),   # å»æ‰ y è½´çš„åˆ»åº¦
+      panel.border = element_blank()    # å»æ‰å¤–è¾¹æ¡†    
       ) +
-scale_x_discrete(breaks=c(2000,         # µ÷Õûºá×ø±êÒªÕ¹Ê¾µÄ¿Ì¶È±êÇ©
+scale_x_discrete(breaks=c(2000,         # è°ƒæ•´æ¨ªåæ ‡è¦å±•ç¤ºçš„åˆ»åº¦æ ‡ç­¾
                           2005,
                           2010,
                           2015,
                           2020),
                  expand=c(0.01,0)
                  )+
-scale_y_continuous( breaks=c(1,11,21,31), # µ÷Õû ×İ×ø±êÒªÕ¹Ê¾µÄ¿Ì¶È±êÇ©
+scale_y_continuous( breaks=c(1,11,21,31), # è°ƒæ•´ çºµåæ ‡è¦å±•ç¤ºçš„åˆ»åº¦æ ‡ç­¾
 			  labels=c("1"="31",
                              "11"="21",
                              "21"="11",
@@ -120,15 +120,15 @@ scale_y_continuous( breaks=c(1,11,21,31), # µ÷Õû ×İ×ø±êÒªÕ¹Ê¾µÄ¿Ì¶È±êÇ©
 			)+
 guides(
 	colour = guide_legend(
-		title = NULL, # È¥µôÍ¼Àı±êÌâ
-		ncol = 1,      # Í¼ÀıÖ»ÒªÒ»ÁĞ
+		title = NULL, # å»æ‰å›¾ä¾‹æ ‡é¢˜
+		ncol = 1,      # å›¾ä¾‹åªè¦ä¸€åˆ—
 		keyheight = 0.7
 	)
 ) +
 coord_fixed(ratio=3/5)+ 
 labs(
-    	x = "Year",           # x Öá
-    	y = "Ranking(ECI)",   # y Öá
-   	title = "±êÌâ")        # ±êÌâ
+    	x = "Year",           # x è½´
+    	y = "Ranking(ECI)",   # y è½´
+   	title = "æ ‡é¢˜")        # æ ‡é¢˜
 
 ggsave("1.pdf")
