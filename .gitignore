@@ -1,6 +1,8 @@
 
+# cmake
 bin
 build
+lib
 
 # Prerequisites
 *.d

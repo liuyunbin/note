@@ -3,7 +3,7 @@ PS1='\[\e[32m\]$(date "+%Y-%m-%d %H:%M:%S %z") \[\e[0m\]'
 
 note=~/github/note
 
-PATH="$PATH:$note/src/bash"
+PATH="$PATH:$note/script/:$note/bin/"
 
 alias lsa="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtu" # 以 文件访问时间     排序, 不准确
 alias lsc="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtc" # 以 文件属性修改时间 排序

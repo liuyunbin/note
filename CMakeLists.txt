@@ -13,9 +13,9 @@ set(CXX_FLAGS
 
 string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}") # 设置 C++ 编译选项
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../../lib) # 设置 静态库     的输出目录
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../../lib) # 设置 动态库     的输出目录
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../../bin) # 设置 二进制文件 的输出目录
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib) # 设置 静态库     的输出目录
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib) # 设置 动态库     的输出目录
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin) # 设置 二进制文件 的输出目录
 
 #include_directories(${CMAKE_SOURCE_DIR}/include) # 设置头文件的搜索目录
 #   link_directories(${CMAKE_SOURCE_DIR}/lib)     # 设置库文件的搜索目录
@@ -24,17 +24,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../../bin) # 设置 二�
 # 激活测试
 enable_testing()
 
-add_executable(lsh lsh.cc)
-target_link_libraries(lsh readline)
+add_executable(00101 src/001/01.cc)
 
-add_executable(test_iostream test_iostream.cc)
+###########################################################################
 
-###############################################
-
-add_subdirectory(solve_sudoku)
-
-#add_executable(test_double   test_double.cc)
-add_executable(test_int      test_int.cc)
+# add_executable(lsh lsh.cc)
+# target_link_libraries(lsh readline)
 
 #add_executable(
 #    huge-number-unittest
