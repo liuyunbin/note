@@ -1,5 +1,5 @@
 
-#include "log.h"
+#include "00.h"
 
 int main() {
     log("测试僵尸进程");
