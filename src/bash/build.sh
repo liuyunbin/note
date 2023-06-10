@@ -3,12 +3,8 @@
 set -ueo pipefail
 
 mkdir -p build
-
 cd build
-
 cmake ..
-
 make
-
 # make test
 

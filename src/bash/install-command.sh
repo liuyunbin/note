@@ -1,24 +1,17 @@
 #!/bin/bash
-#
-# 本程序用于安装常用命令
-#
 
-set -ev
+set -ueo pipefail
 
-if which apt &> /dev/null; then
-    sudo apt install clang-format -y
+sudo apt install -y clang-format
+sudo apt install -y cmake
+sudo apt install -y g++
+sudo apt install -y vim
 
-    sudo apt install cmake -y
+#sudo apt install -y icdiff
 
-    sudo apt install g++ -y
+#sudo apt install -y libgoogle-glog-dev
 
-    sudo apt install icdiff -y
+#sudo apt install -y libgtest-dev
 
-    sudo apt install libgoogle-glog-dev -y
+#sudo apt install -y icdiff
 
-    sudo apt install libgtest-dev -y
-
-    sudo apt install vim -y
-else
-    sudo yum install google-benchmark-devel
-fi
