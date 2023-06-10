@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -ueo pipefail
 
 function log_info() { echo -e "\033[00m$(date +'%Y-%m-%d %H:%M:%S %z') $@\033[0m" > /dev/tty;          }
