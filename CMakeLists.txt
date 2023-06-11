@@ -63,6 +63,9 @@ add_executable(00401 src/004/01.cc)
 add_executable(00402 src/004/02.cc)
 add_executable(00403 src/004/03.cc)
 
+# 孤儿进程
+add_executable(00501 src/005/01.cc)
+
 ###########################################################################
 
 # add_executable(lsh lsh.cc)
