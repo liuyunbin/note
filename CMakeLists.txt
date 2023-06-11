@@ -41,7 +41,12 @@ add_executable(00113 src/001/13.cc)
 add_executable(00114 src/001/14.cc)
 add_executable(00115 src/001/15.cc)
 
-#add_executable(00201 src/002/01.cc)
+#进程
+add_executable(00201 src/002/01.cc)
+add_executable(00202 src/002/02.cc)
+add_executable(00203 src/002/03.cc)
+add_executable(00204 src/002/04.cc)
+add_executable(00205 src/002/05.cc)
 
 #add_executable(00301 src/003/01.cc)
 
