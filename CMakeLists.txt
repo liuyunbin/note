@@ -58,6 +58,11 @@ add_executable(00306 src/003/06.cc)
 add_executable(00307 src/003/07.cc)
 add_executable(00308 src/003/08.cc)
 
+# 会话
+add_executable(00401 src/004/01.cc)
+add_executable(00402 src/004/02.cc)
+add_executable(00403 src/004/03.cc)
+
 ###########################################################################
 
 # add_executable(lsh lsh.cc)
