@@ -25,6 +25,13 @@ include_directories(${CMAKE_SOURCE_DIR}/include) # 设置头文件的搜索目�
 enable_testing()
 
 add_executable(00101 src/001/01.cc)
+add_executable(00102 src/001/02.cc)
+add_executable(00103 src/001/03.cc)
+add_executable(00104 src/001/04.cc)
+add_executable(00105 src/001/05.cc)
+add_executable(00106 src/001/06.cc)
+add_executable(00107 src/001/07.cc)
+add_executable(00108 src/001/08.cc)
 
 ###########################################################################
 
