@@ -35,6 +35,8 @@ add_executable(00108 src/001/08.cc)
 
 add_executable(00201 src/002/01.cc)
 
+add_executable(00301 src/003/01.cc)
+
 ###########################################################################
 
 # add_executable(lsh lsh.cc)
