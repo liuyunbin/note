@@ -44,6 +44,7 @@
 * 经过终端或伪终端登录后, 通过 su 可再变化
 
 ## 配置文件
+```
 /etc/passwd          # 用户基本信息
 /etc/shadow          # 用户密码信息
 /etc/group           # 组基本信息
@@ -53,8 +54,10 @@
 /etc/subgid          # 用户隶属的 GID
 /etc/subuid          # 用户隶属的 UID
 /etc/login.defs      # 有关登录的配置信息
+```
 
 ## 相关命令
+```
 useradd           # 添加用户或修改默认配置
 useradd -c ...    #   指定关于用户的一段描述
 useradd -e ...    #   指定用户过期日期, YYYY-MM-DD
@@ -146,4 +149,5 @@ lastlog -t 10     # 最近一次的登录在 10 天内的信息
 lastlog -C -u lyb # 清除 lyb 最近一次的登录信息
 lastlog -S -u lyb # 设置 lyb 最近一次的登录信息
 lastlog    -u lyb # 查看 lyb 最近一次的登录信息
+```
 
