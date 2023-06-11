@@ -69,6 +69,16 @@ add_executable(00501 src/005/01.cc)
 # 孤儿进程组
 add_executable(00601 src/006/01.cc)
 
+# 僵尸进程
+add_executable(00701 src/007/01.cc)
+add_executable(00702 src/007/02.cc)
+add_executable(00703 src/007/03.cc)
+add_executable(00704 src/007/04.cc)
+add_executable(00705 src/007/05.cc)
+add_executable(00706 src/007/06.cc)
+add_executable(00707 src/007/07.cc)
+add_executable(00708 src/007/08.cc)
+
 ###########################################################################
 
 # add_executable(lsh lsh.cc)
