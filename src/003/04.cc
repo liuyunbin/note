@@ -1,7 +1,8 @@
 
-#include "log.h"
+#include "00.h"
 
 int main() {
+    log();
     log("测试新建子进程对应的进程组(子进程调用exec之后)");
     log();
 
@@ -18,8 +19,8 @@ int main() {
     kill(child, SIGKILL);
 
     sleep(1);
-    log();
     log("主进程退出");
+    log();
 
     return 0;
 }

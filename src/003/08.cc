@@ -1,7 +1,8 @@
 
-#include "log.h"
+#include "00.h"
 
 int main() {
+    log();
     log("测试修改进程组(原进程组和目标进程组属于不同会话)");
     log();
 
@@ -15,12 +16,10 @@ int main() {
     }
     sleep(1);
     log("子进程的状态信息");
-    log(child);
-    log();
     test(getpid(), child);
     sleep(1);
-    log();
     log("主进程退出");
+    log();
 
     return 0;
 }

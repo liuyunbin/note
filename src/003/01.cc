@@ -1,7 +1,8 @@
 
-#include "log.h"
+#include "00.h"
 
 int main() {
+    log();
     log("测试新建自身进程对应的进程组");
     log();
 
@@ -12,6 +13,7 @@ int main() {
     }
     sleep(1);
     log("主进程退出");
+    log();
 
     return 0;
 }

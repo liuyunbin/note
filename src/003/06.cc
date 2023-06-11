@@ -1,7 +1,8 @@
 
-#include "log.h"
+#include "00.h"
 
 int main() {
+    log();
     log("测试新建孙进程对应的进程组");
     log();
 
@@ -39,7 +40,10 @@ int main() {
         pid_t grandchild = atoi(str.data());
 
         log("进程关系");
-        std::string cmd = "ps -o pid,ppid,pgid,sid,comm -C a.out";
+        std::string cmd = "ps -o pid,ppid,pgid,sid,comm -p";
+        cmd += std::to_string(child) + ",";
+        cmd += std::to_string(grandchild) + ",";
+        cmd += std::to_string(getpid());
         system(cmd.data());
         log("修改孙进程(" + str + ")的进程组");
         test(grandchild, grandchild);
@@ -48,8 +52,8 @@ int main() {
         kill(grandchild, SIGKILL);
     }
 
-    log();
     log("主进程退出");
+    log();
 
     return 0;
 }

@@ -41,14 +41,22 @@ add_executable(00113 src/001/13.cc)
 add_executable(00114 src/001/14.cc)
 add_executable(00115 src/001/15.cc)
 
-#进程
+# 进程
 add_executable(00201 src/002/01.cc)
 add_executable(00202 src/002/02.cc)
 add_executable(00203 src/002/03.cc)
 add_executable(00204 src/002/04.cc)
 add_executable(00205 src/002/05.cc)
 
-#add_executable(00301 src/003/01.cc)
+# 进程组
+add_executable(00301 src/003/01.cc)
+add_executable(00302 src/003/02.cc)
+add_executable(00303 src/003/03.cc)
+add_executable(00304 src/003/04.cc)
+add_executable(00305 src/003/05.cc)
+add_executable(00306 src/003/06.cc)
+add_executable(00307 src/003/07.cc)
+add_executable(00308 src/003/08.cc)
 
 ###########################################################################
 
