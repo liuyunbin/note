@@ -1,13 +1,5 @@
 
-#include <setjmp.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
-#include <iostream>
-#include <map>
-#include <string>
+#include "log.h"
 
 std::map<int, std::string> m;
 void init() {
@@ -42,16 +34,4 @@ void init() {
     m[SIGIO] = "29-SIGIO";
     m[SIGPWR] = "30-SIGPWR";
     m[SIGSYS] = "31-SIGSYS";
-}
-
-std::string get_time() {
-    time_t now = time(NULL);
-    struct tm* info = localtime(&now);
-    char buf[1024];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
-    return buf;
-}
-
-void log(const std::string& msg = "") {
-    std::cout << get_time() << " " << getpid() << " " << msg << std::endl;
 }

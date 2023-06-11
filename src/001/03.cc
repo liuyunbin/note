@@ -1,45 +1,38 @@
 
-#include "log.h"
+#include "00.h"
+
+int count = 0;
+
+void handle_signal(int sig, siginfo_t* sig_info, void*) {
+    log("捕获信号 SIGUSR1 第 " + std::to_string(++count) + " 次");
+}
 
 int main() {
     log();
-    log("测试预防僵尸进程");
-    log("测试设置 SIGCHLD 处理为 SIG_IGN");
+    log("测试多个信号处于待决状态信号会丢失");
     log();
 
-    log("设置 SIGCHLD 的信号处理");
-    signal(SIGCHLD, SIG_IGN);
+    log("注册信号处理函数");
+    struct sigaction act;
+    act.sa_sigaction = handle_signal;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_SIGINFO;
+    sigaction(SIGUSR1, &act, NULL);
 
-    log("阻塞信号 SIGCHLD");
+    log("阻塞信号 SIGUSR1");
     sigset_t mask;
     sigemptyset(&mask);
-    sigaddset(&mask, SIGCHLD);
+    sigaddset(&mask, SIGUSR1);
     sigprocmask(SIG_SETMASK, &mask, NULL);
 
-    std::string cmd = "ps -o pid,comm,state -p ";
-
     for (int i = 1; i <= 5; ++i) {
-        pid_t fd = fork();
-        if (fd == 0) {
-            // 子进程
-            std::string msg = "第 " + std::to_string(i) + " 个子进程(";
-            msg += std::to_string(getpid()) + ")启动后退出";
-            log(msg);
-            exit(-1);
-        } else {
-            // 父进程
-            cmd += std::to_string(fd) + ",";
-            sleep(1);
-        }
+        log("发送信号 SIGUSR1 第 " + std::to_string(i) + " 次");
+        kill(getpid(), SIGUSR1);
     }
 
-    cmd.pop_back();  // 删除多余的逗号
-
-    log("解除信号 SIGCHLD 的阻塞");
+    log("解除信号 SIGUSR1 阻塞");
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
     sleep(1);
-    log("子进程的状态");
-    system(cmd.data());
 
     log("主进程退出");
     log();

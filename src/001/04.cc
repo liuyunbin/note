@@ -1,59 +1,33 @@
 
-#include "log.h"
+#include "00.h"
+
+int count = 0;
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
-    for (;;) {
-        int fd = waitpid(-1, NULL, WNOHANG);
-        if (fd <= 0) break;
-        log("已退出的子进程是: " + std::to_string(fd));
-    }
+    log("捕获信号 SIGUSR1 第 " + std::to_string(++count) + " 次");
 }
 
 int main() {
     log();
-    log("测试预防僵尸进程");
-    log("测试设置 SIGCHLD 处理为: 循环调用 waitpid()");
+    log("测试信号处理函数被重置");
     log();
 
-    log("设置 SIGCHLD 的信号处理");
+    log("注册信号处理函数");
     struct sigaction act;
     act.sa_sigaction = handle_signal;
-    act.sa_flags = SA_SIGINFO;
     sigemptyset(&act.sa_mask);
-    sigaction(SIGCHLD, &act, NULL);
 
-    log("阻塞信号 SIGCHLD");
-    sigset_t mask;
-    sigemptyset(&mask);
-    sigaddset(&mask, SIGCHLD);
-    sigprocmask(SIG_SETMASK, &mask, NULL);
+    log("设置信号触发后被重置");
+    act.sa_flags = SA_SIGINFO | SA_RESETHAND;
+    sigaction(SIGUSR1, &act, NULL);
 
-    std::string cmd = "ps -o pid,comm,state -p ";
-
-    for (int i = 1; i <= 5; ++i) {
-        pid_t fd = fork();
-        if (fd == 0) {
-            // 子进程
-            std::string msg = "第 " + std::to_string(i) + " 个子进程(";
-            msg += std::to_string(getpid()) + ")启动后退出";
-            log(msg);
-            exit(-1);
-        } else {
-            // 父进程
-            cmd += std::to_string(fd) + ",";
-            sleep(1);
-        }
-    }
-
-    cmd.pop_back();  // 删除多余的逗号
-
-    log("解除信号 SIGCHLD 的阻塞");
-    sigprocmask(SIG_UNBLOCK, &mask, NULL);
+    log("发送信号 SIGUSR1 第 1 次");
+    kill(getpid(), SIGUSR1);
     sleep(1);
-    log("子进程的状态");
-    system(cmd.data());
+    log("发送信号 SIGUSR1 第 2 次");
+    kill(getpid(), SIGUSR1);
 
+    sleep(1);
     log("主进程退出");
     log();
 

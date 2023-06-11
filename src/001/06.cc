@@ -1,44 +1,43 @@
 
-#include "log.h"
+#include "00.h"
+
+void handle_signal(int sig, siginfo_t* sig_info, void*) {
+    log("捕获信号 " + m[sig]);
+    log("处理信号 " + m[sig] + " 中...");
+    sleep(2);
+    log("处理信号 " + m[sig] + " 完成");
+}
 
 int main() {
+    init();
+
     log();
-    log("测试预防僵尸进程");
-    log("测试杀死父进程");
+    log("测试信号处理过程中不同的信号到达");
     log();
 
-    if (fork() == 0) {
-        pid_t child = fork();
-        if (child == 0) {
-            log("测试的子进程(" + std::to_string(getpid()) + ")启动");
-            for (;;)
-                ;
-        } else if (fork() == 0) {
-            log("测试的控制进程(" + std::to_string(getpid()) + ")启动");
-            sleep(1);
-            std::string cmd = "ps -o pid,ppid,comm,state -p ";
-            cmd += std::to_string(child);
-            log("测试的子进程的状态");
-            system(cmd.data());
-            log("杀死测试的父进程(" + std::to_string(getppid()) + ")");
-            kill(getppid(), SIGKILL);
-            sleep(1);
-            log("测试的子进程的状态");
-            system(cmd.data());
-            log("杀死测试的子进程(" + std::to_string(child) + ")");
-            kill(child, SIGKILL);
-            sleep(1);
-            log("测试的子进程的状态");
-            system(cmd.data());
-            return 0;
-        } else {
-            log("测试的父进程(" + std::to_string(getpid()) + ")启动");
-            for (;;)
-                ;
-        }
+    log("设置信号处理函数");
+    struct sigaction act;
+    act.sa_sigaction = handle_signal;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
+    sigaction(SIGUSR1, &act, NULL);
+    sigaction(SIGUSR2, &act, NULL);
+
+    pid_t fd = fork();
+    if (fd == 0) {
+        log("子进程启动");
+        for (;;)
+            ;
+    } else {
+        sleep(1);
+        log("发送信号 " + m[SIGUSR1]);
+        kill(fd, SIGUSR1);
+        sleep(1);
+        log("发送信号 " + m[SIGUSR2]);
+        kill(fd, SIGUSR2);
+        sleep(5);
+        kill(fd, SIGKILL);
     }
-
-    sleep(4);
 
     log("主进程退出");
     log();

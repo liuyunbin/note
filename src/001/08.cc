@@ -1,23 +1,21 @@
 
-#include "log.h"
+#include "00.h"
 
 int main() {
     log();
-    log("测试产生僵尸进程, 不退出");
+    log("测试信号 SIGABRT 处理为 SIG_DFL");
     log();
-    pid_t child = fork();
 
-    if (child == 0) {
-        exit(0);
-    }
-    sleep(1);  // 保证子进程已启动并退出
-    log("产生僵尸进程(" + std::to_string(child) + ")");
-    std::string cmd = "ps -o pid,comm,state -p " + std::to_string(child);
-    system(cmd.data());
+    log("设置 SIGABRT 处理为 SIG_DFL");
+    signal(SIGABRT, SIG_DFL);
 
-    log("主进程死循环, 不退出...");
-    for (;;)
-        ;
+    log("调用 abort()");
+    abort();
+
+    sleep(1);
+
+    log("主进程正常退出");
+    log();
 
     return 0;
 }

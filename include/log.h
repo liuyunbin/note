@@ -1,6 +1,8 @@
 #ifndef LOG_H_
 #define LOG_H_
 
+#include <setjmp.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>

@@ -1,28 +1,38 @@
 
-#include "log.h"
+#include "00.h"
 
 int main() {
+    init();
+
     log();
-    log("测试僵尸进程");
-    log("测试父进程未处理子进程退出的状态信息");
+    log("测试信号阻塞");
     log();
 
-    pid_t child = fork();
+    log("阻塞所有信号");
+    sigset_t mask;
+    sigfillset(&mask);
+    sigprocmask(SIG_SETMASK, &mask, NULL);
 
-    if (child == 0) {
-        log("子进程(" + std::to_string(getpid()) + ")已启动");
-        for (;;)
-            ;
-    }
-    sleep(1);  // 保证子进程已启动
-    std::string cmd = "ps -o pid,comm,state -p " + std::to_string(child);
-    log("子进程状态");
-    system(cmd.data());
-    log("杀死子进程(" + std::to_string(child) + ")");
-    kill(child, SIGKILL);
-    sleep(1);
-    log("子进程状态");
-    system(cmd.data());
+    log("查看被阻塞的信号");
+    sigset_t old_mask;
+    sigprocmask(SIG_SETMASK, NULL, &old_mask);
+
+    for (auto key : m)
+        if (sigismember(&old_mask, key.first))
+            log("已被阻塞的信号: " + m[key.first]);
+
+    log("发送除 " + m[SIGKILL] + " 和 " + m[SIGSTOP] + " 外的所有信号");
+
+    for (auto key : m)
+        if (key.first != SIGKILL && key.first != SIGSTOP)
+            kill(getpid(), key.first);
+
+    log("查看待决的信号");
+    sigset_t new_mask;
+    sigpending(&new_mask);
+    for (auto key : m)
+        if (sigismember(&new_mask, key.first))
+            log("待决的信号: " + m[key.first]);
 
     log("主进程退出");
     log();
