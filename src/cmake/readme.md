@@ -1,14 +1,16 @@
 
 ## 使用流程
-                                  # 1. 在指定目录下写 CMakeLists.txt，文件名区分大小写
-mkdir -p build && cd build        # 2. 创建并切换到构建目录
-cmake -DCMAKE_INSTALL_PREFIX=/usr # 3. 设置安装前缀，生成 Makefile
-make                              # 4. 编译
-make test                         # 5. 测试（可选）
-make install                      # 6. 安装（可选）
+```
+$                                   # 1. 在指定目录下写 CMakeLists.txt，文件名区分大小写
+$ mkdir -p build && cd build        # 2. 创建并切换到构建目录
+$ cmake -DCMAKE_INSTALL_PREFIX=/usr # 3. 设置安装前缀，生成 Makefile
+$ make                              # 4. 编译
+$ make test                         # 5. 测试（可选）
+$ make install                      # 6. 安装（可选）
+```
 
 ## CMake 常用命令, 命令不区分大小写
-
+```
 message(STATUS      "message to display")   # 向用户输出提示信息
 message(FATAL_ERROR "message to display")   # 向用户输出错误信息，构建直接停止
 
@@ -49,11 +51,14 @@ add_test(test-name executable-name arg) # 添加测试程序
 
 add_custom_target(doc COMMAND doxygen doc/Doxyfile  # 添加命令 make doc
 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})              # 设置工作目录
+```
 
-                     # CMake 常用变量, 变量区分大小写
+### CMake 常用变量, 变量区分大小写
+```
 CMAKE_PROJECT_NAME   # 项目名称
 CMKAE_SOURCE_DIR     # 项目的源目录
 CMKAE_BINARY_DIR     # 项目的构建目录
 CMAKE_INSTALL_PREFIX # 安装目录前缀
 CMAKE_CXX_FLAGS      # C++ 编译选项
+```
 
