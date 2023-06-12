@@ -1,8 +1,8 @@
 
 ## 编译
 ```
-./src/bash/install-dependency.sh  # 安装依赖
-./src/bash/build.sh               # 编译
+./src/bash/install-dependency.sh
+./src/bash/build.sh
 ```
 
 ## 目录
@@ -16,4 +16,5 @@
 * [孤儿进程组](./src/006/readme.md)
 * [僵尸进程](./src/007/readme.md)
 * [用户和组](./src/008/readme.md)
+* [打包和压缩](./src/009/readme.md)
 
