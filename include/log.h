@@ -9,8 +9,19 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <algorithm>
+#include <bitset>
+#include <cctype>
+#include <cfenv>
+#include <cfloat>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <iomanip>
 #include <iostream>
+#include <limits>
 #include <map>
+#include <sstream>
 #include <string>
 
 std::string get_time() {

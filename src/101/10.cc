@@ -1,6 +1,5 @@
 
-#include <iostream>
-#include <string>
+#include "log.h"
 
 void test(char* p) {
     for (int i = 0; p[i] != '\0'; ++i) {

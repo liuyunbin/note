@@ -1,32 +1,35 @@
 
-#include "test.h"
+#include "00.h"
 
-void test(const string& name, double x) {
+void test(const std::string& name, double x) {
+    Double d(x);
     std::cout << std::endl;
     std::cout << "          测试类型: " << name << std::endl;
-    std::cout << "            二进制: " << to_bit(x) << std::endl;
-    std::cout << "        计算机存储: " << to_double_cs(x) << std::endl;
-    std::cout << "          手动计算: " << to_double_hand(x) << std::endl;
+    std::cout << "            二进制: " << d.bit << std::endl;
+    std::cout << "        计算机存储: " << d.double_by_cs << std::endl;
+    std::cout << "          手动计算: " << d.double_by_hand << std::endl;
 }
 
-void test(const string& name, double x, const string& bit) {
-    test(name, x);
-    std::cout << "原浮点数(  二进制): " << to_bit(bit) << std::endl;
-    std::cout << "原浮点数(手动计算): " << to_double_hand(bit) << std::endl;
+void test(const std::string& name, double x, const std::string& bit) {
+    Double d(bit);
+    std::cout << std::endl;
+    std::cout << "          测试类型: " << name << std::endl;
+    std::cout << "            二进制: " << d.bit_by_cs << std::endl;
+    std::cout << "        计算机存储: " << d.double_by_cs << std::endl;
+    std::cout << "原浮点数(  二进制): " << d.bit_by_test << std::endl;
+    std::cout << "原浮点数(手动计算): " << d.double_by_hand << std::endl;
 }
 
 int main() {
-    init();
-
     double x;
 
-    x = nextafter(0.1, numeric_limits<double>::lowest());
+    x = std::nextafter(0.1, std::numeric_limits<double>::lowest());
     test("0.1 的前一个数", x);
 
     x = 0.1;
     test("0.1", x);
 
-    x = nextafter(0.1, numeric_limits<double>::max());
+    x = std::nextafter(0.1, std::numeric_limits<double>::max());
     test("0.1 的后一个数", x);
 
     test("0.1", 0.1,

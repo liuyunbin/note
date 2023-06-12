@@ -1,8 +1,5 @@
 
-#include <bitset>
-#include <iostream>
-#include <limits>
-#include <string>
+#include "log.h"
 
 void test(const std::string& str, int x, int y) {
     std::cout << std::endl;

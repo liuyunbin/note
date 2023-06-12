@@ -1,8 +1,5 @@
 
-#include <bitset>
-#include <iomanip>
-#include <iostream>
-#include <string>
+#include "log.h"
 
 template <typename T>
 union Node {
@@ -16,7 +13,7 @@ void test(const std::string& str, T v) {
     node.t = v;
 
     std::cout << str << " ";
-    for (int i = 0; i < sizeof(T); ++i) {
+    for (size_t i = 0; i < sizeof(T); ++i) {
         if (i != 0 && i % 8 == 0) {
             std::cout << std::endl << std::setw(32) << " ";
         }

@@ -1,22 +1,15 @@
 
-#include "test.h"
+#include "00.h"
 
-void test(const string& name, string bit) {
-    bit = trim(bit);
+void test(const std::string& name, const std::string& bit) {
+    Double d(bit);
 
-    stringstream tmp(to_double_hand(bit));
-
-    Node node;
-    tmp >> node.x;
-
-    string bit_cs = bitset<64>(node.y).to_string();
-
-    cout << "        测试类型: " << name << endl;
-    cout << "    测试的二进制: " << to_bit(bit) << endl;
-    cout << "    存储的二进制: " << to_bit(bit_cs) << endl;
-    cout << "          手动值: " << to_double_hand(bit) << endl;
-    cout << "          存储值: " << to_double_cs(bit_cs) << "(精确值)" << endl;
-    cout << endl;
+    std::cout << "        测试类型: " << name << std::endl;
+    std::cout << "    测试的二进制: " << d.bit_by_test << std::endl;
+    std::cout << "    存储的二进制: " << d.bit_by_cs << std::endl;
+    std::cout << "          手动值: " << d.double_by_hand << std::endl;
+    std::cout << "          存储值: " << d.double_by_cs << std::endl;
+    std::cout << std::endl;
 }
 
 void test() {

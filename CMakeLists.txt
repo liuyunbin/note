@@ -79,6 +79,18 @@ add_executable(00706 src/007/06.cc)
 add_executable(00707 src/007/07.cc)
 add_executable(00708 src/007/08.cc)
 
+# 整数 浮点数 字符的存储
+add_executable(10101 src/101/01.cc)
+add_executable(10102 src/101/02.cc)
+add_executable(10103 src/101/03.cc)
+add_executable(10104 src/101/04.cc)
+add_executable(10105 src/101/05.cc)
+add_executable(10106 src/101/06.cc)
+add_executable(10107 src/101/07.cc)
+add_executable(10108 src/101/08.cc)
+add_executable(10109 src/101/09.cc)
+add_executable(10110 src/101/10.cc)
+
 ###########################################################################
 
 # add_executable(lsh lsh.cc)

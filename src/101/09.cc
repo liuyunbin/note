@@ -1,8 +1,8 @@
 
-#include "test.h"
+#include "00.h"
 
 void test(const std::string& str, double x) {
-    std::cout << str << " => " << to_double_cs(x) << std::endl;
+    std::cout << str << " => " << Double(x).double_by_cs << std::endl;
 }
 
 int main() {
