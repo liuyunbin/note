@@ -17,4 +17,5 @@
 * [僵尸进程](./src/007/readme.md)
 * [用户和组](./src/008/readme.md)
 * [打包和压缩](./src/009/readme.md)
+* [文本和文件](./src/010/readme.md)
 
