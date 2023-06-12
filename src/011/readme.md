@@ -37,6 +37,7 @@
 2. 如果有管理员权限，优先选择包管理器，而后选择编译安装到用户目录，尽量不要编译安装到系统目录
 
 ## 常用命令
+```
 apt update      # 更新软件源
                 # 软件源: /etc/apt/sources.list
                 #         /etc/apt/sources.list.d/
@@ -83,4 +84,5 @@ yum list vim             # 列出某软件包的详细信息
 yum list updates         # 列出可用更新
 yum provides vim         # 查看软件属于哪个软件包
 yum provides /etc/vimrc  # 查看文件由哪个软件使用
+```
 
