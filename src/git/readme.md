@@ -1,12 +1,61 @@
 
-# 未跟踪
-# 已修改
-# 已暂存
-# 已提交
+## 简介
+* Git 是一个分布式版本管理的工具
+* 本文只列举 Git 最常用的功能
+* Git 只是版本管理的工具, 未必需要做到, 知其然并知其所以然, 够用就好
 
+## 基本说明
+### 三个工作区域：
+1. Git 仓库
+2. 暂存区域
+3. 工作目录
+
+### 文件和目录的分类：
+1. 未跟踪的（untracked），位于工作目录
+2. 已暂存的（staged），属于暂存区域，位于 Git 仓库目录
+3. 已提交的（committed），位于 Git 仓库目录
+4. 已修改的（modified），位于工作目录
+5. 已忽略的文件或目录，位于工作目录
+
+### 忽略文件或目录
+在文件 .gitignore 中添加要忽略的文件或目录，规则如下：
+1. 空行或以 `#` 开头的行将被忽略
+2. 以 `/` 开头防止递归
+3. 以 `/` 结尾表示目录
+4. 以 `!` 开头，表示不忽略文件或目录
+5. `*` 匹配任意字符（不包括 `/`）
+6. `**` 匹配任意字符
+7. `[abc]` 表示匹配方括号内的任意单个字符
+8. `[0-9]` 表示匹配范围 [0, 9] 内的任意单个个字符
+9. `?` 匹配任意单个字符
+
+## 本地配置基础环境连接 GitHub
+```
+$ sudo apt install git                                 # 安装 Git
+$                                                      #
+$ git config --global user.name  liuyunbin             # 配置用户名
+$ git config --global user.email yunbinliu@outlook.com # 配置邮箱
+$ git config --global core.editor vim                  # 配置默认编辑器
+$ git config --global log.date iso                     # 配置日志使用 年月日 时分秒 时区 的格式
+$
+$ git config --global alias.lg "log --pretty=format:'%Cgreen%ad%Creset %h %s %C(yellow)%d%Creset %Cblue%an%Creset'"                                                 # 添加别名
+$                                                      #
+$ git config --list --global                           # 查看当前用户的配置信息
+$                                                      #
+$ ssh-keygen -t rsa                                    # 生成密钥
+$                                                      # 复制公钥到 GitHub
+$                                                      #     将文件 `~/.ssh/id_rsa.pub` 里的公钥添加到
+$                                                      #     https://github.com/settings/keys
+$                                                      # 到此可以免密码使用 GitHub
+$ ssh -T git@github.com                                # 测试是否成功
+```
+
+## 常用命令
+```
 git add README # 未跟踪 --> 已暂存
 git add README # 已修改 --> 已暂存
 git add README # 合并时把有冲突的文件标记为已解决状态
+git add -u     # 添加所有已修改的文件
 
 git blame  main.cc        # 查看文件每行的最后变更
 
@@ -37,23 +86,28 @@ git checkout -b      serverfix origin/serverfix # 新建并关联到远程分支
 git checkout --track           origin/serverfix # 新建并关联到远程分支
 git checkout         serverfix                  # 本地分支不存在, 且 远程分支存在, 新建并关联到远程分支
 
-git clone https://github.com/liuyunbin/note # 克隆仓库
+git clone                      https://github.com/liuyunbin/note # 克隆仓库
+git clone --recurse-submodules https://github.com...             # 克隆包含子模块的项目
 git clone git@github.com:liuyunbin/note     # ssh 协议
 git clone git@github.com:liuyunbin/note.git # TODO: 和上一个有什么区别
-git clone --recurse-submodules https://github.com...  # 克隆包含子模块的项目
 
-git commit -a -m "message" # 已修改 --> 已暂存 --> 已提交
-git commit    -m "message" #            已暂存 --> 已提交
-git commit --amend         # 将要修改的内容合并到最后一次提交中, 并修改提交信息, 旧的提交将删除
-git commit --amend -m ...  # 将要修改的内容合并到最后一次提交中, 并修改提交信息, 旧的提交将删除
+git commit -a -m "message"   # 已修改 --> 已暂存 --> 已提交
+git commit    -m "message"   #            已暂存 --> 已提交
+git commit --amend           # 将要修改的内容合并到最后一次提交中, 并修改提交信息, 旧的提交将删除
+git commit --amend -m ...    # 将要修改的内容合并到最后一次提交中, 并修改提交信息, 旧的提交将删除
+git commit --amend --no-edit # 同上, 但不需要修改提交信息
 
-# --system  为整个系统中的项目配置
-# --global  为某个用户下的项目配置
-# --local   为单独的某个项目配置 -- 这个是默认行为
+                                                     # --system  为整个系统中的项目配置
+                                                     # --global  为某个用户下的项目配置
+                                                     # --local   为单独的某个项目配置 -- 这个是默认行为
 git config --global user.name  liuyunbin             # 配置用户名
 git config --global user.email yunbinliu@outlook.com # 配置邮箱
 git config --global core.editor vim                  # 配置默认编辑器
 git config --global log.date iso                     # 日志使用 年月日 时分秒 时区 的格式
+git config --global color.status      auto
+git config --global color.diff        auto
+git config --global color.branch      auto
+git config --global color.interactive auto
 git config --global --list                           # 检查配置信息
 git config --global --list --show-origin             # 检查配置信息 以及 所属文件
 git config --global               user.name          # 检查某一项配置
@@ -70,6 +124,7 @@ git config --global core.autocrlf false # 提交时: 不转换,      检出时: 
 git config --global core.safecrlf true  # 拒绝提交包含混合换行符的文件
 git config --global core.safecrlf false # 允许提交包含混合换行符的文件  == Linux 下的默认值
 git config --global core.safecrlf warn  # 提交包含混合换行符的文件时给出警告
+
 git config --global core.quotepath false # 引用路径不使用八进制, 中文名不再乱码
 
                      # 有参数比较 已修改 与 Git 仓库的区别吗? TODO
@@ -78,9 +133,12 @@ git diff --staged    # 暂存区域 和 Git 仓库 的差异
 git diff --cached    # 暂存区域 和 Git 仓库 的差异
 git diff --submodule # 获取子模块的修改
 
-git fetch [remote-name]                         # 从远程仓库获取数据
+git fetch [remote-name] # 从远程仓库获取数据
+git fetch -a            # 从所有远程仓库获取数据
 
-git init                                    # 初始化仓库
+git for-each-ref --format='%(committerdate:iso) %(refname) %(authorname)'
+                        # 查看所有远程分支最后一次的提交
+git init                    # 初始化仓库
 
 git log
 git log --stat              # 显示简略统计信息
@@ -94,7 +152,22 @@ git log --pretty=short      # 只有作者, 没有日期
 git log --pretty=full       # 显示作者和提交者
 git log --pretty=fuller     # 显示作者 作者提交的日期和提交者 提交者提交的日期
 git log --pretty=format:"." # 指定显示格式
-git log --pretty=format:"%ad %an %h %s"
+git log --pretty=format:'%Cgreen%ad%Creset %h %s %C(yellow)%d%Creset %Cblue%an%Creset'
+                            # %h 提交的简写哈希值
+                            # %t 树的简写哈希值
+                            # %p 父提交的简写哈希值
+                            # %an 作者名字
+                            # %ae 作者的邮箱
+                            # %ad 作者修订日期
+                            # %cn 提交者的名字
+                            # %ce 提交者的邮箱
+                            # %cd 提交日期
+                            # %d  ref名称 -- 包括tag等
+                            # %s 提交说明
+                            # %Cred	切换到红色
+                            # %Cgreen 切换到绿色
+                            # %Cblue  切换到蓝色
+                            # %Creset 重设颜色
 git log --graph             # 显示分支的合并
 git log --name-only         # 显示修改的文件清单
 git log --name-status       # 显示修改的文件信息, 增删改
@@ -126,7 +199,8 @@ git merge test-branch # 将 test-branch 合并到 当前分支
 
 git mv file_from file_to # 移动文件或目录
 
-git pull                                        # 从远程仓库获取数据, 然后合并
+git pull            # 从远程仓库获取数据, 然后合并
+git pull --rebase   # 从远程仓库获取数据, 然后合并, 自动 rebase
 
 git push origin master                          # 推送提交到远程仓库
 git push origin A:B                             # 推送本地分支A到远程分支B
@@ -151,6 +225,7 @@ git remote rm     origin            # 删除远程仓库
 git remote remove origin            # 删除远程仓库
 git remote rename origin new-origin # 重命名远程仓库
 git remote show   origin            # 查看远程仓库的详细信息
+git remote prune  origin            # 删除本地仓库中的远程分支(远程仓库里已删除)
 
 git reset --soft  HEAD~           # 将 HEAD 指到 HEAD~, 暂存区和工作目录不变
                                   # 有可能会丢失 HEAD~ 之后的数据
@@ -206,7 +281,6 @@ git stash apply               # 恢复已贮藏的工作
 git stash apply --index       # 恢复已贮藏的工作, 同时恢复暂存区
 git stash drop                # 丢弃贮藏区的工作
 git stash pop                 # 恢复已贮藏的工作, 并丢弃贮藏区的工作
-git stash                     # 保存当前状态
 
 git status         # 列出文件状态
 git status  -s     # 显示简短信息
@@ -227,53 +301,12 @@ git switch -c test-branch # 创建并切换到 test-branch
 git tag                       # 列出 标签
 git tag -l "v*"               # 列出 标签
 git tag v1.0                  # 创建 标签
+git tag v1.0  提交号          # 在某次提交上, 创建 标签
 git tag -d v1.0               # 删除本地 标签
 git tag --contains 提交号     # 查看某个提交号在哪些 tag 中出现
+```
 
 ## 参考资源
 1. https://help.github.com/en/articles/set-up-git
 2. https://git-scm.com/book/zh/v2
-
-## 简介
-Git 是一个分布式版本管理的工具
-
-## 测试环境
-* Ubuntu 18.04 LTS
-* Git 2.17.1
-
-### Git 常用命令
-**注意：以下说明中均不包含被忽略的文件和目录**
-
-## 简介
-* Git 是一个分布式版本管理的工具
-* 本文只列举 Git 最常用的功能
-* Git 只是版本管理的工具, 未必需要做到, 知其然并知其所以然, 够用就好
-
-## 安装
-$ sudo apt install git
-
-## 基本说明
-### 三个工作区域：
-1. Git 仓库
-2. 暂存区域
-3. 工作目录
-
-### 文件和目录的分类：
-1. 未跟踪的（untracked），位于工作目录
-2. 已暂存的（staged），属于暂存区域，位于 Git 仓库目录
-3. 已提交的（committed），位于 Git 仓库目录
-4. 已修改的（modified），位于工作目录
-5. 已忽略的文件或目录，位于工作目录
-
-### 忽略文件或目录
-在文件 .gitignore 中添加要忽略的文件或目录，规则如下：
-1. 空行或以 `#` 开头的行将被忽略
-2. 以 `/` 开头防止递归
-3. 以 `/` 结尾表示目录
-4. 以 `!` 开头，表示不忽略文件或目录
-5. `*` 匹配任意字符（不包括 `/`）
-6. `**` 匹配任意字符
-7. `[abc]` 表示匹配方括号内的任意单个字符
-8. `[0-9]` 表示匹配范围 [0, 9] 内的任意单个个字符
-9. `?` 匹配任意单个字符
 
