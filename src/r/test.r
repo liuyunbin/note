@@ -58,7 +58,7 @@ col_names = colnames(df) # 列名称
 col_nums = ncol(df) # 列的个数
 row_nums = nrow(df) # 行的个数, 即 年分数
 
-### 处理 横标轴的刻度名称, 每 n 个 展示一个 
+### 处理 横标轴的刻度名称, 每 n 个 展示一个
 n = 5
 year_len = length(df[,1])
 scale_x_names = vector(mode='character',length=year_len)
@@ -68,7 +68,7 @@ for (i in 1:year_len) {
 	}
 }
 
-### 处理 纵标轴的刻度名称, 每 n 个 展示一个 
+### 处理 纵标轴的刻度名称, 每 n 个 展示一个
 n = 10
 scale_y_names = vector(mode='character', length=31)
 for (i in 1:31) {
@@ -84,8 +84,8 @@ df = melt(df, id = "year", variable.name = "city", value.name = "data")
 ## 画图
 
 # ggplot()     存入数据
-ggplot(data = df, 
-       mapping = aes(x = year, 
+ggplot(data = df,
+       mapping = aes(x = year,
                      y = data,
                      group=city,
                      colour=city)) +
@@ -95,7 +95,7 @@ theme_bw() +                            # 去掉背景
 theme(panel.grid=element_blank(),       # 去掉网格
 	axis.ticks.x = element_blank(),   # 去掉 x 轴的刻度
       axis.ticks.y = element_blank(),   # 去掉 y 轴的刻度
-      panel.border = element_blank()    # 去掉外边框    
+      panel.border = element_blank()    # 去掉外边框
       ) +
 scale_x_discrete(breaks=c(2000,         # 调整横坐标要展示的刻度标签
                           2005,
@@ -125,7 +125,7 @@ guides(
 		keyheight = 0.7
 	)
 ) +
-coord_fixed(ratio=3/5)+ 
+coord_fixed(ratio=3/5)+
 labs(
     	x = "Year",           # x 轴
     	y = "Ranking(ECI)",   # y 轴
