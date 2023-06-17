@@ -1,4 +1,11 @@
 
+
+# 编译
+```
+./bash/install-dependency.sh
+./bash/build.sh
+```
+
 # 操作系统-僵尸进程
 ## 产生的原因
 * 子进程退出时, 会向父进程发送 `SIGCHLD`, 同时内核会保留子进程退出的状态信息
