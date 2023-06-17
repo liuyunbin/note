@@ -17,79 +17,79 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib) # 设置 静态库  
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib) # 设置 动态库     的输出目录
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin) # 设置 二进制文件 的输出目录
 
-include_directories(${CMAKE_SOURCE_DIR}/include) # 设置头文件的搜索目录
+#include_directories(${CMAKE_SOURCE_DIR}/include) # 设置头文件的搜索目录
 #   link_directories(${CMAKE_SOURCE_DIR}/lib)     # 设置库文件的搜索目录
 #   link_directories(${CMAKE_SOURCE_DIR}/lib64)   # 设置库文件的搜索目录
 
 # 激活测试
 enable_testing()
 
+# 操作系统-僵尸进程
+add_executable(101 bash/101.cc)
+add_executable(102 bash/102.cc)
+add_executable(103 bash/103.cc)
+add_executable(104 bash/104.cc)
+add_executable(105 bash/105.cc)
+add_executable(106 bash/106.cc)
+add_executable(107 bash/107.cc)
+add_executable(108 bash/108.cc)
+
 # 信号
-add_executable(00101 src/001/01.cc)
-add_executable(00102 src/001/02.cc)
-add_executable(00103 src/001/03.cc)
-add_executable(00104 src/001/04.cc)
-add_executable(00105 src/001/05.cc)
-add_executable(00106 src/001/06.cc)
-add_executable(00107 src/001/07.cc)
-add_executable(00108 src/001/08.cc)
-add_executable(00109 src/001/09.cc)
-add_executable(00110 src/001/10.cc)
-add_executable(00111 src/001/11.cc)
-add_executable(00112 src/001/12.cc)
-add_executable(00113 src/001/13.cc)
-add_executable(00114 src/001/14.cc)
-add_executable(00115 src/001/15.cc)
-
-# 进程
-add_executable(00201 src/002/01.cc)
-add_executable(00202 src/002/02.cc)
-add_executable(00203 src/002/03.cc)
-add_executable(00204 src/002/04.cc)
-add_executable(00205 src/002/05.cc)
-
-# 进程组
-add_executable(00301 src/003/01.cc)
-add_executable(00302 src/003/02.cc)
-add_executable(00303 src/003/03.cc)
-add_executable(00304 src/003/04.cc)
-add_executable(00305 src/003/05.cc)
-add_executable(00306 src/003/06.cc)
-add_executable(00307 src/003/07.cc)
-add_executable(00308 src/003/08.cc)
-
-# 会话
-add_executable(00401 src/004/01.cc)
-add_executable(00402 src/004/02.cc)
-add_executable(00403 src/004/03.cc)
-
-# 孤儿进程
-add_executable(00501 src/005/01.cc)
-
-# 孤儿进程组
-add_executable(00601 src/006/01.cc)
-
-# 僵尸进程
-add_executable(00701 src/007/01.cc)
-add_executable(00702 src/007/02.cc)
-add_executable(00703 src/007/03.cc)
-add_executable(00704 src/007/04.cc)
-add_executable(00705 src/007/05.cc)
-add_executable(00706 src/007/06.cc)
-add_executable(00707 src/007/07.cc)
-add_executable(00708 src/007/08.cc)
-
-# 整数 浮点数 字符的存储
-add_executable(10101 src/101/01.cc)
-add_executable(10102 src/101/02.cc)
-add_executable(10103 src/101/03.cc)
-add_executable(10104 src/101/04.cc)
-add_executable(10105 src/101/05.cc)
-add_executable(10106 src/101/06.cc)
-add_executable(10107 src/101/07.cc)
-add_executable(10108 src/101/08.cc)
-add_executable(10109 src/101/09.cc)
-add_executable(10110 src/101/10.cc)
+#add_executable(00101 src/001/01.cc)
+#add_executable(00102 src/001/02.cc)
+#add_executable(00103 src/001/03.cc)
+#add_executable(00104 src/001/04.cc)
+#add_executable(00105 src/001/05.cc)
+#add_executable(00106 src/001/06.cc)
+#add_executable(00107 src/001/07.cc)
+#add_executable(00108 src/001/08.cc)
+#add_executable(00109 src/001/09.cc)
+#add_executable(00110 src/001/10.cc)
+#add_executable(00111 src/001/11.cc)
+#add_executable(00112 src/001/12.cc)
+#add_executable(00113 src/001/13.cc)
+#add_executable(00114 src/001/14.cc)
+#add_executable(00115 src/001/15.cc)
+#
+## 进程
+#add_executable(00201 src/002/01.cc)
+#add_executable(00202 src/002/02.cc)
+#add_executable(00203 src/002/03.cc)
+#add_executable(00204 src/002/04.cc)
+#add_executable(00205 src/002/05.cc)
+#
+## 进程组
+#add_executable(00301 src/003/01.cc)
+#add_executable(00302 src/003/02.cc)
+#add_executable(00303 src/003/03.cc)
+#add_executable(00304 src/003/04.cc)
+#add_executable(00305 src/003/05.cc)
+#add_executable(00306 src/003/06.cc)
+#add_executable(00307 src/003/07.cc)
+#add_executable(00308 src/003/08.cc)
+#
+## 会话
+#add_executable(00401 src/004/01.cc)
+#add_executable(00402 src/004/02.cc)
+#add_executable(00403 src/004/03.cc)
+#
+## 孤儿进程
+#add_executable(00501 src/005/01.cc)
+#
+## 孤儿进程组
+#add_executable(00601 src/006/01.cc)
+#
+## 整数 浮点数 字符的存储
+#add_executable(10101 src/101/01.cc)
+#add_executable(10102 src/101/02.cc)
+#add_executable(10103 src/101/03.cc)
+#add_executable(10104 src/101/04.cc)
+#add_executable(10105 src/101/05.cc)
+#add_executable(10106 src/101/06.cc)
+#add_executable(10107 src/101/07.cc)
+#add_executable(10108 src/101/08.cc)
+#add_executable(10109 src/101/09.cc)
+#add_executable(10110 src/101/10.cc)
 
 ###########################################################################
 
