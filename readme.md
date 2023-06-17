@@ -2,8 +2,8 @@
 
 # 编译
 ```
-./bash/install-dependency.sh
-./bash/build.sh
+./install-dependency.sh
+./build.sh
 ```
 
 # 操作系统-僵尸进程
