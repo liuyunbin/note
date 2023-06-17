@@ -8,7 +8,6 @@
 ## 目录
 ### 操作系统
 
-* [信号](./src/001/readme.md)
 * [进程](./src/002/readme.md)
 * [进程组](./src/003/readme.md)
 * [会话](./src/004/readme.md)
