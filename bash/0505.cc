@@ -1,7 +1,4 @@
 
-#ifndef LOG_H_
-#define LOG_H_
-
 #include <setjmp.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -36,8 +33,6 @@ std::string get_time() {
 void log(const std::string& msg = "") {
     std::cout << get_time() << " " << msg << std::endl;
 }
-
-#endif
 
 void handle_signal(int sig) { log("子进程捕捉到信号 SIGUSR1"); }
 

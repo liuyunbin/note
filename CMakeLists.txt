@@ -57,13 +57,13 @@ add_executable(0413 bash/0413.cc)
 add_executable(0414 bash/0414.cc)
 add_executable(0415 bash/0415.cc)
 
-## 进程
-#add_executable(00201 src/002/01.cc)
-#add_executable(00202 src/002/02.cc)
-#add_executable(00203 src/002/03.cc)
-#add_executable(00204 src/002/04.cc)
-#add_executable(00205 src/002/05.cc)
-#
+# 进程
+add_executable(0501 bash/0501.cc)
+add_executable(0502 bash/0502.cc)
+add_executable(0503 bash/0503.cc)
+add_executable(0504 bash/0504.cc)
+add_executable(0505 bash/0505.cc)
+
 ## 进程组
 #add_executable(00301 src/003/01.cc)
 #add_executable(00302 src/003/02.cc)
