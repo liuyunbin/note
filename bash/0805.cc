@@ -1,7 +1,4 @@
 
-#ifndef LOG_H_
-#define LOG_H_
-
 #include <setjmp.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -25,6 +22,8 @@
 #include <sstream>
 #include <string>
 
+#include "0800.h"
+
 std::string get_time() {
     time_t now = time(NULL);
     struct tm* info = localtime(&now);
@@ -36,9 +35,6 @@ std::string get_time() {
 void log(const std::string& msg = "") {
     std::cout << get_time() << " " << msg << std::endl;
 }
-
-#endif
-#include "00.h"
 
 // type 为 0 表示除, 为 1 表示 乘, 2 表示小于, 3 表示使用 isless, 其他使用 lrint
 void test(const std::string& name, double x, double y, int type = 0) {

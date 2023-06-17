@@ -79,17 +79,17 @@ add_executable(0701 bash/0701.cc)
 add_executable(0702 bash/0702.cc)
 add_executable(0703 bash/0703.cc)
 
-## 整数 浮点数 字符的存储
-#add_executable(10101 src/101/01.cc)
-#add_executable(10102 src/101/02.cc)
-#add_executable(10103 src/101/03.cc)
-#add_executable(10104 src/101/04.cc)
-#add_executable(10105 src/101/05.cc)
-#add_executable(10106 src/101/06.cc)
-#add_executable(10107 src/101/07.cc)
-#add_executable(10108 src/101/08.cc)
-#add_executable(10109 src/101/09.cc)
-#add_executable(10110 src/101/10.cc)
+# 计算机组成原理-整数-浮点数-字符
+add_executable(0801 bash/0801.cc)
+add_executable(0802 bash/0802.cc)
+add_executable(0803 bash/0803.cc)
+add_executable(0804 bash/0804.cc)
+add_executable(0805 bash/0805.cc)
+add_executable(0806 bash/0806.cc)
+add_executable(0807 bash/0807.cc)
+add_executable(0808 bash/0808.cc)
+add_executable(0809 bash/0809.cc)
+add_executable(0810 bash/0810.cc)
 
 ###########################################################################
 
