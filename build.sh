@@ -7,4 +7,6 @@ cd build
 cmake ..
 make
 # make test
+cd ..
+rm -r build
 
