@@ -10,5 +10,5 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: ./src/bash/install-dependency.sh
-      - run: ./src/bash/build.sh
+      - run: ./bash/install-dependency.sh
+      - run: ./bash/build.sh
