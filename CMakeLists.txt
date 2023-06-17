@@ -74,11 +74,11 @@ add_executable(0606 bash/0606.cc)
 add_executable(0607 bash/0607.cc)
 add_executable(0608 bash/0608.cc)
 
-## 会话
-#add_executable(00401 src/004/01.cc)
-#add_executable(00402 src/004/02.cc)
-#add_executable(00403 src/004/03.cc)
-#
+# 会话
+add_executable(0701 bash/0701.cc)
+add_executable(0702 bash/0702.cc)
+add_executable(0703 bash/0703.cc)
+
 ## 整数 浮点数 字符的存储
 #add_executable(10101 src/101/01.cc)
 #add_executable(10102 src/101/02.cc)
