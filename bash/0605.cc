@@ -1,7 +1,4 @@
 
-#ifndef LOG_H_
-#define LOG_H_
-
 #include <setjmp.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -37,8 +34,6 @@ void log(const std::string& msg = "") {
     std::cout << get_time() << " " << msg << std::endl;
 }
 
-#endif
-
 void test(pid_t pid, pid_t pgid) {
     log();
 
@@ -66,4 +61,26 @@ void test(pid_t pid, pid_t pgid) {
     log(msg);
 
     log();
+}
+
+int main() {
+    log();
+    log("测试新建子进程对应的进程组(其他情况)");
+    log();
+
+    pid_t child = fork();
+    if (child == 0) {
+        for (;;)
+            ;
+    }
+    sleep(1);
+    log("新建子进程(" + std::to_string(child) + ")的进程组");
+    test(child, child);
+    kill(child, SIGKILL);
+
+    sleep(1);
+    log("主进程退出");
+    log();
+
+    return 0;
 }

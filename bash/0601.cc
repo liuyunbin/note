@@ -1,7 +1,4 @@
 
-#ifndef LOG_H_
-#define LOG_H_
-
 #include <setjmp.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -37,17 +34,42 @@ void log(const std::string& msg = "") {
     std::cout << get_time() << " " << msg << std::endl;
 }
 
-#endif
-#include "00.h"
+void test(pid_t pid, pid_t pgid) {
+    log();
+
+    std::string msg;
+
+    msg += "进程 " + std::to_string(pid);
+    msg += " 进程组 " + std::to_string(getpgid(pid));
+    msg += " 会话 " + std::to_string(getsid(pid));
+    log(msg);
+
+    msg = "修改进程组 ";
+    msg += std::to_string(getpgid(pid));
+    msg += " => ";
+    msg += std::to_string(pgid);
+    if (setpgid(pid, pgid) < 0) {
+        msg += ": ";
+        msg += strerror(errno);
+    }
+    log(msg);
+
+    msg.clear();
+    msg += "进程 " + std::to_string(pid);
+    msg += " 进程组 " + std::to_string(getpgid(pid));
+    msg += " 会话 " + std::to_string(getsid(pid));
+    log(msg);
+
+    log();
+}
 
 int main() {
     log();
-    log("测试新建会话首进程对应的的进程组");
+    log("测试新建自身进程对应的进程组");
     log();
 
+    test(getpid(), getpid());
     if (fork() == 0) {
-        log("创建新会话");
-        setsid();
         test(getpid(), getpid());
         exit(-1);
     }

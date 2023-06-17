@@ -57,23 +57,23 @@ add_executable(0413 bash/0413.cc)
 add_executable(0414 bash/0414.cc)
 add_executable(0415 bash/0415.cc)
 
-# 进程
+# 操作系统-进程
 add_executable(0501 bash/0501.cc)
 add_executable(0502 bash/0502.cc)
 add_executable(0503 bash/0503.cc)
 add_executable(0504 bash/0504.cc)
 add_executable(0505 bash/0505.cc)
 
-## 进程组
-#add_executable(00301 src/003/01.cc)
-#add_executable(00302 src/003/02.cc)
-#add_executable(00303 src/003/03.cc)
-#add_executable(00304 src/003/04.cc)
-#add_executable(00305 src/003/05.cc)
-#add_executable(00306 src/003/06.cc)
-#add_executable(00307 src/003/07.cc)
-#add_executable(00308 src/003/08.cc)
-#
+# 操作系统-进程组
+add_executable(0601 bash/0601.cc)
+add_executable(0602 bash/0602.cc)
+add_executable(0603 bash/0603.cc)
+add_executable(0604 bash/0604.cc)
+add_executable(0605 bash/0605.cc)
+add_executable(0606 bash/0606.cc)
+add_executable(0607 bash/0607.cc)
+add_executable(0608 bash/0608.cc)
+
 ## 会话
 #add_executable(00401 src/004/01.cc)
 #add_executable(00402 src/004/02.cc)
