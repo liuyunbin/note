@@ -1,6 +1,4 @@
 
-#ifndef LOG_H_
-#define LOG_H_
 
 #include <setjmp.h>
 #include <signal.h>
@@ -37,7 +35,6 @@ void log(const std::string& msg = "") {
     std::cout << get_time() << " " << msg << std::endl;
 }
 
-#endif
 
 int main() {
     log();

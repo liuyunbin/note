@@ -34,6 +34,9 @@ add_executable(0106 bash/0106.cc)
 add_executable(0107 bash/0107.cc)
 add_executable(0108 bash/0108.cc)
 
+# 操作系统-孤儿进程
+add_executable(0201 bash/0201.cc)
+
 # 信号
 #add_executable(00101 src/001/01.cc)
 #add_executable(00102 src/001/02.cc)
@@ -72,9 +75,6 @@ add_executable(0108 bash/0108.cc)
 #add_executable(00401 src/004/01.cc)
 #add_executable(00402 src/004/02.cc)
 #add_executable(00403 src/004/03.cc)
-#
-## 孤儿进程
-#add_executable(00501 src/005/01.cc)
 #
 ## 孤儿进程组
 #add_executable(00601 src/006/01.cc)
