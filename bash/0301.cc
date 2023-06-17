@@ -1,7 +1,4 @@
 
-#ifndef LOG_H_
-#define LOG_H_
-
 #include <setjmp.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -36,8 +33,6 @@ std::string get_time() {
 void log(const std::string& msg = "") {
     std::cout << get_time() << " " << msg << std::endl;
 }
-
-#endif
 
 std::map<int, std::string> m;
 
@@ -107,7 +102,6 @@ int main() {
         }
     }
 
-    sleep(3);
     sleep(3);
     log("主进程退出");
     log();
