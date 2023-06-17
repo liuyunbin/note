@@ -1,7 +1,4 @@
 
-#ifndef LOG_H_
-#define LOG_H_
-
 #include <setjmp.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -36,8 +33,6 @@ std::string get_time() {
 void log(const std::string& msg = "") {
     std::cout << get_time() << " " << msg << std::endl;
 }
-
-#endif
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
     log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
