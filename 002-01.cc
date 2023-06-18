@@ -3,7 +3,7 @@
 
 int main() {
     log();
-    log("测试孤儿进程");
+    log("操作系统-孤儿进程");
     log();
 
     if (fork() == 0) {
