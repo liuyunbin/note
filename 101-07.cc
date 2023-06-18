@@ -5,11 +5,11 @@ template <typename T>
 void test(const std::string& name, T bit) {
     Double d(bit);
 
-    std::cout << std::endl;
-    std::cout << "测试类型: " << name << std::endl;
-    std::cout << "  二进制: " << d.bit << std::endl;
-    std::cout << "  计算机: " << d.double_by_cs << std::endl;
-    std::cout << "    手动: " << d.double_by_hand << std::endl;
+    log();
+    log("测试类型: " + name);
+    log("  二进制: " + d.bit);
+    log("  计算机: " + d.double_by_cs);
+    log("    手动: " + d.double_by_hand);
 }
 
 void test() {
@@ -28,21 +28,18 @@ void test() {
     test("非数字",
          "0 11111111111 0000000000000000000000000000000000000000000000000001");
 
-    std::cout << std::endl << "使用 numeric_limits" << std::endl;
-    std::cout << "最小非规约负数: ";
-    std::cout << Double(std::numeric_limits<double>::lowest()).bit << std::endl;
-    std::cout << "最小非规约正数: ";
-    std::cout << Double(std::numeric_limits<double>::denorm_min()).bit
-              << std::endl;
-    std::cout << "最小  规约正数: ";
-    std::cout << Double(std::numeric_limits<double>::min()).bit << std::endl;
-    std::cout << "最大  规约正数: ";
-    std::cout << Double(std::numeric_limits<double>::max()).bit << std::endl;
-    std::cout << "        正无穷: ";
-    std::cout << Double(std::numeric_limits<double>::infinity()).bit
-              << std::endl;
+    log();
+    log("使用 numeric_limits");
+    log("最小非规约负数: " + Double(std::numeric_limits<double>::lowest()).bit);
+    log("最小非规约正数: " +
+        Double(std::numeric_limits<double>::denorm_min()).bit);
+    log("最小  规约正数: " + Double(std::numeric_limits<double>::min()).bit);
+    log("最大  规约正数: " + Double(std::numeric_limits<double>::max()).bit);
+    log("        正无穷: " +
+        Double(std::numeric_limits<double>::infinity()).bit);
 
-    std::cout << std::endl << "测试浮点数的差值" << std::endl;
+    log();
+    log("测试浮点数的差值");
     double a, b, c, d;
 
     // 最小规约正数
@@ -54,14 +51,13 @@ void test() {
     // 最大非规约正数的上一数
     a = std::nextafter(b, std::numeric_limits<double>::lowest());
 
-    std::cout << "最大非规约正数       - 最大非规约正数的上一数: ";
-    std::cout << b - a << std::endl;
-
-    std::cout << "最小规约正数         - 最大非规约正数:         ";
-    std::cout << c - b << std::endl;
-
-    std::cout << "最小规约正数的下一数 - 最小规约正数:           ";
-    std::cout << d - c << std::endl;
+    log("最大非规约正数       - 最大非规约正数的上一数: " +
+        std::to_string(b - a));
+    log("最小规约正数         - 最大非规约正数:         " +
+        std::to_string(c - b));
+    log("最小规约正数的下一数 - 最小规约正数:           " +
+        std::to_string(d - c));
+    log();
 }
 
 int main() {

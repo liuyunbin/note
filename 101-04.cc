@@ -4,18 +4,20 @@
 void test(const std::string& name, const std::string& bit) {
     Double d(bit);
 
-    std::cout << "        测试类型: " << name << std::endl;
-    std::cout << "    测试的二进制: " << d.bit_by_test << std::endl;
-    std::cout << "    存储的二进制: " << d.bit_by_cs << std::endl;
-    std::cout << "          手动值: " << d.double_by_hand << std::endl;
-    std::cout << "          存储值: " << d.double_by_cs << std::endl;
-    std::cout << std::endl;
+    log();
+    log("        测试类型: " + name);
+    log("    测试的二进制: " + d.bit_by_test);
+    log("    存储的二进制: " + d.bit_by_cs);
+    log("          手动值: " + d.double_by_hand);
+    log("          存储值: " + d.double_by_cs);
 }
 
 void test() {
-    std::cout << "测试存储时的四舍六入五取偶" << std::endl << std::endl;
+    log();
+    log("测试存储时的四舍六入五取偶");
+    log();
 
-    std::cout << "        舍入方向: " << dict_round[fegetround()] << std::endl;
+    log("        舍入方向: " + dict_round[fegetround()]);
 
     test("测试 最后一位是 0, 多余位是 00(舍)",
          "0100001100110000000000000000000000000000000000000000000000000000 00");
@@ -40,6 +42,7 @@ void test() {
 
     test("测试 最后一位是 1, 多余位是 11(入)",
          "0100001100110000000000000000000000000000000000000000000000000001 11");
+    log();
 }
 
 int main() {

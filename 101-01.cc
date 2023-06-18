@@ -12,17 +12,19 @@ void test(const std::string& str, T v) {
     Node<T> node;
     node.t = v;
 
-    std::cout << str << " ";
+    std::string msg = str + " ";
     for (size_t i = 0; i < sizeof(T); ++i) {
-        if (i != 0 && i % 8 == 0) {
-            std::cout << std::endl << std::setw(32) << " ";
+        if (i != 0 && i % 4 == 0) {
+            msg += "\n" + std::string(58, ' ');
         }
-        std::cout << std::bitset<8>(node.str[i]) << " ";
+        msg += std::bitset<8>(node.str[i]).to_string() + " ";
     }
-    std::cout << std::endl;
+    log(msg);
 }
 
 int main() {
+    log();
+
     test("测试        char 存储数字 1 => ", (char)1);
     test("测试       short 存储数字 1 => ", (short)1);
     test("测试         int 存储数字 1 => ", (int)1);
@@ -36,17 +38,14 @@ int main() {
     test("测试    char16_t 存储数字 1 => ", (char16_t)1);
     test("测试    char32_t 存储数字 1 => ", (char32_t)1);
 
-    std::cout << std::endl;
-
     Node<short> node;
     node.t = 1;
 
-    std::cout << "           测试本机的大小端 => ";
-    if (node.str[0] == 1) {
-        std::cout << "小端存储" << std::endl;
-    } else {
-        std::cout << "大端存储" << std::endl;
-    }
+    std::string msg = "测试本机的大小端 => ";
+    msg += node.str[0] == 1 ? "小端存储" : "大端存储";
+    log();
+    log(msg);
+    log();
 
     return 0;
 }

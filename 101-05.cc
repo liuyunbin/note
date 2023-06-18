@@ -22,16 +22,20 @@ void test(const std::string& name, double x, double y, int type = 0) {
             except += v.second + " ";
         }
 
-    if (except.empty()) except = "空";
-    std::cout << std::endl;
-    std::cout << "测试类型: " << name << std::endl;
-    std::cout << "测试结果: " << result << std::endl;
-    std::cout << "异常信息: " << except << std::endl;
+    if (except.empty()) {
+        except = "空";
+    }
+
+    log();
+    log("测试类型: " + name);
+    log("测试结果: " + result);
+    log("异常信息: " + except);
+    log();
 }
 
 void test() {
     double x;
-    std::cout << "测试浮点数的异常" << std::endl;
+    log("测试浮点数的异常");
     test("测试除以零", 1, 0.0);
     test("测试结果不准确", 1, 10.0);
     x = std::numeric_limits<double>::max();

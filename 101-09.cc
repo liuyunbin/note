@@ -2,11 +2,12 @@
 #include "log.h"
 
 void test(const std::string& str, double x) {
-    std::cout << str << " => " << Double(x).double_by_cs << std::endl;
+    log(str + " => " + Double(x).double_by_cs);
 }
 
 int main() {
     init();
+    log();
 
     test("4503599627370496.0", 4503599627370496.0);
     test("4503599627370496.1", 4503599627370496.1);
@@ -28,6 +29,7 @@ int main() {
     test("4503599627370497", 4503599627370497);
     test("4503599627370498", 4503599627370498);
     test("4503599627370499", 4503599627370499);
+    log();
 
     return 0;
 }

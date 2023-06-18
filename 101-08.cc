@@ -3,21 +3,23 @@
 
 void test(const std::string& name, double x) {
     Double d(x);
-    std::cout << std::endl;
-    std::cout << "          测试类型: " << name << std::endl;
-    std::cout << "            二进制: " << d.bit << std::endl;
-    std::cout << "        计算机存储: " << d.double_by_cs << std::endl;
-    std::cout << "          手动计算: " << d.double_by_hand << std::endl;
+
+    log();
+    log("          测试类型: " + name);
+    log("            二进制: " + d.bit);
+    log("        计算机存储: " + d.double_by_cs);
+    log("          手动计算: " + d.double_by_hand);
 }
 
 void test(const std::string& name, double x, const std::string& bit) {
     Double d(bit);
-    std::cout << std::endl;
-    std::cout << "          测试类型: " << name << std::endl;
-    std::cout << "            二进制: " << d.bit_by_cs << std::endl;
-    std::cout << "        计算机存储: " << d.double_by_cs << std::endl;
-    std::cout << "原浮点数(  二进制): " << d.bit_by_test << std::endl;
-    std::cout << "原浮点数(手动计算): " << d.double_by_hand << std::endl;
+
+    log();
+    log("          测试类型: " + name);
+    log("            二进制: " + d.bit_by_cs);
+    log("        计算机存储: " + d.double_by_cs);
+    log("原浮点数(  二进制): " + d.bit_by_test);
+    log("原浮点数(手动计算): " + d.double_by_hand);
 }
 
 int main() {
@@ -66,5 +68,6 @@ int main() {
     test(
         "测试 4503599627370497 的上限(进, 不含)", 4503599627370497.5,
         "0 10000110011 0000000000000000000000000000000000000000000000000001 1");
+    log();
     return 0;
 }
