@@ -5,6 +5,7 @@ void handle_signal(int sig) { log("测试的父进程捕捉到信号 SIGUSR1"); 
 
 int main() {
     log();
+    log("操作系统-进程");
     log("测试不可被信号打断的休眠(指被捕获的信号)");
     log();
 

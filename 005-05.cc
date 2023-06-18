@@ -5,6 +5,7 @@ void handle_signal(int sig) { log("子进程捕捉到信号 SIGUSR1"); }
 
 int main() {
     log();
+    log("操作系统-进程");
     log("测试 暂停 => 继续");
     log();
 
