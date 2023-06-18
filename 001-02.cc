@@ -1,4 +1,5 @@
 
+#include "log.h"
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
     log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");

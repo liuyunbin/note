@@ -1,4 +1,5 @@
 
+#include "log.h"
 
 void show(pid_t pid) {
     std::string msg;

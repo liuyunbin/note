@@ -1,4 +1,5 @@
 
+#include "log.h"
 
 void handle_signal(int sig) { log("子进程捕捉到信号 SIGUSR1"); }
 

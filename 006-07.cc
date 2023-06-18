@@ -1,4 +1,5 @@
 
+#include "log.h"
 
 void test(pid_t pid, pid_t pgid) {
     log();

@@ -1,4 +1,5 @@
 
+#include "log.h"
 
 std::map<int, std::string> m;
 void init() {

@@ -1,4 +1,5 @@
 
+#include "log.h"
 
 template <typename T>
 union Node {

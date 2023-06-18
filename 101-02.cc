@@ -1,4 +1,5 @@
 
+#include "log.h"
 
 void test(const std::string& str, int x, int y) {
     std::cout << std::endl;
