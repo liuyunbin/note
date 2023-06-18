@@ -7,7 +7,7 @@ void handle_signal(int sig, siginfo_t* sig_info, void*) {
 
 int main() {
     log();
-    log("测试预防僵尸进程");
+    log("操作系统-僵尸进程-预防");
     log("测试设置 SIGCHLD 处理为: 设置 SA_NOCLDWAIT");
     log();
 

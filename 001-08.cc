@@ -3,7 +3,7 @@
 
 int main() {
     log();
-    log("测试产生僵尸进程, 不退出");
+    log("操作系统-僵尸进程-测试");
     log();
     pid_t child = fork();
 
@@ -15,7 +15,7 @@ int main() {
     std::string cmd = "ps -o pid,comm,state -p " + std::to_string(child);
     system(cmd.data());
 
-    log("主进程死循环, 不退出...");
+    log("死循环...");
     for (;;)
         ;
 
