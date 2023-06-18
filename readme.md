@@ -16,6 +16,7 @@
 * [操作系统-会话](./007-00.md)
 * [操作系统-用户和组](./008-00.md)
 * [操作系统-打包和压缩](./009-00.md)
+* [操作系统-软件安装](./010-00.md)
 
 # 操作系统-文件和文本
 ## 文件时间
@@ -38,94 +39,6 @@
     * 所属主无权限, 所属组有权限时,
     * 对所属主也将判断为无权限
 * 在目录下新增或删除文件时, 至少拥有此目录的写和执行权限
-
-# 操作系统-软件安装
-## 包管理器
-### 优点：
-1. 安装，卸载 或 升级方便
-2. 不容易对系统造成污染（可能性极小）
-3. 不需要处理复杂的依赖关系
-
-### 缺点：
-1. 需要有管理员权限
-2. 安装的版本可能比较旧
-3. 不能指定编译参数
-
-## 源码编译到系统目录
-### 优点：
-1. 可以安装指定的版本
-2. 可以指定编译参数
-
-### 缺点：
-1. 需要理员权限
-2. 可能需要处理复杂的依赖关系
-3. 可能会对系统造成污染
-4. 安装，卸载 或 升级比较麻烦
-
-## 源码编译到用户目录
-### 优点：
-1. 可以安装指定的版本
-2. 可以指定编译参数
-3. 不会对系统造成污染
-4. 不需要管理员权限（需要管理员提供编译工具）
-
-### 缺点：
-1. 可能需要处理复杂的依赖关系
-2. 安装，卸载 或 升级比较麻烦
-
-## 个人建议：
-1. 如果没有管理员权限，只能选择源码编译到用户目录
-2. 如果有管理员权限，优先选择包管理器，而后选择编译安装到用户目录，尽量不要编译安装到系统目录
-
-## 常用命令
-```
-apt update      # 更新软件源
-                # 软件源: /etc/apt/sources.list
-                #         /etc/apt/sources.list.d/
-                # 格式:  包类别(deb-软件包 deb-src-源码包) url 发行版本号 分类
-                # 更新软件源:
-                #   1. 修改上述文件 或 add-apt-repository ... 或 add-apt-repository --remove ...
-                #   2. apt update
-apt search  vim # 搜寻软件包
-apt install vim # 安装软件包
-apt show    vim # 列出软件包的信息
-apt upgrade     # 更新软件
-apt remove  vim # 卸载软件包
-apt purge   vim # 卸载软件包, 删除数据和配置文件
-apt autoremove  # 自动卸载不需要的软件包
-
-                   # dpkg 为 apt 的后端
-dpkg -i ...        # 安装本地的包
-dpkg -L vim        # 列出 vim 软件包安装的全部文件
-dpkg --search /... # 查看该文件是哪个软件包安装的, 使用绝对路径
-
-yum install epel-release # 安装软件源 epel
-yum check-update         # 更新软件源
-                         # 软件源: /etc/yum.repos.d/
-                         # * [...]           -- 源的名字
-                         # * name=...        -- 源的描述
-                         # * baseurl=file:// --	源的路径, file:// 表示本地仓库
-                         # * enabled=...	 --	是否启用该仓库, 1-启用, 0-不启用
-                         # * gpgcheck=...	 -- 是否不用校验软件包的签名, 0-不校验, 1-校验
-                         # * gpgkey=...      -- 上个选项对应的 key 值
-yum clean all            # 清空软件源缓存
-yum makecache            # 新建软件源缓存
-yum repolist             # 查看软件源(可达的)
-
-yum search vim           # 搜寻软件包
-yum install package_name # 安装软件, 也可以本地安装
-yum localinstall ...     # 本地安装
-yum update package_name  # 更新某个软件包
-yum update               # 更新所有软件包
-yum remove  package_name # 卸载软件
-yum erase   package_name # 卸载软件，删除数据和文件
-
-yum list installed       # 列出已安装的软件
-yum list vim             # 列出某软件包的详细信息
-yum list updates         # 列出可用更新
-yum provides vim         # 查看软件属于哪个软件包
-yum provides /etc/vimrc  # 查看文件由哪个软件使用
-```
 
 # 操作系统-日期和时间
 ## 基础概念
