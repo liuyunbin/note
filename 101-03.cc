@@ -1,8 +1,6 @@
 
 #include "log.h"
 
-#include "101-00.h"
-
 void test(const std::string& name, const std::string& bit) {
     Double d(bit);
 

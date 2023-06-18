@@ -1,8 +1,6 @@
 
 #include "log.h"
 
-#include "101-00.h"
-
 // type 为 0 表示除, 为 1 表示 乘, 2 表示小于, 3 表示使用 isless, 其他使用 lrint
 void test(const std::string& name, double x, double y, int type = 0) {
     std::feclearexcept(FE_ALL_EXCEPT);

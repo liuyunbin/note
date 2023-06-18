@@ -1,8 +1,6 @@
 
 #include "log.h"
 
-#include "101-00.h"
-
 int main() {
     init();
 

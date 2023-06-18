@@ -1,8 +1,6 @@
 
 #include "log.h"
 
-#include "101-00.h"
-
 void test(const std::string& str, double x) {
     std::cout << str << " => " << Double(x).double_by_cs << std::endl;
 }

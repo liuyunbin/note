@@ -1,8 +1,6 @@
 
 #include "log.h"
 
-#include "101-00.h"
-
 template <typename T>
 void test(const std::string& name, T bit) {
     Double d(bit);

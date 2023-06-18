@@ -1,8 +1,6 @@
 
 #include "log.h"
 
-#include "101-00.h"
-
 void test(const std::string& name, double x) {
     Double d(x);
     std::cout << std::endl;
