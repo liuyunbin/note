@@ -86,17 +86,21 @@ void init() {
     dict_round[FE_UPWARD] = "向上舍入";
 }
 
-// 测试 PGID
-void test_pgid(pid_t pid, pid_t pgid) {
-    log();
-
+// 展示 PID PGID SID
+void show_pid_pgid_sid(pid_t pid) {
     std::string msg;
-
     msg += "进程 " + std::to_string(pid);
     msg += " 进程组 " + std::to_string(getpgid(pid));
     msg += " 会话 " + std::to_string(getsid(pid));
     log(msg);
+}
 
+// 测试 PGID
+void test_pgid(pid_t pid, pid_t pgid) {
+    log();
+    show_pid_pgid_sid(pid);
+
+    std::string msg;
     msg = "修改进程组 ";
     msg += std::to_string(getpgid(pid));
     msg += " => ";
@@ -107,11 +111,22 @@ void test_pgid(pid_t pid, pid_t pgid) {
     }
     log(msg);
 
-    msg.clear();
-    msg += "进程 " + std::to_string(pid);
-    msg += " 进程组 " + std::to_string(getpgid(pid));
-    msg += " 会话 " + std::to_string(getsid(pid));
+    show_pid_pgid_sid(pid);
+    log();
+}
+
+// 测试 SID
+void test_sid() {
+    log();
+    show_pid_pgid_sid(getpid());
+
+    std::string msg = "新建会话";
+    if (setsid() < 0) {
+        msg += ": ";
+        msg += strerror(errno);
+    }
     log(msg);
 
+    show_pid_pgid_sid(getpid());
     log();
 }
