@@ -9,7 +9,7 @@ int main() {
     init();
 
     log();
-    log("测试信号");
+    log("操作系统-信号-测试");
     log();
 
     log("注册所有信号处理");
@@ -17,7 +17,9 @@ int main() {
     act.sa_sigaction = handle_signal;
     sigemptyset(&act.sa_mask);
     act.sa_flags = SA_SIGINFO | SA_NOCLDSTOP | SA_NOCLDWAIT | SA_RESTART;
-    for (auto key : m) sigaction(key.first, &act, NULL);
+    for (auto key : m) {
+        sigaction(key.first, &act, NULL);
+    }
 
     log("主进程死循环");
     for (;;)

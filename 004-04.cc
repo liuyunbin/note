@@ -9,6 +9,7 @@ void handle_signal(int sig, siginfo_t* sig_info, void*) {
 
 int main() {
     log();
+    log("操作系统-信号-不可靠");
     log("测试信号处理函数被重置");
     log();
 

@@ -9,6 +9,7 @@ void handle_signal(int sig, siginfo_t* sig_info, void*) {
 
 int main() {
     log();
+    log("操作系统-信号-不可靠");
     log("测试多个信号处于待决状态信号会丢失");
     log();
 

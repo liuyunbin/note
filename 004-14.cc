@@ -6,9 +6,8 @@ void handle_signal(int sig, siginfo_t* sig_info, void*) {
 }
 
 int main() {
-    init();
-
     log();
+    log("操作系统-信号");
     log("测试不接受子进程暂停继续产生的 SIGCHLD");
     log();
 

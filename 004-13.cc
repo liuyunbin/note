@@ -6,9 +6,8 @@ void handle_signal(int sig, siginfo_t* sig_info, void*) {
 }
 
 int main() {
-    init();
-
     log();
+    log("操作系统-信号");
     log("测试子进程暂停, 继续, 退出时, 向父进程发送 SIGCHLD, 父进程的处理");
     log();
 

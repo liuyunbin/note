@@ -3,6 +3,7 @@
 
 int main() {
     log();
+    log("操作系统-信号");
     log("测试信号 SIGABRT 处理为 SIG_DFL");
     log();
 
