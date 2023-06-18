@@ -261,21 +261,3 @@ class Double {
         return result;
     }
 };
-
-std::map<int, std::string> dict_except;  // 存储浮点数异常
-std::map<int, std::string> dict_round;   // 存储舍入模式
-
-void init() {
-    // 浮点数异常
-    dict_except[FE_DIVBYZERO] = "除以 0";
-    dict_except[FE_INEXACT] = "结果不准确";
-    dict_except[FE_INVALID] = "参数非法";
-    dict_except[FE_OVERFLOW] = "上溢";
-    dict_except[FE_UNDERFLOW] = "下溢";
-
-    // 舍入方向
-    dict_round[FE_DOWNWARD] = "向下舍入";
-    dict_round[FE_TONEAREST] = "最近舍入";
-    dict_round[FE_TOWARDZERO] = "向零舍入";
-    dict_round[FE_UPWARD] = "向上舍入";
-}

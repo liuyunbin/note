@@ -1,18 +1,13 @@
 
 #include "log.h"
 
-std::map<int, std::string> m;
-
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
     log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + m[sig]);
 }
 
 int main() {
-    m[SIGHUP] = " 1-SIGHUP ";
-    m[SIGCONT] = "18-SIGCONT";
-
     log();
-    log("测试孤儿进程组");
+    log("操作系统-孤儿进程组");
     log();
     log("设置信号处理");
     struct sigaction act;
