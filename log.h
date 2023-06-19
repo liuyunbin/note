@@ -34,6 +34,12 @@ void log(const std::string& msg = "") {
     std::cout << get_time() << " " << msg << std::endl;
 }
 
+std::string to_string(const char* fmt, double data) {
+    char buf[64];
+    snprintf(buf, sizeof(buf), fmt, data);
+    return std::string(buf);
+}
+
 std::map<int, std::string> m;            // 信号处理
 std::map<int, std::string> dict_except;  // 存储浮点数异常
 std::map<int, std::string> dict_round;   // 存储舍入模式

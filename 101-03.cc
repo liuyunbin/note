@@ -2,19 +2,15 @@
 #include "log.h"
 
 void test(const std::string& name, const std::string& bit) {
-    log();
-
     Double d(bit);
 
+    log();
     log("        测试类型: " + name);
     log("    测试的二进制: " + d.bit_by_test);
     log("    存储的二进制: " + d.bit_by_cs);
     log("          手动值: " + d.double_by_hand);
     log("          存储值: " + d.double_by_cs);
-
-    char buf[1024];
-    snprintf(buf, sizeof(buf), "%.2lf", d.data);
-    log("    保留两位小数: " + std::string(buf));
+    log("    保留两位小数: " + to_string("%.2lf", d.data));
 }
 
 void test() {
