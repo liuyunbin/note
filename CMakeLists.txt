@@ -91,6 +91,9 @@ add_executable(101-08 101-08.cc)
 add_executable(101-09 101-09.cc)
 add_executable(101-10 101-10.cc)
 
+# 计算机语言-C++
+add_executable(302-01 302-01.cc)
+
 ###########################################################################
 
 # add_executable(lsh lsh.cc)
