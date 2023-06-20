@@ -22,6 +22,33 @@
 #include <sstream>
 #include <string>
 
+template <typename T>
+std::string to_string(T data) {
+    std::stringstream tmp;
+    tmp << data;
+    return tmp.str();
+}
+
+template <typename T, typename... Args>
+std::string to_string(T data, Args... args) {
+    std::stringstream tmp;
+    tmp << data;
+    return tmp.str() + to_string(args...);
+}
+
+template <typename T>
+std::string to_string(const char* fmt, T data) {
+    char buf[64];
+    snprintf(buf, sizeof(buf), fmt, data);
+    return buf;
+}
+
+double to_double(const std::string& str) {
+    double data;
+    sscanf(str.data(), "%lf", &data);
+    return data;
+}
+
 std::string get_time() {
     time_t now = time(NULL);
     struct tm* info = localtime(&now);
@@ -34,17 +61,16 @@ void log(const std::string& msg = "") {
     std::cout << get_time() << " " << msg << std::endl;
 }
 
-std::string to_string(const char* fmt, double data) {
-    char buf[64];
-    snprintf(buf, sizeof(buf), fmt, data);
-    return std::string(buf);
-}
-
 template <typename T>
 void log(const char* fmt, T data) {
     char buf[64];
     snprintf(buf, sizeof(buf), fmt, data);
-    log(std::string(buf));
+    log(buf);
+}
+
+template <typename T, typename... Args>
+void log(T data, Args... args) {
+    log(to_string(data, args...));
 }
 
 std::map<int, std::string> m;            // 信号处理
