@@ -4,15 +4,13 @@
 int count = 0;
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获信号 " + m[sig] + " 第 " + std::to_string(++count) + " 次");
-    log("处理信号 " + m[sig] + " 中...");
+    log("捕获信号 ", m[sig], " 第 ", ++count, " 次");
+    log("处理信号 ", m[sig], " 中...");
     sleep(2);
-    log("处理信号 " + m[sig] + " 完成");
+    log("处理信号 ", m[sig], " 完成");
 }
 
 int main() {
-    init();
-
     log();
     log("操作系统-信号");
     log("测试信号处理过程中相同的信号到达");
@@ -32,19 +30,19 @@ int main() {
             ;
     } else {
         sleep(1);
-        log("发送信号 " + m[SIGUSR1] + " 第 1 次");
+        log("发送信号 ", m[SIGUSR1], " 第 1 次");
         kill(fd, SIGUSR1);
         sleep(1);
-        log("发送信号 " + m[SIGUSR1] + " 第 2 次");
+        log("发送信号 ", m[SIGUSR1], " 第 2 次");
         kill(fd, SIGUSR1);
-        log("发送信号 " + m[SIGUSR1] + " 第 3 次");
+        log("发送信号 ", m[SIGUSR1], " 第 3 次");
         kill(fd, SIGUSR1);
         sleep(5);
         kill(fd, SIGKILL);
     }
 
-    log("主进程退出");
     log();
-
+    log("主进程正常退出");
+    log();
     return 0;
 }

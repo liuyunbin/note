@@ -4,7 +4,7 @@
 template <typename T>
 union Node {
     char str[sizeof(T)];
-    T t;
+    T    t;
 };
 
 template <typename T>
@@ -24,6 +24,8 @@ void test(const std::string& str, T v) {
 
 int main() {
     log();
+    log("测试字节序");
+    log();
 
     test("测试        char 存储数字 1 => ", (char)1);
     test("测试       short 存储数字 1 => ", (short)1);
@@ -41,11 +43,10 @@ int main() {
     Node<short> node;
     node.t = 1;
 
-    std::string msg = "测试本机的大小端 => ";
-    msg += node.str[0] == 1 ? "小端存储" : "大端存储";
-    log();
-    log(msg);
-    log();
+    log("测试本机的大小端 => ", node.str[0] == 1 ? "小端存储" : "大端存储");
 
+    log();
+    log("主进程正常退出");
+    log();
     return 0;
 }

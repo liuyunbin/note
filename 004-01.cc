@@ -2,8 +2,6 @@
 #include "log.h"
 
 int main() {
-    init();
-
     log();
     log("操作系统-信号-阻塞");
     log();
@@ -19,9 +17,9 @@ int main() {
 
     for (auto key : m)
         if (sigismember(&old_mask, key.first))
-            log("已被阻塞的信号: " + m[key.first]);
+            log("已被阻塞的信号: ", m[key.first]);
 
-    log("发送除 " + m[SIGKILL] + " 和 " + m[SIGSTOP] + " 外的所有信号");
+    log("发送除 ", m[SIGKILL], " 和 ", m[SIGSTOP], " 外的所有信号");
 
     for (auto key : m)
         if (key.first != SIGKILL && key.first != SIGSTOP)
@@ -32,10 +30,10 @@ int main() {
     sigpending(&new_mask);
     for (auto key : m)
         if (sigismember(&new_mask, key.first))
-            log("待决的信号: " + m[key.first]);
+            log("待决的信号: ", m[key.first]);
 
-    log("主进程退出");
     log();
-
+    log("主进程正常退出");
+    log();
     return 0;
 }

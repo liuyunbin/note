@@ -36,9 +36,22 @@ std::string to_string(T data, Args... args) {
     return tmp.str() + to_string(args...);
 }
 
+void log(const std::string& msg = "") {
+    time_t     now  = time(NULL);
+    struct tm* info = localtime(&now);
+    char       buf[1024];
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
+    std::cout << buf << " " << msg << std::endl;
+}
+
+template <typename... Args>
+void log(Args... args) {
+    log(to_string(args...));
+}
+
 template <typename T>
-std::string to_string(const char* fmt, T data) {
-    char buf[64];
+std::string format(const char* fmt, T data) {
+    char buf[2048];
     snprintf(buf, sizeof(buf), fmt, data);
     return buf;
 }
@@ -49,89 +62,61 @@ double to_double(const std::string& str) {
     return data;
 }
 
-std::string get_time() {
-    time_t now = time(NULL);
-    struct tm* info = localtime(&now);
-    char buf[1024];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
-    return buf;
-}
+// 信号处理
+std::map<int, std::string> m{
+    {SIGHUP,    " 1-SIGHUP"   },
+    {SIGINT,    " 2-SIGINT"   },
+    {SIGQUIT,   " 3-SIGQUIT"  },
+    {SIGILL,    " 4-SIGILL"   },
+    {SIGTRAP,   " 5-SIGTRAP"  },
+    {SIGABRT,   " 6-SIGABRT"  },
+    {SIGBUS,    " 7-SIGBUS"   },
+    {SIGFPE,    " 8-SIGFPE"   },
+    {SIGKILL,   " 9-SIGKILL"  },
+    {SIGUSR1,   "10-SIGUSR1"  },
+    {SIGSEGV,   "11-SIGSEGV"  },
+    {SIGUSR2,   "12-SIGUSR2"  },
+    {SIGPIPE,   "13-SIGPIPE"  },
+    {SIGALRM,   "14-SIGALRM"  },
+    {SIGTERM,   "15-SIGTERM"  },
+    {SIGSTKFLT, "16-SIGSTKFLT"},
+    {SIGCHLD,   "17-SIGCHLD"  },
+    {SIGCONT,   "18-SIGCONT"  },
+    {SIGSTOP,   "19-SIGSTOP"  },
+    {SIGTSTP,   "20-SIGTSTP"  },
+    {SIGTTIN,   "21-SIGTTIN"  },
+    {SIGTTOU,   "22-SIGTTOU"  },
+    {SIGURG,    "23-SIGURG"   },
+    {SIGXCPU,   "24-SIGXCPU"  },
+    {SIGXFSZ,   "25-SIGXFSZ"  },
+    {SIGVTALRM, "26-SIGVTALRM"},
+    {SIGPROF,   "27-SIGPROF"  },
+    {SIGWINCH,  "28-SIGWINCH" },
+    {SIGIO,     "29-SIGIO"    },
+    {SIGPWR,    "30-SIGPWR"   },
+    {SIGSYS,    "31-SIGSYS"   }
+};
 
-void log(const std::string& msg = "") {
-    std::cout << get_time() << " " << msg << std::endl;
-}
+// 存储浮点数异常
+std::map<int, std::string> dict_except{
+    {FE_DIVBYZERO, "除以0"        },
+    {FE_INEXACT,   "结果不准确"},
+    {FE_INVALID,   "参数非法"   },
+    {FE_OVERFLOW,  "上溢"         },
+    {FE_UNDERFLOW, "下溢"         }
+};
 
-template <typename T>
-void log(const char* fmt, T data) {
-    char buf[64];
-    snprintf(buf, sizeof(buf), fmt, data);
-    log(buf);
-}
-
-template <typename T, typename... Args>
-void log(T data, Args... args) {
-    log(to_string(data, args...));
-}
-
-std::map<int, std::string> m;            // 信号处理
-std::map<int, std::string> dict_except;  // 存储浮点数异常
-std::map<int, std::string> dict_round;   // 存储舍入模式
-
-void init() {
-    // 信号处理
-    m[SIGHUP] = " 1-SIGHUP";
-    m[SIGINT] = " 2-SIGINT";
-    m[SIGQUIT] = " 3-SIGQUIT";
-    m[SIGILL] = " 4-SIGILL";
-    m[SIGTRAP] = " 5-SIGTRAP";
-    m[SIGABRT] = " 6-SIGABRT";
-    m[SIGBUS] = " 7-SIGBUS";
-    m[SIGFPE] = " 8-SIGFPE";
-    m[SIGKILL] = " 9-SIGKILL";
-    m[SIGUSR1] = "10-SIGUSR1";
-    m[SIGSEGV] = "11-SIGSEGV";
-    m[SIGUSR2] = "12-SIGUSR2";
-    m[SIGPIPE] = "13-SIGPIPE";
-    m[SIGALRM] = "14-SIGALRM";
-    m[SIGTERM] = "15-SIGTERM";
-    m[SIGSTKFLT] = "16-SIGSTKFLT";
-    m[SIGCHLD] = "17-SIGCHLD";
-    m[SIGCONT] = "18-SIGCONT";
-    m[SIGSTOP] = "19-SIGSTOP";
-    m[SIGTSTP] = "20-SIGTSTP";
-    m[SIGTTIN] = "21-SIGTTIN";
-    m[SIGTTOU] = "22-SIGTTOU";
-    m[SIGURG] = "23-SIGURG";
-    m[SIGXCPU] = "24-SIGXCPU";
-    m[SIGXFSZ] = "25-SIGXFSZ";
-    m[SIGVTALRM] = "26-SIGVTALRM";
-    m[SIGPROF] = "27-SIGPROF";
-    m[SIGWINCH] = "28-SIGWINCH";
-    m[SIGIO] = "29-SIGIO";
-    m[SIGPWR] = "30-SIGPWR";
-    m[SIGSYS] = "31-SIGSYS";
-
-    // 浮点数异常
-    dict_except[FE_DIVBYZERO] = "除以 0";
-    dict_except[FE_INEXACT] = "结果不准确";
-    dict_except[FE_INVALID] = "参数非法";
-    dict_except[FE_OVERFLOW] = "上溢";
-    dict_except[FE_UNDERFLOW] = "下溢";
-
-    // 舍入方向
-    dict_round[FE_DOWNWARD] = "向下舍入";
-    dict_round[FE_TONEAREST] = "最近舍入";
-    dict_round[FE_TOWARDZERO] = "向零舍入";
-    dict_round[FE_UPWARD] = "向上舍入";
-}
+//存储舍入模式
+std::map<int, std::string> dict_round{
+    {FE_DOWNWARD,   "向下舍入"},
+    {FE_TONEAREST,  "最近舍入"},
+    {FE_TOWARDZERO, "向零舍入"},
+    {FE_UPWARD,     "向上舍入"}
+};
 
 // 展示 PID PGID SID
 void show_pid_pgid_sid(pid_t pid) {
-    std::string msg;
-    msg += "进程 " + std::to_string(pid);
-    msg += " 进程组 " + std::to_string(getpgid(pid));
-    msg += " 会话 " + std::to_string(getsid(pid));
-    log(msg);
+    log("进程 ", pid, " 进程组 ", getpgid(pid), " 会话 ", getsid(pid));
 }
 
 // 测试 PGID
@@ -139,11 +124,7 @@ void test_pgid(pid_t pid, pid_t pgid) {
     log();
     show_pid_pgid_sid(pid);
 
-    std::string msg;
-    msg = "修改进程组 ";
-    msg += std::to_string(getpgid(pid));
-    msg += " => ";
-    msg += std::to_string(pgid);
+    std::string msg = to_string("修改进程组 ", getpgid(pid), " => ", pgid);
     if (setpgid(pid, pgid) < 0) {
         msg += ": ";
         msg += strerror(errno);
@@ -151,7 +132,6 @@ void test_pgid(pid_t pid, pid_t pgid) {
     log(msg);
 
     show_pid_pgid_sid(pid);
-    log();
 }
 
 // 测试 SID
@@ -167,18 +147,17 @@ void test_sid() {
     log(msg);
 
     show_pid_pgid_sid(getpid());
-    log();
 }
 
 // 测试 浮点数
 class Double {
-   public:
+  public:
     union Node {
-        double x;
+        double   x;
         uint64_t y;
     };
 
-    double data;
+    double      data;
     std::string bit;
     std::string bit_by_test;
     std::string bit_by_cs;
@@ -189,16 +168,15 @@ class Double {
     Double(double x) {
         init();
 
-        data = x;
-
         Node node;
-        node.x = x;
-        bit = std::bitset<64>(node.y).to_string();
-        bit_by_test = bit;
-        bit_by_cs = bit;
-        bit_by_show = to_bit();
+        node.x         = x;
+        bit            = std::bitset<64>(node.y).to_string();
+        bit_by_test    = bit;
+        bit_by_cs      = bit;
+        bit_by_show    = to_bit();
         double_by_hand = to_double_hand();
-        double_by_cs = to_double_cs();
+        double_by_cs   = to_double_cs();
+        data           = x;
     }
 
     Double(const std::string& str) {
@@ -210,56 +188,56 @@ class Double {
             bit += std::string(64 - (int)bit.size(), '0');
         }
 
-        bit_by_test = bit;
-        bit_by_show = to_bit();
+        bit_by_test    = bit;
+        bit_by_show    = to_bit();
         double_by_hand = to_double_hand();
 
         Node node;
-        std::stringstream tmp(double_by_hand);
-        tmp >> node.x;
+        node.x = to_double(double_by_hand);
 
-        data = node.x;
-
-        bit = std::bitset<64>(node.y).to_string();
-        bit_by_cs = bit;
+        bit          = std::bitset<64>(node.y).to_string();
+        bit_by_cs    = bit;
         double_by_cs = to_double_cs();
+        data         = node.x;
     }
 
-   private:
-    std::map<int, std::string> dict_pow;  // 存储 2 的幂次
-                                          // 负幂次只存储小数点后的部分
+  private:
+    // 存储 2 的幂次, 负幂次只存储小数点后的部分
+    std::map<int, std::string> dict_pow;
 
     void init() {
         // 2 的幂次
-        int n = 2000;
+        int         n = 2000;
         std::string str;
 
         str = "5";
         for (int i = -1; i >= -n; --i) {
             dict_pow[i] = str;
 
-            str = "";
+            str     = "";
             int sum = 0;
             for (char ch : dict_pow[i]) {
                 sum = sum * 10 + (ch - '0');
                 str += std::string(1, sum / 2 + '0');
                 sum %= 2;
             }
-            if (sum != 0) str += "5";
+            if (sum != 0)
+                str += "5";
         }
 
         str = "1";
         for (int i = 0; i <= n; ++i) {
             dict_pow[i] = str;
 
-            str = "";
+            str     = "";
             int sum = 0;
             for (int j = (int)dict_pow[i].size() - 1; j >= 0; --j) {
                 sum += (dict_pow[i][j] - '0') * 2;
                 str = std::string(1, sum % 10 + '0') + str;
                 sum /= 10;
             }
-            if (sum != 0) str = std::string(1, sum + '0') + str;
+            if (sum != 0)
+                str = std::string(1, sum + '0') + str;
         }
     }
 
@@ -295,30 +273,28 @@ class Double {
             // 还剩 0 无穷 非数字
         }
 
-        std::string e_int_string = std::to_string(e_int);
+        std::string e_int_string = to_string(e_int);
         e_int_string =
             std::string(5 - (int)e_int_string.size(), ' ') + e_int_string;
 
         std::string result;
-        result += s_str + " ";
-        result += e_str + "(" + e_int_string + ") ";
-        result += f_str + " ";
-        result += bit.substr(64);  // 多余 64 位的部分
-        return result;
+        return to_string(s_str,
+                         " ",
+                         e_str,
+                         "(",
+                         e_int_string,
+                         ") ",
+                         f_str,
+                         " ",
+                         bit.substr(64));  // 多余 64 位的部分
     }
 
     // 计算机内部存储的浮点数(字符串)
     std::string to_double_cs() {
         Node node;
-        node.y = std::bitset<64>(bit.substr(0, 64)).to_ulong();
-
-        data = node.x;
-
-        std::stringstream tmp;
-        // 不使用科学计数数
-        tmp << std::setprecision(2000) << std::fixed << node.x;  // 最多 1074 位
-        std::string result = tmp.str();
-        size_t index = result.find_last_not_of('0');
+        node.y             = std::bitset<64>(bit.substr(0, 64)).to_ulong();
+        std::string result = format("%.2000f", node.x);  // 最多 1074 位
+        size_t      index  = result.find_last_not_of('0');
 
         if (result[index] == '.') {
             --index;
@@ -337,7 +313,7 @@ class Double {
         else
             x = x + std::string(y.size() - x.size(), '0');  // 小数
 
-        int sum = 0;
+        int         sum = 0;
         std::string z;
 
         for (int i = (int)x.size() - 1; i >= 0; --i) {
@@ -378,7 +354,7 @@ class Double {
         std::string f_str = bit.substr(12);
 
         std::bitset<11> e_bit(e_str);
-        int e_int = e_bit.to_ulong();
+        int             e_int = e_bit.to_ulong();
 
         std::bitset<52> f_bit(f_str);  // 只用于判断 0 无穷 非数字
 
@@ -434,3 +410,16 @@ class Double {
         return result;
     }
 };
+
+template <typename T>
+void test_double(const std::string& name, T data) {
+    Double d(data);
+
+    log();
+    log("        测试类型: ", name);
+    log("    测试的二进制: ", d.bit_by_test);
+    log("    存储的二进制: ", d.bit_by_cs);
+    log("          手动值: ", d.double_by_hand);
+    log("          存储值: ", d.double_by_cs);
+    log("    保留两位小数: ", format("%.2lf", d.data));
+}

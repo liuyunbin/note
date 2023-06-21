@@ -4,7 +4,7 @@
 int count = 0;
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获信号 SIGUSR1 第 " + std::to_string(++count) + " 次");
+    log("捕获信号 SIGUSR1 第 ", ++count, " 次");
 }
 
 int main() {
@@ -29,8 +29,9 @@ int main() {
     kill(getpid(), SIGUSR1);
 
     sleep(1);
-    log("主进程退出");
-    log();
 
+    log();
+    log("主进程正常退出");
+    log();
     return 0;
 }

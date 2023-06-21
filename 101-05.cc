@@ -27,15 +27,17 @@ void test(const std::string& name, double x, double y, int type = 0) {
     }
 
     log();
-    log("测试类型: " + name);
-    log("测试结果: " + result);
-    log("异常信息: " + except);
-    log();
+    log("测试类型: ", name);
+    log("测试结果: ", result);
+    log("异常信息: ", except);
 }
 
-void test() {
-    double x;
+int main() {
+    log();
     log("测试浮点数的异常");
+    log();
+
+    double x;
     test("测试除以零", 1, 0.0);
     test("测试结果不准确", 1, 10.0);
     x = std::numeric_limits<double>::max();
@@ -56,10 +58,9 @@ void test() {
     test("测试 signaling_NaN < signaling_NaN", x, x, 2);
     test("测试 isless(signaling_NaN, signaling_NaN)", x, x, 3);
     test("测试 lrint(signaling_NaN)", x, x, 4);
-}
 
-int main() {
-    init();
-    test();
+    log();
+    log("主进程正常退出");
+    log();
     return 0;
 }

@@ -13,8 +13,9 @@ int main() {
         exit(-1);
     }
     sleep(1);
-    log("主进程退出");
-    log();
 
+    log();
+    log("主进程正常退出");
+    log();
     return 0;
 }

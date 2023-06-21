@@ -19,8 +19,9 @@ int main() {
     log("子进程的状态信息");
     test_pgid(getpid(), child);
     sleep(1);
-    log("主进程退出");
-    log();
 
+    log();
+    log("主进程正常退出");
+    log();
     return 0;
 }

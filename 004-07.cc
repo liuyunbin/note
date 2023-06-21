@@ -2,15 +2,13 @@
 #include "log.h"
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获信号 " + m[sig]);
-    log("处理信号 " + m[sig] + " 中...");
+    log("捕获信号 ", m[sig]);
+    log("处理信号 ", m[sig], " 中...");
     sleep(2);
-    log("处理信号 " + m[sig] + " 完成");
+    log("处理信号 ", m[sig], " 完成");
 }
 
 int main() {
-    init();
-
     log();
     log("操作系统-信号");
     log("测试信号处理过程中阻塞其他信号");
@@ -33,17 +31,17 @@ int main() {
             ;
     } else {
         sleep(1);
-        log("发送信号 " + m[SIGUSR1]);
+        log("发送信号 ", m[SIGUSR1]);
         kill(fd, SIGUSR1);
         sleep(1);
-        log("发送信号 " + m[SIGUSR2]);
+        log("发送信号 ", m[SIGUSR2]);
         kill(fd, SIGUSR2);
         sleep(5);
         kill(fd, SIGKILL);
     }
 
-    log("主进程退出");
     log();
-
+    log("主进程正常退出");
+    log();
     return 0;
 }

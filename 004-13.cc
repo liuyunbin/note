@@ -2,7 +2,7 @@
 #include "log.h"
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
+    log("捕获来自 ", sig_info->si_pid, " 的信号 SIGCHLD");
 }
 
 int main() {
@@ -38,7 +38,8 @@ int main() {
     sleep(1);
     sleep(1);
 
-    log("主进程退出");
+    log();
+    log("主进程正常退出");
     log();
     return 0;
 }

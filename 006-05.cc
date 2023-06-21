@@ -13,13 +13,14 @@ int main() {
             ;
     }
     sleep(1);
-    log("新建子进程(" + std::to_string(child) + ")的进程组");
+    log("新建子进程(", child, ")的进程组");
     test_pgid(child, child);
     kill(child, SIGKILL);
 
     sleep(1);
-    log("主进程退出");
-    log();
 
+    log();
+    log("主进程正常退出");
+    log();
     return 0;
 }

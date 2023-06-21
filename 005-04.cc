@@ -23,7 +23,7 @@ int main() {
         exit(-1);
     } else {
         sleep(1);
-        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
+        std::string cmd = to_string("ps -o pid,state,comm -p ", fd);
 
         log("测试的父进程状态");
         system(cmd.data());
@@ -37,8 +37,9 @@ int main() {
     }
 
     sleep(10);
+
+    log();
     log("主进程正常退出");
     log();
-
     return 0;
 }

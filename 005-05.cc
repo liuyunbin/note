@@ -1,7 +1,9 @@
 
 #include "log.h"
 
-void handle_signal(int sig) { log("子进程捕捉到信号 SIGUSR1"); }
+void handle_signal(int sig) {
+    log("子进程捕捉到信号 SIGUSR1");
+}
 
 int main() {
     log();
@@ -17,7 +19,7 @@ int main() {
             ;
     } else {
         sleep(1);
-        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
+        std::string cmd = to_string("ps -o pid,state,comm -p ", fd);
 
         log("使子进程暂停");
         kill(fd, SIGSTOP);
@@ -45,8 +47,8 @@ int main() {
         wait(NULL);
     }
 
+    log();
     log("主进程正常退出");
     log();
-
     return 0;
 }

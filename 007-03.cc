@@ -15,7 +15,7 @@ int main() {
             log("当前进程和父进程的信息");
             show_pid_pgid_sid(getpid());
             show_pid_pgid_sid(getppid());
-            log("杀死父进程(会话首进程): " + std::to_string(getppid()));
+            log("杀死父进程(会话首进程)(", getppid(), ")");
             if (kill(getppid(), SIGKILL) < 0) {
                 perror("");
             }
@@ -31,8 +31,9 @@ int main() {
     }
 
     sleep(3);
-    log("主进程退出");
-    log();
 
+    log();
+    log("主进程正常退出");
+    log();
     return 0;
 }

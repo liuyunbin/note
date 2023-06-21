@@ -2,11 +2,12 @@
 #include "log.h"
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
+    log("捕获来自 ", sig_info->si_pid, " 的信号 SIGCHLD");
     for (;;) {
         int fd = waitpid(-1, NULL, WNOHANG);
-        if (fd <= 0) break;
-        log("已退出的子进程是: " + std::to_string(fd));
+        if (fd <= 0)
+            break;
+        log("已退出的子进程是: ", fd);
     }
 }
 
@@ -19,7 +20,7 @@ int main() {
     log("设置 SIGCHLD 的信号处理");
     struct sigaction act;
     act.sa_sigaction = handle_signal;
-    act.sa_flags = SA_SIGINFO;
+    act.sa_flags     = SA_SIGINFO;
     sigemptyset(&act.sa_mask);
     sigaction(SIGCHLD, &act, NULL);
 
@@ -35,13 +36,11 @@ int main() {
         pid_t fd = fork();
         if (fd == 0) {
             // 子进程
-            std::string msg = "第 " + std::to_string(i) + " 个子进程(";
-            msg += std::to_string(getpid()) + ")启动后退出";
-            log(msg);
+            log("第 ", i, " 个子进程(", getpid(), ")启动后退出");
             exit(-1);
         } else {
             // 父进程
-            cmd += std::to_string(fd) + ",";
+            cmd += to_string(fd, ",");
             sleep(1);
         }
     }
@@ -54,8 +53,8 @@ int main() {
     log("子进程的状态");
     system(cmd.data());
 
-    log("主进程退出");
     log();
-
+    log("主进程正常退出");
+    log();
     return 0;
 }

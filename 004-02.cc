@@ -2,12 +2,10 @@
 #include "log.h"
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获信号 " + m[sig]);
+    log("捕获信号 ", m[sig]);
 }
 
 int main() {
-    init();
-
     log();
     log("操作系统-信号-优先级");
     log();
@@ -28,7 +26,7 @@ int main() {
     sigfillset(&mask);
     sigprocmask(SIG_SETMASK, &mask, NULL);
 
-    log("发送除 " + m[SIGKILL] + " 和 " + m[SIGSTOP] + " 外的所有信号");
+    log("发送除 ", m[SIGKILL], " 和 ", m[SIGSTOP], " 外的所有信号");
 
     for (auto key : m)
         if (key.first != SIGKILL && key.first != SIGSTOP)
@@ -39,8 +37,8 @@ int main() {
 
     sleep(1);
 
-    log("主进程退出");
     log();
-
+    log("主进程正常退出");
+    log();
     return 0;
 }

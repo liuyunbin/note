@@ -9,8 +9,8 @@ int main() {
     log("测试进程组的首进程建立新会话");
     test_sid();
 
-    log("主进程退出");
     log();
-
+    log("主进程正常退出");
+    log();
     return 0;
 }
