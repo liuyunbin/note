@@ -1,6 +1,22 @@
 ---
-Language:      Cpp
-BasedOnStyle:  Google
-IndentWidth:   4
+Language                           : Cpp         # 语言 C++
+BasedOnStyle                       : Google      # 基本风格 Google
+AccessModifierOffset               : -2          # private, protect, public 的相对缩进为 2
+AlignArrayOfStructures             : Left        # 数组左对齐
+AlignConsecutiveAssignments        : Consecutive # 对齐连续的赋值或初始化
+AlignConsecutiveBitFields          : Consecutive # 对齐连续的位
+AlignConsecutiveDeclarations       : Consecutive # 对齐连续的声明
+AlignConsecutiveMacros             : Consecutive # 对齐连续的宏
+AllowShortBlocksOnASingleLine      : Never       # 不允许任何短的 块     放在一行
+AllowShortCaseLabelsOnASingleLine  : false       # 不允许任何短的 case   放在一行
+AllowShortEnumsOnASingleLine       : false       # 不允许任何短的 枚举   放在一行
+AllowShortFunctionsOnASingleLine   : None        # 不允许任何短的 函数   放在一行
+AllowShortIfStatementsOnASingleLine: Never       # 不允许任何短的 if     放在一行
+AllowShortLambdasOnASingleLine     : None        # 不允许任何短的 lambda 放在一行
+AllowShortLoopsOnASingleLine       : false       # 不允许任何短的 循环   放在一行
+BinPackArguments                   : false       # 函数调用时,       如果一行放不下所有参数, 每行一个参数
+BinPackParameters                  : false       # 函数声明或定义时, 如果一行放不下所有参数, 每行一个参数
+IndentCaseLabels                   : false       # case 不缩进
+IndentWidth                        : 4           # 缩进的宽度
+SeparateDefinitionBlocks           : Always      # 始终以空行分割定义
 ...
-
