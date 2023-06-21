@@ -6,6 +6,7 @@ function log_info() { echo -e "\033[00m$(date +'%Y-%m-%d %H:%M:%S %z') $@\033[0m
 function log_warn() { echo -e "\033[33m$(date +'%Y-%m-%d %H:%M:%S %z') $@\033[0m" > /dev/tty;          }
 function log_erro() { echo -e "\033[31m$(date +'%Y-%m-%d %H:%M:%S %z') $@\033[0m" > /dev/tty; exit -1; }
 
+log_info
 log_info "测试浮点数计算"
 awk 'BEGIN { n = 0;}
      { for (i = 1; i <= NF; ++i) arr[n++] = $i }
@@ -25,20 +26,39 @@ awk 'BEGIN { n = 0;}
             printf("%.2lf ", arr[i]);
         }
         printf("\n");
-    }' 3.txt
+    }' <<< "1.1 2.2 3.3 4.4 5.5 6.6"
 
+data="
+111 111 111
+222 111 222
+1.111111111111111111111111111111111111111111111111 111 111
+222 222 222"
+
+log_info
 log_info "测试模式匹配: "
-awk '/111/{ printf("\t%s\n", $0) }' 4.txt
+awk '/111/{ printf("\t%s\n", $0) }' <<< "$data"
 
+log_info
 log_info "测试字段匹配: "
-awk '$1 ~ 111 { printf("\t%s\n", $0) }' 4.txt
+awk '$1 ~ 111 { printf("\t%s\n", $0) }' <<< "$data"
 
+log_info
 log_info "测试字段非匹配: "
-awk '$1 !~ 111 { printf("\t%s\n", $0) }' 4.txt
+awk '$1 !~ 111 { printf("\t%s\n", $0) }' <<< "$data"
 
+log_info
+log_info "测试字符串匹配 -- 不同"
+awk '$1 == "1.11111111111111111111111111111111111111111111111" {printf("字符串匹配: %s\n", $2) }' <<< "$data"
+
+log_info
+log_info "测试数字匹配 -- 转换成小数后近似相等"
+awk '$1 ==  1.11111111111111111111111111111111111111111111111  {printf("整数匹配  : %s\n", $2) }' <<< "$data"
+
+log_info
 log_info "测试获取默认 shell"
 awk 'BEGIN { FS=":"} { printf("\t%s --> %s\n", $1, $NF) }' /etc/passwd | tail -5
 
+log_info
 log_info "测试排序"
 
 awk '{
@@ -51,8 +71,9 @@ awk '{
         for (i in arr)
             printf(" %d ", arr[i])
         printf("\n")
-    }' 2.txt
+    }' <<< "1"
 
+log_info
 log_info "测试字符串函数"
 awk '{
         v1 = "abc AAA abc"
@@ -78,16 +99,17 @@ awk '{
         v2 = "1 2 3 4 5"
         len = split(v2, a)
         printf("字符串切割后的长度: %d\n", len)
-    }' 2.txt
+    }' <<< "1"
 
-
+log_info
 log_info "测试时间函数"
 awk '{
         v1 = systime()
         v2 = strftime("%Y-%m-%d %H:%M:%S %z", v1)
         printf("时间戳: %s\n日期格式: %s\n", v1, v2)
-    }' 2.txt
+    }' <<< "1"
 
+log_info
 log_info "测试自定义函数"
 awk '
     function test() {
@@ -96,8 +118,9 @@ awk '
 
     {
         print test()
-    }' 2.txt
+    }' <<< "1"
 
+log_info
 log_info "测试数字, 字符串相加"
 awk '{
     v1 = 111
@@ -115,19 +138,14 @@ awk '{
     printf("字符串连接: %d\n", "111" "111");
     printf("字符串连接: %d\n", v1 v2);
     printf("字符串连接: %d\n", v2 v2);
-}' 2.txt
+}' <<< "1"
 
-log_info "测试比较"
-awk '/1.111111111111111111111111111111111111111111111111/{printf("模式匹配: %s\n", $2) }' 5.txt
-awk '$1 ==  1.11111111111111111111111111111111111111111111111 {printf("整数字段匹配: %s\n", $2) }' 5.txt
-awk '$1 == "1.11111111111111111111111111111111111111111111111" {printf("字符串字段匹配: %s\n", $2) }' 5.txt
-
-
-
+log_info
 log_info "测试执行系统命令"
 awk '{
     cmd = "date +\"%Y-%m-%d %H:%M:%S %z\""
     cmd | getline time
     close(cmd)
     printf("时间为: %s\n", time)
-}' 2.txt
+}' <<< "1"
+
