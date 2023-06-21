@@ -1,10 +1,11 @@
 
-set number                            " 默认显示行号
 set cindent                           " 使用 C 风格的自动缩进
 set expandtab                         " 自动扩展 Tab
-set tabstop=4                         " 设置 Tab 所占的宽度
+set hlsearch                          " 高亮
+set number                            " 默认显示行号
 set shiftwidth=4                      " 自动缩进使用的空格数量
 set softtabstop=4                     " 调整 缩进的 表现, 开启 expandtab 的时候, 此选项没用
+set tabstop=4                         " 设置 Tab 所占的宽度
 autocmd FileType make set noexpandtab " Makefile 不扩展 Tab
 
 "对行末的空格标红
