@@ -24,75 +24,75 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin) # 设置 二进制�
 # 激活测试
 enable_testing()
 
-# 操作系统-僵尸进程
-add_executable(001-01 001-01.cc)
-add_executable(001-02 001-02.cc)
-add_executable(001-03 001-03.cc)
-add_executable(001-04 001-04.cc)
-add_executable(001-05 001-05.cc)
-add_executable(001-06 001-06.cc)
-add_executable(001-07 001-07.cc)
-add_executable(001-08 001-08.cc)
-
-# 操作系统-孤儿进程
-add_executable(002-01 002-01.cc)
-
-# 操作系统-孤儿进程组
-add_executable(003-01 003-01.cc)
-
-# 操作系统-信号
-add_executable(004-01 004-01.cc)
-add_executable(004-02 004-02.cc)
-add_executable(004-03 004-03.cc)
-add_executable(004-04 004-04.cc)
-add_executable(004-05 004-05.cc)
-add_executable(004-06 004-06.cc)
-add_executable(004-07 004-07.cc)
-add_executable(004-08 004-08.cc)
-add_executable(004-09 004-09.cc)
-add_executable(004-10 004-10.cc)
-add_executable(004-11 004-11.cc)
-add_executable(004-12 004-12.cc)
-add_executable(004-13 004-13.cc)
-add_executable(004-14 004-14.cc)
-add_executable(004-15 004-15.cc)
-
-# 操作系统-进程
-add_executable(005-01 005-01.cc)
-add_executable(005-02 005-02.cc)
-add_executable(005-03 005-03.cc)
-add_executable(005-04 005-04.cc)
-add_executable(005-05 005-05.cc)
-
-# 操作系统-进程组
-add_executable(006-01 006-01.cc)
-add_executable(006-02 006-02.cc)
-add_executable(006-03 006-03.cc)
-add_executable(006-04 006-04.cc)
-add_executable(006-05 006-05.cc)
-add_executable(006-06 006-06.cc)
-add_executable(006-07 006-07.cc)
-add_executable(006-08 006-08.cc)
-
-# 会话
-add_executable(007-01 007-01.cc)
-add_executable(007-02 007-02.cc)
-add_executable(007-03 007-03.cc)
-
-# 计算机组成原理-整数-浮点数-字符
-add_executable(101-01 101-01.cc)
-add_executable(101-02 101-02.cc)
-add_executable(101-03 101-03.cc)
-add_executable(101-04 101-04.cc)
-add_executable(101-05 101-05.cc)
-add_executable(101-06 101-06.cc)
-add_executable(101-07 101-07.cc)
-add_executable(101-08 101-08.cc)
-add_executable(101-09 101-09.cc)
-add_executable(101-10 101-10.cc)
-
-# 计算机语言-C++
-add_executable(302-01 302-01.cc)
+## 操作系统-僵尸进程
+#add_executable(001-01 001-01.cc)
+#add_executable(001-02 001-02.cc)
+#add_executable(001-03 001-03.cc)
+#add_executable(001-04 001-04.cc)
+#add_executable(001-05 001-05.cc)
+#add_executable(001-06 001-06.cc)
+#add_executable(001-07 001-07.cc)
+#add_executable(001-08 001-08.cc)
+#
+## 操作系统-孤儿进程
+#add_executable(002-01 002-01.cc)
+#
+## 操作系统-孤儿进程组
+#add_executable(003-01 003-01.cc)
+#
+## 操作系统-信号
+#add_executable(004-01 004-01.cc)
+#add_executable(004-02 004-02.cc)
+#add_executable(004-03 004-03.cc)
+#add_executable(004-04 004-04.cc)
+#add_executable(004-05 004-05.cc)
+#add_executable(004-06 004-06.cc)
+#add_executable(004-07 004-07.cc)
+#add_executable(004-08 004-08.cc)
+#add_executable(004-09 004-09.cc)
+#add_executable(004-10 004-10.cc)
+#add_executable(004-11 004-11.cc)
+#add_executable(004-12 004-12.cc)
+#add_executable(004-13 004-13.cc)
+#add_executable(004-14 004-14.cc)
+#add_executable(004-15 004-15.cc)
+#
+## 操作系统-进程
+#add_executable(005-01 005-01.cc)
+#add_executable(005-02 005-02.cc)
+#add_executable(005-03 005-03.cc)
+#add_executable(005-04 005-04.cc)
+#add_executable(005-05 005-05.cc)
+#
+## 操作系统-进程组
+#add_executable(006-01 006-01.cc)
+#add_executable(006-02 006-02.cc)
+#add_executable(006-03 006-03.cc)
+#add_executable(006-04 006-04.cc)
+#add_executable(006-05 006-05.cc)
+#add_executable(006-06 006-06.cc)
+#add_executable(006-07 006-07.cc)
+#add_executable(006-08 006-08.cc)
+#
+## 会话
+#add_executable(007-01 007-01.cc)
+#add_executable(007-02 007-02.cc)
+#add_executable(007-03 007-03.cc)
+#
+## 计算机组成原理-整数-浮点数-字符
+#add_executable(101-01 101-01.cc)
+#add_executable(101-02 101-02.cc)
+#add_executable(101-03 101-03.cc)
+#add_executable(101-04 101-04.cc)
+#add_executable(101-05 101-05.cc)
+#add_executable(101-06 101-06.cc)
+#add_executable(101-07 101-07.cc)
+#add_executable(101-08 101-08.cc)
+#add_executable(101-09 101-09.cc)
+#add_executable(101-10 101-10.cc)
+#
+## 计算机语言-C++
+#add_executable(302-01 302-01.cc)
 
 ###########################################################################
 
