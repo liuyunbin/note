@@ -24,7 +24,7 @@ int main() {
     log("操作系统-僵尸进程-预防: SIGCHLD 处理为 SA_NOCLDWAIT");
     log();
 
-    log("设置 SIGCHLD 的信号处理");
+    log("设置 SIGCHLD 的信号处理: SA_NOCLDWAIT");
     struct sigaction act;
     act.sa_sigaction = handle_signal;
     act.sa_flags     = SA_SIGINFO | SA_NOCLDWAIT;
