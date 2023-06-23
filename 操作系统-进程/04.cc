@@ -1,10 +1,25 @@
 
-#include "log.h"
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <unistd.h>
+
+#include <iostream>
+#include <map>
+#include <string>
+
+void log(const std::string& msg = "") {
+    time_t     now  = time(NULL);
+    struct tm* info = localtime(&now);
+    char       buf[1024];
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
+    std::cout << buf << " " << msg << std::endl;
+}
 
 int main() {
     log();
-    log("操作系统-进程");
-    log("测试不可被信号打断的休眠(指被捕获的信号) 对 SIGKILL 的处理");
+    log("操作系统-进程: 不可被信号打断的休眠(指被捕获的信号)");
+    log("对 SIGKILL 的处理");
     log();
 
     pid_t fd = fork();
@@ -23,7 +38,7 @@ int main() {
         exit(-1);
     } else {
         sleep(1);
-        std::string cmd = to_string("ps -o pid,state,comm -p ", fd);
+        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
 
         log("测试的父进程状态");
         system(cmd.data());

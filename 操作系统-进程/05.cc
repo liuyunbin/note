@@ -1,5 +1,20 @@
 
-#include "log.h"
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <unistd.h>
+
+#include <iostream>
+#include <map>
+#include <string>
+
+void log(const std::string& msg = "") {
+    time_t     now  = time(NULL);
+    struct tm* info = localtime(&now);
+    char       buf[1024];
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
+    std::cout << buf << " " << msg << std::endl;
+}
 
 void handle_signal(int sig) {
     log("子进程捕捉到信号 SIGUSR1");
@@ -7,8 +22,7 @@ void handle_signal(int sig) {
 
 int main() {
     log();
-    log("操作系统-进程");
-    log("测试 暂停 => 继续");
+    log("操作系统-进程: 暂停 => 继续");
     log();
 
     pid_t fd = fork();
@@ -19,7 +33,7 @@ int main() {
             ;
     } else {
         sleep(1);
-        std::string cmd = to_string("ps -o pid,state,comm -p ", fd);
+        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
 
         log("使子进程暂停");
         kill(fd, SIGSTOP);
