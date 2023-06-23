@@ -1,23 +1,36 @@
 
-#include "log.h"
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <unistd.h>
+
+#include <iostream>
+#include <string>
+
+void log(const std::string& msg = "") {
+    time_t     now  = time(NULL);
+    struct tm* info = localtime(&now);
+    char       buf[1024];
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
+    std::cout << buf << " " << msg << std::endl;
+}
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获来自 ", sig_info->si_pid, " 的信号 SIGCHLD");
+    log("捕获信号 SIGCHLD 来自: " + std::to_string(sig_info->si_pid));
     for (;;) {
         int fd = waitpid(-1, NULL, WNOHANG);
         if (fd <= 0)
             break;
-        log("已退出的子进程是: ", fd);
+        log("已退出的子进程是: " + std::to_string(fd));
     }
 }
 
 int main() {
     log();
-    log("操作系统-僵尸进程-预防");
-    log("测试设置 SIGCHLD 处理为: 循环调用 waitpid()");
+    log("操作系统-僵尸进程-预防: SIGCHLD 处理为 循环调用 waitpid");
     log();
 
-    log("设置 SIGCHLD 的信号处理");
+    log("设置 SIGCHLD 的信号处理: 循环调用 waitpid");
     struct sigaction act;
     act.sa_sigaction = handle_signal;
     act.sa_flags     = SA_SIGINFO;
@@ -36,11 +49,12 @@ int main() {
         pid_t fd = fork();
         if (fd == 0) {
             // 子进程
-            log("第 ", i, " 个子进程(", getpid(), ")启动后退出");
+            log("子进程启动后退出: " + std::to_string(getpid()));
             exit(-1);
         } else {
             // 父进程
-            cmd += to_string(fd, ",");
+            cmd += std::to_string(fd);
+            cmd += ",";
             sleep(1);
         }
     }

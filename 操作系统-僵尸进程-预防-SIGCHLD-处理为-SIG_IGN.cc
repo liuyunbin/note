@@ -1,10 +1,23 @@
 
-#include "log.h"
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <unistd.h>
+
+#include <iostream>
+#include <string>
+
+void log(const std::string& msg = "") {
+    time_t     now  = time(NULL);
+    struct tm* info = localtime(&now);
+    char       buf[1024];
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
+    std::cout << buf << " " << msg << std::endl;
+}
 
 int main() {
     log();
-    log("操作系统-僵尸进程-预防");
-    log("测试设置 SIGCHLD 处理为 SIG_IGN");
+    log("操作系统-僵尸进程-预防: SIGCHLD 处理为 SIG_IGN");
     log();
 
     log("设置 SIGCHLD 的信号处理");
@@ -22,11 +35,12 @@ int main() {
         pid_t fd = fork();
         if (fd == 0) {
             // 子进程
-            log("第 ", i, " 个子进程(", getpid(), ")启动后退出");
+            log("子进程启动后退出: " + std::to_string(getpid()));
             exit(-1);
         } else {
             // 父进程
-            cmd += to_string(fd, ",");
+            cmd += std::to_string(fd);
+            cmd += ",";
             sleep(1);
         }
     }
