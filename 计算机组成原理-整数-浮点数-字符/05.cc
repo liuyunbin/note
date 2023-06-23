@@ -27,9 +27,9 @@ void test(const std::string& name, double x, double y, int type = 0) {
     }
 
     log();
-    log("测试类型: ", name);
-    log("测试结果: ", result);
-    log("异常信息: ", except);
+    log("测试类型: " + name);
+    log("测试结果: " + result);
+    log("异常信息: " + except);
 }
 
 int main() {

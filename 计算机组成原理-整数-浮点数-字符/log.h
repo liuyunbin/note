@@ -1,10 +1,6 @@
 
-#include <setjmp.h>
-#include <signal.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 #include <unistd.h>
 
 #include <algorithm>
@@ -22,31 +18,12 @@
 #include <sstream>
 #include <string>
 
-template <typename T>
-std::string to_string(T data) {
-    std::stringstream tmp;
-    tmp << data;
-    return tmp.str();
-}
-
-template <typename T, typename... Args>
-std::string to_string(T data, Args... args) {
-    std::stringstream tmp;
-    tmp << data;
-    return tmp.str() + to_string(args...);
-}
-
 void log(const std::string& msg = "") {
     time_t     now  = time(NULL);
     struct tm* info = localtime(&now);
     char       buf[1024];
     strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
     std::cout << buf << " " << msg << std::endl;
-}
-
-template <typename... Args>
-void log(Args... args) {
-    log(to_string(args...));
 }
 
 template <typename T>
@@ -61,41 +38,6 @@ double to_double(const std::string& str) {
     sscanf(str.data(), "%lf", &data);
     return data;
 }
-
-// 信号处理
-std::map<int, std::string> m{
-    {SIGHUP,    " 1-SIGHUP"   },
-    {SIGINT,    " 2-SIGINT"   },
-    {SIGQUIT,   " 3-SIGQUIT"  },
-    {SIGILL,    " 4-SIGILL"   },
-    {SIGTRAP,   " 5-SIGTRAP"  },
-    {SIGABRT,   " 6-SIGABRT"  },
-    {SIGBUS,    " 7-SIGBUS"   },
-    {SIGFPE,    " 8-SIGFPE"   },
-    {SIGKILL,   " 9-SIGKILL"  },
-    {SIGUSR1,   "10-SIGUSR1"  },
-    {SIGSEGV,   "11-SIGSEGV"  },
-    {SIGUSR2,   "12-SIGUSR2"  },
-    {SIGPIPE,   "13-SIGPIPE"  },
-    {SIGALRM,   "14-SIGALRM"  },
-    {SIGTERM,   "15-SIGTERM"  },
-    {SIGSTKFLT, "16-SIGSTKFLT"},
-    {SIGCHLD,   "17-SIGCHLD"  },
-    {SIGCONT,   "18-SIGCONT"  },
-    {SIGSTOP,   "19-SIGSTOP"  },
-    {SIGTSTP,   "20-SIGTSTP"  },
-    {SIGTTIN,   "21-SIGTTIN"  },
-    {SIGTTOU,   "22-SIGTTOU"  },
-    {SIGURG,    "23-SIGURG"   },
-    {SIGXCPU,   "24-SIGXCPU"  },
-    {SIGXFSZ,   "25-SIGXFSZ"  },
-    {SIGVTALRM, "26-SIGVTALRM"},
-    {SIGPROF,   "27-SIGPROF"  },
-    {SIGWINCH,  "28-SIGWINCH" },
-    {SIGIO,     "29-SIGIO"    },
-    {SIGPWR,    "30-SIGPWR"   },
-    {SIGSYS,    "31-SIGSYS"   }
-};
 
 // 存储浮点数异常
 std::map<int, std::string> dict_except{
@@ -113,41 +55,6 @@ std::map<int, std::string> dict_round{
     {FE_TOWARDZERO, "向零舍入"},
     {FE_UPWARD,     "向上舍入"}
 };
-
-// 展示 PID PGID SID
-void show_pid_pgid_sid(pid_t pid) {
-    log("进程 ", pid, " 进程组 ", getpgid(pid), " 会话 ", getsid(pid));
-}
-
-// 测试 PGID
-void test_pgid(pid_t pid, pid_t pgid) {
-    log();
-    show_pid_pgid_sid(pid);
-
-    std::string msg = to_string("修改进程组 ", getpgid(pid), " => ", pgid);
-    if (setpgid(pid, pgid) < 0) {
-        msg += ": ";
-        msg += strerror(errno);
-    }
-    log(msg);
-
-    show_pid_pgid_sid(pid);
-}
-
-// 测试 SID
-void test_sid() {
-    log();
-    show_pid_pgid_sid(getpid());
-
-    std::string msg = "新建会话";
-    if (setsid() < 0) {
-        msg += ": ";
-        msg += strerror(errno);
-    }
-    log(msg);
-
-    show_pid_pgid_sid(getpid());
-}
 
 // 测试 浮点数
 class Double {
@@ -273,20 +180,14 @@ class Double {
             // 还剩 0 无穷 非数字
         }
 
-        std::string e_int_string = to_string(e_int);
+        std::string e_int_string = std::to_string(e_int);
         e_int_string =
             std::string(5 - (int)e_int_string.size(), ' ') + e_int_string;
 
-        std::string result;
-        return to_string(s_str,
-                         " ",
-                         e_str,
-                         "(",
-                         e_int_string,
-                         ") ",
-                         f_str,
-                         " ",
-                         bit.substr(64));  // 多余 64 位的部分
+        std::string result =
+            s_str + " " + e_str + "(" + e_int_string + ") " + f_str;
+        result += " " + bit.substr(64);  // 多余 64 位的部分
+        return result;
     }
 
     // 计算机内部存储的浮点数(字符串)
@@ -416,10 +317,10 @@ void test_double(const std::string& name, T data) {
     Double d(data);
 
     log();
-    log("        测试类型: ", name);
-    log("    测试的二进制: ", d.bit_by_test);
-    log("    存储的二进制: ", d.bit_by_cs);
-    log("          手动值: ", d.double_by_hand);
-    log("          存储值: ", d.double_by_cs);
-    log("    保留两位小数: ", format("%.2lf", d.data));
+    log("        测试类型: " + name);
+    log("    测试的二进制: " + d.bit_by_test);
+    log("    存储的二进制: " + d.bit_by_cs);
+    log("          手动值: " + d.double_by_hand);
+    log("          存储值: " + d.double_by_cs);
+    log("    保留两位小数: " + format("%.2lf", d.data));
 }

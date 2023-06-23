@@ -30,12 +30,12 @@ int main() {
 
     log();
     log("使用 numeric_limits");
-    log("最小非规约负数: ", Double(std::numeric_limits<double>::lowest()).bit);
-    log("最小非规约正数: ",
+    log("最小非规约负数: " + Double(std::numeric_limits<double>::lowest()).bit);
+    log("最小非规约正数: " +
         Double(std::numeric_limits<double>::denorm_min()).bit);
-    log("最小  规约正数: ", Double(std::numeric_limits<double>::min()).bit);
-    log("最大  规约正数: ", Double(std::numeric_limits<double>::max()).bit);
-    log("        正无穷: ",
+    log("最小  规约正数: " + Double(std::numeric_limits<double>::min()).bit);
+    log("最大  规约正数: " + Double(std::numeric_limits<double>::max()).bit);
+    log("        正无穷: " +
         Double(std::numeric_limits<double>::infinity()).bit);
 
     log();

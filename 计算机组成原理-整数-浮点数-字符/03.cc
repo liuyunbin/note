@@ -6,7 +6,7 @@ int main() {
     log("测试保留小数时的四舍六入五取偶");
     log();
 
-    log("        舍入方向: ", dict_round[fegetround()]);
+    log("        舍入方向: " + dict_round[fegetround()]);
     test_double(
         "测试保留小数时的 五进",
         "0 01111111100 0000000000000000000000000000000000000000000000000001");

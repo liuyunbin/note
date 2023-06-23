@@ -6,7 +6,7 @@ int main() {
     log("测试存储时的四舍六入五取偶");
     log();
 
-    log("        舍入方向: ", dict_round[fegetround()]);
+    log("        舍入方向: " + dict_round[fegetround()]);
 
     test_double(
         "测试 最后一位是 0, 多余位是 00(舍)",

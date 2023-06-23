@@ -43,7 +43,9 @@ int main() {
     Node<short> node;
     node.t = 1;
 
-    log("测试本机的大小端 => ", node.str[0] == 1 ? "小端存储" : "大端存储");
+    std::string msg = "测试本机的大小端 => ";
+    msg += node.str[0] == 1 ? "小端存储" : "大端存储";
+    log(msg);
 
     log();
     log("主进程正常退出");
