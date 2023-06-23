@@ -1,22 +1,35 @@
 
-#include "log.h"
+
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <unistd.h>
+
+#include <iostream>
+#include <string>
+
+void log(const std::string& msg = "") {
+    time_t     now  = time(NULL);
+    struct tm* info = localtime(&now);
+    char       buf[1024];
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
+    std::cout << buf << " " << msg << std::endl;
+}
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获来自 ", sig_info->si_pid, " 的信号 SIGCHLD");
+    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
 }
 
 int main() {
     log();
-    log("操作系统-信号");
-    log("测试不接受子进程暂停继续产生的 SIGCHLD");
+    log("操作系统-信号: 子进程状态变化时, 父进程的处理");
     log();
 
     log("注册信号处理");
-    log("设置不接受子进程暂停继续产生的 SIGCHLD");
     struct sigaction act;
     act.sa_sigaction = handle_signal;
     sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT | SA_NOCLDSTOP;
+    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
     sigaction(SIGCHLD, &act, NULL);
 
     pid_t fd = fork();
