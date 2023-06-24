@@ -253,84 +253,6 @@ shift+insert       # 粘贴命令行内容
 
 \command # 忽略别名
 
-awk '
-     BEGIN   { getline     } # 可选  读取一行
-     pattern { commands    } # pattern 类型
-                             #      * NR < 5        # 行号 [1,4] 的行
-                             #      * NR==1,NR==4   # 行号 [1,4] 的行
-                             #      * /linux/       #   包含 linux 的行, 支持正则
-                             #      * !/linux/      # 不包含 linux 的行, 支持正则
-                             #      * /start/,/end/ # [] 区间匹配, 支持正则
-                             #      * $1  ~ /123/   # 使用正则表达式匹配
-                             #      * $1 !~ /123/   # 使用正则表达式匹配, 排除匹配到的行
-                             #      * $1 ==  123    # 数值匹配, 精确匹配
-                             #      * $1 == "123"   # 字符串匹配, 精确匹配
-     END     { print "end" } # 可选
-    ' 1.txt
-
-awk            '{ print $0 }' 1.txt #
-awk -F:        '{ print $0 }' 1.txt # 以字符       : 作为字段分割符
-awk -F123      '{ print $0 }' 1.txt # 以字符串   123 作为字段分割符
-awk -F[123]    '{ print $0 }' 1.txt # 以字符   1 2 3 作为字段分割符
-awk -f         1.awk          1.txt # 从文件中读取命令
-awk -v lyb=... '{ print $0 }' 1.txt # 定义变量
-    # * 数字:
-    #     * 包括整数和浮点数
-    #     * 整数除以整数，结果可能是小数
-    #     * int(...) 将浮点数转换为整数，将舍弃小数部分，比如 int(1.9) == 1, int(-1.9) == -1
-    #     * + 将对数字进行相加, 即使是字符串
-    # * 字符串：以单引号 或 双引号 包含的字符串
-    #     * tolower() -- 小写
-    #     * toupper() -- 大写
-    #     * length()  -- 长度
-    #     * sub() -- 正则查找, 替换第一处
-    #     * gsub() -- 正则查找, 替换所有
-    #     * gensub() -- 正则查找, 可选择替换所有还是某一个, 不修改原字符串
-    #     * index() -- 字符串查找
-    #     * match() -- 字符串查找(正则表达式), 并将结果保存到数组
-    #     * split() -- 字符串 => 数组
-    #     * 字符串连接直接使用空分开即可
-    # * 数组：awk 使用关联数组，下标使用数字或字符串都成
-    #     * 添加或修改元素  : arr[i] = ...
-    #     * 删除数组中的变量: delete arr[i]
-    #     * 遍历数组: i 为数组下标，注意返回的顺序不固定
-    #         for (i in arr) {
-    #             ....
-    #         }
-    #     * asort()  -- 元素排序
-    #     * asorti() -- 索引排序
-    # * 变量:
-    #     * 变量不需要声明，可以直接使用
-    #     * 变量使用一般不用使用 $, 除非是数字型变量，为了和数字区分，需要加上 $ 符号
-    # * 赋值：赋值号左右两边有无空格都成
-    # * 语句使用分号分割
-    # *       if 语句, 同 C语言
-    # *    while 语句, 同 C语言
-    # * do while 语句, 同 C语言
-    # *      for 语句，同 C语言, 外加 for (i in arr) i 为索引, arr 为数组
-    # * 时间函数
-    #     * systime()  -- 获取当前的时间戳
-    #     * strftime() -- 时间戳 --> 格式化
-    #     * mktime()   -- 年月日等 --> 时间戳
-    # * 其他常用函数
-    #     * print    参数以逗号分割，输出的字段分割符默认为空格，结尾将输出换行符
-    #     * printf   同 C 语言
-    # * 常用变量
-    #       * $0  整行
-    #       * $1  第一列
-    #       * FS  输入字段分隔符 默认值为空字符
-    #       * RS  输入记录分隔符 默认值为换行符
-    #       * OFS 输出字段分隔符 默认值为空格
-    #       * ORS 输出记录分隔符 默认值为换行符
-    #       * FILENAME   用作gawk输入数据的数据文件的文件名
-    #       * FNR        当前数据文件中的数据行数
-    #       * IGNORECASE 设成非零值时，忽略gawk命令中出现的字符串的字符大小写
-    #       * NF         数据文件中的字段总数
-    #       * NR         已处理的输入记录数
-    #       * RLENGTH    由match函数所匹配的子字符串的长度
-    #       * RSTART     由match函数所匹配的子字符串的起始位置
-    # * 函数, 执行 shell 命令及测试 见: 301-04.sh
-
 basename $(readlink -f $0) # 获取脚本的名称
 dirname  $(readlink -f $0) # 获取脚本的目录
 
@@ -345,31 +267,6 @@ bg %jobspec # 后台暂停 --> 后台运行, 有无 % 都成
 fg %jobspec # 后台     --> 前台运行, 有无 % 都成
 
 c++filt  a.out    # 可以解析动态库里的符号
-
-                  # 文件如果是符号链接, 将使用符号链接对应的文件
-cat               # 输出 标准输入 的内容
-cat          -    # 输出 标准输入 的内容
-cat    1.txt      # 输出 1.txt 的内容, 文件支持多个
-cat    1.txt -    # 输出 1.txt 和 标准输入 的内容
-cat -n 1.txt      # 显示行号
-cat -b 1.txt      # 显示行号, 行号不包括空行, 将覆盖参数 -n
-cat -s 1.txt      # 去掉多余的连续的空行
-cat -T 1.txt      # 显示 TAB
-cat -E 1.txt      # 使用 $ 标明行结束的位置
-
-chattr +i 1.c # 设置文件不可修改
-chattr -i 1.c # 取消文件不可修改
-
-chmod  755    1.c # 设置权限, 不足四位时, 补前缀 0
-chmod  644 -R 1.c # 递归
-chmod 4755    1.c # 设置 SUID(4)
-chmod 2755    1.c # 设置 SGID(2)
-chmod 1755    1.c # 设置 SBIT(1)
-
-chown lyb:lyb 1.c # 修改文件所属的组和用户
-
-chsh -s ...      # 修改默认的 shell
-chsh -l          # 列出所有支持的 shell
 
 
 clang-format    main.cc                                  # 预览规范后的代码
@@ -386,27 +283,6 @@ clang-format -style=file main.cc                         # 使用自定义代码
 # askubuntu     -> https://askubuntu.com/questions/730609/how-can-i-find-the-directory-to-clang-format
 # stackoverflow -> https://stackoverflow.com/a/39781747/7671328
 
-column -t # 列对齐
-
-                                                       # 文件如果是符号链接, 将使用符号链接对应的文件
-comm                        1.c 2.c                    # 要求文件已排序, 以行比较
-comm --check-order          1.c 2.c                    #   检测文件是否已排序
-comm --nocheck-order        1.c 2.c                    # 不检测文件是否已排序
-comm --output-delimiter=... 1.c 2.c                    # 指定列分割, 默认是 TAB
-comm                        1.c 2.c       | tr -d '\t' # 全集
-comm                        1.c 2.c -1 -2 | tr -d '\t' # 交集
-comm                        1.c 2.c -3    | tr -d '\t' # B - A 和 A - B
-comm                        1.c 2.c -1 -3              # B - A
-comm                        1.c 2.c -2 -3              # A - B
-
-cp    123 456      # 拷贝文件时, 使用符号链接所指向的文件
-                   # 拷贝目录时, 目录中的符号链接将使用符号链接本身
-                   # 456 只使用符号链接所指向的文件
-cp -r 123 456      # 递归复制
-cp -P 123 456      # 总是拷贝符号链接本身
-cp -L 123 456      # 总是拷贝符号链接所指的文件
-cp --parents a/b t # 全路径复制, 将生成 t/a/b
-
            # 定期执行命令
 crontab -l # 查询任务表
 crontab -e # 编辑任务表
@@ -421,16 +297,6 @@ crontab -r # 删除任务表
 
 curl -I ... # 只打印头部信息
                                       # 文件如果是符号链接, 将使用符号链接对应的文件
-cut                        -b 2   1.c # 按字节切割, 输出第 2 个字节
-cut                        -c 2-  1.c # 按字符切割, 输出 [2, 末尾] 字符
-cut                        -f 2-5 1.c # 按列切割,   输出 [2,5] 列
-cut -d STR                 -f 2,5 1.c # 设置输入字段的分隔符, 默认为 TAB, 输出 第 2 列和第 5 列
-cut -s                     -f  -5 1.c # 不输出不包含字段分隔符的列, 输出 [开头, 5] 的列
-cut --output-delimiter=STR -f  -5 1.c # 设置输出的字段分隔符, 默认使用输入的字段分隔符
-
-diff    1.txt 2.txt # 比较两个文件的不同
-diff -u 1.txt 2.txt # 一体化输出, 比较两个文件的不同
-
 dd if=/dev/zero of=junk.data bs=1M count=1
 dd if=/dev/zero bs=1M count=1000 | nc 127.0.0.1 9999 # 测速-客户端
 
@@ -453,11 +319,6 @@ docker exec     容器ID ls  # 对于在后台运行的容器, 执行命令
 
 dos2unix 1.txt # \r\n (windows) => \n (Linux/iOS)
 unix2doc 1.txt # \n (Linux/iOS) => \r\n (windows)
-
-                   # dpkg 为 apt 的后端
-dpkg -i ...        # 安装本地的包
-dpkg -L vim        # 列出 vim 软件包安装的全部文件
-dpkg --search /... # 查看该文件是哪个软件包安装的, 使用绝对路径
 
 du                      # 列出目录大小
 du -0                   # 输出以 \0 分割, 默认是换行符

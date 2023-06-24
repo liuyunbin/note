@@ -1,0 +1,259 @@
+---
+Language:        Cpp                 # 语言
+# BasedOnStyle:  Google              # 基本风格 Google
+AccessModifierOffset: -1             # 访问控制符的缩进, eg: private, protect, public
+AlignAfterOpenBracket: Align         # 左括号后的对齐方式:
+                                     #     * true        -- 列对齐
+                                     #     * Align       -- 对齐
+                                     #     * DontAlign   -- 不对齐
+                                     #     * AlwaysBreak -- 左括号后换行
+AlignArrayOfStructures: left         # 是否对齐数组:
+                                     #     * None  -- 不对齐
+                                     #     * Left  -- 左对齐
+                                     #     * Right -- 右对齐
+AlignConsecutiveAssignments: AcrossEmptyLinesAndComments
+                                     # 是否对齐赋值运算符或初始化
+                                     #     * None                        -- 不对齐
+                                     #     * false                       -- 不对齐
+                                     #     * Consecutive                 -- 相邻的行对齐
+                                     #     * AcrossEmptyLines            -- 即使有空行也对齐
+                                     #     * AcrossComments              -- 即使有注释也对齐
+                                     #     * AcrossEmptyLinesAndComments -- 即使有空行或注释也对齐
+AlignConsecutiveBitFields:           # 是否对齐字节位, 格式同上
+AlignConsecutiveDeclarations:        # 是否对齐声明, 格式同上
+AlignConsecutiveMacros:              # 是否对齐宏, 格式同上
+AlignEscapedNewlines: Left           # 是否对齐表示在同一行的反斜杠(\)
+                                     #     * None -- 不对齐
+                                     #     * Left  -- 左对齐
+                                     #     * Right -- 右对齐
+AlignOperands:   true                # 是否对齐运算符的操作数
+                                     #     * true                   -- 垂直对齐
+                                     #     * DontAlign              -- 不对齐
+                                     #     * Align
+                                     #          * 如果 BreakBeforeBinaryOperators 设置
+                                     #                 * 运算符 和 下一操作数在同一行
+                                     #          * 否则
+                                     #                 * 运算符 和 上一操作数在同一行
+                                     #     * AlignAfterOperator 运算符 和 上一操作数在同一行
+                                     #          * 如果 BreakBeforeBinaryOperators 设置
+                                     #                 * 运算符 和 上一运算符对齐
+                                     #          * 否则
+                                     #                 * 运算符 不和 上一运算符对齐
+AlignTrailingComments: true          # 是否对齐行尾注释:
+                                     #     * true    对齐
+                                     #     * false 不对齐
+
+AllowAllArgumentsOnNextLine: false   #  true  允许所有的参数放在下一行
+                                     #  false 每行一个参数
+AllowAllConstructorInitializersOnNextLine: true # 已过时
+AllowAllParametersOfDeclarationOnNextLine: true # true  如果一行放不下, 则 放到下一行
+                                                # false 如果一行放不下, 则 每行一个参数
+AllowShortBlocksOnASingleLine: Never  # 短的块是否放到一行
+                                      #     * Never  -- 不允许
+                                      #     * Empty  -- 仅空块放在同一行
+                                      #     * Always -- 允许
+AllowShortCaseLabelsOnASingleLine: false # 短的 case 是否放在一行
+                                         #     * true
+                                         #     * false
+AllowShortEnumsOnASingleLine: false # 短的 枚举 是否放在一行
+                                    #    * true
+                                    #    * false
+AllowShortFunctionsOnASingleLine: All # 短的 函数 是否放在一行
+                                      #     * None       -- 不允许
+                                      #     * InlineOnly -- 仅仅 在类内
+                                      #     * Empty      -- 仅仅 空函数
+                                      #     * Inline     -- 仅仅 在类内 或 空函数
+                                      #     * All        -- 允许所有情况
+AllowShortIfStatementsOnASingleLine:  # 允许 短的 if 放在同一行
+                                      #     * Never          -- 不允许
+                                      #     * WithoutElse    -- 仅没有 else 才允许
+                                      #     * OnlyFirstIf    -- 仅仅 第一个 if 才允许
+                                      #     * AllIfsAndElse  -- 所有情况都允许
+AllowShortLambdasOnASingleLine: All   # 允许 短的 Lambda 放在同一行
+                                      #     * None     -- 不允许
+                                      #     * Empty    -- 空的允许
+                                      #     * Inline   -- 作为函数允许
+                                      #     * All      -- 允许
+AllowShortLoopsOnASingleLine: true    # 允许短循环放在同一行
+
+AlwaysBreakAfterDefinitionReturnType: None # 定义返回类型后是否换行, 已过时
+AlwaysBreakAfterReturnType: None # 返回类型后是否换行
+                                 #     * None                -- 不换行
+                                 #     * All                 -- 所有都换行
+                                 #     * TopLevel            -- 类外都换行
+                                 #     * AllDefinitions      -- 定义都换行
+                                 #     * TopLevelDefinitions -- 类外定义都换行
+AlwaysBreakBeforeMultilineStrings: true # 赋值多行字符串是否换行
+AlwaysBreakTemplateDeclarations: Yes  # 模板是否换行
+                                      #     * No          -- 不换行
+                                      #     * MultiLine   -- 函数复杂时换行
+                                      #     * Yes         -- 换行
+
+AttributeMacros  # 属性
+
+BinPackArguments: true  # true
+                        # false -- 函数调用时, 每行一个参数 或 参数在同一行上
+BinPackParameters: true # true
+                        # false -- 函数声明或定义时, 每行一个参数 或 参数在同一行上
+
+BitFieldColonSpacing # 位域对齐
+
+BraceWrapping: # 大括号换行，只有当 BreakBeforeBraces 设置为 Custom 时才有效
+  AfterCaseLabel:  false
+  AfterClass:      false
+  AfterControlStatement: false
+  AfterEnum:       false
+  AfterFunction:   false
+  AfterNamespace:  false
+  AfterObjCDeclaration: false
+  AfterStruct:     false
+  AfterUnion:      false
+  AfterExternBlock: false
+  BeforeCatch:     false
+  BeforeElse:      false
+  IndentBraces:    false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true
+BreakBeforeBinaryOperators: None # 二元操作符换行
+                                 #     * None          -- 在操作符后换行
+                                 #     * NonAssignment -- 在非赋值的操作符前换行
+                                 #     * All           -- 在操作符前换行
+
+BreakBeforeBraces: Attach          # 大括号换行
+BreakBeforeConceptDeclarations     # concept 换行
+BreakBeforeTernaryOperators        # 三元操作符换行
+BreakConstructorInitializers       # 初始化换行
+BreakBeforeInheritanceComma: false # 继承换行
+BreakStringLiterals: true # 字符串常量
+
+ColumnLimit:     80                                   # 列数限制
+CommentPragmas:  '^ IWYU pragma:'                     # 正则注释
+CompactNamespaces: false                              # 命名空间是否每行一个
+ConstructorInitializerAllOnOneLineOrOnePerLine: true  # 已过时
+ConstructorInitializerIndentWidth: 4                  # 构造函数缩进宽度
+ContinuationIndentWidth: 4                            # 延续的缩进的宽度
+Cpp11BracedListStyle: true                            # 统一初始化去掉多余的空格
+
+DeriveLineEnding: true                                # 行结束符
+DerivePointerAlignment: true                          # 格式化 & *
+DisableFormat:   false                                # 不格式化
+
+EmptyLineAfterAccessModifier             # 如何处理访问控制符后的换行符
+EmptyLineBeforeAccessModifier            # 如何处理访问控制符前的换行符
+ExperimentalAutoDetectBinPacking: false  # 自动检测函数的调用和定义是否被格式为每行一个参数
+
+FixNamespaceComments: true               # 是否修复命名空间注释
+
+ForEachMacros:          # 以下宏不作为函数, 而是函数调用
+  - foreach
+  - Q_FOREACH
+  - BOOST_FOREACH
+
+IncludeBlocks:   Regroup  # IF 宏
+IncludeCategories:        # 头文件排序
+  - Regex:           '^<ext/.*\.h>'
+    Priority:        2
+    SortPriority:    0
+  - Regex:           '^<.*\.h>'
+    Priority:        1
+    SortPriority:    0
+  - Regex:           '^<.*'
+    Priority:        2
+    SortPriority:    0
+  - Regex:           '.*'
+    Priority:        3
+    SortPriority:    0
+IncludeIsMainRegex: '([-_](test|unittest))?$'
+IncludeIsMainSourceRegex: ''
+
+IndentAccessModifiers:            # 访问控制缩进
+IndentCaseBlocks:                 # case 块缩进
+IndentCaseLabels: true            # case 缩进
+IndentExternBlock:                # extern 缩进
+IndentGotoLabels: true            # goto 缩进
+IndentPPDirectives: None          # 预编译缩进
+IndentRequires:                   # require 缩进
+IndentWidth:     2                # 缩进的宽度
+IndentWrappedFunctionNames: false # 函数多行定义 或 声明时缩进
+
+KeepEmptyLinesAtTheStartOfBlocks: false # 是否保留块开始的空行
+
+LambdaBodyIndentation # lambda 的换行
+
+MacroBlockBegin: ''
+MacroBlockEnd:   ''
+MaxEmptyLinesToKeep: 1 # 最大的空行数
+
+NamespaceIndentation: None # 命名空间缩进
+
+PenaltyBreakAssignment: 2
+PenaltyBreakBeforeFirstCallParameter: 1
+PenaltyBreakComment: 300
+PenaltyBreakFirstLessLess: 120
+PenaltyBreakString: 1000
+PenaltyBreakTemplateDeclaration: 10
+PenaltyExcessCharacter: 1000000
+PenaltyReturnTypeOnItsOwnLine: 200
+PointerAlignment: Left
+
+RawStringFormats:
+  - Language:        Cpp
+    Delimiters:
+      - cc
+      - CC
+      - cpp
+      - Cpp
+      - CPP
+      - 'c++'
+      - 'C++'
+    CanonicalDelimiter: ''
+    BasedOnStyle:    google
+  - Language:        TextProto
+    Delimiters:
+      - pb
+      - PB
+      - proto
+      - PROTO
+    EnclosingFunctions:
+      - EqualsProto
+      - EquivToProto
+      - PARSE_PARTIAL_TEXT_PROTO
+      - PARSE_TEST_PROTO
+      - PARSE_TEXT_PROTO
+      - ParseTextOrDie
+      - ParseTextProtoOrDie
+    CanonicalDelimiter: ''
+    BasedOnStyle:    google
+ReflowComments:  true # 允许重新格式注释
+
+SortIncludes:    true                    # 头文件排序
+SortUsingDeclarations: true              # 排序声明
+SpaceAfterCStyleCast: false              # C 风格的 cast
+SpaceAfterLogicalNot: false              # ! 操作
+SpaceAfterTemplateKeyword: true          # 模板
+SpaceBeforeAssignmentOperators: true     # 赋值
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceInEmptyBlock: false
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 2
+SpacesInAngles:  false
+SpacesInConditionalStatement: false
+SpacesInContainerLiterals: true
+SpacesInCStyleCastParentheses: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpaceBeforeSquareBrackets: false
+Standard:        Auto
+StatementMacros:
+  - Q_UNUSED
+  - QT_REQUIRE_VERSION
+TabWidth:        8
+UseCRLF:         false
+UseTab:          Never
+...
+
