@@ -1,9 +1,9 @@
 
-#include "00.h"
+#include "log.h"
 
 int main() {
     log();
-    log("测试新建孙进程对应的进程组");
+    log("操作系统-进程组: 新建孙进程对应的进程组");
     log();
 
     int pipefd[2];
@@ -31,7 +31,7 @@ int main() {
         // 测试的父进程
         close(pipefd[1]);
 
-        char ch;
+        char        ch;
         std::string str;
 
         while (read(pipefd[0], &ch, 1) > 0) {
@@ -45,15 +45,15 @@ int main() {
         cmd += std::to_string(grandchild) + ",";
         cmd += std::to_string(getpid());
         system(cmd.data());
-        log("修改孙进程(" + str + ")的进程组");
-        test(grandchild, grandchild);
+        log("修改孙进程的进程组: " + str);
+        test_pgid(grandchild, grandchild);
 
         kill(child, SIGKILL);
         kill(grandchild, SIGKILL);
     }
 
-    log("主进程退出");
     log();
-
+    log("主进程正常退出");
+    log();
     return 0;
 }
