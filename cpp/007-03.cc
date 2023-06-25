@@ -4,13 +4,12 @@
 int count = 0;
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获信号 SIGUSR1 第 ", ++count, " 次");
+    log("捕获信号 SIGUSR1 第 " + std::to_string(++count) + " 次");
 }
 
 int main() {
     log();
-    log("操作系统-信号-不可靠");
-    log("测试多个信号处于待决状态信号会丢失");
+    log("操作系统-信号-不可靠: 多个信号处于待决状态信号会丢失");
     log();
 
     log("注册信号处理函数");
@@ -27,7 +26,7 @@ int main() {
     sigprocmask(SIG_SETMASK, &mask, NULL);
 
     for (int i = 1; i <= 5; ++i) {
-        log("发送信号 SIGUSR1 第 ", i, " 次");
+        log("发送信号 SIGUSR1 第 " + std::to_string(i) + " 次");
         kill(getpid(), SIGUSR1);
     }
 

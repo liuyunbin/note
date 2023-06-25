@@ -2,20 +2,21 @@
 #include "log.h"
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获来自 ", sig_info->si_pid, " 的信号 SIGCHLD");
+    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
 }
 
 int main() {
     log();
-    log("操作系统-信号");
-    log("测试子进程暂停, 继续, 退出时, 向父进程发送 SIGCHLD, 父进程的处理");
+    log("操作系统-信号: 子进程状态变化时, 父进程的处理");
+    log("不接收子进程暂停继续产生的 SIGCHLD");
     log();
 
     log("注册信号处理");
+    log("设置不接受子进程暂停继续产生的 SIGCHLD");
     struct sigaction act;
     act.sa_sigaction = handle_signal;
     sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
+    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT | SA_NOCLDSTOP;
     sigaction(SIGCHLD, &act, NULL);
 
     pid_t fd = fork();

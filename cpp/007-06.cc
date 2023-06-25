@@ -1,5 +1,5 @@
 
-#include "00.h"
+#include "log.h"
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
     log("捕获信号 " + m[sig]);
@@ -9,10 +9,8 @@ void handle_signal(int sig, siginfo_t* sig_info, void*) {
 }
 
 int main() {
-    init();
-
     log();
-    log("测试信号处理过程中不同的信号到达");
+    log("操作系统-信号: 信号处理过程中不同的信号到达");
     log();
 
     log("设置信号处理函数");
@@ -39,8 +37,8 @@ int main() {
         kill(fd, SIGKILL);
     }
 
-    log("主进程退出");
     log();
-
+    log("主进程正常退出");
+    log();
     return 0;
 }

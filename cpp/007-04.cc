@@ -4,13 +4,12 @@
 int count = 0;
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获信号 SIGUSR1 第 ", ++count, " 次");
+    log("捕获信号 SIGUSR1 第 " + std::to_string(++count) + " 次");
 }
 
 int main() {
     log();
-    log("操作系统-信号-不可靠");
-    log("测试信号处理函数被重置");
+    log("操作系统-信号-不可靠: 信号处理函数被重置");
     log();
 
     log("注册信号处理函数");
