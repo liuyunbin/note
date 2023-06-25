@@ -1,20 +1,5 @@
 
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <unistd.h>
-
-#include <iostream>
-#include <map>
-#include <string>
-
-void log(const std::string& msg = "") {
-    time_t     now  = time(NULL);
-    struct tm* info = localtime(&now);
-    char       buf[1024];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
-    std::cout << buf << " " << msg << std::endl;
-}
+#include "log.h"
 
 int main() {
     log();
