@@ -3,8 +3,7 @@
 
 int main() {
     log();
-    log("操作系统-会话-销毁");
-    log("测试销毁会话(会话不和终端绑定)");
+    log("操作系统-会话-销毁: 会话不和终端绑定");
     log();
 
     if (fork() == 0) {
@@ -15,7 +14,7 @@ int main() {
             log("当前进程和父进程的信息");
             show_pid_pgid_sid(getpid());
             show_pid_pgid_sid(getppid());
-            log("杀死父进程(会话首进程)(", getppid(), ")");
+            log("杀死父进程(会话首进程): " + std::to_string(getppid()));
             if (kill(getppid(), SIGKILL) < 0) {
                 perror("");
             }
