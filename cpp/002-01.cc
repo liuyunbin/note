@@ -10,27 +10,22 @@ int main() {
         if (fork() == 0) {
             // 测试的子进程
             sleep(1);
-            log("测试的子进程(", getpid(), ")启动");
-            std::string cmd =
-                to_string("ps -o pid,ppid,pgid,sid,state,comm -p ",
-                          getpid(),
-                          ",",
-                          getppid());
+            log("测试的子进程启动: " + std::to_string(getpid()));
+            std::string cmd = "ps -o pid,ppid,pgid,sid,state,comm -p ";
+            cmd += std::to_string(getpid()) + "," + std::to_string(getppid());
             log("进程状态");
             system(cmd.data());
-            log("杀死父进程 ", getppid());
+            log("杀死父进程 " + std::to_string(getppid()));
             kill(getppid(), SIGKILL);
             sleep(1);
-            cmd = to_string("ps -o pid,ppid,pgid,sid,state,comm -p ",
-                            getpid(),
-                            ",",
-                            getppid());
+            cmd = "ps -o pid,ppid,pgid,sid,state,comm -p ";
+            cmd += std::to_string(getpid()) + "," + std::to_string(getppid());
             log("进程状态");
             system(cmd.data());
             return 0;
         } else {
             // 测试的父进程
-            log("测试的父进程(", getpid(), ")启动");
+            log("测试的父进程启动: " + std::to_string(getpid()));
             for (;;)
                 ;
         }
