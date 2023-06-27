@@ -1,8 +1,8 @@
 
 # 编译
 ```
-./bash/install-dependency.sh
-./bash/build.sh
+./install-dependency.sh
+./build.sh
 ```
 
 # 目录
