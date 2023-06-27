@@ -25,14 +25,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin) # 设置 二进制�
 enable_testing()
 
 # 计算机操作系统-僵尸进程
-add_executable(001-01 001-01.cc)
-add_executable(001-02 001-02.cc)
-add_executable(001-03 001-03.cc)
-add_executable(001-04 001-04.cc)
-add_executable(001-05 001-05.cc)
-add_executable(001-06 001-06.cc)
-add_executable(001-07 001-07.cc)
-add_executable(001-08 001-08.cc)
+add_executable(002-01 002-01.cc)
+add_executable(002-02 002-02.cc)
+add_executable(002-03 002-03.cc)
+add_executable(002-04 002-04.cc)
+add_executable(002-05 002-05.cc)
+add_executable(002-06 002-06.cc)
+add_executable(002-07 002-07.cc)
+add_executable(002-08 002-08.cc)
 
 ## 计算机操作系统-孤儿进程
 #add_executable(002-01 002-01.cc)
