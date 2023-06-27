@@ -12,7 +12,7 @@ alias lsd="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtd" # 以 文件内容修
 alias lss="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrS"  # 以 文件大小         排序
 alias lsv="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrv"  # 以 文件名为版本号   排序
 
-alias b="cd $note; ./bash/build.sh > /dev/null; cd - > /dev/null"
+alias b="cd $note; ./build.sh > /dev/null; cd - > /dev/null"
 alias c="cd $note; pwd"
 alias g="g++ -g -std=c++11 "
 alias lastlog="tool.sh lastlog" # 列出用户的最后一次登录
