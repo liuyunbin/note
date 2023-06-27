@@ -1,20 +1,6 @@
 
-#include <signal.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#include <time.h>
 
-#include <algorithm>
-#include <bitset>
-#include <cctype>
-#include <cfenv>
-#include <cfloat>
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
-#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
