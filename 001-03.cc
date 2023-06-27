@@ -1,9 +1,15 @@
 
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
 #include "log.h"
 
 int main() {
     log();
-    log("操作系统-僵尸进程-预防: SIGCHLD 处理为 SIG_IGN");
+    log("计算机操作系统-僵尸进程");
+    log("预防僵尸进程的产生: 忽略信号 SIGCHLD");
     log();
 
     log("设置 SIGCHLD 的信号处理");
@@ -21,12 +27,11 @@ int main() {
         pid_t fd = fork();
         if (fd == 0) {
             // 子进程
-            log("子进程启动后退出: " + std::to_string(getpid()));
+            log("子进程启动后退出: ", getpid());
             exit(-1);
         } else {
             // 父进程
-            cmd += std::to_string(fd);
-            cmd += ",";
+            cmd += std::to_string(fd) + ",";
             sleep(1);
         }
     }

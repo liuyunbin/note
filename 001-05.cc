@@ -1,16 +1,22 @@
 
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
 #include "log.h"
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获信号 SIGCHLD 来自: " + std::to_string(sig_info->si_pid));
+    log("捕获信号 SIGCHLD 来自: ", sig_info->si_pid);
 }
 
 int main() {
     log();
-    log("操作系统-僵尸进程-预防: SIGCHLD 处理为 SA_NOCLDWAIT");
+    log("计算机操作系统-僵尸进程");
+    log("预防僵尸进程的产生: 设置 SIGCHLD 选项为 SA_NOCLDWAIT");
     log();
 
-    log("设置 SIGCHLD 的信号处理: SA_NOCLDWAIT");
+    log("设置 SIGCHLD 的信号选项: SA_NOCLDWAIT");
     struct sigaction act;
     act.sa_sigaction = handle_signal;
     act.sa_flags     = SA_SIGINFO | SA_NOCLDWAIT;
@@ -29,12 +35,11 @@ int main() {
         pid_t fd = fork();
         if (fd == 0) {
             // 子进程
-            log("子进程启动后退出: " + std::to_string(getpid()));
+            log("子进程启动后退出: ", getpid());
             exit(-1);
         } else {
             // 父进程
-            cmd += std::to_string(fd);
-            cmd += ",";
+            cmd += std::to_string(fd) + ",";
             sleep(1);
         }
     }
