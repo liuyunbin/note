@@ -90,11 +90,11 @@ void test_exit() {
 }
 
 int main() {
-#if 1
+#if 0
     test_macro();  // 测试宏
 #endif
 
-#if 0
+#if 1
     test_va();  // 测试可变参数
 #endif
 
@@ -112,8 +112,8 @@ int v123 = 123456;
 
 #define TEST_MACRO_STR(fmt, X) printf(fmt, #X, X)
 #define TEST_MACRO_CAT(fmt, X) printf(fmt, v##X)
-#define TEST_MACRO(fmt, ...) \
-    printf(fmt, ##__VA_ARGS__)  // 如果可变参数不存在, 去掉前面的逗号
+// 可变参数, 如果可变参数不存在, 去掉前面的逗号
+#define TEST_MACRO(fmt, ...) printf(fmt, ##__VA_ARGS__)
 
 void test_macro() {
     TEST_MACRO_STR("测试宏变字符串: %s -> %d\n", 123);
@@ -123,10 +123,27 @@ void test_macro() {
 }
 
 // 测试可变参数
+//    printf() -- 输出到标准输出
+//   fprintf() -- 输出到标准IO
+//   dprintf() -- 输出到文件描述符
+//   sprintf() -- 输出到字符串
+//  snprintf() -- 输出到字符串
+//
+//   vprintf() -- 使用可变参数 va
+//  vfprintf() -- 使用可变参数 va
+//  vdprintf() -- 使用可变参数 va
+//  vsprintf() -- 使用可变参数 va
+// vsnprintf() -- 使用可变参数 va
+//
+//  __VA_ARGS__  -- 只能在宏中使用, 代替可变参数
+//
+//  va_start -- 初始化
+//  va_arg   -- 获取下一个可变参数
+//  va_copy  -- 拷贝
+//  va_end   -- 清空
+//
 
-#define LOG(...)   printf(__VA_ARGS__)
-#define TEST(ARGS) printf("%s => %d\n", #ARGS, ARGS)
-#define LYB        111
+#define TEST_VA(fmt, ...) printf(fmt, ##__VA_ARGS__)
 
 void test_va_c(const char* s, ...) {
     va_list ap;
@@ -145,8 +162,7 @@ void test_va_cpp(T t, Args... args) {
 }
 
 void test_va() {
-    LOG("测试 C 可变参数: %s -> %s\n", "123", "456");
-    test_va_c("测试 C 可变参数: %s -> %s\n", "123", "456");
-    test_va_cpp("测试 c++ 可变参数: ", "123", "456", "\n");
-    TEST(LYB);
+    TEST_VA("测试 C 风格的可变参数: %s -> %s\n", "123", "456");
+    test_va_c("测试 C 风格的可变参数: %s -> %s\n", "123", "456");
+    test_va_cpp("测试 C++ 风格的可变参数: ", "123", " -> ", "456", "\n");
 }
