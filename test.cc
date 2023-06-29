@@ -3,6 +3,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/resource.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
@@ -14,7 +16,8 @@
 void test_va();     // 测试可变参数
 void test_macro();  // 测试宏
 void test_exit();   // 测试退出
-void test_jmp();    // 测试 jmp
+void test_jmp();    // 测试跨函数跳转
+void test_limit();  // 测试资源限制
 
 int main() {
 #if 0
@@ -29,11 +32,15 @@ int main() {
     test_exit();  // 测试退出
 #endif
 
-#if 1
-    test_jmp();
+#if 0
+    test_jmp(); // 测试跨函数跳转
 #endif
 
-    std::cout << "环境变量 PATH: " << getenv("PATH") << std::endl;
+    //    std::cout << "环境变量 PATH: " << getenv("PATH") << std::endl;
+
+#if 1
+    test_limit();  // 测试资源限制
+#endif
 
     return 0;
 }
@@ -212,4 +219,27 @@ void test_jmp(int v) {
 void test_jmp() {
     log("测试 jmp");
     test_jmp(10);
+}
+
+// 测试资源限制
+// 软限制值可以任意修改, 只要小于等于硬限制值即可
+// 硬限制值可以降低, 只要大于等于软限制值即可
+// 只有超级用户才可以提高硬限制值
+// RLIM_INFINITY 表示不做限制
+
+#define TEST_LIMIT(X)                   \
+    {                                   \
+        struct rlimit rlim;             \
+        getrlimit(X, &rlim);            \
+        log(#X);                        \
+        log("软限制: ", rlim.rlim_cur); \
+        log("硬限制: ", rlim.rlim_max); \
+        log();                          \
+    }
+
+void test_limit() {
+    log("测试资源限制: ");
+    log();
+    TEST_LIMIT(RLIMIT_CPU);
+    TEST_LIMIT(RLIMIT_CORE);
 }
