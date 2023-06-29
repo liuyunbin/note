@@ -12,63 +12,19 @@
 
 void test_va();     // 测试可变参数
 void test_macro();  // 测试宏
-
-class A {
-  public:
-    A() {
-        std::cout << "调用构造函数" << std::endl;
-    }
-
-    ~A() {
-        std::cout << "调用析构函数" << std::endl;
-    }
-};
-
-void test_1() {
-    std::cout << "测试函数-1" << std::endl;
-}
-
-void test_2() {
-    std::cout << "测试函数-2" << std::endl;
-}
-
-void test_atexit() {
-    std::cout << "注册退出函数" << std::endl;
-    atexit(test_1);
-    atexit(test_1);
-    atexit(test_2);
-    atexit(test_2);
-}
-
-void test_exit() {
-    if (fork() == 0) {
-        std::cout << "测试 exit" << std::endl;
-        A a;
-        test_atexit();
-        std::cout << "退出" << std::endl;
-        exit(0);
-    }
-
-    sleep(1);
-    std::cout << std::endl;
-
-    if (fork() == 0) {
-        std::cout << "测试 _exit" << std::endl;
-        A a;
-        test_atexit();
-        std::cout << "退出" << std::endl;
-        _exit(0);
-    }
-    sleep(1);
-}
+void test_exit();   // 测试退出
 
 int main() {
 #if 0
     test_macro();  // 测试宏
 #endif
 
-#if 1
+#if 0
     test_va();  // 测试可变参数
+#endif
+
+#if 1
+    test_exit();  // 测试退出
 #endif
 
     //    std::cout << "环境变量 PATH: " << getenv("PATH") << std::endl;
@@ -166,4 +122,66 @@ void test_va() {
     TEST_VA("测试 C 风格的可变参数: %s -> %s\n", "123", "456");
     test_va_c("测试 C 风格的可变参数: %s -> %s\n", "123", "456");
     test_va_cpp("测试 C++ 风格的可变参数: ", "123", " -> ", "456", "\n");
+}
+
+// 测试退出
+class A {
+  public:
+    A() {
+        std::cout << "调用构造函数" << std::endl;
+    }
+
+    ~A() {
+        std::cout << "调用析构函数" << std::endl;
+    }
+};
+
+void test_1() {
+    std::cout << "测试函数-1" << std::endl;
+}
+
+void test_2() {
+    std::cout << "测试函数-2" << std::endl;
+}
+
+void test_atexit() {
+    std::cout << "注册退出函数" << std::endl;
+    atexit(test_1);
+    atexit(test_1);
+    atexit(test_2);
+    atexit(test_2);
+}
+
+void test_exit() {
+    if (fork() == 0) {
+        std::cout << "测试 exit" << std::endl;
+        A a;
+        test_atexit();
+        std::cout << "退出" << std::endl;
+        exit(0);
+    }
+
+    sleep(1);
+    std::cout << std::endl;
+
+    if (fork() == 0) {
+        std::cout << "测试 _exit" << std::endl;
+        A a;
+        test_atexit();
+        std::cout << "退出" << std::endl;
+        _exit(0);
+    }
+
+    sleep(1);
+    std::cout << std::endl;
+
+    if (fork() == 0) {
+        std::cout << "测试正常退出" << std::endl;
+        A a;
+        test_atexit();
+        std::cout << "退出" << std::endl;
+        return;
+    }
+
+    sleep(1);
 }
