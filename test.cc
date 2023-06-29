@@ -1,4 +1,5 @@
 
+#include <setjmp.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +14,7 @@
 void test_va();     // 测试可变参数
 void test_macro();  // 测试宏
 void test_exit();   // 测试退出
+void test_jmp();    // 测试 jmp
 
 int main() {
 #if 0
@@ -23,15 +25,15 @@ int main() {
     test_va();  // 测试可变参数
 #endif
 
-#if 1
+#if 0
     test_exit();  // 测试退出
 #endif
 
-    //    std::cout << "环境变量 PATH: " << getenv("PATH") << std::endl;
+#if 1
+    test_jmp();
+#endif
 
-    //    std::cout << std::endl;
-
-    //    test_exit();
+    std::cout << "环境变量 PATH: " << getenv("PATH") << std::endl;
 
     return 0;
 }
@@ -184,4 +186,30 @@ void test_exit() {
     }
 
     sleep(1);
+}
+
+// 测试跨函数跳转
+
+jmp_buf buf_jmp;
+
+void test_jmp(int v) {
+    if (v == 0) {
+        longjmp(buf_jmp, 3);
+    }
+
+    if (v == 3) {
+        if (setjmp(buf_jmp) == 0) {
+            log("第一次经过, v = ", v);
+        } else {
+            log("再一次经过, v = ", v);
+            return;
+        }
+    }
+    log("参数: v = ", v);
+    test_jmp(v - 1);
+}
+
+void test_jmp() {
+    log("测试 jmp");
+    test_jmp(10);
 }
