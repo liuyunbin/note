@@ -24,6 +24,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin) # 设置 二进制�
 # 激活测试
 enable_testing()
 
+add_executable(lsh lsh.cc)
+target_link_libraries(lsh readline)
+
 # 计算机操作系统-僵尸进程
 add_executable(002-01 002-01.cc)
 add_executable(002-02 002-02.cc)
@@ -96,8 +99,6 @@ add_executable(002-08 002-08.cc)
 
 ###########################################################################
 
-# add_executable(lsh lsh.cc)
-# target_link_libraries(lsh readline)
 
 #add_executable(
 #    huge-number-unittest
