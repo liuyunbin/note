@@ -1,37 +1,33 @@
 
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
 #include "log.h"
 
 int main() {
     log();
-    log("操作系统-孤儿进程");
+    log("计算机操作系统-僵尸进程");
+    log("重现僵尸进程的产生: 父进程未处理子进程退出的状态信息");
     log();
 
-    if (fork() == 0) {
-        if (fork() == 0) {
-            // 测试的子进程
-            sleep(1);
-            log("测试的子进程启动: " + std::to_string(getpid()));
-            std::string cmd = "ps -o pid,ppid,pgid,sid,state,comm -p ";
-            cmd += std::to_string(getpid()) + "," + std::to_string(getppid());
-            log("进程状态");
-            system(cmd.data());
-            log("杀死父进程 " + std::to_string(getppid()));
-            kill(getppid(), SIGKILL);
-            sleep(1);
-            cmd = "ps -o pid,ppid,pgid,sid,state,comm -p ";
-            cmd += std::to_string(getpid()) + "," + std::to_string(getppid());
-            log("进程状态");
-            system(cmd.data());
-            return 0;
-        } else {
-            // 测试的父进程
-            log("测试的父进程启动: " + std::to_string(getpid()));
-            for (;;)
-                ;
-        }
-    }
+    pid_t fd = fork();
 
-    sleep(3);
+    if (fd == 0) {
+        log("子进程已启动: ", getpid());
+        for (;;)
+            ;
+    }
+    sleep(1);  // 保证子进程已启动
+    std::string cmd = "ps -o pid,comm,state -p " + std::to_string(fd);
+    log("子进程状态");
+    system(cmd.data());
+    log("杀死子进程:", fd);
+    kill(fd, SIGKILL);
+    sleep(1);
+    log("子进程状态");
+    system(cmd.data());
 
     log();
     log("主进程正常退出");
