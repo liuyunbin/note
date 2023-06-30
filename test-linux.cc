@@ -47,6 +47,7 @@ void test_zombie_8();  // 测试: 产生僵尸进程不退出
 void test_orphan_process();        // 测试孤儿进程
 void test_orphan_process_group();  // 测试孤儿进程组
 void test_pgid();                  // 测试进程组
+void test_sid();                   // 测试会话
 
 int main() {
     // 测试宏
@@ -95,7 +96,10 @@ int main() {
     // test_orphan_process_group();
 
     // 测试进程组
-    test_pgid();
+    // test_pgid();
+
+    // 测试会话
+    test_sid();
     //    std::cout << "环境变量 PATH: " << getenv("PATH") << std::endl;
     //    printf("123");
     //    if (fork() == 0) {
@@ -972,6 +976,68 @@ void test_pgid() {
     log("子进程的状态信息");
     test_pgid(getpid(), fd);
     sleep(1);
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+// 测试会话
+void test_sid_help() {
+    show_pid_pgid_sid(getpid());
+
+    std::string msg = "新建会话";
+    if (setsid() < 0) {
+        msg += ": ";
+        msg += strerror(errno);
+    }
+    log(msg);
+
+    show_pid_pgid_sid(getpid());
+}
+
+void test_sid() {
+    log();
+    log("测试进程组的首进程建立新会话");
+    test_sid_help();
+
+    log();
+    log("测试不是进程组的首进程建立新会话");
+
+    if (fork() == 0) {
+        test_sid_help();
+        exit(-1);
+    }
+
+    sleep(1);
+
+    log();
+    log("测试会话销毁: 会话不和终端绑定");
+
+    if (fork() == 0) {
+        log("建立新会话");
+        test_sid_help();
+        if (fork() == 0) {
+            log("新会话的子进程");
+            log("当前进程和父进程的信息");
+            show_pid_pgid_sid(getpid());
+            show_pid_pgid_sid(getppid());
+            log("杀死父进程(会话首进程): " + std::to_string(getppid()));
+            if (kill(getppid(), SIGKILL) < 0) {
+                perror("");
+            }
+            sleep(1);
+            log("当前进程和父进程的信息");
+            show_pid_pgid_sid(getpid());
+            show_pid_pgid_sid(getppid());
+            exit(-1);
+        } else {
+            for (;;)
+                ;
+        }
+    }
+
+    sleep(3);
 
     log();
     log("主进程正常退出");

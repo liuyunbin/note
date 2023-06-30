@@ -29,21 +29,6 @@ std::map<int, std::string> dict_round{
     {FE_UPWARD,     "向上舍入"}
 };
 
-// 测试 SID
-void test_sid() {
-    log();
-    show_pid_pgid_sid(getpid());
-
-    std::string msg = "新建会话";
-    if (setsid() < 0) {
-        msg += ": ";
-        msg += strerror(errno);
-    }
-    log(msg);
-
-    show_pid_pgid_sid(getpid());
-}
-
 // 测试 浮点数
 class Double {
   public:
