@@ -32,6 +32,7 @@ void test_zombie_5();  // 预防僵尸进程的产生:
 void test_zombie_6();  // 预防僵尸进程的产生: 杀死父进程
 void test_zombie_7();  // 销毁僵尸进程: 杀死僵尸进程的父进程
 void test_zombie_8();  // 测试: 产生僵尸进程不退出
+void test_orphan_process();  // 测试孤儿进程
 
 int main() {
     // 测试宏
@@ -71,7 +72,10 @@ int main() {
     // test_zombie_7();
 
     // 测试: 产生僵尸进程不退出
-    test_zombie_8();
+    // test_zombie_8();
+
+    // 测试孤儿进程
+    test_orphan_process();
     //    std::cout << "环境变量 PATH: " << getenv("PATH") << std::endl;
     //    printf("123");
     //    if (fork() == 0) {
@@ -624,6 +628,44 @@ void test_zombie_8() {
     log("死循环...");
     for (;;)
         ;
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+// 测试孤儿进程
+void test_orphan_process() {
+    log();
+    log("测试孤儿进程");
+    log();
+
+    if (fork() == 0) {
+        if (fork() == 0) {
+            // 测试的子进程
+            sleep(1);
+            log("测试的子进程启动: " + std::to_string(getpid()));
+            std::string cmd = "ps -o pid,ppid,pgid,sid,state,comm -p ";
+            cmd += std::to_string(getpid()) + "," + std::to_string(getppid());
+            log("进程状态");
+            system(cmd.data());
+            log("杀死父进程 " + std::to_string(getppid()));
+            kill(getppid(), SIGKILL);
+            sleep(1);
+            cmd = "ps -o pid,ppid,pgid,sid,state,comm -p ";
+            cmd += std::to_string(getpid()) + "," + std::to_string(getppid());
+            log("进程状态");
+            system(cmd.data());
+            return;
+        } else {
+            // 测试的父进程
+            log("测试的父进程启动: " + std::to_string(getpid()));
+            for (;;)
+                ;
+        }
+    }
+
+    sleep(3);
 
     log();
     log("主进程正常退出");
