@@ -48,6 +48,7 @@ void test_orphan_process();        // 测试孤儿进程
 void test_orphan_process_group();  // 测试孤儿进程组
 void test_pgid();                  // 测试进程组
 void test_sid();                   // 测试会话
+void test_vfork();                 // 测试 vfork
 
 int main() {
     // 测试宏
@@ -99,13 +100,13 @@ int main() {
     // test_pgid();
 
     // 测试会话
-    test_sid();
+    // test_sid();
+
+    // 测试 vfork
+    test_vfork();
+
     //    std::cout << "环境变量 PATH: " << getenv("PATH") << std::endl;
-    //    printf("123");
-    //    if (fork() == 0) {
-    //        exit(0);
-    //    }
-    //    sleep(1);
+    sleep(1);
     return 0;
 }
 
@@ -307,17 +308,6 @@ void test_limit() {
     TEST_LIMIT(RLIMIT_CPU);
     TEST_LIMIT(RLIMIT_CORE);
 }
-
-//  fork()
-// vfork()
-//
-// getpid()  -- 进程 ID
-// getppid() -- 父进程 ID
-// getuid()  -- 实际用户
-// geteuid() -- 有效用户
-// getgid()  -- 实际组
-// getegid() -- 有效组
-//
 
 // 测试僵尸进程
 void test_zombie_1() {
@@ -1043,3 +1033,37 @@ void test_sid() {
     log("主进程正常退出");
     log();
 }
+
+// 测试 vfork
+void test_vfork_help() {
+    std::string str = "123";
+    std::cout << "调用 vfork 前为: " << str << std::endl;
+    if (vfork() == 0) {
+        str = "456";
+        std::cout << "vfork 内修改为: " << str << std::endl;
+        exit(0);
+    }
+    std::cout << "调用 vfork 后为: " << str << std::endl;
+}
+
+void test_vfork() {
+    std::string str = "123";
+    std::cout << "上一层函数调用前为: " << str << std::endl;
+    test_vfork_help();
+    std::cout << "上一层函数调用后为: " << str << std::endl;
+}
+
+//  fork()
+// vfork()
+//
+// getpid()  -- 进程 ID
+// getppid() -- 父进程 ID
+// getuid()  -- 实际用户
+// geteuid() -- 有效用户
+// getgid()  -- 实际组
+// getegid() -- 有效组
+//
+// setuid(uid) -- 进程  具有超级权限时, 设置 实际的 有效的 保存的用户 ID 为 uid
+//             -- 进程不具有超级权限时, uid 等于 实际的 ID 或 保存的用户 ID 时,
+//             将有效的 ID 改为 uid
+// setgid()    -- 和上述类似
