@@ -1,54 +1,4 @@
 
-#include <setjmp.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
-#include <algorithm>
-#include <bitset>
-#include <cctype>
-#include <cfenv>
-#include <cfloat>
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <map>
-#include <sstream>
-#include <string>
-
-template <typename T>
-std::string to_string(T data) {
-    std::stringstream tmp;
-    tmp << data;
-    return tmp.str();
-}
-
-template <typename T, typename... Args>
-std::string to_string(T data, Args... args) {
-    std::stringstream tmp;
-    tmp << data;
-    return tmp.str() + to_string(args...);
-}
-
-void log(const std::string& msg = "") {
-    time_t     now  = time(NULL);
-    struct tm* info = localtime(&now);
-    char       buf[1024];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
-    std::cout << buf << " " << msg << std::endl;
-}
-
-template <typename... Args>
-void log(Args... args) {
-    log(to_string(args...));
-}
-
 template <typename T>
 std::string format(const char* fmt, T data) {
     char buf[2048];
@@ -61,41 +11,6 @@ double to_double(const std::string& str) {
     sscanf(str.data(), "%lf", &data);
     return data;
 }
-
-// 信号处理
-std::map<int, std::string> m{
-    {SIGHUP,    " 1-SIGHUP"   },
-    {SIGINT,    " 2-SIGINT"   },
-    {SIGQUIT,   " 3-SIGQUIT"  },
-    {SIGILL,    " 4-SIGILL"   },
-    {SIGTRAP,   " 5-SIGTRAP"  },
-    {SIGABRT,   " 6-SIGABRT"  },
-    {SIGBUS,    " 7-SIGBUS"   },
-    {SIGFPE,    " 8-SIGFPE"   },
-    {SIGKILL,   " 9-SIGKILL"  },
-    {SIGUSR1,   "10-SIGUSR1"  },
-    {SIGSEGV,   "11-SIGSEGV"  },
-    {SIGUSR2,   "12-SIGUSR2"  },
-    {SIGPIPE,   "13-SIGPIPE"  },
-    {SIGALRM,   "14-SIGALRM"  },
-    {SIGTERM,   "15-SIGTERM"  },
-    {SIGSTKFLT, "16-SIGSTKFLT"},
-    {SIGCHLD,   "17-SIGCHLD"  },
-    {SIGCONT,   "18-SIGCONT"  },
-    {SIGSTOP,   "19-SIGSTOP"  },
-    {SIGTSTP,   "20-SIGTSTP"  },
-    {SIGTTIN,   "21-SIGTTIN"  },
-    {SIGTTOU,   "22-SIGTTOU"  },
-    {SIGURG,    "23-SIGURG"   },
-    {SIGXCPU,   "24-SIGXCPU"  },
-    {SIGXFSZ,   "25-SIGXFSZ"  },
-    {SIGVTALRM, "26-SIGVTALRM"},
-    {SIGPROF,   "27-SIGPROF"  },
-    {SIGWINCH,  "28-SIGWINCH" },
-    {SIGIO,     "29-SIGIO"    },
-    {SIGPWR,    "30-SIGPWR"   },
-    {SIGSYS,    "31-SIGSYS"   }
-};
 
 // 存储浮点数异常
 std::map<int, std::string> dict_except{
@@ -113,26 +28,6 @@ std::map<int, std::string> dict_round{
     {FE_TOWARDZERO, "向零舍入"},
     {FE_UPWARD,     "向上舍入"}
 };
-
-// 展示 PID PGID SID
-void show_pid_pgid_sid(pid_t pid) {
-    log("进程 ", pid, " 进程组 ", getpgid(pid), " 会话 ", getsid(pid));
-}
-
-// 测试 PGID
-void test_pgid(pid_t pid, pid_t pgid) {
-    log();
-    show_pid_pgid_sid(pid);
-
-    std::string msg = to_string("修改进程组 ", getpgid(pid), " => ", pgid);
-    if (setpgid(pid, pgid) < 0) {
-        msg += ": ";
-        msg += strerror(errno);
-    }
-    log(msg);
-
-    show_pid_pgid_sid(pid);
-}
 
 // 测试 SID
 void test_sid() {

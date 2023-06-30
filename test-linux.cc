@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/resource.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -11,7 +12,17 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <algorithm>
+#include <bitset>
+#include <cctype>
+#include <cfenv>
+#include <cfloat>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <iomanip>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <sstream>
 #include <string>
@@ -35,6 +46,7 @@ void test_zombie_7();  // 销毁僵尸进程: 杀死僵尸进程的父进程
 void test_zombie_8();  // 测试: 产生僵尸进程不退出
 void test_orphan_process();        // 测试孤儿进程
 void test_orphan_process_group();  // 测试孤儿进程组
+void test_pgid();                  // 测试进程组
 
 int main() {
     // 测试宏
@@ -80,7 +92,10 @@ int main() {
     // test_orphan_process();
 
     // 测试孤儿进程组
-    test_orphan_process_group();
+    // test_orphan_process_group();
+
+    // 测试进程组
+    test_pgid();
     //    std::cout << "环境变量 PATH: " << getenv("PATH") << std::endl;
     //    printf("123");
     //    if (fork() == 0) {
@@ -778,6 +793,185 @@ void test_orphan_process_group() {
     }
 
     sleep(3);
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+// 展示 PID PGID SID
+void show_pid_pgid_sid(pid_t pid) {
+    log("进程 ", pid, " 进程组 ", getpgid(pid), " 会话 ", getsid(pid));
+}
+
+// 测试 PGID
+void test_pgid(pid_t pid, pid_t pgid) {
+    show_pid_pgid_sid(pid);
+
+    std::string msg = to_string("修改进程组 ", getpgid(pid), " => ", pgid);
+    if (setpgid(pid, pgid) < 0) {
+        msg += ": ";
+        msg += strerror(errno);
+    }
+    log(msg);
+
+    show_pid_pgid_sid(pid);
+}
+
+void test_pgid() {
+    log();
+    log("测试进程组: 新建自身进程对应的进程组");
+
+    test_pgid(getpid(), getpid());
+    if (fork() == 0) {
+        test_pgid(getpid(), getpid());
+        exit(-1);
+    }
+    sleep(1);
+
+    log();
+    log("测试进程组: 新建父进程对应的进程组");
+
+    if (fork() == 0) {
+        // 测试的父进程
+        if (fork() == 0) {
+            // 测试的子进程
+            log("新建父进程的进程组: ", getppid());
+            test_pgid(getppid(), getppid());
+            kill(getppid(), SIGKILL);
+            exit(-1);
+        }
+        for (;;)
+            ;
+    }
+    sleep(1);
+
+    log();
+    log("测试进程组: 新建子进程对应的进程组(子进程属于不同的会话)");
+
+    pid_t fd = fork();
+    if (fd == 0) {
+        log("子进程新建会话");
+        setsid();
+        for (;;)
+            ;
+    }
+    sleep(1);
+    log("父进程会话: ", getsid(getpid()));
+    log("子进程会话: ", getsid(fd));
+    log("新建子进程的进程组: ", fd);
+    test_pgid(fd, fd);
+    kill(fd, SIGKILL);
+
+    sleep(1);
+
+    log();
+    log("测试进程组: 新建子进程对应的进程组(子进程调用exec之后)");
+
+    fd = fork();
+    if (fd == 0) {
+        log("子进程调用exec");
+        execl("/usr/bin/sleep", "sleep", "3", NULL);
+        log("子进程失败");
+        exit(-1);
+    }
+    sleep(1);
+    log("新建子进程的进程组: ", fd);
+    test_pgid(fd, fd);
+    kill(fd, SIGKILL);
+
+    sleep(1);
+
+    log();
+    log("测试进程组: 新建子进程对应的进程组(其他情况)");
+
+    fd = fork();
+    if (fd == 0) {
+        for (;;)
+            ;
+    }
+    sleep(1);
+    log("新建子进程的进程组: ", fd);
+    test_pgid(fd, fd);
+    kill(fd, SIGKILL);
+
+    sleep(1);
+
+    log();
+    log("操作系统-进程组: 新建孙进程对应的进程组");
+
+    int pipefd[2];
+    pipe(pipefd);
+    pid_t child = fork();
+    if (child == 0) {
+        pid_t grandchild = fork();
+
+        if (grandchild == 0) {
+            // 测试的孙进程
+            close(pipefd[0]);
+            close(pipefd[1]);
+            for (;;)
+                ;
+        } else {
+            // 测试的子进程
+            close(pipefd[0]);
+            std::string str = std::to_string(grandchild);
+            write(pipefd[1], str.data(), str.size());
+            close(pipefd[1]);
+            for (;;)
+                ;
+        }
+    } else {
+        // 测试的父进程
+        close(pipefd[1]);
+
+        char        ch;
+        std::string str;
+
+        while (read(pipefd[0], &ch, 1) > 0) {
+            str.push_back(ch);
+        }
+        pid_t grandchild = atoi(str.data());
+
+        log("进程关系");
+        std::string cmd = "ps -o pid,ppid,pgid,sid,comm -p";
+        cmd += std::to_string(child) + ",";
+        cmd += std::to_string(grandchild) + ",";
+        cmd += std::to_string(getpid());
+        system(cmd.data());
+        log("修改孙进程的进程组: " + str);
+        test_pgid(grandchild, grandchild);
+
+        kill(child, SIGKILL);
+        kill(grandchild, SIGKILL);
+    }
+
+    log();
+    log("测试进程组: 新建会话首进程对应的的进程组");
+
+    if (fork() == 0) {
+        log("创建新会话");
+        setsid();
+        test_pgid(getpid(), getpid());
+        exit(-1);
+    }
+    sleep(1);
+
+    log();
+    log("测试进程组: 测试修改进程组(原进程组和目标进程组属于不同会话)");
+
+    fd = fork();
+
+    if (fd == 0) {
+        log("子进程创建新会话");
+        setsid();
+        for (;;)
+            ;
+    }
+    sleep(1);
+    log("子进程的状态信息");
+    test_pgid(getpid(), fd);
+    sleep(1);
 
     log();
     log("主进程正常退出");
