@@ -27,6 +27,8 @@
 #include <sstream>
 #include <string>
 
+void test_signal();  // 测试信号
+
 void test_va();     // 测试可变参数
 void test_macro();  // 测试宏
 void test_exit();   // 测试退出
@@ -53,24 +55,6 @@ void test_pgid();   // 测试进程组
 void test_sid();    // 测试会话
 void test_vfork();  // 测试 vfork
 
-void test_signal_01();  // 测试信号阻塞
-void test_signal_02();  // 测试信号优先级
-void test_signal_03();  // 测试信号不可靠:
-                        // 多个信号处于待决状态信号会丢失
-void test_signal_04();  // 测试信号不可靠: 信号处理函数被重置
-void test_signal_05();  // 测试信号处理过程中相同的信号到达
-void test_signal_06();  // 测试信号处理过程中不同的信号到达
-void test_signal_07();  // 测试信号处理过程中阻塞其他信号
-void test_signal_08();  // 测试信号 SIGABRT 处理为 SIG_DFL
-void test_signal_09();  // 测试信号 SIGABRT 处理为 SIG_IGN
-void test_signal_10();  // 测试信号 SIGABRT 处理为 捕获信号并返回
-void test_signal_11();  // 测试信号 SIGABRT 处理为 捕获信号不返回
-void test_signal_12();  // 测试信号 SIGFPE 处理为 捕获信号并返回
-void test_signal_13();  // 测试信号: 子进程状态变化时, 父进程的处理
-void test_signal_14();  // 测试信号: 子进程状态变化时, 父进程的处理
-                        // 设置不接收子进程暂停继续产生的 SIGCHLD
-void test_signal_15();  // 信号测试: 捕捉所有信号, 死循环
-
 void test_process_01();  // 测试进程:   可被信号打断的休眠(指被捕获的信号)
 void test_process_02();  // 测试进程: 不可被信号打断的休眠(指被捕获的信号)
 void test_process_03();  // 测试进程: 不可被信号打断的休眠(指被捕获的信号)
@@ -80,6 +64,10 @@ void test_process_04();  // 测试进程: 不可被信号打断的休眠(指被�
 void test_process_05();  // 测试进程: 暂停 => 继续
 
 int main() {
+    alarm(1);
+    // 测试信号
+    test_signal();
+
     // 测试宏
     // test_macro();
 
@@ -134,52 +122,6 @@ int main() {
     // 测试 vfork
     // test_vfork();
 
-    // 测试信号阻塞
-    // test_signal_01();
-
-    // 测试信号优先级
-    // test_signal_02();
-
-    // 测试信号不可靠: 多个信号处于待决状态信号会丢失
-    // test_signal_03();
-
-    // 测试信号不可靠: 信号处理函数被重置
-    // test_signal_04();
-
-    // 测试信号处理过程中相同的信号到达
-    // test_signal_05();
-
-    // 测试信号处理过程中不同的信号到达
-    // test_signal_06();
-
-    // 测试信号处理过程中阻塞其他信号
-    // test_signal_07();
-
-    // 测试信号 SIGABRT 处理为 SIG_DFL
-    // test_signal_08();
-
-    // 测试信号 SIGABRT 处理为 SIG_IGN
-    // test_signal_09();
-
-    // 测试信号 SIGABRT 处理为 捕获信号并返回
-    // test_signal_10();
-
-    // 测试信号 SIGABRT 处理为 捕获信号不返回
-    // test_signal_11();
-
-    // 测试信号 SIGFPE 处理为 捕获信号并返回
-    // test_signal_12();
-
-    // 测试信号: 子进程状态变化时, 父进程的处理
-    // test_signal_13();
-
-    // 测试信号: 子进程状态变化时, 父进程的处理
-    // 设置不接收子进程暂停继续产生的 SIGCHLD
-    // test_signal_14();
-
-    // 信号测试: 捕捉所有信号, 死循环
-    // test_signal_15();
-
     // 测试进程: 可被信号打断的休眠(指被捕获的信号)
     // test_process_01();
 
@@ -195,9 +137,9 @@ int main() {
     // test_process_04();
 
     // 测试进程: 暂停 -> 继续
-    test_process_05();
-    //    std::cout << "环境变量 PATH: " << getenv("PATH") << std::endl;
-    sleep(1);
+    // test_process_05();
+    // std::cout << "环境变量 PATH: " << getenv("PATH") << std::endl;
+    //  sleep(1);
     return 0;
 }
 
@@ -267,6 +209,10 @@ void handle_signal(int sig, siginfo_t* sig_info, void*) {
     log("捕获来自 ", sig_info->si_pid, " 的信号 ", m[sig]);
 }
 
+void handle_signal(int sig) {
+    log("子进程捕捉到信号 ", m[sig]);
+}
+
 void handle_signal_1(int sig, siginfo_t* sig_info, void*) {
     log("捕获信号 SIGCHLD, 来自: ", sig_info->si_pid);
     int fd = waitpid(-1, NULL, WNOHANG);
@@ -285,24 +231,20 @@ void handle_signal_2(int sig, siginfo_t* sig_info, void*) {
     }
 }
 
-void handle_signal_3(int sig, siginfo_t* sig_info, void*) {
-    log("捕获信号 SIGCHLD 来自: ", sig_info->si_pid);
-}
-
 int count = 0;
 
-void handle_signal_4(int sig, siginfo_t* sig_info, void*) {
+void handle_signal_3(int sig, siginfo_t* sig_info, void*) {
     log("捕获信号 SIGUSR1 第 " + std::to_string(++count) + " 次");
 }
 
-void handle_signal_5(int sig, siginfo_t* sig_info, void*) {
+void handle_signal_4(int sig, siginfo_t* sig_info, void*) {
     log("捕获信号 " + m[sig] + " 第 " + std::to_string(++count) + " 次");
     log("处理信号 " + m[sig] + " 中...");
     sleep(2);
     log("处理信号 " + m[sig] + " 完成");
 }
 
-void handle_signal_6(int sig, siginfo_t* sig_info, void*) {
+void handle_signal_5(int sig, siginfo_t* sig_info, void*) {
     log("捕获信号 " + m[sig]);
     log("处理信号 " + m[sig] + " 中...");
     sleep(2);
@@ -311,13 +253,503 @@ void handle_signal_6(int sig, siginfo_t* sig_info, void*) {
 
 jmp_buf buf;
 
-void handle_signal_7(int sig, siginfo_t* sig_info, void*) {
+void handle_signal_6(int sig, siginfo_t* sig_info, void*) {
     log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGABRT");
     longjmp(buf, 1);
 }
 
-void handle_signal_8(int sig) {
-    log("子进程捕捉到信号 SIGUSR1");
+// 测试信号
+void test_signal_01() {
+    log();
+    log("测试信号阻塞");
+    log();
+
+    log("阻塞所有信号");
+    sigset_t mask;
+    sigfillset(&mask);
+    sigprocmask(SIG_SETMASK, &mask, NULL);
+
+    log("查看被阻塞的信号");
+    sigset_t old_mask;
+    sigprocmask(SIG_SETMASK, NULL, &old_mask);
+
+    for (auto key : m)
+        if (sigismember(&old_mask, key.first))
+            log("已被阻塞的信号: " + m[key.first]);
+
+    log("发送除 " + m[SIGKILL] + " 和 " + m[SIGSTOP] + " 外的所有信号");
+
+    for (auto key : m)
+        if (key.first != SIGKILL && key.first != SIGSTOP)
+            kill(getpid(), key.first);
+
+    log("查看待决的信号");
+    sigset_t new_mask;
+    sigpending(&new_mask);
+    for (auto key : m)
+        if (sigismember(&new_mask, key.first))
+            log("待决的信号: " + m[key.first]);
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+// 测试信号
+void test_signal_02() {
+    log();
+    log("测试信号优先级");
+    log();
+
+    log("注册所有的信号处理");
+    struct sigaction act;
+    act.sa_sigaction = handle_signal;
+
+    log("设置信号处理过程中阻塞所有信号");
+    sigfillset(&act.sa_mask);
+    act.sa_flags = SA_RESTART | SA_SIGINFO;
+    for (auto key : m) {
+        sigaction(key.first, &act, NULL);
+    }
+
+    log("阻塞所有信号");
+    sigset_t mask;
+    sigfillset(&mask);
+    sigprocmask(SIG_SETMASK, &mask, NULL);
+
+    log("发送除 " + m[SIGKILL] + " 和 " + m[SIGSTOP] + " 外的所有信号");
+
+    for (auto key : m)
+        if (key.first != SIGKILL && key.first != SIGSTOP)
+            kill(getpid(), key.first);
+
+    log("解除信号阻塞");
+    sigprocmask(SIG_UNBLOCK, &mask, NULL);
+
+    sleep(1);
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal_03() {
+    count = 0;
+
+    log();
+    log("测试信号不可靠: 多个信号处于待决状态信号会丢失");
+    log();
+
+    log("注册信号处理函数");
+    struct sigaction act;
+    act.sa_sigaction = handle_signal_3;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_SIGINFO;
+    sigaction(SIGUSR1, &act, NULL);
+
+    log("阻塞信号 SIGUSR1");
+    sigset_t mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGUSR1);
+    sigprocmask(SIG_SETMASK, &mask, NULL);
+
+    for (int i = 1; i <= 5; ++i) {
+        log("发送信号 SIGUSR1 第 " + std::to_string(i) + " 次");
+        kill(getpid(), SIGUSR1);
+    }
+
+    log("解除信号 SIGUSR1 阻塞");
+    sigprocmask(SIG_UNBLOCK, &mask, NULL);
+    sleep(1);
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal_04() {
+    count = 0;
+
+    log();
+    log("测试信号不可靠: 信号处理函数被重置");
+    log();
+
+    log("注册信号处理函数");
+    struct sigaction act;
+    act.sa_sigaction = handle_signal_3;
+    sigemptyset(&act.sa_mask);
+
+    log("设置信号触发后被重置");
+    act.sa_flags = SA_SIGINFO | SA_RESETHAND;
+    sigaction(SIGUSR1, &act, NULL);
+
+    log("发送信号 SIGUSR1 第 1 次");
+    kill(getpid(), SIGUSR1);
+    sleep(1);
+    log("发送信号 SIGUSR1 第 2 次");
+    kill(getpid(), SIGUSR1);
+
+    sleep(1);
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal_05() {
+    count = 0;
+
+    log();
+    log("测试信号处理过程中相同的信号到达");
+    log();
+
+    log("设置信号处理函数");
+    struct sigaction act;
+    act.sa_sigaction = handle_signal_4;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_SIGINFO;
+    sigaction(SIGUSR1, &act, NULL);
+
+    pid_t fd = fork();
+    if (fd == 0) {
+        log("子进程启动");
+        for (;;)
+            ;
+    } else {
+        sleep(1);
+        log("发送信号 " + m[SIGUSR1] + " 第 1 次");
+        kill(fd, SIGUSR1);
+        sleep(1);
+        log("发送信号 " + m[SIGUSR1] + " 第 2 次");
+        kill(fd, SIGUSR1);
+        log("发送信号 " + m[SIGUSR1] + " 第 3 次");
+        kill(fd, SIGUSR1);
+        sleep(5);
+        kill(fd, SIGKILL);
+    }
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal_06() {
+    log();
+    log("测试信号处理过程中不同的信号到达");
+    log();
+
+    log("设置信号处理函数");
+    struct sigaction act;
+    act.sa_sigaction = handle_signal_5;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
+    sigaction(SIGUSR1, &act, NULL);
+    sigaction(SIGUSR2, &act, NULL);
+
+    pid_t fd = fork();
+    if (fd == 0) {
+        log("子进程启动");
+        for (;;)
+            ;
+    } else {
+        sleep(1);
+        log("发送信号 " + m[SIGUSR1]);
+        kill(fd, SIGUSR1);
+        sleep(1);
+        log("发送信号 " + m[SIGUSR2]);
+        kill(fd, SIGUSR2);
+        sleep(5);
+        kill(fd, SIGKILL);
+    }
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal_07() {
+    log();
+    log("测试信号处理过程中阻塞其他信号");
+    log();
+
+    log("设置信号处理函数");
+    struct sigaction act;
+    act.sa_sigaction = handle_signal_5;
+    sigemptyset(&act.sa_mask);
+
+    log("设置信号处理过程中阻塞 SIGUSR2");
+    sigaddset(&act.sa_mask, SIGUSR2);
+    act.sa_flags = SA_SIGINFO;
+    sigaction(SIGUSR1, &act, NULL);
+    sigaction(SIGUSR2, &act, NULL);
+
+    pid_t fd = fork();
+    if (fd == 0) {
+        for (;;)
+            ;
+    } else {
+        sleep(1);
+        log("发送信号 " + m[SIGUSR1]);
+        kill(fd, SIGUSR1);
+        sleep(1);
+        log("发送信号 " + m[SIGUSR2]);
+        kill(fd, SIGUSR2);
+        sleep(5);
+        kill(fd, SIGKILL);
+    }
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal_08() {
+    log();
+    log("测试信号 SIGABRT 处理为 SIG_DFL");
+    log();
+
+    log("设置 SIGABRT 处理为 SIG_DFL");
+    signal(SIGABRT, SIG_DFL);
+
+    log("调用 abort()");
+    abort();
+
+    sleep(1);
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal_09() {
+    log();
+    log("测试信号 SIGABRT 处理为 SIG_IGN");
+    log();
+
+    log("设置 SIGABRT 处理为 SIG_IGN");
+    signal(SIGABRT, SIG_IGN);
+
+    log("调用 abort()");
+    abort();
+
+    sleep(1);
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal_10() {
+    log();
+    log("测试信号 SIGABRT 处理为 捕获信号并返回");
+    log();
+
+    log("设置 SIGABRT 处理为 捕获信号并返回");
+    struct sigaction act;
+    sigemptyset(&act.sa_mask);
+    act.sa_sigaction = handle_signal;
+    act.sa_flags     = SA_SIGINFO;
+    sigaction(SIGABRT, &act, NULL);
+
+    log("调用 abort()");
+    abort();
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal_11() {
+    log();
+    log("测试信号 SIGABRT 处理为 捕获信号不返回");
+    log();
+
+    log("设置 SIGABRT 处理为 捕获信号不返回");
+    struct sigaction act;
+    sigemptyset(&act.sa_mask);
+    act.sa_sigaction = handle_signal_6;
+    act.sa_flags     = SA_SIGINFO;
+    sigaction(SIGABRT, &act, NULL);
+
+    if (setjmp(buf) == 0) {
+        log("调用 abort()");
+        abort();
+    }
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal_12() {
+    log();
+    log("测试信号 SIGFPE 处理为 捕获信号并返回");
+    log();
+
+    log("设置 SIGFPE 处理为 捕获信号并返回");
+    struct sigaction act;
+    sigemptyset(&act.sa_mask);
+    act.sa_sigaction = handle_signal;
+    act.sa_flags     = SA_SIGINFO;
+    sigaction(SIGFPE, &act, NULL);
+
+    log("整数除以 0");
+    int a = 0;
+    int b = 1 / a;
+    log(std::to_string(b));
+
+    sleep(1);
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal_13() {
+    log();
+    log("测试信号: 子进程状态变化时, 父进程的处理");
+    log();
+
+    log("注册信号处理");
+    struct sigaction act;
+    act.sa_sigaction = handle_signal;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
+    sigaction(SIGCHLD, &act, NULL);
+
+    pid_t fd = fork();
+    if (fd == 0) {
+        // 子进程
+        log("子进程启动");
+        sleep(2);
+        log("子进程退出");
+        return;
+    } else {
+        // 父进程
+        sleep(1);
+        log("发送信号使子进程暂停");
+        kill(fd, SIGTSTP);
+        sleep(1);
+        log("发送信号使子进程继续");
+        kill(fd, SIGCONT);
+    }
+    sleep(1);
+    sleep(1);
+    sleep(1);
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal_14() {
+    log();
+    log("测试信号: 子进程状态变化时, 父进程的处理");
+    log("不接收子进程暂停继续产生的 SIGCHLD");
+    log();
+
+    log("注册信号处理");
+    log("设置不接受子进程暂停继续产生的 SIGCHLD");
+    struct sigaction act;
+    act.sa_sigaction = handle_signal;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT | SA_NOCLDSTOP;
+    sigaction(SIGCHLD, &act, NULL);
+
+    pid_t fd = fork();
+    if (fd == 0) {
+        // 子进程
+        log("子进程启动");
+        sleep(2);
+        log("子进程退出");
+        return;
+    } else {
+        // 父进程
+        sleep(1);
+        log("发送信号使子进程暂停");
+        kill(fd, SIGTSTP);
+        sleep(1);
+        log("发送信号使子进程继续");
+        kill(fd, SIGCONT);
+    }
+    sleep(1);
+    sleep(1);
+    sleep(1);
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal_15() {
+    log();
+    log("信号测试: 捕捉所有信号, 死循环");
+    log();
+
+    log("注册所有信号处理");
+    struct sigaction act;
+    act.sa_sigaction = handle_signal;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_SIGINFO | SA_NOCLDSTOP | SA_NOCLDWAIT | SA_RESTART;
+    for (auto key : m) {
+        sigaction(key.first, &act, NULL);
+    }
+
+    log("主进程死循环");
+    for (;;)
+        ;
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_signal() {
+    // 测试信号阻塞
+    // test_signal_01();
+
+    // 测试信号优先级
+    // test_signal_02();
+
+    // 测试信号不可靠: 多个信号处于待决状态信号会丢失
+    // test_signal_03();
+
+    // 测试信号不可靠: 信号处理函数被重置
+    // test_signal_04();
+
+    // 测试信号处理过程中相同的信号到达
+    // test_signal_05();
+
+    // 测试信号处理过程中不同的信号到达
+    // test_signal_06();
+
+    // 测试信号处理过程中阻塞其他信号
+    // test_signal_07();
+
+    // 测试信号 SIGABRT 处理为 SIG_DFL
+    // test_signal_08();
+
+    // 测试信号 SIGABRT 处理为 SIG_IGN
+    // test_signal_09();
+
+    // 测试信号 SIGABRT 处理为 捕获信号并返回
+    // test_signal_10();
+
+    // 测试信号 SIGABRT 处理为 捕获信号不返回
+    // test_signal_11();
+
+    // 测试信号 SIGFPE 处理为 捕获信号并返回
+    // test_signal_12();
+
+    // 测试信号: 子进程状态变化时, 父进程的处理
+    // test_signal_13();
+
+    // 测试信号: 子进程状态变化时, 父进程的处理
+    // 设置不接收子进程暂停继续产生的 SIGCHLD
+    // test_signal_14();
+
+    // 信号测试: 捕捉所有信号, 死循环
+    test_signal_15();
 }
 
 // 测试宏
@@ -660,7 +1092,7 @@ void test_zombie_5() {
 
     log("设置 SIGCHLD 的信号选项: SA_NOCLDWAIT");
     struct sigaction act;
-    act.sa_sigaction = handle_signal_3;
+    act.sa_sigaction = handle_signal;
     act.sa_flags     = SA_SIGINFO | SA_NOCLDWAIT;
     sigemptyset(&act.sa_mask);
     sigaction(SIGCHLD, &act, NULL);
@@ -1190,452 +1622,6 @@ void test_vfork() {
 //             将有效的 ID 改为 uid
 // setgid()    -- 和上述类似
 
-// 测试信号
-void test_signal_01() {
-    log();
-    log("测试信号阻塞");
-    log();
-
-    log("阻塞所有信号");
-    sigset_t mask;
-    sigfillset(&mask);
-    sigprocmask(SIG_SETMASK, &mask, NULL);
-
-    log("查看被阻塞的信号");
-    sigset_t old_mask;
-    sigprocmask(SIG_SETMASK, NULL, &old_mask);
-
-    for (auto key : m)
-        if (sigismember(&old_mask, key.first))
-            log("已被阻塞的信号: " + m[key.first]);
-
-    log("发送除 " + m[SIGKILL] + " 和 " + m[SIGSTOP] + " 外的所有信号");
-
-    for (auto key : m)
-        if (key.first != SIGKILL && key.first != SIGSTOP)
-            kill(getpid(), key.first);
-
-    log("查看待决的信号");
-    sigset_t new_mask;
-    sigpending(&new_mask);
-    for (auto key : m)
-        if (sigismember(&new_mask, key.first))
-            log("待决的信号: " + m[key.first]);
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-// 测试信号
-void test_signal_02() {
-    log();
-    log("测试信号优先级");
-    log();
-
-    log("注册所有的信号处理");
-    struct sigaction act;
-    act.sa_sigaction = handle_signal;
-
-    log("设置信号处理过程中阻塞所有信号");
-    sigfillset(&act.sa_mask);
-    act.sa_flags = SA_RESTART | SA_SIGINFO;
-    for (auto key : m) {
-        sigaction(key.first, &act, NULL);
-    }
-
-    log("阻塞所有信号");
-    sigset_t mask;
-    sigfillset(&mask);
-    sigprocmask(SIG_SETMASK, &mask, NULL);
-
-    log("发送除 " + m[SIGKILL] + " 和 " + m[SIGSTOP] + " 外的所有信号");
-
-    for (auto key : m)
-        if (key.first != SIGKILL && key.first != SIGSTOP)
-            kill(getpid(), key.first);
-
-    log("解除信号阻塞");
-    sigprocmask(SIG_UNBLOCK, &mask, NULL);
-
-    sleep(1);
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_signal_03() {
-    count = 0;
-
-    log();
-    log("测试信号不可靠: 多个信号处于待决状态信号会丢失");
-    log();
-
-    log("注册信号处理函数");
-    struct sigaction act;
-    act.sa_sigaction = handle_signal_4;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO;
-    sigaction(SIGUSR1, &act, NULL);
-
-    log("阻塞信号 SIGUSR1");
-    sigset_t mask;
-    sigemptyset(&mask);
-    sigaddset(&mask, SIGUSR1);
-    sigprocmask(SIG_SETMASK, &mask, NULL);
-
-    for (int i = 1; i <= 5; ++i) {
-        log("发送信号 SIGUSR1 第 " + std::to_string(i) + " 次");
-        kill(getpid(), SIGUSR1);
-    }
-
-    log("解除信号 SIGUSR1 阻塞");
-    sigprocmask(SIG_UNBLOCK, &mask, NULL);
-    sleep(1);
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_signal_04() {
-    count = 0;
-
-    log();
-    log("测试信号不可靠: 信号处理函数被重置");
-    log();
-
-    log("注册信号处理函数");
-    struct sigaction act;
-    act.sa_sigaction = handle_signal_4;
-    sigemptyset(&act.sa_mask);
-
-    log("设置信号触发后被重置");
-    act.sa_flags = SA_SIGINFO | SA_RESETHAND;
-    sigaction(SIGUSR1, &act, NULL);
-
-    log("发送信号 SIGUSR1 第 1 次");
-    kill(getpid(), SIGUSR1);
-    sleep(1);
-    log("发送信号 SIGUSR1 第 2 次");
-    kill(getpid(), SIGUSR1);
-
-    sleep(1);
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_signal_05() {
-    count = 0;
-
-    log();
-    log("测试信号处理过程中相同的信号到达");
-    log();
-
-    log("设置信号处理函数");
-    struct sigaction act;
-    act.sa_sigaction = handle_signal_5;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO;
-    sigaction(SIGUSR1, &act, NULL);
-
-    pid_t fd = fork();
-    if (fd == 0) {
-        log("子进程启动");
-        for (;;)
-            ;
-    } else {
-        sleep(1);
-        log("发送信号 " + m[SIGUSR1] + " 第 1 次");
-        kill(fd, SIGUSR1);
-        sleep(1);
-        log("发送信号 " + m[SIGUSR1] + " 第 2 次");
-        kill(fd, SIGUSR1);
-        log("发送信号 " + m[SIGUSR1] + " 第 3 次");
-        kill(fd, SIGUSR1);
-        sleep(5);
-        kill(fd, SIGKILL);
-    }
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_signal_06() {
-    log();
-    log("测试信号处理过程中不同的信号到达");
-    log();
-
-    log("设置信号处理函数");
-    struct sigaction act;
-    act.sa_sigaction = handle_signal_6;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
-    sigaction(SIGUSR1, &act, NULL);
-    sigaction(SIGUSR2, &act, NULL);
-
-    pid_t fd = fork();
-    if (fd == 0) {
-        log("子进程启动");
-        for (;;)
-            ;
-    } else {
-        sleep(1);
-        log("发送信号 " + m[SIGUSR1]);
-        kill(fd, SIGUSR1);
-        sleep(1);
-        log("发送信号 " + m[SIGUSR2]);
-        kill(fd, SIGUSR2);
-        sleep(5);
-        kill(fd, SIGKILL);
-    }
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_signal_07() {
-    log();
-    log("测试信号处理过程中阻塞其他信号");
-    log();
-
-    log("设置信号处理函数");
-    struct sigaction act;
-    act.sa_sigaction = handle_signal_6;
-    sigemptyset(&act.sa_mask);
-
-    log("设置信号处理过程中阻塞 SIGUSR2");
-    sigaddset(&act.sa_mask, SIGUSR2);
-    act.sa_flags = SA_SIGINFO;
-    sigaction(SIGUSR1, &act, NULL);
-    sigaction(SIGUSR2, &act, NULL);
-
-    pid_t fd = fork();
-    if (fd == 0) {
-        for (;;)
-            ;
-    } else {
-        sleep(1);
-        log("发送信号 " + m[SIGUSR1]);
-        kill(fd, SIGUSR1);
-        sleep(1);
-        log("发送信号 " + m[SIGUSR2]);
-        kill(fd, SIGUSR2);
-        sleep(5);
-        kill(fd, SIGKILL);
-    }
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_signal_08() {
-    log();
-    log("测试信号 SIGABRT 处理为 SIG_DFL");
-    log();
-
-    log("设置 SIGABRT 处理为 SIG_DFL");
-    signal(SIGABRT, SIG_DFL);
-
-    log("调用 abort()");
-    abort();
-
-    sleep(1);
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_signal_09() {
-    log();
-    log("测试信号 SIGABRT 处理为 SIG_IGN");
-    log();
-
-    log("设置 SIGABRT 处理为 SIG_IGN");
-    signal(SIGABRT, SIG_IGN);
-
-    log("调用 abort()");
-    abort();
-
-    sleep(1);
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_signal_10() {
-    log();
-    log("测试信号 SIGABRT 处理为 捕获信号并返回");
-    log();
-
-    log("设置 SIGABRT 处理为 捕获信号并返回");
-    struct sigaction act;
-    sigemptyset(&act.sa_mask);
-    act.sa_sigaction = handle_signal;
-    act.sa_flags     = SA_SIGINFO;
-    sigaction(SIGABRT, &act, NULL);
-
-    log("调用 abort()");
-    abort();
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_signal_11() {
-    log();
-    log("测试信号 SIGABRT 处理为 捕获信号不返回");
-    log();
-
-    log("设置 SIGABRT 处理为 捕获信号不返回");
-    struct sigaction act;
-    sigemptyset(&act.sa_mask);
-    act.sa_sigaction = handle_signal_7;
-    act.sa_flags     = SA_SIGINFO;
-    sigaction(SIGABRT, &act, NULL);
-
-    if (setjmp(buf) == 0) {
-        log("调用 abort()");
-        abort();
-    }
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_signal_12() {
-    log();
-    log("测试信号 SIGFPE 处理为 捕获信号并返回");
-    log();
-
-    log("设置 SIGFPE 处理为 捕获信号并返回");
-    struct sigaction act;
-    sigemptyset(&act.sa_mask);
-    act.sa_sigaction = handle_signal;
-    act.sa_flags     = SA_SIGINFO;
-    sigaction(SIGFPE, &act, NULL);
-
-    log("整数除以 0");
-    int a = 0;
-    int b = 1 / a;
-    log(std::to_string(b));
-
-    sleep(1);
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_signal_13() {
-    log();
-    log("测试信号: 子进程状态变化时, 父进程的处理");
-    log();
-
-    log("注册信号处理");
-    struct sigaction act;
-    act.sa_sigaction = handle_signal;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT;
-    sigaction(SIGCHLD, &act, NULL);
-
-    pid_t fd = fork();
-    if (fd == 0) {
-        // 子进程
-        log("子进程启动");
-        sleep(2);
-        log("子进程退出");
-        return;
-    } else {
-        // 父进程
-        sleep(1);
-        log("发送信号使子进程暂停");
-        kill(fd, SIGTSTP);
-        sleep(1);
-        log("发送信号使子进程继续");
-        kill(fd, SIGCONT);
-    }
-    sleep(1);
-    sleep(1);
-    sleep(1);
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_signal_14() {
-    log();
-    log("测试信号: 子进程状态变化时, 父进程的处理");
-    log("不接收子进程暂停继续产生的 SIGCHLD");
-    log();
-
-    log("注册信号处理");
-    log("设置不接受子进程暂停继续产生的 SIGCHLD");
-    struct sigaction act;
-    act.sa_sigaction = handle_signal;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO | SA_NOCLDWAIT | SA_NOCLDSTOP;
-    sigaction(SIGCHLD, &act, NULL);
-
-    pid_t fd = fork();
-    if (fd == 0) {
-        // 子进程
-        log("子进程启动");
-        sleep(2);
-        log("子进程退出");
-        return;
-    } else {
-        // 父进程
-        sleep(1);
-        log("发送信号使子进程暂停");
-        kill(fd, SIGTSTP);
-        sleep(1);
-        log("发送信号使子进程继续");
-        kill(fd, SIGCONT);
-    }
-    sleep(1);
-    sleep(1);
-    sleep(1);
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_signal_15() {
-    log();
-    log("信号测试: 捕捉所有信号, 死循环");
-    log();
-
-    log("注册所有信号处理");
-    struct sigaction act;
-    act.sa_sigaction = handle_signal;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO | SA_NOCLDSTOP | SA_NOCLDWAIT | SA_RESTART;
-    for (auto key : m) {
-        sigaction(key.first, &act, NULL);
-    }
-
-    log("主进程死循环");
-    for (;;)
-        ;
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
 void test_process_01() {
     log();
     log("测试进程: 可被信号打断的休眠(指被捕获的信号)");
@@ -1646,7 +1632,7 @@ void test_process_01() {
         log("子进程启动");
 
         log("子进程注册信号处理函数");
-        signal(SIGUSR1, handle_signal_8);
+        signal(SIGUSR1, handle_signal);
 
         log("子进程休眠10秒");
         sleep(10);
@@ -1681,7 +1667,7 @@ void test_process_02() {
     pid_t fd = fork();
     if (fd == 0) {
         log("测试的父进程注册信号处理函数");
-        signal(SIGUSR1, handle_signal_8);
+        signal(SIGUSR1, handle_signal);
         if (vfork() == 0) {
             log("测试的子进程启动");
             log("测试的子进程休眠10秒");
@@ -1810,7 +1796,7 @@ void test_process_05() {
     pid_t fd = fork();
     if (fd == 0) {
         log("子进程注册信号处理函数");
-        signal(SIGUSR1, handle_signal_8);
+        signal(SIGUSR1, handle_signal);
         for (;;)
             ;
     } else {
