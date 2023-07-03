@@ -64,9 +64,7 @@ void test_process_04();  // 测试进程: 不可被信号打断的休眠(指被�
 void test_process_05();  // 测试进程: 暂停 => 继续
 
 int main() {
-    alarm(1);
-    // 测试信号
-    test_signal();
+    test_signal();  // 测试信号
 
     // 测试宏
     // test_macro();
@@ -694,6 +692,12 @@ void test_signal_15() {
     for (auto key : m) {
         sigaction(key.first, &act, NULL);
     }
+
+    std::string cmd = "ps -o pid,ppid,sid,comm -p ";
+    cmd += std::to_string(getpid()) + ",";
+    cmd += std::to_string(getppid());
+    log("进程状态");
+    system(cmd.data());
 
     log("主进程死循环");
     for (;;)
