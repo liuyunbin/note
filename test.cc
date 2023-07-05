@@ -36,9 +36,6 @@ void test_exit();   // 测试退出
 void test_jmp();    // 测试跨函数跳转
 void test_limit();  // 测试资源限制
 
-void test_orphan_process();        // 测试孤儿进程
-void test_orphan_process_group();  // 测试孤儿进程组
-
 void test_pgid();   // 测试进程组
 void test_sid();    // 测试会话
 void test_vfork();  // 测试 vfork
@@ -69,12 +66,6 @@ int main() {
 
     // 测试资源限制
     // test_limit();
-
-    // 测试孤儿进程
-    // test_orphan_process();
-
-    // 测试孤儿进程组
-    // test_orphan_process_group();
 
     // 测试进程组
     // test_pgid();
@@ -1057,11 +1048,6 @@ void test_zombie() {
     // test_zombie_8();
 }
 
-// 测试进程
-void test_process() {
-    test_zombie();  // 测试僵尸进程
-}
-
 // 测试孤儿进程
 void test_orphan_process() {
     log();
@@ -1098,6 +1084,15 @@ void test_orphan_process() {
     log();
     log("主进程正常退出");
     log();
+}
+
+// 测试进程
+void test_process() {
+    test_zombie();          // 测试僵尸进程
+    test_orphan_process();  // 测试孤儿进程
+
+    // 测试孤儿进程组
+    // test_orphan_process_group();
 }
 
 // 测试孤儿进程组
