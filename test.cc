@@ -693,7 +693,7 @@ void test_signal_15() {
         sigaction(key.first, &act, NULL);
     }
 
-    std::string cmd = "ps -o pid,ppid,sid,comm -p ";
+    std::string cmd = "ps -o pid,ppid,pgid,sid,comm -p ";
     cmd += std::to_string(getpid()) + ",";
     cmd += std::to_string(getppid());
     log("进程状态");
