@@ -27,26 +27,14 @@
 #include <sstream>
 #include <string>
 
-void test_signal();  // 测试信号
+void test_signal();   // 测试信号
+void test_process();  // 测试进程
 
 void test_va();     // 测试可变参数
 void test_macro();  // 测试宏
 void test_exit();   // 测试退出
 void test_jmp();    // 测试跨函数跳转
 void test_limit();  // 测试资源限制
-
-void test_zombie_1();  // 重现僵尸进程的产生:
-                       // 父进程未处理子进程退出的状态信息
-void test_zombie_2();  // 重新僵尸进程的产生:
-                       // 父进程未正确处理子进程退出的状态信息
-void test_zombie_3();  // 预防僵尸进程的产生: 忽略信号 SIGCHLD
-void test_zombie_4();  // 预防僵尸进程的产生:
-                       // 设置 SIGCHLD 处理为 循环调用 waitpid");
-void test_zombie_5();  // 预防僵尸进程的产生:
-                       // 设置 SIGCHLD 选项为 SA_NOCLDWAIT
-void test_zombie_6();  // 预防僵尸进程的产生: 杀死父进程
-void test_zombie_7();  // 销毁僵尸进程: 杀死僵尸进程的父进程
-void test_zombie_8();  // 测试: 产生僵尸进程不退出
 
 void test_orphan_process();        // 测试孤儿进程
 void test_orphan_process_group();  // 测试孤儿进程组
@@ -64,7 +52,8 @@ void test_process_04();  // 测试进程: 不可被信号打断的休眠(指被�
 void test_process_05();  // 测试进程: 暂停 => 继续
 
 int main() {
-    test_signal();  // 测试信号
+    test_signal();   // 测试信号
+    test_process();  // 测试进程
 
     // 测试宏
     // test_macro();
@@ -80,30 +69,6 @@ int main() {
 
     // 测试资源限制
     // test_limit();
-
-    // 重现僵尸进程的产生: 父进程未处理子进程退出的状态信息
-    // test_zombie_1();
-
-    // 重新僵尸进程的产生: 父进程未正确处理子进程退出的状态信息
-    // test_zombie_2();
-
-    // 预防僵尸进程的产生: 忽略信号 SIGCHLD
-    // test_zombie_3();
-
-    // 预防僵尸进程的产生: 设置 SIGCHLD 处理为 循环调用 waitpid");
-    // test_zombie_4();
-
-    // 预防僵尸进程的产生: 设置 SIGCHLD 选项为 SA_NOCLDWAIT
-    // test_zombie_5();
-
-    // 预防僵尸进程的产生: 杀死父进程
-    // test_zombie_6();
-
-    // 销毁僵尸进程: 杀死僵尸进程的父进程
-    // test_zombie_7();
-
-    // 测试: 产生僵尸进程不退出
-    // test_zombie_8();
 
     // 测试孤儿进程
     // test_orphan_process();
@@ -753,178 +718,7 @@ void test_signal() {
     // test_signal_14();
 
     // 信号测试: 捕捉所有信号, 死循环
-    test_signal_15();
-}
-
-// 测试宏
-int v123 = 123456;
-
-#define TEST_MACRO_STR(fmt, X) printf(fmt, #X, X)
-#define TEST_MACRO_CAT(fmt, X) printf(fmt, v##X)
-// 可变参数, 如果可变参数不存在, 去掉前面的逗号
-#define TEST_MACRO(fmt, ...) printf(fmt, ##__VA_ARGS__)
-
-void test_macro() {
-    TEST_MACRO_STR("测试宏变字符串: %s -> %d\n", 123);
-    TEST_MACRO_CAT("测试    宏连接: %d\n", 123);
-    TEST_MACRO("测试宏有可变参数: %d\n", 123);
-    TEST_MACRO("测试宏无可变参数\n");
-}
-
-// 测试可变参数
-//    printf() -- 输出到标准输出
-//   fprintf() -- 输出到标准IO
-//   dprintf() -- 输出到文件描述符
-//   sprintf() -- 输出到字符串
-//  snprintf() -- 输出到字符串
-//
-//   vprintf() -- 使用可变参数 va
-//  vfprintf() -- 使用可变参数 va
-//  vdprintf() -- 使用可变参数 va
-//  vsprintf() -- 使用可变参数 va
-// vsnprintf() -- 使用可变参数 va
-//
-//  __VA_ARGS__  -- 只能在宏中使用, 代替可变参数
-//
-//  va_start -- 初始化
-//  va_arg   -- 获取下一个可变参数
-//  va_copy  -- 拷贝
-//  va_end   -- 清空
-//
-
-#define TEST_VA(fmt, ...) printf(fmt, ##__VA_ARGS__)
-
-void test_va_c(const char* s, ...) {
-    va_list ap;
-    va_start(ap, s);
-    vprintf(s, ap);
-    va_end(ap);
-}
-
-void test_va_cpp() {
-}
-
-template <typename T, typename... Args>
-void test_va_cpp(T t, Args... args) {
-    std::cout << t;
-    test_va_cpp(args...);
-}
-
-void test_va() {
-    TEST_VA("测试 C 风格的可变参数: %s -> %s\n", "123", "456");
-    test_va_c("测试 C 风格的可变参数: %s -> %s\n", "123", "456");
-    test_va_cpp("测试 C++ 风格的可变参数: ", "123", " -> ", "456", "\n");
-}
-
-// 测试退出
-class A {
-  public:
-    A() {
-        std::cout << "调用构造函数" << std::endl;
-    }
-
-    ~A() {
-        std::cout << "调用析构函数" << std::endl;
-    }
-};
-
-void test_1() {
-    std::cout << "测试函数-1" << std::endl;
-}
-
-void test_2() {
-    std::cout << "测试函数-2" << std::endl;
-}
-
-void test_atexit() {
-    std::cout << "注册退出函数" << std::endl;
-    atexit(test_1);
-    atexit(test_1);
-    atexit(test_2);
-    atexit(test_2);
-}
-
-void test_exit() {
-    if (fork() == 0) {
-        std::cout << "测试 exit" << std::endl;
-        A a;
-        test_atexit();
-        std::cout << "退出" << std::endl;
-        exit(0);
-    }
-
-    sleep(1);
-    std::cout << std::endl;
-
-    if (fork() == 0) {
-        std::cout << "测试 _exit" << std::endl;
-        A a;
-        test_atexit();
-        std::cout << "退出" << std::endl;
-        _exit(0);
-    }
-
-    sleep(1);
-    std::cout << std::endl;
-
-    if (fork() == 0) {
-        std::cout << "测试正常退出" << std::endl;
-        A a;
-        test_atexit();
-        std::cout << "退出" << std::endl;
-        return;
-    }
-
-    sleep(1);
-}
-
-// 测试跨函数跳转
-
-jmp_buf buf_jmp;
-
-void test_jmp(int v) {
-    if (v == 0) {
-        longjmp(buf_jmp, 3);
-    }
-
-    if (v == 3) {
-        if (setjmp(buf_jmp) == 0) {
-            log("第一次经过, v = ", v);
-        } else {
-            log("再一次经过, v = ", v);
-            return;
-        }
-    }
-    log("参数: v = ", v);
-    test_jmp(v - 1);
-}
-
-void test_jmp() {
-    log("测试 jmp");
-    test_jmp(10);
-}
-
-// 测试资源限制
-// 软限制值可以任意修改, 只要小于等于硬限制值即可
-// 硬限制值可以降低, 只要大于等于软限制值即可
-// 只有超级用户才可以提高硬限制值
-// RLIM_INFINITY 表示不做限制
-
-#define TEST_LIMIT(X)                   \
-    {                                   \
-        struct rlimit rlim;             \
-        getrlimit(X, &rlim);            \
-        log(#X);                        \
-        log("软限制: ", rlim.rlim_cur); \
-        log("硬限制: ", rlim.rlim_max); \
-        log();                          \
-    }
-
-void test_limit() {
-    log("测试资源限制: ");
-    log();
-    TEST_LIMIT(RLIMIT_CPU);
-    TEST_LIMIT(RLIMIT_CORE);
+    // test_signal_15();
 }
 
 // 测试僵尸进程
@@ -1242,6 +1036,30 @@ void test_zombie_8() {
     log();
     log("主进程正常退出");
     log();
+}
+
+void test_zombie() {
+    // 重现僵尸进程的产生: 父进程未处理子进程退出的状态信息
+    // test_zombie_1();
+    // 重新僵尸进程的产生: 父进程未正确处理子进程退出的状态信息
+    // test_zombie_2();
+    // 预防僵尸进程的产生: 忽略信号 SIGCHLD
+    // test_zombie_3();
+    // 预防僵尸进程的产生: 设置 SIGCHLD 处理为 循环调用 waitpid");
+    // test_zombie_4();
+    // 预防僵尸进程的产生: 设置 SIGCHLD 选项为 SA_NOCLDWAIT
+    // test_zombie_5();
+    // 预防僵尸进程的产生: 杀死父进程
+    // test_zombie_6();
+    // 销毁僵尸进程: 杀死僵尸进程的父进程
+    // test_zombie_7();
+    // 测试: 产生僵尸进程不退出
+    // test_zombie_8();
+}
+
+// 测试进程
+void test_process() {
+    test_zombie();  // 测试僵尸进程
 }
 
 // 测试孤儿进程
@@ -1590,6 +1408,173 @@ void test_sid() {
     log();
     log("主进程正常退出");
     log();
+}
+
+// 测试宏
+int v123 = 123456;
+
+#define TEST_MACRO_STR(fmt, X) printf(fmt, #X, X)
+#define TEST_MACRO_CAT(fmt, X) printf(fmt, v##X)
+// 可变参数, 如果可变参数不存在, 去掉前面的逗号
+#define TEST_MACRO(fmt, ...) printf(fmt, ##__VA_ARGS__)
+
+void test_macro() {
+    TEST_MACRO_STR("测试宏变字符串: %s -> %d\n", 123);
+    TEST_MACRO_CAT("测试    宏连接: %d\n", 123);
+    TEST_MACRO("测试宏有可变参数: %d\n", 123);
+    TEST_MACRO("测试宏无可变参数\n");
+}
+
+// 测试可变参数
+//    printf() -- 输出到标准输出
+//   fprintf() -- 输出到标准IO
+//   dprintf() -- 输出到文件描述符
+//   sprintf() -- 输出到字符串
+//  snprintf() -- 输出到字符串
+//
+//   vprintf() -- 使用可变参数 va
+//  vfprintf() -- 使用可变参数 va
+//  vdprintf() -- 使用可变参数 va
+//  vsprintf() -- 使用可变参数 va
+// vsnprintf() -- 使用可变参数 va
+//
+//  __VA_ARGS__  -- 只能在宏中使用, 代替可变参数
+//
+//  va_start -- 初始化
+//  va_arg   -- 获取下一个可变参数
+//  va_copy  -- 拷贝
+//  va_end   -- 清空
+//
+
+#define TEST_VA(fmt, ...) printf(fmt, ##__VA_ARGS__)
+
+void test_va_c(const char* s, ...) {
+    va_list ap;
+    va_start(ap, s);
+    vprintf(s, ap);
+    va_end(ap);
+}
+
+void test_va_cpp() {
+}
+
+template <typename T, typename... Args>
+void test_va_cpp(T t, Args... args) {
+    std::cout << t;
+    test_va_cpp(args...);
+}
+
+void test_va() {
+    TEST_VA("测试 C 风格的可变参数: %s -> %s\n", "123", "456");
+    test_va_c("测试 C 风格的可变参数: %s -> %s\n", "123", "456");
+    test_va_cpp("测试 C++ 风格的可变参数: ", "123", " -> ", "456", "\n");
+}
+
+// 测试退出
+class A {
+  public:
+    A() {
+        std::cout << "调用构造函数" << std::endl;
+    }
+
+    ~A() {
+        std::cout << "调用析构函数" << std::endl;
+    }
+};
+
+void test_1() {
+    std::cout << "测试函数-1" << std::endl;
+}
+
+void test_2() {
+    std::cout << "测试函数-2" << std::endl;
+}
+
+void test_atexit() {
+    std::cout << "注册退出函数" << std::endl;
+    atexit(test_1);
+    atexit(test_1);
+    atexit(test_2);
+    atexit(test_2);
+}
+
+void test_exit() {
+    if (fork() == 0) {
+        std::cout << "测试 exit" << std::endl;
+        A a;
+        test_atexit();
+        std::cout << "退出" << std::endl;
+        exit(0);
+    }
+
+    sleep(1);
+    std::cout << std::endl;
+
+    if (fork() == 0) {
+        std::cout << "测试 _exit" << std::endl;
+        A a;
+        test_atexit();
+        std::cout << "退出" << std::endl;
+        _exit(0);
+    }
+
+    sleep(1);
+    std::cout << std::endl;
+
+    if (fork() == 0) {
+        std::cout << "测试正常退出" << std::endl;
+        A a;
+        test_atexit();
+        std::cout << "退出" << std::endl;
+        return;
+    }
+
+    sleep(1);
+}
+
+// 测试跨函数跳转
+
+jmp_buf buf_jmp;
+
+void test_jmp(int v) {
+    if (v == 0) {
+        longjmp(buf_jmp, 3);
+    }
+
+    if (v == 3) {
+        if (setjmp(buf_jmp) == 0) {
+            log("第一次经过, v = ", v);
+        } else {
+            log("再一次经过, v = ", v);
+            return;
+        }
+    }
+    log("参数: v = ", v);
+    test_jmp(v - 1);
+}
+
+void test_jmp() {
+    log("测试 jmp");
+    test_jmp(10);
+}
+
+// 测试资源限制
+
+#define TEST_LIMIT(X)                   \
+    {                                   \
+        struct rlimit rlim;             \
+        getrlimit(X, &rlim);            \
+        log(#X);                        \
+        log("软限制: ", rlim.rlim_cur); \
+        log("硬限制: ", rlim.rlim_max); \
+        log();                          \
+    }
+
+void test_limit() {
+    log("测试资源限制: ");
+    log();
+    TEST_LIMIT(RLIMIT_CPU);
+    TEST_LIMIT(RLIMIT_CORE);
 }
 
 // 测试 vfork
