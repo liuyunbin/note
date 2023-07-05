@@ -1086,15 +1086,6 @@ void test_orphan_process() {
     log();
 }
 
-// 测试进程
-void test_process() {
-    test_zombie();          // 测试僵尸进程
-    test_orphan_process();  // 测试孤儿进程
-
-    // 测试孤儿进程组
-    // test_orphan_process_group();
-}
-
 // 测试孤儿进程组
 void test_orphan_process_group() {
     log();
@@ -1162,6 +1153,18 @@ void test_orphan_process_group() {
     log();
     log("主进程正常退出");
     log();
+}
+
+// 测试进程
+void test_process() {
+    // 测试僵尸进程
+    // test_zombie();
+
+    // 测试孤儿进程
+    // test_orphan_process();
+
+    // 测试孤儿进程组
+    test_orphan_process_group();
 }
 
 // 展示 PID PGID SID
