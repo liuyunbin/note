@@ -38,14 +38,6 @@ void test_limit();  // 测试资源限制
 
 void test_vfork();  // 测试 vfork
 
-void test_process_01();  // 测试进程:   可被信号打断的休眠(指被捕获的信号)
-void test_process_02();  // 测试进程: 不可被信号打断的休眠(指被捕获的信号)
-void test_process_03();  // 测试进程: 不可被信号打断的休眠(指被捕获的信号)
-                         // 对 SIGSTOP 的处理
-void test_process_04();  // 测试进程: 不可被信号打断的休眠(指被捕获的信号)
-                         // 对 SIGKILL 的处理
-void test_process_05();  // 测试进程: 暂停 => 继续
-
 int main() {
     test_signal();   // 测试信号
     test_process();  // 测试进程
@@ -68,22 +60,6 @@ int main() {
     // 测试 vfork
     // test_vfork();
 
-    // 测试进程: 可被信号打断的休眠(指被捕获的信号)
-    // test_process_01();
-
-    // 测试进程: 不可被信号打断的休眠(指被捕获的信号)
-    // test_process_02();
-
-    // 测试进程: 不可被信号打断的休眠(指被捕获的信号)
-    // 对 SIGSTOP 的处理
-    // test_process_03();
-
-    // 测试进程: 不可被信号打断的休眠(指被捕获的信号)
-    // 对 SIGKILL 的处理
-    // test_process_04();
-
-    // 测试进程: 暂停 -> 继续
-    // test_process_05();
     // std::cout << "环境变量 PATH: " << getenv("PATH") << std::endl;
     //  sleep(1);
     return 0;
@@ -1388,6 +1364,238 @@ void test_sid() {
     log();
 }
 
+void test_process_status_01() {
+    log();
+    log("测试进程: 可被信号打断的休眠(指被捕获的信号)");
+    log();
+
+    pid_t fd = fork();
+    if (fd == 0) {
+        log("子进程启动");
+
+        log("子进程注册信号处理函数");
+        signal(SIGUSR1, handle_signal);
+
+        log("子进程休眠10秒");
+        sleep(10);
+        log("子进程休眠完成");
+        exit(-1);
+    } else {
+        sleep(1);
+        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
+
+        log("子进程状态");
+        system(cmd.data());
+
+        log("向子进程发送信号 SIGUSR1");
+        kill(fd, SIGUSR1);
+        sleep(1);
+        log("子进程状态");
+        system(cmd.data());
+
+        wait(NULL);
+    }
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_process_status_02() {
+    log();
+    log("测试进程: 不可被信号打断的休眠(指被捕获的信号)");
+    log();
+
+    pid_t fd = fork();
+    if (fd == 0) {
+        log("测试的父进程注册信号处理函数");
+        signal(SIGUSR1, handle_signal);
+        if (vfork() == 0) {
+            log("测试的子进程启动");
+            log("测试的子进程休眠10秒");
+            sleep(10);
+            log("测试的子进程休眠完成");
+            log("测试的子进程退出");
+            exit(-1);
+        }
+        log("测试的父进程休眠1s");
+        sleep(1);
+        log("测试的父进程退出");
+        exit(-1);
+    } else {
+        sleep(1);
+        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
+
+        log("测试的父进程状态");
+        system(cmd.data());
+
+        log("向测试的父进程发送信号 SIGUSR1");
+        kill(fd, SIGUSR1);
+        sleep(1);
+        log("测试的父进程状态");
+        system(cmd.data());
+        wait(NULL);
+    }
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_process_status_03() {
+    log();
+    log("测试进程: 不可被信号打断的休眠(指被捕获的信号)");
+    log("对 SIGSTOP 的处理");
+    log();
+
+    pid_t fd = fork();
+    if (fd == 0) {
+        if (vfork() == 0) {
+            log("测试的子进程启动");
+            log("测试的子进程休眠10秒");
+            sleep(10);
+            log("测试的子进程休眠完成");
+            log("测试的子进程退出");
+            exit(-1);
+        }
+        log("测试的父进程休眠1s");
+        sleep(1);
+        log("测试的父进程退出");
+        exit(-1);
+    } else {
+        sleep(1);
+        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
+
+        log("测试的父进程状态");
+        system(cmd.data());
+
+        log("向测试的父进程发送信号 SIGSTOP");
+        kill(fd, SIGSTOP);
+        sleep(1);
+        log("测试的父进程状态");
+        system(cmd.data());
+
+        log("向测试的父进程发送信号 SIGCONT");
+        kill(fd, SIGCONT);
+        sleep(1);
+        log("测试的父进程状态");
+        system(cmd.data());
+        wait(NULL);
+    }
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_process_status_04() {
+    log();
+    log("测试进程: 不可被信号打断的休眠(指被捕获的信号)");
+    log("对 SIGKILL 的处理");
+    log();
+
+    pid_t fd = fork();
+    if (fd == 0) {
+        if (vfork() == 0) {
+            log("测试的子进程启动");
+            log("测试的子进程休眠10秒");
+            sleep(10);
+            log("测试的子进程休眠完成");
+            log("测试的子进程退出");
+            exit(-1);
+        }
+        log("测试的父进程休眠1s");
+        sleep(1);
+        log("测试的父进程退出");
+        exit(-1);
+    } else {
+        sleep(1);
+        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
+
+        log("测试的父进程状态");
+        system(cmd.data());
+
+        log("向测试的父进程发送信号 SIGKILL");
+        kill(fd, SIGKILL);
+        sleep(1);
+        log("测试的父进程状态");
+        system(cmd.data());
+        wait(NULL);
+    }
+
+    sleep(10);
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+void test_process_status_05() {
+    log();
+    log("测试进程: 暂停 => 继续");
+    log();
+
+    pid_t fd = fork();
+    if (fd == 0) {
+        log("子进程注册信号处理函数");
+        signal(SIGUSR1, handle_signal);
+        for (;;)
+            ;
+    } else {
+        sleep(1);
+        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
+
+        log("使子进程暂停");
+        kill(fd, SIGSTOP);
+        sleep(1);
+        log("子进程状态");
+        system(cmd.data());
+
+        log("向子进程发送信号 SIGUSR1");
+        kill(fd, SIGUSR1);
+        sleep(1);
+        log("子进程状态");
+        system(cmd.data());
+
+        log("向子进程发送信号 SIGCONT");
+        kill(fd, SIGCONT);
+        sleep(1);
+        log("子进程状态");
+        system(cmd.data());
+
+        log("向子进程发送信号 SIGKILL");
+        kill(fd, SIGKILL);
+        sleep(1);
+        log("子进程状态");
+        system(cmd.data());
+        wait(NULL);
+    }
+
+    log();
+    log("主进程正常退出");
+    log();
+}
+
+// 测试进程状态
+void test_process_status() {
+    // 测试进程: 可被信号打断的休眠(指被捕获的信号)
+    // test_process_status_01();
+
+    // 测试进程: 不可被信号打断的休眠(指被捕获的信号)
+    // test_process_status_02();
+
+    // 测试进程: 不可被信号打断的休眠(指被捕获的信号)
+    // 对 SIGSTOP 的处理
+    // test_process_status_03();
+
+    // 测试进程: 不可被信号打断的休眠(指被捕获的信号)
+    // 对 SIGKILL 的处理
+    // test_process_status_04();
+
+    // 测试进程: 暂停 -> 继续
+    test_process_status_05();
+}
+
 // 测试进程
 void test_process() {
     // 测试僵尸进程
@@ -1403,7 +1611,10 @@ void test_process() {
     // test_pgid();
 
     // 测试会话
-    test_sid();
+    // test_sid();
+
+    // 测试进程状态
+    test_process_status();
 }
 
 // 测试宏
@@ -1606,215 +1817,3 @@ void test_vfork() {
 //             -- 进程不具有超级权限时, uid 等于 实际的 ID 或 保存的用户 ID 时,
 //             将有效的 ID 改为 uid
 // setgid()    -- 和上述类似
-
-void test_process_01() {
-    log();
-    log("测试进程: 可被信号打断的休眠(指被捕获的信号)");
-    log();
-
-    pid_t fd = fork();
-    if (fd == 0) {
-        log("子进程启动");
-
-        log("子进程注册信号处理函数");
-        signal(SIGUSR1, handle_signal);
-
-        log("子进程休眠10秒");
-        sleep(10);
-        log("子进程休眠完成");
-        exit(-1);
-    } else {
-        sleep(1);
-        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
-
-        log("子进程状态");
-        system(cmd.data());
-
-        log("向子进程发送信号 SIGUSR1");
-        kill(fd, SIGUSR1);
-        sleep(1);
-        log("子进程状态");
-        system(cmd.data());
-
-        wait(NULL);
-    }
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_process_02() {
-    log();
-    log("测试进程: 不可被信号打断的休眠(指被捕获的信号)");
-    log();
-
-    pid_t fd = fork();
-    if (fd == 0) {
-        log("测试的父进程注册信号处理函数");
-        signal(SIGUSR1, handle_signal);
-        if (vfork() == 0) {
-            log("测试的子进程启动");
-            log("测试的子进程休眠10秒");
-            sleep(10);
-            log("测试的子进程休眠完成");
-            log("测试的子进程退出");
-            exit(-1);
-        }
-        log("测试的父进程休眠1s");
-        sleep(1);
-        log("测试的父进程退出");
-        exit(-1);
-    } else {
-        sleep(1);
-        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
-
-        log("测试的父进程状态");
-        system(cmd.data());
-
-        log("向测试的父进程发送信号 SIGUSR1");
-        kill(fd, SIGUSR1);
-        sleep(1);
-        log("测试的父进程状态");
-        system(cmd.data());
-        wait(NULL);
-    }
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_process_03() {
-    log();
-    log("测试进程: 不可被信号打断的休眠(指被捕获的信号)");
-    log("对 SIGSTOP 的处理");
-    log();
-
-    pid_t fd = fork();
-    if (fd == 0) {
-        if (vfork() == 0) {
-            log("测试的子进程启动");
-            log("测试的子进程休眠10秒");
-            sleep(10);
-            log("测试的子进程休眠完成");
-            log("测试的子进程退出");
-            exit(-1);
-        }
-        log("测试的父进程休眠1s");
-        sleep(1);
-        log("测试的父进程退出");
-        exit(-1);
-    } else {
-        sleep(1);
-        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
-
-        log("测试的父进程状态");
-        system(cmd.data());
-
-        log("向测试的父进程发送信号 SIGSTOP");
-        kill(fd, SIGSTOP);
-        sleep(1);
-        log("测试的父进程状态");
-        system(cmd.data());
-
-        log("向测试的父进程发送信号 SIGCONT");
-        kill(fd, SIGCONT);
-        sleep(1);
-        log("测试的父进程状态");
-        system(cmd.data());
-        wait(NULL);
-    }
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_process_04() {
-    log();
-    log("测试进程: 不可被信号打断的休眠(指被捕获的信号)");
-    log("对 SIGKILL 的处理");
-    log();
-
-    pid_t fd = fork();
-    if (fd == 0) {
-        if (vfork() == 0) {
-            log("测试的子进程启动");
-            log("测试的子进程休眠10秒");
-            sleep(10);
-            log("测试的子进程休眠完成");
-            log("测试的子进程退出");
-            exit(-1);
-        }
-        log("测试的父进程休眠1s");
-        sleep(1);
-        log("测试的父进程退出");
-        exit(-1);
-    } else {
-        sleep(1);
-        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
-
-        log("测试的父进程状态");
-        system(cmd.data());
-
-        log("向测试的父进程发送信号 SIGKILL");
-        kill(fd, SIGKILL);
-        sleep(1);
-        log("测试的父进程状态");
-        system(cmd.data());
-        wait(NULL);
-    }
-
-    sleep(10);
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
-void test_process_05() {
-    log();
-    log("测试进程: 暂停 => 继续");
-    log();
-
-    pid_t fd = fork();
-    if (fd == 0) {
-        log("子进程注册信号处理函数");
-        signal(SIGUSR1, handle_signal);
-        for (;;)
-            ;
-    } else {
-        sleep(1);
-        std::string cmd = "ps -o pid,state,comm -p " + std::to_string(fd);
-
-        log("使子进程暂停");
-        kill(fd, SIGSTOP);
-        sleep(1);
-        log("子进程状态");
-        system(cmd.data());
-
-        log("向子进程发送信号 SIGUSR1");
-        kill(fd, SIGUSR1);
-        sleep(1);
-        log("子进程状态");
-        system(cmd.data());
-
-        log("向子进程发送信号 SIGCONT");
-        kill(fd, SIGCONT);
-        sleep(1);
-        log("子进程状态");
-        system(cmd.data());
-
-        log("向子进程发送信号 SIGKILL");
-        kill(fd, SIGKILL);
-        sleep(1);
-        log("子进程状态");
-        system(cmd.data());
-        wait(NULL);
-    }
-
-    log();
-    log("主进程正常退出");
-    log();
-}
