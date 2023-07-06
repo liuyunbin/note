@@ -29,39 +29,13 @@
 
 void test_signal();   // 测试信号
 void test_process();  // 测试进程
-
-void test_va();     // 测试可变参数
-void test_macro();  // 测试宏
-void test_exit();   // 测试退出
-void test_jmp();    // 测试跨函数跳转
-void test_limit();  // 测试资源限制
-
-void test_vfork();  // 测试 vfork
+void test_cpp();      // 测试 cpp
 
 int main() {
     test_signal();   // 测试信号
     test_process();  // 测试进程
+    test_cpp();      // 测试 cpp
 
-    // 测试宏
-    // test_macro();
-
-    // 测试可变参数
-    // test_va();
-
-    // 测试退出
-    // test_exit();
-
-    // 测试跨函数跳转
-    // test_jmp();
-
-    // 测试资源限制
-    // test_limit();
-
-    // 测试 vfork
-    // test_vfork();
-
-    // std::cout << "环境变量 PATH: " << getenv("PATH") << std::endl;
-    //  sleep(1);
     return 0;
 }
 
@@ -1596,109 +1570,28 @@ void test_process_status() {
     test_process_status_05();
 }
 
-// 测试进程
-void test_process() {
-    // 测试僵尸进程
-    // test_zombie();
-
-    // 测试孤儿进程
-    // test_orphan_process();
-
-    // 测试孤儿进程组
-    // test_orphan_process_group();
-
-    // 测试进程组
-    // test_pgid();
-
-    // 测试会话
-    // test_sid();
-
-    // 测试进程状态
-    test_process_status();
-}
-
-// 测试宏
-int v123 = 123456;
-
-#define TEST_MACRO_STR(fmt, X) printf(fmt, #X, X)
-#define TEST_MACRO_CAT(fmt, X) printf(fmt, v##X)
-// 可变参数, 如果可变参数不存在, 去掉前面的逗号
-#define TEST_MACRO(fmt, ...) printf(fmt, ##__VA_ARGS__)
-
-void test_macro() {
-    TEST_MACRO_STR("测试宏变字符串: %s -> %d\n", 123);
-    TEST_MACRO_CAT("测试    宏连接: %d\n", 123);
-    TEST_MACRO("测试宏有可变参数: %d\n", 123);
-    TEST_MACRO("测试宏无可变参数\n");
-}
-
-// 测试可变参数
-//    printf() -- 输出到标准输出
-//   fprintf() -- 输出到标准IO
-//   dprintf() -- 输出到文件描述符
-//   sprintf() -- 输出到字符串
-//  snprintf() -- 输出到字符串
-//
-//   vprintf() -- 使用可变参数 va
-//  vfprintf() -- 使用可变参数 va
-//  vdprintf() -- 使用可变参数 va
-//  vsprintf() -- 使用可变参数 va
-// vsnprintf() -- 使用可变参数 va
-//
-//  __VA_ARGS__  -- 只能在宏中使用, 代替可变参数
-//
-//  va_start -- 初始化
-//  va_arg   -- 获取下一个可变参数
-//  va_copy  -- 拷贝
-//  va_end   -- 清空
-//
-
-#define TEST_VA(fmt, ...) printf(fmt, ##__VA_ARGS__)
-
-void test_va_c(const char* s, ...) {
-    va_list ap;
-    va_start(ap, s);
-    vprintf(s, ap);
-    va_end(ap);
-}
-
-void test_va_cpp() {
-}
-
-template <typename T, typename... Args>
-void test_va_cpp(T t, Args... args) {
-    std::cout << t;
-    test_va_cpp(args...);
-}
-
-void test_va() {
-    TEST_VA("测试 C 风格的可变参数: %s -> %s\n", "123", "456");
-    test_va_c("测试 C 风格的可变参数: %s -> %s\n", "123", "456");
-    test_va_cpp("测试 C++ 风格的可变参数: ", "123", " -> ", "456", "\n");
-}
-
 // 测试退出
 class A {
   public:
     A() {
-        std::cout << "调用构造函数" << std::endl;
+        log("调用构造函数");
     }
 
     ~A() {
-        std::cout << "调用析构函数" << std::endl;
+        log("调用析构函数");
     }
 };
 
 void test_1() {
-    std::cout << "测试函数-1" << std::endl;
+    log("测试函数-1");
 }
 
 void test_2() {
-    std::cout << "测试函数-2" << std::endl;
+    log("测试函数-2");
 }
 
 void test_atexit() {
-    std::cout << "注册退出函数" << std::endl;
+    log("注册退出函数");
     atexit(test_1);
     atexit(test_1);
     atexit(test_2);
@@ -1707,32 +1600,32 @@ void test_atexit() {
 
 void test_exit() {
     if (fork() == 0) {
-        std::cout << "测试 exit" << std::endl;
+        log("测试 exit");
         A a;
         test_atexit();
-        std::cout << "退出" << std::endl;
+        log("退出");
         exit(0);
     }
 
     sleep(1);
-    std::cout << std::endl;
+    log();
 
     if (fork() == 0) {
-        std::cout << "测试 _exit" << std::endl;
+        log("测试 _exit");
         A a;
         test_atexit();
-        std::cout << "退出" << std::endl;
+        log("退出");
         _exit(0);
     }
 
     sleep(1);
-    std::cout << std::endl;
+    log();
 
     if (fork() == 0) {
-        std::cout << "测试正常退出" << std::endl;
+        log("测试正常退出");
         A a;
         test_atexit();
-        std::cout << "退出" << std::endl;
+        log("退出");
         return;
     }
 
@@ -1787,33 +1680,125 @@ void test_limit() {
 // 测试 vfork
 void test_vfork_help() {
     std::string str = "123";
-    std::cout << "调用 vfork 前为: " << str << std::endl;
+    log("调用 vfork 前为: ", str);
     if (vfork() == 0) {
         str = "456";
-        std::cout << "vfork 内修改为: " << str << std::endl;
+        log("vfork 内修改为: ", str);
         exit(0);
     }
-    std::cout << "调用 vfork 后为: " << str << std::endl;
+    log("调用 vfork 后为: ", str);
 }
 
 void test_vfork() {
     std::string str = "123";
-    std::cout << "上一层函数调用前为: " << str << std::endl;
+    log("上一层函数调用前为: ", str);
     test_vfork_help();
-    std::cout << "上一层函数调用后为: " << str << std::endl;
+    log("上一层函数调用后为: ", str);
 }
 
-//  fork()
-// vfork()
+void test_env() {
+    log("环境变量 PATH: ", getenv("PATH"));
+}
+
+// 测试进程
+void test_process() {
+    // 测试僵尸进程
+    // test_zombie();
+
+    // 测试孤儿进程
+    // test_orphan_process();
+
+    // 测试孤儿进程组
+    // test_orphan_process_group();
+
+    // 测试进程组
+    // test_pgid();
+
+    // 测试会话
+    // test_sid();
+
+    // 测试进程状态
+    // test_process_status();
+
+    // 测试退出
+    // test_exit();
+
+    // 测试跨函数跳转
+    // test_jmp();
+
+    // 测试资源限制
+    // test_limit();
+
+    // 测试 vfork
+    // test_vfork();
+
+    // 测试环境变量 PATH
+    test_env();
+}
+
+// 测试宏
+int v123 = 123456;
+
+#define TEST_MACRO_STR(fmt, X) printf(fmt, #X, X)
+#define TEST_MACRO_CAT(fmt, X) printf(fmt, v##X)
+// 可变参数, 如果可变参数不存在, 去掉前面的逗号
+#define TEST_MACRO(fmt, ...) printf(fmt, ##__VA_ARGS__)
+
+void test_macro() {
+    TEST_MACRO_STR("测试宏变字符串: %s -> %d\n", 123);
+    TEST_MACRO_CAT("测试    宏连接: %d\n", 123);
+    TEST_MACRO("测试宏有可变参数: %d\n", 123);
+    TEST_MACRO("测试宏无可变参数\n");
+}
+
+// 测试可变参数
+//    printf() -- 输出到标准输出
+//   fprintf() -- 输出到标准IO
+//   dprintf() -- 输出到文件描述符
+//   sprintf() -- 输出到字符串
+//  snprintf() -- 输出到字符串
 //
-// getpid()  -- 进程 ID
-// getppid() -- 父进程 ID
-// getuid()  -- 实际用户
-// geteuid() -- 有效用户
-// getgid()  -- 实际组
-// getegid() -- 有效组
+//   vprintf() -- 使用可变参数 va
+//  vfprintf() -- 使用可变参数 va
+//  vdprintf() -- 使用可变参数 va
+//  vsprintf() -- 使用可变参数 va
+// vsnprintf() -- 使用可变参数 va
 //
-// setuid(uid) -- 进程  具有超级权限时, 设置 实际的 有效的 保存的用户 ID 为 uid
-//             -- 进程不具有超级权限时, uid 等于 实际的 ID 或 保存的用户 ID 时,
-//             将有效的 ID 改为 uid
-// setgid()    -- 和上述类似
+//  __VA_ARGS__  -- 只能在宏中使用, 代替可变参数
+//
+//  va_start -- 初始化
+//  va_arg   -- 获取下一个可变参数
+//  va_copy  -- 拷贝
+//  va_end   -- 清空
+
+#define TEST_VA(fmt, ...) printf(fmt, ##__VA_ARGS__)
+
+void test_va_c(const char* s, ...) {
+    va_list ap;
+    va_start(ap, s);
+    vprintf(s, ap);
+    va_end(ap);
+}
+
+void test_va_cpp() {
+}
+
+template <typename T, typename... Args>
+void test_va_cpp(T t, Args... args) {
+    std::cout << t;
+    test_va_cpp(args...);
+}
+
+void test_va() {
+    TEST_VA("测试 C 风格的可变参数: %s -> %s\n", "123", "456");
+    test_va_c("测试 C 风格的可变参数: %s -> %s\n", "123", "456");
+    test_va_cpp("测试 C++ 风格的可变参数: ", "123", " -> ", "456", "\n");
+}
+
+void test_cpp() {
+    // 测试宏
+    // test_macro();
+
+    // 测试可变参数
+    // test_va();
+}
