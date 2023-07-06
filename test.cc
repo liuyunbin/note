@@ -36,8 +36,6 @@ void test_exit();   // 测试退出
 void test_jmp();    // 测试跨函数跳转
 void test_limit();  // 测试资源限制
 
-void test_pgid();   // 测试进程组
-void test_sid();    // 测试会话
 void test_vfork();  // 测试 vfork
 
 void test_process_01();  // 测试进程:   可被信号打断的休眠(指被捕获的信号)
@@ -66,12 +64,6 @@ int main() {
 
     // 测试资源限制
     // test_limit();
-
-    // 测试进程组
-    // test_pgid();
-
-    // 测试会话
-    // test_sid();
 
     // 测试 vfork
     // test_vfork();
@@ -1155,18 +1147,6 @@ void test_orphan_process_group() {
     log();
 }
 
-// 测试进程
-void test_process() {
-    // 测试僵尸进程
-    // test_zombie();
-
-    // 测试孤儿进程
-    // test_orphan_process();
-
-    // 测试孤儿进程组
-    test_orphan_process_group();
-}
-
 // 展示 PID PGID SID
 void show_pid_pgid_sid(pid_t pid) {
     log("进程 ", pid, " 进程组 ", getpgid(pid), " 会话 ", getsid(pid));
@@ -1406,6 +1386,24 @@ void test_sid() {
     log();
     log("主进程正常退出");
     log();
+}
+
+// 测试进程
+void test_process() {
+    // 测试僵尸进程
+    // test_zombie();
+
+    // 测试孤儿进程
+    // test_orphan_process();
+
+    // 测试孤儿进程组
+    // test_orphan_process_group();
+
+    // 测试进程组
+    // test_pgid();
+
+    // 测试会话
+    test_sid();
 }
 
 // 测试宏
