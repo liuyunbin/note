@@ -19,7 +19,7 @@ alias lastlog="tool.sh lastlog" # 列出用户的最后一次登录
 alias l="lsm"
 #alias p="tool.sh ps"            # 列出进程的常用信息
 alias p="git push gitlab master; git push github master"
-alias t="./a.out"
+alias t="g test.cc && ./a.out"
 alias v='vim -c "e ++enc=utf-8" -c "set nobomb"'
 alias x='tar zxf'
 alias z='tar zcf'
