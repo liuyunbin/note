@@ -456,3 +456,13 @@ print("            测试字符删除: $v3\n");
 print("            测试字符合并: $v4\n");
 print("    测试转换未匹配的字符: $v5\n");
 
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# 测试执行 shell 命令
+
+my $v1 = `date +"%Y-%m-%d %H:%M:%S %z"`;
+print("当前时间: $v1");
+
