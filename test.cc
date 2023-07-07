@@ -27,18 +27,11 @@
 #include <sstream>
 #include <string>
 
-void test_signal();   // 测试信号
-void test_process();  // 测试进程
-void test_cpp();      // 测试 cpp
-
-int main() {
-    test_signal();   // 测试信号
-    test_process();  // 测试进程
-    test_cpp();      // 测试 cpp
-
-    return 0;
-}
-
+/********************************
+ *
+ *         公共函数
+ *
+ ********************************/
 // 日志输出
 template <typename T>
 std::string to_string(T data) {
@@ -154,7 +147,11 @@ void handle_signal_6(int sig, siginfo_t* sig_info, void*) {
     longjmp(buf, 1);
 }
 
-// 测试信号
+/*****************************
+ *
+ *          测试信号
+ *
+ *****************************/
 void test_signal_01() {
     log();
     log("测试信号阻塞");
@@ -651,8 +648,14 @@ void test_signal() {
     // test_signal_14();
 
     // 信号测试: 捕捉所有信号, 死循环
-    test_signal_15();
+    // test_signal_15();
 }
+
+/****************************************
+ *
+ *              测试进程
+ *
+ ****************************************/
 
 // 测试僵尸进程
 void test_zombie_1() {
@@ -1727,7 +1730,7 @@ void test_process() {
     // test_jmp();
 
     // 测试资源限制
-    // test_limit();
+    test_limit();
 
     // 测试 vfork
     // test_vfork();
@@ -1750,6 +1753,12 @@ void test_macro() {
     TEST_MACRO("测试宏有可变参数: %d\n", 123);
     TEST_MACRO("测试宏无可变参数\n");
 }
+
+/****************************************
+ *
+ *              测试 C++
+ *
+ ****************************************/
 
 // 测试可变参数
 //    printf() -- 输出到标准输出
@@ -1802,6 +1811,12 @@ void test_cpp() {
     // 测试可变参数
     // test_va();
 }
+
+/****************************************
+ *
+ *              测试计算机存储
+ *
+ ****************************************/
 
 #if 0
 
@@ -2164,8 +2179,6 @@ int main() {
     return 0;
 }
 
-#include "log.h"
-
 void test(const std::string& str, double x) {
     log(str + " => " + Double(x).double_by_cs);
 }
@@ -2202,8 +2215,6 @@ int main() {
     return 0;
 }
 
-#include "log.h"
-
 void test(const std::string& name, char* p, size_t n) {
     log(name);
     for (size_t i = 0; i < n; ++i) {
@@ -2235,34 +2246,6 @@ int main() {
     log("主进程正常退出");
     log();
     return 0;
-}
-#endif
-
-#include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#include <algorithm>
-#include <bitset>
-#include <cctype>
-#include <cfenv>
-#include <cfloat>
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <map>
-#include <sstream>
-#include <string>
-
-void log(const std::string& msg = "") {
-    time_t     now  = time(NULL);
-    struct tm* info = localtime(&now);
-    char       buf[1024];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
-    std::cout << buf << " " << msg << std::endl;
 }
 
 template <typename T>
@@ -2869,8 +2852,6 @@ void test_double(const std::string& name, T data) {
     log("    保留两位小数: ", format("%.2lf", d.data));
 }
 
-#include "log.h"
-
 int main() {
     log();
     log("测试 C++ 格式化输入和输出");
@@ -2938,5 +2919,15 @@ int main() {
     log();
     log("主进程正常退出");
     log();
+    return 0;
+}
+
+#endif
+
+int main() {
+    test_signal();   // 测试信号
+    test_process();  // 测试进程
+    test_cpp();      // 测试 cpp
+
     return 0;
 }
