@@ -69,16 +69,17 @@ class lshell {
 #define ARGV_SIZE_MAX 32  // 命令行参数的最大值
 
 int main() {
-    lsheel s;
+    //    lshell s;
 
     for (;;) {
-        s.get_cmd();
-        s.run_cmd();
+        //        s.get_cmd();
+        //        s.run_cmd();
     }
 
     return 0;
 }
 
+#if 0
 lshell::lshell() {
     user_id            = getuid();  // 用户 ID
     struct passwd *pwd = getpwuid(user_id);
@@ -323,3 +324,4 @@ void do_ulimit() {
 
 int getrlimit(int resource, struct rlimit *rlim);
 int setrlimit(int resource, const struct rlimit *rlim);
+#endif

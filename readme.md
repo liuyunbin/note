@@ -1,7 +1,7 @@
 # 编译
 ```
-./install-dependency.sh
-./build.sh
+./tool.sh install_dependency
+./tool.sh build
 ```
 
 # 目录
