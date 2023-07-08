@@ -15,7 +15,8 @@ alias lsv="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrv"  # 以 文件名为版
 alias b="cd $note; tool.sh build > /dev/null; cd - > /dev/null"
 alias c="cd $note; pwd"
 alias g="g++ -g -std=c++11 "
-alias lastlog="tool.sh lastlog" # 列出用户的最后一次登录
+alias i="tool.sh install_command" # 安装命令
+alias lastlog="tool.sh lastlog"   # 列出用户的最后一次登录
 alias l="lsm"
 #alias p="tool.sh ps"            # 列出进程的常用信息
 alias p="git push gitlab master; git push github master"
