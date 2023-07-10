@@ -825,6 +825,31 @@ void test_env() {
     log("环境变量 PATH: ", getenv("PATH"));
 }
 
+// 测试跨函数跳转
+jmp_buf buf_jmp;
+
+void test_jmp(int v) {
+    if (v == 0) {
+        longjmp(buf_jmp, 3);
+    }
+
+    if (v == 3) {
+        if (setjmp(buf_jmp) == 0) {
+            log("第一次经过, v = ", v);
+        } else {
+            log("再一次经过, v = ", v);
+            return;
+        }
+    }
+    log("参数: v = ", v);
+    test_jmp(v - 1);
+}
+
+void test_jmp() {
+    log("测试 jmp");
+    test_jmp(10);
+}
+
 void test_process() {
     // 测试僵尸进程
     // test_zombie();
@@ -842,7 +867,10 @@ void test_process() {
     // test_sid();
 
     // 测试环境变量
-    test_env();
+    // test_env();
+
+    // 测试跨函数跳转
+    test_jmp();
 }
 
 int main() {
@@ -1679,32 +1707,6 @@ void test_exit() {
     sleep(1);
 }
 
-// 测试跨函数跳转
-
-jmp_buf buf_jmp;
-
-void test_jmp(int v) {
-    if (v == 0) {
-        longjmp(buf_jmp, 3);
-    }
-
-    if (v == 3) {
-        if (setjmp(buf_jmp) == 0) {
-            log("第一次经过, v = ", v);
-        } else {
-            log("再一次经过, v = ", v);
-            return;
-        }
-    }
-    log("参数: v = ", v);
-    test_jmp(v - 1);
-}
-
-void test_jmp() {
-    log("测试 jmp");
-    test_jmp(10);
-}
-
 // 测试资源限制
 
 #define TEST_LIMIT(X)                   \
@@ -1750,9 +1752,6 @@ void test_process_1() {
 
     // 测试退出
     // test_exit();
-
-    // 测试跨函数跳转
-    // test_jmp();
 
     // 测试资源限制
     test_limit();
