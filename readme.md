@@ -235,6 +235,16 @@
     * ulimit -c ------------ 查看 core 文件大小的软限制
     * ulimit -c -H --------- 查看 core 文件大小的硬限制
     * ulimit -c unlimited -- 设置 core 文件大小的软限制不受限制
+* core 不能生成的原因
+    * 设置了 SUID, 进程的实际用户不是可执行文件的所有者
+    * 设置了 SGID, 进程的实际组不是可执行文件组的所有者
+    * 没有写当前目录的权限
+    * 文件已存在, 但无权限修改
+    * 文件太大, 受 ulimit 的限制
+* ubuntu 生产 core
+    1. ulimit -c unlimited -- 设置 core 文件大小的软限制不受限制
+    2. /etc/sysctl.conf 添加 `kernel.core_pattern=%e.%p` -- 文件名, 进程号
+    3. sudo sysctl -p -- 配置生效
 * 获取子进程的状态变化的信息
     *    wait()
     * waitpid()
@@ -261,12 +271,6 @@
 * setregid(): 设置实际和有效组ID
 * seteuid(): 设置有效用户ID
 * setegid(): 设置有效组ID
-* core 不能生成的原因
-    * 设置了 SUID, 进程的实际用户不是可执行文件的所有者
-    * 设置了 SGID, 进程的实际组不是可执行文件组的所有者
-    * 没有写当前目录的权限
-    * 文件已存在, 但无权限修改
-    * 文件太大, 受 ulimit 的限制
 * 系统文件
     * /proc/loadavg: 系统负载
     * /proc/cpuinfo: cpu 信息
