@@ -226,62 +226,15 @@
 * 跨函数跳转
     * longjmp()
     * setjmp()
-
-       RLIMIT_AS -- 虚拟内存
-       RLIMIT_CORE -- core 文件
-       RLIMIT_CPU  -- CPU 时间
-       RLIMIT_DATA -- 数据段: 初始化数据, 未初始化数据, 堆
-       RLIMIT_FSIZE -- 文件大小
-       RLIMIT_LOCKS
-       RLIMIT_MEMLOCK: 内存中可以锁定的大小
-       RLIMIT_MSGQUEUE: 消息队列的大小
-       RLIMIT_NICE: 进程优先级的上限
-       RLIMIT_NOFILE: 文件描述符的最大限制
-       RLIMIT_NPROC: 用户的进程线程数
-       RLIMIT_RSS: 物理内存
-       RLIMIT_RTPRIO: 调度的优先级
-       RLIMIT_RTTIME: 调度时, CPU 的最大耗时 毫秒
-       RLIMIT_SIGPENDING: 信号队列的长度
-       RLIMIT_STACK: 栈大小
-
 * 资源使用的限制
     * getrlimit(): 获取资源使用的限制
     * setrlimit(): 设置资源使用的限制
         * 软限制值可以任意修改, 只要小于等于硬限制值即可
         * 硬限制值可以降低, 只要大于等于软限制值即可
         * 只有超级用户才可以提高硬限制值
-        * `RLIM_INFINITY` 表示不做限制
-    * ulimit -a ------------ 查看所有资源的软限制
-    * ulimit -a -S --------- 查看所有资源的软限制
-    * ulimit -a -H --------- 查看所有资源的硬限制
-    * ulimit -b	... -------- 限制
     * ulimit -c ------------ 查看 core 文件大小的软限制
+    * ulimit -c -H --------- 查看 core 文件大小的硬限制
     * ulimit -c unlimited -- 设置 core 文件大小的软限制不受限制
-    * ulimit -d	... -------- 限制程序数据段的大小
-    * ulimit -e	... -------- 限制程序优先级
-    * ulimit -f	... -------- 限制文件大小
-    * ulimit -i	... -------- 限制待决的信号的数量
-    * ulimit -k	... -------- 限制
-    * ulimit -l	... -------- 限制加锁的内存大小
-    * ulimit -m	... -------- 限制物理内存大小
-    * ulimit -n	... -------- 限制打开文件的最大个数
-    * ulimit -p	... -------- 限制匿名管道的缓冲大小
-    * ulimit -P	... -------- 限制伪终端的个数
-    * ulimit -q	... -------- 限制消息队列的大小
-    * ulimit -r	... -------- 限制
-    * ulimit -R	... -------- 限制
-    * ulimit -s	... -------- 限制栈大小
-    * ulimit -t	... -------- 限制 CPU 的使用时间
-    * ulimit -T	... -------- 限制线程数
-    * ulimit -u	... -------- 限制进程数
-    * ulimit -v	... -------- 限制虚拟内存大小
-    * ulimit -x	... -------- 限制文件锁的个数
-
-real-time non-blocking time  (microseconds, -R) unlimited
-real-time priority                  (-r) 0
-      -r	the maximum real-time scheduling priority
-      -R	the maximum time a real-time process can run before blocking
-
 * 获取子进程的状态变化的信息
     *    wait()
     * waitpid()
