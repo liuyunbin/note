@@ -850,6 +850,68 @@ void test_jmp() {
     test_jmp(10);
 }
 
+// 测试退出
+class A {
+  public:
+    A() {
+        log("调用构造函数");
+    }
+
+    ~A() {
+        log("调用析构函数");
+    }
+};
+
+void test_1() {
+    log("测试函数-1");
+}
+
+void test_2() {
+    log("测试函数-2");
+}
+
+void test_atexit() {
+    log("注册退出函数");
+    atexit(test_1);
+    atexit(test_1);
+    atexit(test_2);
+    atexit(test_2);
+}
+
+void test_exit() {
+    if (fork() == 0) {
+        log("测试 exit");
+        A a;
+        test_atexit();
+        log("退出");
+        exit(0);
+    }
+
+    sleep(1);
+    log();
+
+    if (fork() == 0) {
+        log("测试 _exit");
+        A a;
+        test_atexit();
+        log("退出");
+        _exit(0);
+    }
+
+    sleep(1);
+    log();
+
+    if (fork() == 0) {
+        log("测试正常退出");
+        A a;
+        test_atexit();
+        log("退出");
+        return;
+    }
+
+    sleep(1);
+}
+
 void test_process() {
     // 测试僵尸进程
     // test_zombie();
@@ -870,7 +932,10 @@ void test_process() {
     // test_env();
 
     // 测试跨函数跳转
-    test_jmp();
+    // test_jmp();
+
+    // 测试退出
+    test_exit();
 }
 
 int main() {
@@ -1645,68 +1710,6 @@ void test_process_status() {
     test_process_status_05();
 }
 
-// 测试退出
-class A {
-  public:
-    A() {
-        log("调用构造函数");
-    }
-
-    ~A() {
-        log("调用析构函数");
-    }
-};
-
-void test_1() {
-    log("测试函数-1");
-}
-
-void test_2() {
-    log("测试函数-2");
-}
-
-void test_atexit() {
-    log("注册退出函数");
-    atexit(test_1);
-    atexit(test_1);
-    atexit(test_2);
-    atexit(test_2);
-}
-
-void test_exit() {
-    if (fork() == 0) {
-        log("测试 exit");
-        A a;
-        test_atexit();
-        log("退出");
-        exit(0);
-    }
-
-    sleep(1);
-    log();
-
-    if (fork() == 0) {
-        log("测试 _exit");
-        A a;
-        test_atexit();
-        log("退出");
-        _exit(0);
-    }
-
-    sleep(1);
-    log();
-
-    if (fork() == 0) {
-        log("测试正常退出");
-        A a;
-        test_atexit();
-        log("退出");
-        return;
-    }
-
-    sleep(1);
-}
-
 // 测试资源限制
 
 #define TEST_LIMIT(X)                   \
@@ -1749,9 +1752,6 @@ void test_vfork() {
 void test_process_1() {
     // 测试进程状态
     // test_process_status();
-
-    // 测试退出
-    // test_exit();
 
     // 测试资源限制
     test_limit();
