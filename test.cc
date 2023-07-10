@@ -648,7 +648,7 @@ void test_signal() {
     // test_signal_14();
 
     // 信号测试: 捕捉所有信号, 死循环
-    test_signal_15();
+    // test_signal_15();
 }
 
 /****************************************
@@ -1503,44 +1503,6 @@ void test_limit() {
     TEST_LIMIT("栈大小", RLIMIT_STACK);
 }
 
-void test_process() {
-    // 测试僵尸进程
-    // test_zombie();
-
-    // 测试孤儿进程
-    // test_orphan_process();
-
-    // 测试孤儿进程组
-    // test_orphan_process_group();
-
-    // 测试进程组
-    // test_pgid();
-
-    // 测试会话
-    // test_sid();
-
-    // 测试环境变量
-    // test_env();
-
-    // 测试跨函数跳转
-    // test_jmp();
-
-    // 测试退出
-    // test_exit();
-
-    // 测试资源限制
-    test_limit();
-}
-
-int main() {
-    test_signal();  // 测试信号
-    // test_process();  // 测试进程
-
-    //    test_cpp();      // 测试 cpp
-
-    return 0;
-}
-
 void test_process_status_01() {
     log();
     log("测试进程: 可被信号打断的休眠(指被捕获的信号)");
@@ -1773,6 +1735,47 @@ void test_process_status() {
     test_process_status_05();
 }
 
+void test_process() {
+    // 测试僵尸进程
+    // test_zombie();
+
+    // 测试孤儿进程
+    // test_orphan_process();
+
+    // 测试孤儿进程组
+    // test_orphan_process_group();
+
+    // 测试进程组
+    // test_pgid();
+
+    // 测试会话
+    // test_sid();
+
+    // 测试环境变量
+    // test_env();
+
+    // 测试跨函数跳转
+    // test_jmp();
+
+    // 测试退出
+    // test_exit();
+
+    // 测试资源限制
+    // test_limit();
+
+    // 测试进程状态
+    test_process_status();
+}
+
+int main() {
+    test_signal();   // 测试信号
+    test_process();  // 测试进程
+
+    //    test_cpp();      // 测试 cpp
+
+    return 0;
+}
+
 // 测试 vfork
 void test_vfork_help() {
     std::string str = "123";
@@ -1794,9 +1797,6 @@ void test_vfork() {
 
 // 测试进程
 void test_process_1() {
-    // 测试进程状态
-    // test_process_status();
-
     // 测试 vfork
     // test_vfork();
 }
