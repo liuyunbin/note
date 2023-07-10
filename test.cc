@@ -1735,6 +1735,25 @@ void test_process_status() {
     test_process_status_05();
 }
 
+// 测试 vfork
+void test_vfork_help() {
+    std::string str = "123";
+    log("调用 vfork 前为: ", str);
+    if (vfork() == 0) {
+        str = "456";
+        log("vfork 内修改为: ", str);
+        exit(0);
+    }
+    log("调用 vfork 后为: ", str);
+}
+
+void test_vfork() {
+    std::string str = "123";
+    log("上一层函数调用前为: ", str);
+    test_vfork_help();
+    log("上一层函数调用后为: ", str);
+}
+
 void test_process() {
     // 测试僵尸进程
     // test_zombie();
@@ -1764,7 +1783,10 @@ void test_process() {
     // test_limit();
 
     // 测试进程状态
-    test_process_status();
+    // test_process_status();
+
+    // 测试 vfork
+    test_vfork();
 }
 
 int main() {
@@ -1774,31 +1796,6 @@ int main() {
     //    test_cpp();      // 测试 cpp
 
     return 0;
-}
-
-// 测试 vfork
-void test_vfork_help() {
-    std::string str = "123";
-    log("调用 vfork 前为: ", str);
-    if (vfork() == 0) {
-        str = "456";
-        log("vfork 内修改为: ", str);
-        exit(0);
-    }
-    log("调用 vfork 后为: ", str);
-}
-
-void test_vfork() {
-    std::string str = "123";
-    log("上一层函数调用前为: ", str);
-    test_vfork_help();
-    log("上一层函数调用后为: ", str);
-}
-
-// 测试进程
-void test_process_1() {
-    // 测试 vfork
-    // test_vfork();
 }
 
 // 测试宏
