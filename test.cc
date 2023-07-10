@@ -817,6 +817,14 @@ void test_sid() {
     log();
 }
 
+void test_env() {
+    log("环境变量 PATH: ", getenv("PATH"));
+    log("修改环境变量");
+    char str[] = "PATH=LYB";
+    putenv(str);
+    log("环境变量 PATH: ", getenv("PATH"));
+}
+
 void test_process() {
     // 测试僵尸进程
     // test_zombie();
@@ -831,7 +839,10 @@ void test_process() {
     // test_pgid();
 
     // 测试会话
-    test_sid();
+    // test_sid();
+
+    // 测试环境变量
+    test_env();
 }
 
 int main() {
@@ -1730,10 +1741,6 @@ void test_vfork() {
     log("上一层函数调用前为: ", str);
     test_vfork_help();
     log("上一层函数调用后为: ", str);
-}
-
-void test_env() {
-    log("环境变量 PATH: ", getenv("PATH"));
 }
 
 // 测试进程
