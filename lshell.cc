@@ -36,9 +36,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include <sys/resource.h>
 #include <sys/stat.h>
-#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <termios.h>
@@ -46,66 +44,44 @@
 #include <unistd.h>
 
 #include <iostream>
-#include <map>
 #include <string>
 #include <vector>
 
-class lshell {
-  public:
-    lshell();
-    void get_cmd();  // 获取命令
+#define BUF_SIZE 4096
 
-  private:
-    uid_t       user_id;        // 用户 ID
-    std::string user_name;      // 用户名称
-    std::string user_home_dir;  // 用户主目录
-
-    std::string cmd;
-
-    std::string get_prompt();  // 获取命令行提示符
-};
-
-#define BUF_SIZE      4096
 #define ARGV_SIZE_MAX 32  // 命令行参数的最大值
 
-int main() {
-    //    lshell s;
+#define COMMAND_SIZE_MAX 1024  // 命令行的最大大小
 
-    for (;;) {
-        //        s.get_cmd();
-        //        s.run_cmd();
-    }
-
-    return 0;
-}
-
-#if 0
-lshell::lshell() {
-    user_id            = getuid();  // 用户 ID
-    struct passwd *pwd = getpwuid(user_id);
-    user_name          = pwd->pw_name;  // 用户名称
-    user_home_dir      = pwd->pw_dir;   // 用户主目录
-}
+std::string command;
+std::string prompt;
 
 // 获取命令行提示符
-std::string lshell::get_prompt() {
-    std::string prompt = user_name + ":";
+void get_prompt() {
+    uid_t          user_id = getuid();
+    struct passwd *pwd     = getpwuid(user_id);
+
+    prompt                    = pwd->pw_name;  // user name
+    std::string user_home_dir = pwd->pw_dir;
 
     char       *p           = get_current_dir_name();
     std::string current_dir = p;
     free(p);  // 及时释放，避免内存泄漏
 
+    prompt += ":";
+
     if (current_dir == user_home_dir) {
         prompt += "~";
     } else if (current_dir < user_home_dir) {
         prompt += current_dir;
-    } else if (current_dir.substr(0, user_home_dir.size()) != user_home_dir) {
+    } else if (current_dir.compare(0, user_home_dir.size(), user_home_dir) !=
+               0) {
         prompt += current_dir;
     } else if (current_dir[user_home_dir.size()] != '/') {
         prompt += current_dir;
     } else {
         prompt += '~';
-        prompt += current_dir.substr(user_home_dir.size());
+        prompt += current_dir.data() + user_home_dir.size();
     }
 
     if (user_id == 0)
@@ -114,36 +90,60 @@ std::string lshell::get_prompt() {
         prompt += "$ ";
 }
 
-// 获取用户的输入
-void lshell::get_cmd() {
-    std::string prompt = get_prompt();  // 获取命令提示符
+// 获取用户的输入，处理掉 ~ 代表目录的位置
+void get_command() {
+    get_prompt();  // 获取命令提示符
 
     char *p = readline(prompt.data());  // 读取一行，不包括 '\n'
     if (p == NULL)                      // 读入 EOF
         exit(EXIT_FAILURE);
+    if (p[0] != '\0')
+        add_history(p);
+    uid_t          user_id = getuid();
+    struct passwd *pwd     = getpwuid(user_id);
 
-    cmd = "";
-    // 处理掉 ~ 代表目录的位置
+    command = "";
     for (size_t i = 0; p[i] != '\0'; ++i) {
         if (p[i] != '~')
-            cmd += p[i];
+            command += p[i];
         else if (p[i + 1] == ' ' || p[i + 1] == '\0' || p[i + 1] == '/')
-            cmd += user_home_dir;
+            command += pwd->pw_dir;  // user home directory
         else
-            cmd += p[i];
+            command += p[i];
     }
 
     free(p);  // 释放资源，避免内存泄漏
+}
 
-    // 去掉前缀空格
-    size_t index = cmd.find_first_not_of(' ');
-    cmd          = cmd.substr(index);
+bool run_builtin_command() {
+    char buffer_command[COMMAND_SIZE_MAX + 1];
+    strcpy(buffer_command, command.data());
+    std::string user_command = strtok(buffer_command, " ");
+
+    if (user_command == "exit" || user_command == "quit")
+        exit(EXIT_SUCCESS);
+    if (user_command == "about") {
+        printf("write by liuyunbin\n");
+        return true;
+    }
+    if (user_command == "cd") {
+        char *argument = strtok(NULL, " ");
+        if (argument == NULL) {
+            struct passwd *pwd = getpwuid(getuid());
+            argument           = pwd->pw_dir;
+        } else if (strtok(NULL, " ") != NULL) {
+            printf("cd: too many arguments\n");
+            return true;
+        }
+        if (chdir(argument) == -1)
+            printf("cd %s : %s\n", argument, strerror(errno));
+        return true;
+    }
+    return false;
 }
 
 // 解析命令行参数
-void lshell::parse_command(char **argv,
-                           size_t argv_size_max,
-                           char  *current_command) {
+void parse_command(char **argv, size_t argv_size_max, char *current_command) {
     bool   new_argv   = true;  // 新参数开始
     size_t argv_index = 0;
 
@@ -221,44 +221,14 @@ void lshell::parse_command(char **argv,
     }
 }
 
-bool run_builtin_command() {
-    char buffer_command[1024 + 1];
-    strcpy(buffer_command, command.data());
-    std::string user_command = strtok(buffer_command, " ");
-
-    if (user_command == "ulimit") {
-        do_ulimit();
-        return true;
-    }
-
-    if (user_command == "exit" || user_command == "quit")
-        exit(EXIT_SUCCESS);
-    if (user_command == "about") {
-        printf("write by liuyunbin\n");
-        return true;
-    }
-    if (user_command == "cd") {
-        char *argument = strtok(NULL, " ");
-        if (argument == NULL) {
-            struct passwd *pwd = getpwuid(getuid());
-            argument           = pwd->pw_dir;
-        } else if (strtok(NULL, " ") != NULL) {
-            printf("cd: too many arguments\n");
-            return true;
-        }
-        if (chdir(argument) == -1)
-            printf("cd %s : %s\n", argument, strerror(errno));
-        return true;
-    }
-    return false;
-}
-
-void lshell::run_command() {
-    if (command == "")
+void run_command() {
+    // 移除行首的空字符
+    std::size_t index = command.find_first_not_of(' ');
+    if (index == std::string::npos)
         return;
-    add_history(p);
+    command = command.substr(index);
 
-    if (command.size() > 1024) {
+    if (command.size() > COMMAND_SIZE_MAX) {
         printf("命令行过长\n");
         return;
     }
@@ -271,7 +241,7 @@ void lshell::run_command() {
         return;
     }
 
-    char buffer_command[1024];
+    char buffer_command[COMMAND_SIZE_MAX + 1];
     strcpy(buffer_command, command.data());
 
     char *next_command = strtok(buffer_command, "|");
@@ -309,19 +279,11 @@ void lshell::run_command() {
     }
 }
 
-#define GET_LIMIT(X)                            \
-    {                                           \
-        struct rlimit rlim;                     \
-        getrlimit(X, &rlim);                    \
-        printf("  资源: %s\n", #X);             \
-        printf("软限制: %ld\n", rlim.rlim_cur); \
-        printf("硬限制: %ld\n", rlim.rlim_max); \
+int main() {
+    for (;;) {
+        get_command();
+        run_command();
     }
 
-void do_ulimit() {
-    GET_LIMIT(RLIMIT_CORE);
+    return 0;
 }
-
-int getrlimit(int resource, struct rlimit *rlim);
-int setrlimit(int resource, const struct rlimit *rlim);
-#endif
