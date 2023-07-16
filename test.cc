@@ -583,7 +583,7 @@ void test_signal_15() {
     struct sigaction act;
     act.sa_sigaction = handle_signal;
     sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO | SA_NOCLDSTOP | SA_NOCLDWAIT | SA_RESTART;
+    act.sa_flags = SA_SIGINFO;
     for (auto key : m) {
         sigaction(key.first, &act, NULL);
     }
@@ -1762,7 +1762,7 @@ void test_process() {
     // test_orphan_process();
 
     // 测试孤儿进程组
-    // test_orphan_process_group();
+    test_orphan_process_group();
 
     // 测试进程组
     // test_pgid();
@@ -1859,7 +1859,7 @@ void test_cpp() {
     // test_macro();
 
     // 测试可变参数
-    test_va();
+    // test_va();
 }
 
 int main() {
