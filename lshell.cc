@@ -53,7 +53,7 @@
 
 #define COMMAND_SIZE_MAX 1024  // 命令行的最大大小
 
-std::string command;
+std::string cmd;
 std::string prompt;
 
 // 获取命令行提示符
@@ -91,7 +91,7 @@ void get_prompt() {
 }
 
 // 获取用户的输入，处理掉 ~ 代表目录的位置
-void get_command() {
+void get_cmd() {
     get_prompt();  // 获取命令提示符
 
     char *p = readline(prompt.data());  // 读取一行，不包括 '\n'
@@ -102,31 +102,31 @@ void get_command() {
     uid_t          user_id = getuid();
     struct passwd *pwd     = getpwuid(user_id);
 
-    command = "";
+    cmd = "";
     for (size_t i = 0; p[i] != '\0'; ++i) {
         if (p[i] != '~')
-            command += p[i];
+            cmd += p[i];
         else if (p[i + 1] == ' ' || p[i + 1] == '\0' || p[i + 1] == '/')
-            command += pwd->pw_dir;  // user home directory
+            cmd += pwd->pw_dir;  // user home directory
         else
-            command += p[i];
+            cmd += p[i];
     }
 
     free(p);  // 释放资源，避免内存泄漏
 }
 
-bool run_builtin_command() {
-    char buffer_command[COMMAND_SIZE_MAX + 1];
-    strcpy(buffer_command, command.data());
-    std::string user_command = strtok(buffer_command, " ");
+bool run_builtin_cmd() {
+    char buffer_cmd[COMMAND_SIZE_MAX + 1];
+    strcpy(buffer_cmd, cmd.data());
+    std::string user_cmd = strtok(buffer_cmd, " ");
 
-    if (user_command == "exit" || user_command == "quit")
+    if (user_cmd == "exit" || user_cmd == "quit")
         exit(EXIT_SUCCESS);
-    if (user_command == "about") {
+    if (user_cmd == "about") {
         printf("write by liuyunbin\n");
         return true;
     }
-    if (user_command == "cd") {
+    if (user_cmd == "cd") {
         char *argument = strtok(NULL, " ");
         if (argument == NULL) {
             struct passwd *pwd = getpwuid(getuid());
@@ -143,33 +143,33 @@ bool run_builtin_command() {
 }
 
 // 解析命令行参数
-void parse_command(char **argv, size_t argv_size_max, char *current_command) {
+void parse_cmd(char **argv, size_t argv_size_max, char *current_cmd) {
     bool   new_argv   = true;  // 新参数开始
     size_t argv_index = 0;
 
     for (;;) {
-        if (*current_command == '\0') {
+        if (*current_cmd == '\0') {
             argv[argv_index] = NULL;
             return;
         }
-        if (isspace(*current_command)) {
-            *current_command++ = '\0';
-            new_argv           = true;
+        if (isspace(*current_cmd)) {
+            *current_cmd++ = '\0';
+            new_argv       = true;
             continue;
         }
-        if (*current_command == '<') {
-            ++current_command;
-            while (isspace(*current_command))
-                ++current_command;
-            if (*current_command == '\0') {
-                printf("Please use: command < file_name\n");
+        if (*current_cmd == '<') {
+            ++current_cmd;
+            while (isspace(*current_cmd))
+                ++current_cmd;
+            if (*current_cmd == '\0') {
+                printf("Please use: cmd < file_name\n");
                 exit(EXIT_FAILURE);
             }
-            char *filename = current_command;
-            while (!isspace(*current_command) && *current_command != '\0')
-                ++current_command;
-            if (*current_command != '\0')
-                *current_command++ = '\0';
+            char *filename = current_cmd;
+            while (!isspace(*current_cmd) && *current_cmd != '\0')
+                ++current_cmd;
+            if (*current_cmd != '\0')
+                *current_cmd++ = '\0';
             int fd = open(filename, O_RDONLY);
             if (fd < 0) {
                 printf("can't open %s for: %s\n", filename, strerror(errno));
@@ -179,24 +179,24 @@ void parse_command(char **argv, size_t argv_size_max, char *current_command) {
             close(fd);
             continue;
         }
-        if (*current_command == '>') {
+        if (*current_cmd == '>') {
             bool add_to_file = false;
-            if (*++current_command == '>') {
+            if (*++current_cmd == '>') {
                 add_to_file = true;
-                ++current_command;
+                ++current_cmd;
             }
-            while (isspace(*current_command))
-                ++current_command;
-            if (*current_command == '\0') {
-                printf(add_to_file ? "Please use command >  file_name\n"
-                                   : "Please use command >> file_name\n");
+            while (isspace(*current_cmd))
+                ++current_cmd;
+            if (*current_cmd == '\0') {
+                printf(add_to_file ? "Please use cmd >  file_name\n"
+                                   : "Please use cmd >> file_name\n");
                 exit(EXIT_FAILURE);
             }
-            char *filename = current_command;
-            while (!isspace(*current_command) && *current_command != '\0')
-                ++current_command;
-            if (*current_command != '\0')
-                *current_command++ = '\0';
+            char *filename = current_cmd;
+            while (!isspace(*current_cmd) && *current_cmd != '\0')
+                ++current_cmd;
+            if (*current_cmd != '\0')
+                *current_cmd++ = '\0';
             int fd = open(filename,
                           add_to_file ? (O_WRONLY | O_CREAT | O_APPEND)
                                       : (O_WRONLY | O_CREAT),
@@ -211,29 +211,29 @@ void parse_command(char **argv, size_t argv_size_max, char *current_command) {
         }
         if (new_argv == true) {
             new_argv           = false;
-            argv[argv_index++] = current_command;
+            argv[argv_index++] = current_cmd;
             if (argv_index >= argv_size_max) {
                 printf("too many arguments\n");
                 exit(EXIT_FAILURE);
             }
         }
-        ++current_command;
+        ++current_cmd;
     }
 }
 
-void run_command() {
+void run_cmd() {
     // 移除行首的空字符
-    std::size_t index = command.find_first_not_of(' ');
+    std::size_t index = cmd.find_first_not_of(' ');
     if (index == std::string::npos)
         return;
-    command = command.substr(index);
+    cmd = cmd.substr(index);
 
-    if (command.size() > COMMAND_SIZE_MAX) {
+    if (cmd.size() > COMMAND_SIZE_MAX) {
         printf("命令行过长\n");
         return;
     }
 
-    if (run_builtin_command() == true)
+    if (run_builtin_cmd() == true)
         return;
 
     if (fork() > 0) {
@@ -241,17 +241,17 @@ void run_command() {
         return;
     }
 
-    char buffer_command[COMMAND_SIZE_MAX + 1];
-    strcpy(buffer_command, command.data());
+    char buffer_cmd[COMMAND_SIZE_MAX + 1];
+    strcpy(buffer_cmd, cmd.data());
 
-    char *next_command = strtok(buffer_command, "|");
+    char *next_cmd = strtok(buffer_cmd, "|");
     char *argv[ARGV_SIZE_MAX];
 
     for (;;) {
-        char *current_command = next_command;
-        next_command          = strtok(NULL, "|");
-        if (next_command == NULL) {
-            parse_command(argv, ARGV_SIZE_MAX, current_command);
+        char *current_cmd = next_cmd;
+        next_cmd          = strtok(NULL, "|");
+        if (next_cmd == NULL) {
+            parse_cmd(argv, ARGV_SIZE_MAX, current_cmd);
             execvp(argv[0], argv);
             perror("");
             exit(EXIT_FAILURE);
@@ -265,7 +265,7 @@ void run_command() {
                 close(pipe_fd[0]);
                 dup2(pipe_fd[1], STDOUT_FILENO);  // 将标准输出重定向到管道
                 close(pipe_fd[1]);
-                parse_command(argv, ARGV_SIZE_MAX, current_command);
+                parse_cmd(argv, ARGV_SIZE_MAX, current_cmd);
                 execvp(argv[0], argv);
                 perror("");
                 exit(EXIT_FAILURE);
@@ -281,8 +281,8 @@ void run_command() {
 
 int main() {
     for (;;) {
-        get_command();
-        run_command();
+        get_cmd();
+        run_cmd();
     }
 
     return 0;
