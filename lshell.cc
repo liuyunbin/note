@@ -1,29 +1,4 @@
 
-//本程序用于实现 Linux 命令行 shell
-//
-//#### 项目流程：
-// 1. 设置命令行前缀，并输出
-// 2. 读取用户的输入，忽略所有的前置空格，并取代所有的 ~
-// 表示用户主目录的地方，包括 “\~”，“\~\/”
-// 3. 如果用户输入为空，跳到第 1 步
-// 4. 如果用户输入是内置命令：“cd” 或 “about”，在当前进程执行命令，而后，跳到第
-// 1 步
-// 5. 如果用户输入是内置命令：“exit” 或 “quit”，直接退出进程
-// 6. 如果用户输入的是系统命令，fork 子进程，
-//    * 父进程 wait 子进程
-//    * 子进程使用管道（|）对用户输入的命令进行切割，获取当前命令，
-//        * 如果还有下一条命令，则建立管道，fork 子进程，
-//            * 子进程将标准输出重定向到管道，然后对当前命令进行解析，而后执行命令
-//            * 父进程将标准输入重定向到管道，然后 wait
-//            子进程，而后读取下一条命令
-//        * 如果这是最后一条命令，对当前命令进行解析，而后执行命令，然后，跳到第
-//        1 步
-//
-//**说明：**
-//* 对命令进行解析是指：获取参数，并处理 “<” “>”  “>>”，将标准输入 或
-//输出重定向到文件
-//* 由于本项目是，先处理管道，后处理其它重定向，所以，当存在其它重定向时，管道将失效
-
 #include <ctype.h>
 #include <dirent.h>
 #include <errno.h>
@@ -47,11 +22,8 @@
 #include <string>
 #include <vector>
 
-#define BUF_SIZE 4096
-
-#define ARGV_SIZE_MAX 32  // 命令行参数的最大值
-
-#define COMMAND_SIZE_MAX 1024  // 命令行的最大大小
+#define MAX_SIZE_ARGV 32    // 命令行参数的最大值
+#define MAX_SIZE_CMD  1024  // 命令行的最大大小
 
 std::string cmd;
 std::string prompt;
@@ -116,7 +88,7 @@ void get_cmd() {
 }
 
 bool run_builtin_cmd() {
-    char buffer_cmd[COMMAND_SIZE_MAX + 1];
+    char buffer_cmd[MAX_SIZE_CMD + 1];
     strcpy(buffer_cmd, cmd.data());
     std::string user_cmd = strtok(buffer_cmd, " ");
 
@@ -228,7 +200,7 @@ void run_cmd() {
         return;
     cmd = cmd.substr(index);
 
-    if (cmd.size() > COMMAND_SIZE_MAX) {
+    if (cmd.size() > MAX_SIZE_CMD) {
         printf("命令行过长\n");
         return;
     }
@@ -241,17 +213,17 @@ void run_cmd() {
         return;
     }
 
-    char buffer_cmd[COMMAND_SIZE_MAX + 1];
+    char buffer_cmd[MAX_SIZE_CMD + 1];
     strcpy(buffer_cmd, cmd.data());
 
     char *next_cmd = strtok(buffer_cmd, "|");
-    char *argv[ARGV_SIZE_MAX];
+    char *argv[MAX_SIZE_ARGV];
 
     for (;;) {
         char *current_cmd = next_cmd;
         next_cmd          = strtok(NULL, "|");
         if (next_cmd == NULL) {
-            parse_cmd(argv, ARGV_SIZE_MAX, current_cmd);
+            parse_cmd(argv, MAX_SIZE_ARGV, current_cmd);
             execvp(argv[0], argv);
             perror("");
             exit(EXIT_FAILURE);
@@ -265,7 +237,7 @@ void run_cmd() {
                 close(pipe_fd[0]);
                 dup2(pipe_fd[1], STDOUT_FILENO);  // 将标准输出重定向到管道
                 close(pipe_fd[1]);
-                parse_cmd(argv, ARGV_SIZE_MAX, current_cmd);
+                parse_cmd(argv, MAX_SIZE_ARGV, current_cmd);
                 execvp(argv[0], argv);
                 perror("");
                 exit(EXIT_FAILURE);
