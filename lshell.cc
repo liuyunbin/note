@@ -22,67 +22,49 @@
 
 #include <iostream>
 #include <map>
+#include <queue>
 #include <string>
 #include <vector>
 
-#define ARGV_SIZE 32    // 命令行参数的最大值
-#define BUF_SIZE  1024  // 命令行的最大大小
+using namespace std;
 
-std::string prompt;
-char       *argv[ARGV_SIZE];
-char        buf[BUF_SIZE + 1];
+enum status_t {
+    FG,
+    BG,
+    ST
+};
 
-uid_t       user_id;
-std::string user_name;
-std::string user_home;
+struct job_t {
+    pid_t    pid;
+    status_t st;
+    string   cmd;
+};
 
-std::map<std::string, void (*)()> m;
+queue<int>              jids;  // 待用的作业号
+map<int, vector<job_t>> jobs;  // 作业
+map<pid_t, int>         pids;  // 进程号 -> 作业号的映射
 
-void init();
+uid_t  user_id;
+string user_name;
+string user_home;
 
-void get_prompt();  // 获取命令行提示符
-void get_cmd();
-bool parse_cmd(char *curr_cmd);  // 解析命令行参数
-void run_cmd();
-void run_cmd(char *curr_cmd);
+map<string, void (*)()> m;
 
-void do_about();
-void do_exit();
-void do_quit();
-void do_cd();
-void do_ulimit();
-
-int main() {
-    init();
-
-    for (;;) {
-        get_cmd();
-        run_cmd();
-    }
-
-    return 0;
-}
-
-void init() {
-    m["about"]  = do_about;
-    m["exit"]   = do_exit;
-    m["quit"]   = do_quit;
-    m["cd"]     = do_cd;
-    m["ulimit"] = do_ulimit;
-
-    user_id            = getuid();
-    struct passwd *pwd = getpwuid(user_id);
-
-    user_name = pwd->pw_name;
-    user_home = pwd->pw_dir;
-}
+struct cmd_t {
+    vector<string> cmd_vec;
+    string         cmd_str;
+    string         in;
+    string         out;
+    string         add;
+};
 
 // 获取命令行提示符
-void get_prompt() {
-    getcwd(buf, BUF_SIZE);
-    std::string curr_dir = buf;
+string get_prompt() {
+    char  *p        = get_current_dir_name();
+    string curr_dir = p;
+    free(p);
 
-    prompt = user_name + ":";
+    string prompt = user_name + ":";
     if (curr_dir == user_home) {
         prompt += "~";
     } else if (curr_dir < user_home) {
@@ -100,28 +82,20 @@ void get_prompt() {
         prompt += "# ";
     else
         prompt += "$ ";
+
+    return prompt;
 }
 
-// 获取用户的输入，处理掉 ~ 代表目录的位置
-void get_cmd() {
-    get_prompt();  // 获取命令提示符
+// 获取用户的输入
+// 处理掉 ~ 代表目录的位置
+int get_cmd(const string &prompt, string &cmd) {
+    // 读取一行，不包括 '\n'
+    char *p = readline(prompt.data());
+    if (p == NULL)
+        return -1;  // 读入 EOF
 
-    char *p = readline(prompt.data());  // 读取一行，不包括 '\n'
-    if (p == NULL) {                    // 读入 EOF
-        printf("read EOF, exit\n");
-        exit(EXIT_SUCCESS);
-    }
-
-    size_t pos_begin = 0;
-    size_t pos_end   = strlen(p);
-
-    while (pos_begin < pos_end && p[pos_begin] == ' ')
-        ++pos_begin;
-    while (pos_begin < pos_end && p[pos_end - 1] == ' ')
-        --pos_end;
-
-    std::string cmd;
-    for (size_t i = pos_begin; i < pos_end; ++i) {
+    cmd.clear();
+    for (size_t i = 0; p[i] != '\0'; ++i) {
         if (p[i] != '~')
             cmd += p[i];
         else if (p[i + 1] == ' ' || p[i + 1] == '\0' || p[i + 1] == '/')
@@ -132,111 +106,115 @@ void get_cmd() {
 
     free(p);  // 释放资源，避免内存泄漏
 
-    if (cmd.size() > BUF_SIZE) {
-        printf("too long cmd\n");
-        buf[0] = '\0';
-    } else {
-        strcpy(buf, cmd.data());
-        add_history(buf);
-    }
+    return 0;
 }
 
-// 解析命令行参数
-bool parse_cmd(char *curr_cmd) {
-    bool   new_argv   = true;  // 新参数开始
-    size_t argv_index = 0;
-
+// 解析单个命令
+int parse_cmd(const string &str, vector<cmd_t> &cmds) {
+    cmd_t  cmd;
+    size_t i = 0;
     for (;;) {
-        if (*curr_cmd == '\0') {
-            argv[argv_index] = NULL;
-            return true;
-        }
-        if (*curr_cmd == ' ') {
-            *curr_cmd++ = '\0';
-            new_argv    = true;
-            continue;
-        }
-        if (*curr_cmd == '<') {
-            *curr_cmd++ = '\0';
-            new_argv    = true;
-            while (*curr_cmd == ' ')
-                ++curr_cmd;
-            if (*curr_cmd == '\0') {
+        while (i < str.size() && str[i] == ' ')
+            ++i;
+        if (i == str.size())
+            return 0;
+        if (str[i] == '<') {
+            while (i < str.size() && str[i] == ' ')
+                ++i;
+            if (i == str.size()) {
                 printf("Please use: cmd < file_name\n");
-                return false;
+                return -1;
             }
-            char *filename = curr_cmd;
-            while (*curr_cmd != ' ' && *curr_cmd != '\0')
-                ++curr_cmd;
-            if (*curr_cmd != '\0')
-                *curr_cmd++ = '\0';
-            int fd = open(filename, O_RDONLY);
-            if (fd < 0) {
-                printf("can't open %s for: %s\n", filename, strerror(errno));
-                return false;
-            }
-            dup2(fd, STDIN_FILENO);  // 将标准输入重定向到文件
-            close(fd);
+            string name;
+            while (i < str.size() && str[i] != ' ')
+                name.push_back(str[i++]);
+            cmd.in = name;
             continue;
         }
-        if (*curr_cmd == '>') {
-            *curr_cmd++ = '\0';
-            new_argv    = true;
+        if (str[i] == '>') {
+            bool add = false;
+            if (i + 1 < str.size() && str[i + 1] == '>') {
+                ++i;
+                add = true;
+            }
 
-            bool add_to_file = false;
-            if (*curr_cmd == '>') {
-                add_to_file = true;
-                ++curr_cmd;
+            while (i < str.size() && str[i] == ' ')
+                ++i;
+            if (i == str.size()) {
+                if (add)
+                    printf("Please use: cmd << file_name\n");
+                else
+                    printf("Please use: cmd <  file_name\n");
+                return -1;
             }
-            while (*curr_cmd == ' ')
-                ++curr_cmd;
-            if (*curr_cmd == '\0') {
-                printf(add_to_file ? "Please use cmd >  file_name\n"
-                                   : "Please use cmd >> file_name\n");
-                return false;
-            }
-            char *filename = curr_cmd;
-            while (*curr_cmd != ' ' && *curr_cmd != '\0')
-                ++curr_cmd;
-            if (*curr_cmd != '\0')
-                *curr_cmd++ = '\0';
-            int fd = open(filename,
-                          add_to_file ? (O_WRONLY | O_CREAT | O_APPEND)
-                                      : (O_WRONLY | O_CREAT),
-                          0644);
-            if (fd < 0) {
-                printf("can't open %s for: %s\n", filename, strerror(errno));
-                return false;
-            }
-            dup2(fd, STDOUT_FILENO);  // 将标准输出重定向到文件
-            close(fd);
+            string name;
+            while (i < str.size() && str[i] != ' ')
+                name.push_back(str[i++]);
+            if (add)
+                cmd.add = name;
+            else
+                cmd.out = name;
             continue;
         }
-        if (new_argv == true) {
-            new_argv           = false;
-            argv[argv_index++] = curr_cmd;
-            if (argv_index >= ARGV_SIZE) {
-                printf("too many arguments\n");
-                return false;
-            }
-        }
-        ++curr_cmd;
+        string name;
+        while (i < str.size() && str[i] != ' ')
+            name.push_back(str[i++]);
+        cmd.cmd.push_back(name);
     }
+    cmds.push_back(cmd);
 }
 
-void do_about() {
+// 解析用户的输入
+int parse_input(string &input, vector<cmd_t> &cmds) {
+    // 去掉末尾的空白
+    while (!input.empty() && input.back() == ' ')
+        input.pop_back();
+    // 加入历史命令
+    if (!input.empty())
+        add_history(input.data());
+    // 判断是否后台运行
+    int ret = 0;
+    if (!input.empty() && input.back() == '&') {
+        input.pop_back();
+        ret = 1;
+    }
+    // 处理管道并存储其参数
+    cmds.clear();
+    size_t i = 0;
+    for (;;) {
+        while (i < input.size() && input[i] == ' ')
+            ++i;
+        if (i == input.size())
+            break;
+        if (cmd[i] == '|') {
+            printf("invalid command!\n");
+            return -1;
+        }
+        string str;
+        while (i < input.size() && input[i] != '|')
+            str.push_back(input[i]);
+        int ret = parse_cmd(str, cmds);  // 解析每一个命令
+        if (ret != 0)
+            return ret;
+        if (i < input.size())
+            ++i;
+    }
+    return ret;
+}
+
+int do_about(cmd_t &cmd) {
     printf("write by liuyunbin\n");
 }
 
-void do_exit() {
+int do_exit(cmd_t &cmd) {
     exit(EXIT_SUCCESS);
 }
 
-void do_quit() {
+int do_quit(cmd_t &cmd) {
     exit(EXIT_SUCCESS);
 }
 
-void do_cd() {
+int do_cd(cmd_t &cmd) {
     const char *p;
 
     if (argv[1] == NULL) {
@@ -255,20 +233,20 @@ void do_cd() {
     {                                                                        \
         struct rlimit rlim;                                                  \
         getrlimit(X, &rlim);                                                 \
-        std::string s_cur;                                                   \
+        string s_cur;                                                        \
         if (rlim.rlim_cur == RLIM_INFINITY)                                  \
             s_cur = "unlimited";                                             \
         else                                                                 \
-            s_cur = std::to_string(rlim.rlim_cur);                           \
-        std::string s_max;                                                   \
+            s_cur = to_string(rlim.rlim_cur);                                \
+        string s_max;                                                        \
         if (rlim.rlim_max == RLIM_INFINITY)                                  \
             s_max = "unlimited";                                             \
         else                                                                 \
-            s_max = std::to_string(rlim.rlim_max);                           \
+            s_max = to_string(rlim.rlim_max);                                \
         printf("%20s %10s %10s %s\n", #X, s_cur.data(), s_max.data(), name); \
     }
 
-void do_ulimit() {
+int do_ulimit(cmd_t &cmd) {
     LIMIT("虚拟内存大小", RLIMIT_AS);
     LIMIT("core 文件大小", RLIMIT_CORE);
     LIMIT("CPU 总的时间大小", RLIMIT_CPU);
@@ -287,62 +265,217 @@ void do_ulimit() {
     LIMIT("栈大小", RLIMIT_STACK);
 }
 
-void run_cmd(char *curr_cmd) {
-    if (parse_cmd(curr_cmd) == false)
-        return;
-
-    if (m.find(argv[0]) != m.end()) {
-        m[argv[0]]();
-    } else {
-        execvp(argv[0], argv);
-        perror(argv[0]);
-        exit(EXIT_FAILURE);
+// 处理重定向
+int handle_redirection(const string &filename, int flag, int fd_new) {
+    if (filename.empty())
+        return 0;
+    int fd = open(filename.data(), flag, 0644);
+    if (fd < 0) {
+        printf("can't open %s for: %s\n", filename.data(), strerror(errno));
+        return -1;
     }
+    dup2(fd, fd_new);
+    close(fd);
+    return 0;
 }
 
-void run_cmd() {
-    if (strchr(buf, '|') == NULL && strchr(buf, '<') == NULL &&
-        strchr(buf, '>') == NULL) {
-        // 为求简单, 不存在管道和重定向时, 才可能在当前进程中运行
-        size_t      len = strcspn(buf, " <>");
-        std::string name(buf, len);
-        if (m.find(name) != m.end()) {
-            // 内置命令
-            if (parse_cmd(buf))
-                m[argv[0]]();
-            return;
-        }
-    }
+int handle_redirection(const cmd_t &cmd) {
+    int ret;
+    // 输入重定向
+    ret = handle_redirection(cmd.in, O_RDONLY, STDIN_FILENO);
+    if (ret != 0)
+        return ret;
+    // 输出重定向
+    ret = handle_redirection(cmd.out, O_WRONLY | O_CREAT, STDOUT_FILENO);
+    if (ret != 0)
+        return ret;
+    // 添加重定向
+    ret = handle_redirection(
+        cmd.add, O_WRONLY | O_CREAT | O_APPEND, STDOUT_FILENO);
+    if (ret != 0)
+        return ret;
+    return 0;
+}
 
-    if (fork() > 0) {
-        wait(NULL);
+int run_cmd(const cmd_t &cmd) {
+    // 处理重定向
+    int ret = handle_redirection(cmd);
+    if (ret != 0)
+        return ret;
+    // 处理内置命令
+    if (m.find(cmd.cmd[0]) != m.end())
+        return m[argv[0]](cmd);
+    // 处理非内置命令
+    char **argv;
+    argv = (char **)malloc(sizeof(cmd.cmd.size()) + 1);
+    for (size_t i = 0; i < cmd.cmd.size(); ++i)
+        argv[i] = cmd.cmd[i].data();
+    argv[cmd.size()] = NULL;
+    execvp(argv[0], argv);
+    perror(argv[0]);
+    free(argv);
+    return -1;
+}
+
+int jobs_add(int fd, status_t st, cmd_t &cmd) {
+    if (jids.empty()) {
+        printf("to many jobs\n");
+        sigprocmask(SIG_UNBLOCK, &mask_all, NULL);  // 解除信号阻塞
         return;
     }
 
-    char *next_cmd = strtok(buf, "|");
+    // 添加作业
+    int jid = jids.front();
+    jids.pop();
 
-    for (;;) {
-        char *curr_cmd = next_cmd;
-        next_cmd       = strtok(NULL, "|");
-        if (next_cmd == NULL) {
-            run_cmd(curr_cmd);
+    job_t job;
+    job.pid    = fd;
+    job.status = st;
+    job.cmd    = cmd.cmd_str;
+
+    jobs[jid] = job;
+    pids[fd]  = jjid;
+
+    return 0;
+}
+
+void handle_signal(int sig) {
+}
+
+int run_cmd(vector<cmd_t> &cmds, int bg) {
+    if (cmds.empty()) {
+        // 命令为空, 直接跳过
+        return;
+    }
+    // 检测命令是否为空
+    for (size_t i = 0; i < cmds.size(); ++i)
+        if (cmds[i].cmd.empty()) {
+            printf("commond is empty\n");
+            return -1;
+        }
+
+    // 是否在当前进程处理
+    if (!bg && cmds.size() == 1 && cmds[0].in == "" && cmds[0].out == "" &&
+        cmds[0].add == "") {
+        // 非 管道 重定向 以及 后台命令, 才可能在当前进程中运行
+        if (m.find(cmds[0].cmd[0]) != m.end())
+            return m[argv[0]](cmds[0]);
+    }
+
+    sigset_t mask_all;
+    sigset_t mask_empty;
+    sigfillset(&mask_all);
+    sigemptyset(&mask_empty);
+
+    sigprocmask(SIG_SETMASK, &mask_all, NULL);  // 阻塞所有信号
+    pid_t fd = fork();
+    if (fd > 0) {
+        // 父进程
+        setpgid(fd, fd);  // 为子进程设置新的进程组
+        // 添加作业
+        int ret = job_add(fd, bg);
+        if (ret != 0)
+            return ret;
+        if (fg) {
+            // 前台作业
+            tcsetpgrp(0, fd);  // 设置前台进程组
+            while (tcgetpgrp(0) == fd) {
+                sigsuspend(&mask_empty);  // 解阻塞所有信号, 然后暂停
+            }
+        }
+        sigprocmask(SIG_UNBLOCK, &mask_all, NULL);  // 解除信号阻塞
+        return;
+    }
+
+    // 子进程
+    setpgid(0, 0);  // 设置新的进程组
+
+    // 恢复信号处理
+    signal(SIGINT, SIG_DFL);   // ctrl+c
+    signal(SIGQUIT, SIG_DFL);  // ctrl+/
+    signal(SIGTSTP, SIG_DFL);  // ctrl+z
+    signal(SIGTTIN, SIG_DFL);  // 后台读
+    signal(SIGTTOU, SIG_DFL);  // 后台写
+    signal(SIGCHLD, SIG_DFL);  // 子进程退出, 暂停, 继续
+
+    sigprocmask(SIG_UNBLOCK, &mask_all, NULL);  // 解除信号阻塞
+
+    for (size_t i = 0; i < cmds.size(); ++i) {
+        if (i + 1 == cmds.size()) {
+            run_cmd(cmds[i]);
         } else {
             int pipe_fd[2];
             if (pipe(pipe_fd) < 0) {
-                perror(argv[0]);
-                exit(EXIT_FAILURE);
+                perror("");
+                return -1;
             }
             if (fork() == 0) {  // 子进程
                 close(pipe_fd[0]);
                 dup2(pipe_fd[1], STDOUT_FILENO);  // 将标准输出重定向到管道
                 close(pipe_fd[1]);
-                run_cmd(curr_cmd);
+                run_cmd(cmd);
             } else {  // 父进程
                 close(pipe_fd[1]);
                 dup2(pipe_fd[0], STDIN_FILENO);  // 将标准输入重定向到管道
                 close(pipe_fd[1]);
-                wait(NULL);
             }
         }
     }
+}
+
+void init() {
+    // 设置信号处理
+    signal(SIGINT, SIG_IGN);         // ctrl+c
+    signal(SIGQUIT, SIG_IGN);        // ctrl+/
+    signal(SIGTSTP, SIG_IGN);        // ctrl+z
+    signal(SIGTTIN, SIG_IGN);        // 后台读
+    signal(SIGTTOU, SIG_IGN);        // 后台写
+    signal(SIGCHLD, handle_signal);  // 子进程退出, 暂停, 继续
+
+    // 初始化作业号
+    for (int i = 1; i <= JOB_MAX; ++i) {
+        jjids.push(i);
+    }
+
+    // 初始化内置命令
+    m["about"]  = do_about;
+    m["exit"]   = do_exit;
+    m["quit"]   = do_quit;
+    m["cd"]     = do_cd;
+    m["ulimit"] = do_ulimit;
+
+    // 初始化用户信息
+    user_id            = getuid();
+    struct passwd *pwd = getpwuid(user_id);
+
+    user_name = pwd->pw_name;
+    user_home = pwd->pw_dir;
+}
+
+int main() {
+    init();
+
+    string        prompt;
+    string        cmd;
+    vector<cmd_t> cmds;
+    int           ret;
+
+    for (;;) {
+        // 获取提示符
+        prompt = get_prompt();
+        // 获取命令行
+        ret = get_cmd(prompt, cmd);
+        if (ret == -1)
+            return -1;  // 读到 EOF, 退出
+        // 以管道为分割符解析命令行
+        ret = parse_line(cmd, cmds);
+        if (ret == -1) {
+            // 命令不合法, 直接跳过
+            continue;
+        }
+        run_cmd(cmds, ret);
+        tcsetpgrp(0, getpid());  // 设置前台进程组
+    }
+
+    return 0;
 }
