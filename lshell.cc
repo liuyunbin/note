@@ -29,20 +29,28 @@
 using namespace std;
 
 enum status_t {
-    FG,
-    BG,
-    ST
+    FG_RUN,   // 前台运行
+    BG_RUN,   // 后台运行
+    FG_STOP,  // 前台暂停
+    BG_STOP,  // 后台暂停
+    QUIT      // 退出
 };
 
 struct job_t {
-    pid_t    pid;
-    status_t st;
-    string   cmd;
+    pid_t            pgid;        // 进程组 ID
+    status_t         status;      // 作业状态
+    int              count_bg;    // 进程数 -- 后台运行
+    int              count_fg;    // 进程数 -- 前台运行
+    int              count_st;    // 进程数 -- 暂停
+    int              count_quit;  // 进程数 -- 退出
+    vector<pid_t>    pids;        // 任务的进程 ID
+    vector<string>   cmds;        // 任务的字符串
+    vector<status_t> sts;         // 任务的状态
 };
 
-queue<int>              jids;  // 待用的作业号
-map<int, vector<job_t>> jobs;  // 作业
-map<pid_t, int>         pids;  // 进程号 -> 作业号的映射
+queue<int>      jids;  // 待用的作业号
+map<int, job_t> jobs;  // 作业
+map<pid_t, int> pids;  // 进程号 -> 作业号
 
 uid_t  user_id;
 string user_name;
@@ -159,13 +167,14 @@ int parse_cmd(const string &str, vector<cmd_t> &cmds) {
         string name;
         while (i < str.size() && str[i] != ' ')
             name.push_back(str[i++]);
-        cmd.cmd.push_back(name);
+        cmd.cmd_vec.push_back(name);
     }
+    cmd.cmd_str = str;
     cmds.push_back(cmd);
 }
 
 // 解析用户的输入
-int parse_input(string &input, vector<cmd_t> &cmds) {
+int parse_input(string &input, vector<cmd_t> &cmds, status_t &st) {
     // 去掉末尾的空白
     while (!input.empty() && input.back() == ' ')
         input.pop_back();
@@ -173,10 +182,11 @@ int parse_input(string &input, vector<cmd_t> &cmds) {
     if (!input.empty())
         add_history(input.data());
     // 判断是否后台运行
-    int ret = 0;
     if (!input.empty() && input.back() == '&') {
         input.pop_back();
-        ret = 1;
+        st = BG;
+    } else {
+        st = FG;
     }
     // 处理管道并存储其参数
     cmds.clear();
@@ -199,34 +209,40 @@ int parse_input(string &input, vector<cmd_t> &cmds) {
         if (i < input.size())
             ++i;
     }
-    return ret;
+    return 0;
 }
 
 int do_about(cmd_t &cmd) {
     printf("write by liuyunbin\n");
+    return 0;
 }
 
 int do_exit(cmd_t &cmd) {
     exit(EXIT_SUCCESS);
+    return 0;
 }
 
 int do_quit(cmd_t &cmd) {
     exit(EXIT_SUCCESS);
+    return 0;
 }
 
 int do_cd(cmd_t &cmd) {
     const char *p;
 
-    if (argv[1] == NULL) {
+    if (cmd.cmd_vec.size() == 1) {
         p = user_home.data();
-    } else if (argv[2] != NULL) {
+    } else if (cmd.cmd_vec.size() > 2) {
         printf("cd: too many arguments\n");
         return;
     } else {
-        p = argv[1];
+        p = cmd.cmd_vec[1].data();
     }
-    if (chdir(p) == -1)
+    if (chdir(p) == -1) {
         printf("cd %s : %s\n", p, strerror(errno));
+        return -1;
+    }
+    return 0;
 }
 
 #define LIMIT(name, X)                                                       \
@@ -317,48 +333,42 @@ int run_cmd(const cmd_t &cmd) {
     return -1;
 }
 
-int jobs_add(int fd, status_t st, cmd_t &cmd) {
-    if (jids.empty()) {
-        printf("to many jobs\n");
-        sigprocmask(SIG_UNBLOCK, &mask_all, NULL);  // 解除信号阻塞
-        return;
-    }
-
-    // 添加作业
-    int jid = jids.front();
-    jids.pop();
-
-    job_t job;
-    job.pid    = fd;
-    job.status = st;
-    job.cmd    = cmd.cmd_str;
-
-    jobs[jid] = job;
-    pids[fd]  = jjid;
-
-    return 0;
-}
-
 void handle_signal(int sig) {
+    for (;;) {
+        int wstatus;
+        int fd = waitpid(-1, &wstatus, WNOHANG | WUNTRACED);
+        if (fd <= 0)
+            break;
+
+        if (WIFSTOPPED(wstatus)) {
+            // 子进程暂停
+        } else {
+            // 子进程退出
+        }
+
+        WSTOPSIG(wstatus)
+    }
+    while (jobs.find(jid) != jobs.end() && jobs[jid].st == BG &&
+           jobs[jid].counts != 0)
 }
 
-int run_cmd(vector<cmd_t> &cmds, int bg) {
+int run_cmd(vector<cmd_t> &cmds, status_t st) {
     if (cmds.empty()) {
         // 命令为空, 直接跳过
-        return;
+        return 0;
     }
     // 检测命令是否为空
     for (size_t i = 0; i < cmds.size(); ++i)
-        if (cmds[i].cmd.empty()) {
-            printf("commond is empty\n");
+        if (cmds[i].cmd_vec.empty()) {
+            printf("commond is empty: %s\n", cmds[i].cmd_str.data());
             return -1;
         }
 
     // 是否在当前进程处理
-    if (!bg && cmds.size() == 1 && cmds[0].in == "" && cmds[0].out == "" &&
-        cmds[0].add == "") {
+    if (st == BG && cmds.size() == 1 && cmds[0].empty() &&
+        cmds[0].out.empty() && cmds[0].add.empty()) {
         // 非 管道 重定向 以及 后台命令, 才可能在当前进程中运行
-        if (m.find(cmds[0].cmd[0]) != m.end())
+        if (m.find(cmds[0].cmd_vec[0]) != m.end())
             return m[argv[0]](cmds[0]);
     }
 
@@ -368,59 +378,74 @@ int run_cmd(vector<cmd_t> &cmds, int bg) {
     sigemptyset(&mask_empty);
 
     sigprocmask(SIG_SETMASK, &mask_all, NULL);  // 阻塞所有信号
-    pid_t fd = fork();
-    if (fd > 0) {
-        // 父进程
-        setpgid(fd, fd);  // 为子进程设置新的进程组
-        // 添加作业
-        int ret = job_add(fd, bg);
-        if (ret != 0)
-            return ret;
-        if (fg) {
-            // 前台作业
-            tcsetpgrp(0, fd);  // 设置前台进程组
-            while (tcgetpgrp(0) == fd) {
-                sigsuspend(&mask_empty);  // 解阻塞所有信号, 然后暂停
-            }
-        }
+
+    if (jids.empty()) {
+        printf("to many jobs\n");
         sigprocmask(SIG_UNBLOCK, &mask_all, NULL);  // 解除信号阻塞
-        return;
+        return -1;
     }
+    int jid = jids.front();
+    jids.pop();
 
-    // 子进程
-    setpgid(0, 0);  // 设置新的进程组
-
-    // 恢复信号处理
-    signal(SIGINT, SIG_DFL);   // ctrl+c
-    signal(SIGQUIT, SIG_DFL);  // ctrl+/
-    signal(SIGTSTP, SIG_DFL);  // ctrl+z
-    signal(SIGTTIN, SIG_DFL);  // 后台读
-    signal(SIGTTOU, SIG_DFL);  // 后台写
-    signal(SIGCHLD, SIG_DFL);  // 子进程退出, 暂停, 继续
-
-    sigprocmask(SIG_UNBLOCK, &mask_all, NULL);  // 解除信号阻塞
-
+    job_t job;
     for (size_t i = 0; i < cmds.size(); ++i) {
-        if (i + 1 == cmds.size()) {
-            run_cmd(cmds[i]);
-        } else {
-            int pipe_fd[2];
-            if (pipe(pipe_fd) < 0) {
-                perror("");
-                return -1;
-            }
-            if (fork() == 0) {  // 子进程
+        int pipe_fd[2];
+        if (i + 1 != cmds.size() && pipe(pipe_fd) < 0) {
+            // 不是最后一个命令需要新建管道
+            perror("");
+            return -1;
+        }
+        pid_t fd = fork();
+
+        if (fd == 0) {
+            // 子进程
+            setpgid(0, i == 0 ? 0 : job.pgid);  // 设置新的进程组
+
+            // 恢复信号处理
+            signal(SIGINT, SIG_DFL);   // ctrl+c
+            signal(SIGQUIT, SIG_DFL);  // ctrl+/
+            signal(SIGTSTP, SIG_DFL);  // ctrl+z
+            signal(SIGCHLD, SIG_DFL);  // 子进程退出, 暂停, 继续
+            sigprocmask(SIG_UNBLOCK, &mask_all, NULL);  // 解除信号阻塞
+            if (i + 1 != cmds.size()) {
                 close(pipe_fd[0]);
                 dup2(pipe_fd[1], STDOUT_FILENO);  // 将标准输出重定向到管道
                 close(pipe_fd[1]);
-                run_cmd(cmd);
-            } else {  // 父进程
+            }
+            return run_cmd(cmd);
+        } else {
+            // 父进程
+            // 添加作业
+            if (i == 0) {
+                job.pgid   = fd;
+                job.status = st;
+                job.counts = 0;
+            }
+            job.pids.push_back(fd);
+            job.cmds.push_back(cmds[i].cmd_str);
+            job.sts.push_back(RUN);
+            pids[fd] = jjid;
+
+            setpgid(0, job.pgid);  // 设置新的进程组
+
+            if (i + 1 != cmds.size()) {
                 close(pipe_fd[1]);
                 dup2(pipe_fd[0], STDIN_FILENO);  // 将标准输入重定向到管道
                 close(pipe_fd[1]);
             }
         }
     }
+
+    jobs.push_back(job);
+    jobs[jid] = job;
+
+    if (st == BG) {
+        // 前台作业
+        tcsetpgrp(0, job.pgid);  // 设置前台进程组
+        while (tcgetpgrp(0) == job.pgid)
+            sigsuspend(&mask_empty);  // 解阻塞所有信号, 然后暂停
+    }
+    sigprocmask(SIG_UNBLOCK, &mask_all, NULL);  // 解除信号阻塞
 }
 
 void init() {
@@ -455,25 +480,19 @@ void init() {
 int main() {
     init();
 
-    string        prompt;
-    string        cmd;
-    vector<cmd_t> cmds;
-    int           ret;
-
     for (;;) {
         // 获取提示符
-        prompt = get_prompt();
+        string prompt = get_prompt();
         // 获取命令行
-        ret = get_cmd(prompt, cmd);
-        if (ret == -1)
+        string   cmd;
+        status_t st;
+        if (get_cmd(prompt, cmd, st) == -1)
             return -1;  // 读到 EOF, 退出
         // 以管道为分割符解析命令行
-        ret = parse_line(cmd, cmds);
-        if (ret == -1) {
-            // 命令不合法, 直接跳过
-            continue;
-        }
-        run_cmd(cmds, ret);
+        vector<cmd_t> cmds;
+        if (parse_line(cmd, cmds) == -1)
+            continue;  // 命令不合法, 直接跳过
+        run_cmd(cmds, st);
         tcsetpgrp(0, getpid());  // 设置前台进程组
     }
 
