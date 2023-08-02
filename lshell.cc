@@ -22,57 +22,30 @@
 
 #include <iostream>
 #include <map>
-#include <queue>
 #include <string>
 #include <vector>
 
-using namespace std;
+// 用户信息
+uid_t       user_id;    // 用户 ID
+std::string user_name;  // 用户名称
+std::string user_home;  // 用户主目录
 
-enum status_t {
-    FG_RUN,   // 前台运行
-    BG_RUN,   // 后台运行
-    FG_STOP,  // 前台暂停
-    BG_STOP,  // 后台暂停
-    QUIT      // 退出
-};
-
-struct job_t {
-    pid_t            pgid;        // 进程组 ID
-    status_t         status;      // 作业状态
-    int              count_bg;    // 进程数 -- 后台运行
-    int              count_fg;    // 进程数 -- 前台运行
-    int              count_st;    // 进程数 -- 暂停
-    int              count_quit;  // 进程数 -- 退出
-    vector<pid_t>    pids;        // 任务的进程 ID
-    vector<string>   cmds;        // 任务的字符串
-    vector<status_t> sts;         // 任务的状态
-};
-
-queue<int>      jids;  // 待用的作业号
-map<int, job_t> jobs;  // 作业
-map<pid_t, int> pids;  // 进程号 -> 作业号
-
-uid_t  user_id;
-string user_name;
-string user_home;
-
-map<string, void (*)()> m;
-
-struct cmd_t {
-    vector<string> cmd_vec;
-    string         cmd_str;
-    string         in;
-    string         out;
-    string         add;
-};
+void init_user_info() {
+    user_id            = getuid();
+    struct passwd *pwd = getpwuid(user_id);
+    user_name          = pwd->pw_name;
+    user_home          = pwd->pw_dir;
+}
 
 // 获取命令行提示符
-string get_prompt() {
-    char  *p        = get_current_dir_name();
-    string curr_dir = p;
+std::string prompt;
+
+void get_prompt() {
+    char       *p        = get_current_dir_name();
+    std::string curr_dir = p;
     free(p);
 
-    string prompt = user_name + ":";
+    prompt = user_name + ":";
     if (curr_dir == user_home) {
         prompt += "~";
     } else if (curr_dir < user_home) {
@@ -90,50 +63,62 @@ string get_prompt() {
         prompt += "# ";
     else
         prompt += "$ ";
-
-    return prompt;
 }
 
-// 获取用户的输入
-// 处理掉 ~ 代表目录的位置
-int get_cmd(const string &prompt, string &cmd) {
+// 获取用户的输入, 处理掉 ~ 代表目录的位置
+std::string input;
+
+void get_input() {
     // 读取一行，不包括 '\n'
     char *p = readline(prompt.data());
-    if (p == NULL)
-        return -1;  // 读入 EOF
-
-    cmd.clear();
-    for (size_t i = 0; p[i] != '\0'; ++i) {
-        if (p[i] != '~')
-            cmd += p[i];
-        else if (p[i + 1] == ' ' || p[i + 1] == '\0' || p[i + 1] == '/')
-            cmd += user_home;
-        else
-            cmd += p[i];
+    if (p == NULL) {
+        // printf("read EOF, exit\n");
+        exit(0);
     }
-
-    free(p);  // 释放资源，避免内存泄漏
-
-    return 0;
+    input.clear();
+    for (size_t i = 0; p[i] != '\0' && p[i] != '\n'; ++i)
+        if (p[i] != '~')
+            input += p[i];
+        else if (p[i + 1] == ' ' || p[i + 1] == '\0' || p[i + 1] == '/')
+            input += user_home;
+        else
+            input += p[i];
+    free(p);
 }
 
+// 命令
+
+struct cmd_t {
+    std::vector<std::string> cmd_vec;
+    std::string              cmd_str;
+    std::string              in;
+    std::string              out;
+    std::string              add;
+};
+
+std::vector<cmd_t> cmds;
+bool               fg;  // 此轮作业是否是前台作业
+
 // 解析单个命令
-int parse_cmd(const string &str, vector<cmd_t> &cmds) {
-    cmd_t  cmd;
-    size_t i = 0;
+int parse_cmd(std::string str) {
+    while (!str.empty() && str.back() == ' ')
+        str.pop_back();
+    cmd_t cmd;
+    cmd.cmd_str = str;
+    size_t i    = 0;
     for (;;) {
         while (i < str.size() && str[i] == ' ')
             ++i;
         if (i == str.size())
-            return 0;
+            break;
         if (str[i] == '<') {
-            while (i < str.size() && str[i] == ' ')
-                ++i;
-            if (i == str.size()) {
-                printf("Please use: cmd < file_name\n");
+            while (++i < str.size() && str[i] == ' ')
+                ;
+            if (cmd.cmd_vec.empty() || i == str.size()) {
+                printf("please use: cmd <  file_name\n");
                 return -1;
             }
-            string name;
+            std::string name;
             while (i < str.size() && str[i] != ' ')
                 name.push_back(str[i++]);
             cmd.in = name;
@@ -145,17 +130,16 @@ int parse_cmd(const string &str, vector<cmd_t> &cmds) {
                 ++i;
                 add = true;
             }
-
-            while (i < str.size() && str[i] == ' ')
-                ++i;
-            if (i == str.size()) {
+            while (++i < str.size() && str[i] == ' ')
+                ;
+            if (cmd.cmd_vec.empty() || i == str.size()) {
                 if (add)
-                    printf("Please use: cmd << file_name\n");
+                    printf("please use: cmd >> file_name\n");
                 else
-                    printf("Please use: cmd <  file_name\n");
+                    printf("please use: cmd >  file_name\n");
                 return -1;
             }
-            string name;
+            std::string name;
             while (i < str.size() && str[i] != ' ')
                 name.push_back(str[i++]);
             if (add)
@@ -164,17 +148,17 @@ int parse_cmd(const string &str, vector<cmd_t> &cmds) {
                 cmd.out = name;
             continue;
         }
-        string name;
+        std::string name;
         while (i < str.size() && str[i] != ' ')
             name.push_back(str[i++]);
         cmd.cmd_vec.push_back(name);
     }
-    cmd.cmd_str = str;
     cmds.push_back(cmd);
+    return 0;
 }
 
 // 解析用户的输入
-int parse_input(string &input, vector<cmd_t> &cmds, status_t &st) {
+void parse_input() {
     // 去掉末尾的空白
     while (!input.empty() && input.back() == ' ')
         input.pop_back();
@@ -184,9 +168,9 @@ int parse_input(string &input, vector<cmd_t> &cmds, status_t &st) {
     // 判断是否后台运行
     if (!input.empty() && input.back() == '&') {
         input.pop_back();
-        st = BG;
+        fg = false;
     } else {
-        st = FG;
+        fg = true;
     }
     // 处理管道并存储其参数
     cmds.clear();
@@ -196,22 +180,150 @@ int parse_input(string &input, vector<cmd_t> &cmds, status_t &st) {
             ++i;
         if (i == input.size())
             break;
-        if (cmd[i] == '|') {
-            printf("invalid command!\n");
-            return -1;
+        if (input[i] == '|') {
+            printf("invalid cmd!\n");
+            cmds.clear();
+            return;
         }
-        string str;
+        std::string str;
         while (i < input.size() && input[i] != '|')
-            str.push_back(input[i]);
-        int ret = parse_cmd(str, cmds);  // 解析每一个命令
-        if (ret != 0)
-            return ret;
+            str.push_back(input[i++]);
+        if (parse_cmd(str) != 0) {  // 解析每一个命令
+            cmds.clear();
+            return;
+        }
         if (i < input.size())
             ++i;
+    }
+}
+
+// 处理重定向
+int handle_redirection(const std::string &filename, int flag, int fd_new) {
+    if (filename.empty())
+        return 0;
+    int fd = open(filename.data(), flag, 0644);
+    if (fd < 0) {
+        printf("can't open %s for: %s\n", filename.data(), strerror(errno));
+        return -1;
+    }
+    dup2(fd, fd_new);
+    close(fd);
+    return 0;
+}
+
+int handle_redirection(const cmd_t &cmd) {
+    // 输入重定向
+    if (handle_redirection(cmd.in, O_RDONLY, STDIN_FILENO) != 0)
+        return -1;
+    // 输出重定向
+    if (handle_redirection(
+            cmd.out, O_WRONLY | O_CREAT | O_TRUNC, STDOUT_FILENO) != 0)
+        return -1;
+    // 添加重定向
+    if (handle_redirection(
+            cmd.add, O_WRONLY | O_CREAT | O_APPEND, STDOUT_FILENO) != 0)
+        return -1;
+    return 0;
+}
+
+// 作业
+enum status_t {
+    RUN,   // 运行
+    STOP,  // 暂停
+    KILL,  // 被杀死
+    DONE   // 完成
+};
+
+struct task_t {
+    std::string cmd;     // 进程命令
+    status_t    status;  // 进程状态
+};
+
+struct job_t {
+    pid_t                   pgid;        // 进程组 ID
+    int                     count_run;   // 进程数 -- 运行
+    int                     count_stop;  // 进程数 -- 暂停
+    int                     count_kill;  // 进程数 -- 被杀死
+    int                     count_done;  // 进程数 -- 退出
+    std::map<pid_t, task_t> tasks;       // 任务的进程信息
+};
+
+std::map<int, job_t> jobs;          // 作业
+std::map<pid_t, int> pids;          // 进程号 -> 作业号
+int                  next_jid = 1;  // 下一个可用的作业号
+int                  curr_jid;      // 当前的作业号
+
+sigset_t mask_child;
+sigset_t mask_empty;
+
+void init_job() {
+    sigaddset(&mask_child, SIGCHLD);
+    sigemptyset(&mask_empty);
+}
+
+// 调用此函数前需要阻塞 SIGCHLD
+// 此时, 主进程一定是前台进程组
+int list_job(int jid, bool no_status = false) {
+    if (jid == -1) {
+        for (auto &it : jobs)
+            list_job(it.first);
+        return 0;
+    }
+    if (jobs.find(jid) == jobs.end()) {
+        printf("can't find job %d\n", jid);
+        return -1;
+    }
+    bool first = true;
+    for (auto it : jobs[jid].tasks) {
+        const char *p;
+        if (no_status)
+            p = "";
+        else if (it.second.status == RUN)
+            p = "run ";
+        else if (it.second.status == STOP)
+            p = "stop";
+        else if (it.second.status == KILL)
+            p = "killed";
+        else
+            p = "done";
+        const char *cmd = no_status ? "" : it.second.cmd.data();
+        if (first) {
+            first = false;
+            printf("[%d] %d %s %s\n", jid, it.first, p, cmd);
+        } else {
+            printf("[%c] %d %s %s\n", ' ', it.first, p, cmd);
+        }
     }
     return 0;
 }
 
+// 检测并删除已经完成的作业, 此时主进程一定是前台进程组
+void check_job() {
+    sigprocmask(SIG_SETMASK, &mask_child, NULL);  // 阻塞信号
+    for (auto it = jobs.begin(); it != jobs.end();) {
+        if (it->second.count_run != 0 || it->second.count_stop != 0) {
+            // 当前作业还没做完
+            ++it;
+            continue;
+        }
+        // 当前作业已经做完
+        if (it->first != curr_jid)
+            list_job(it->first);
+        // 删除进程号到作业号的映射
+        for (auto &v : it->second.tasks)
+            pids.erase(v.first);
+        // 删除此作业
+        it = jobs.erase(it);
+        // 修正下一个可以使用的作业号
+        next_jid = 0;
+        for (auto &v : jobs)
+            next_jid = std::max(v.first, next_jid);
+        ++next_jid;
+    }
+    sigprocmask(SIG_UNBLOCK, &mask_child, NULL);  // 解除信号阻塞
+}
+
+// 内置命令
 int do_about(cmd_t &cmd) {
     printf("write by liuyunbin\n");
     return 0;
@@ -234,7 +346,7 @@ int do_cd(cmd_t &cmd) {
         p = user_home.data();
     } else if (cmd.cmd_vec.size() > 2) {
         printf("cd: too many arguments\n");
-        return;
+        return 0;
     } else {
         p = cmd.cmd_vec[1].data();
     }
@@ -249,16 +361,16 @@ int do_cd(cmd_t &cmd) {
     {                                                                        \
         struct rlimit rlim;                                                  \
         getrlimit(X, &rlim);                                                 \
-        string s_cur;                                                        \
+        std::string s_cur;                                                   \
         if (rlim.rlim_cur == RLIM_INFINITY)                                  \
             s_cur = "unlimited";                                             \
         else                                                                 \
-            s_cur = to_string(rlim.rlim_cur);                                \
-        string s_max;                                                        \
+            s_cur = std::to_string(rlim.rlim_cur);                           \
+        std::string s_max;                                                   \
         if (rlim.rlim_max == RLIM_INFINITY)                                  \
             s_max = "unlimited";                                             \
         else                                                                 \
-            s_max = to_string(rlim.rlim_max);                                \
+            s_max = std::to_string(rlim.rlim_max);                           \
         printf("%20s %10s %10s %s\n", #X, s_cur.data(), s_max.data(), name); \
     }
 
@@ -279,221 +391,256 @@ int do_ulimit(cmd_t &cmd) {
     LIMIT("调度时 CPU 的最大耗时 毫秒", RLIMIT_RTTIME);
     LIMIT("信号队列的长度", RLIMIT_SIGPENDING);
     LIMIT("栈大小", RLIMIT_STACK);
+    return 0;
 }
 
-// 处理重定向
-int handle_redirection(const string &filename, int flag, int fd_new) {
-    if (filename.empty())
-        return 0;
-    int fd = open(filename.data(), flag, 0644);
-    if (fd < 0) {
-        printf("can't open %s for: %s\n", filename.data(), strerror(errno));
+int do_jobs(cmd_t &cmd) {
+    sigprocmask(SIG_SETMASK, &mask_child, NULL);  // 阻塞信号
+    list_job(-1);
+    sigprocmask(SIG_UNBLOCK, &mask_child, NULL);  // 解除信号阻塞
+    return 0;
+}
+
+int do_bg(cmd_t &cmd) {
+    sigprocmask(SIG_SETMASK, &mask_child, NULL);  // 阻塞信号
+    if (cmd.cmd_vec.size() != 2) {
+        printf("please use bg jid\n");
+        sigprocmask(SIG_UNBLOCK, &mask_child, NULL);  // 解除信号阻塞
         return -1;
     }
-    dup2(fd, fd_new);
-    close(fd);
+    int jid = atoi(cmd.cmd_vec[1].data());
+    if (jobs.find(jid) == jobs.end()) {
+        printf("job not find: %d\n", jid);
+        sigprocmask(SIG_UNBLOCK, &mask_child, NULL);  // 解除信号阻塞
+        return -1;
+    }
+    kill(-jobs[jid].pgid, SIGCONT);
+    list_job(jid);                                // 可能状态还没更新
+    sigprocmask(SIG_UNBLOCK, &mask_child, NULL);  // 解除信号阻塞
     return 0;
 }
 
-int handle_redirection(const cmd_t &cmd) {
-    int ret;
-    // 输入重定向
-    ret = handle_redirection(cmd.in, O_RDONLY, STDIN_FILENO);
-    if (ret != 0)
-        return ret;
-    // 输出重定向
-    ret = handle_redirection(cmd.out, O_WRONLY | O_CREAT, STDOUT_FILENO);
-    if (ret != 0)
-        return ret;
-    // 添加重定向
-    ret = handle_redirection(
-        cmd.add, O_WRONLY | O_CREAT | O_APPEND, STDOUT_FILENO);
-    if (ret != 0)
-        return ret;
+int do_fg(cmd_t &cmd) {
+    sigprocmask(SIG_SETMASK, &mask_child, NULL);  // 阻塞信号
+    if (cmd.cmd_vec.size() != 2) {
+        printf("please use fg jid\n");
+        sigprocmask(SIG_UNBLOCK, &mask_child, NULL);  // 解除信号阻塞
+        return -1;
+    }
+    int jid = atoi(cmd.cmd_vec[1].data());
+    if (jobs.find(jid) == jobs.end()) {
+        printf("job not find: %d\n", jid);
+        sigprocmask(SIG_UNBLOCK, &mask_child, NULL);  // 解除信号阻塞
+        return -1;
+    }
+    tcsetpgrp(0, jobs[jid].pgid);
+    kill(-jobs[jid].pgid, SIGCONT);
+    curr_jid = jid;  // 为了避免作业控制打出前台任务
+    while (tcgetpgrp(0) == jobs[jid].pgid)
+        sigsuspend(&mask_empty);  // 解阻塞信号, 然后暂停
+    sigprocmask(SIG_UNBLOCK, &mask_child, NULL);  // 解除信号阻塞
     return 0;
 }
 
-int run_cmd(const cmd_t &cmd) {
+std::map<std::string, int (*)(cmd_t &)> m;
+
+void init_cmd_builtin() {
+    m["about"]  = do_about;
+    m["exit"]   = do_exit;
+    m["quit"]   = do_quit;
+    m["cd"]     = do_cd;
+    m["ulimit"] = do_ulimit;
+    m["jobs"]   = do_jobs;
+    m["bg"]     = do_bg;
+    m["fg"]     = do_fg;
+}
+
+void handle_signal(int sig) {
+    for (;;) {
+        int wstatus;
+        int fd = waitpid(-1, &wstatus, WNOHANG | WUNTRACED | WCONTINUED);
+        if (fd <= 0)
+            break;
+        // 进程号 -> 作业号
+        if (pids.find(fd) == pids.end()) {
+            printf("can't find fd: %d\n", fd);
+            exit(-1);
+            continue;
+        }
+        int jid = pids[fd];
+        // 作业号 -> 作业
+        if (jobs.find(jid) == jobs.end()) {
+            list_job(-1);
+            printf("can't find jid: %d \n", jid);
+            exit(-1);
+            continue;
+        }
+        // 作业中的进程
+        if (jobs[jid].tasks.find(fd) == jobs[jid].tasks.end()) {
+            printf("can't find fd(%d) in jid(%d)\n", fd, jid);
+            exit(-1);
+            continue;
+        }
+        if (WIFSTOPPED(wstatus)) {
+            // 运行 -> 暂停
+            ++jobs[jid].count_stop;
+            --jobs[jid].count_run;
+            jobs[jid].tasks[fd].status = STOP;
+        } else if (WIFCONTINUED(wstatus)) {
+            // 暂停 -> 运行
+            --jobs[jid].count_stop;
+            ++jobs[jid].count_run;
+            jobs[jid].tasks[fd].status = RUN;
+        } else {
+            // 运行 或 暂停 -> 退出
+            if (jobs[jid].tasks[fd].status == RUN)
+                --jobs[jid].count_run;
+            else
+                --jobs[jid].count_stop;
+            if (WIFSIGNALED(wstatus)) {
+                ++jobs[jid].count_kill;
+                jobs[jid].tasks[fd].status = KILL;
+            } else {
+                ++jobs[jid].count_done;
+                jobs[jid].tasks[fd].status = DONE;
+            }
+        }
+        if (tcgetpgrp(0) == jobs[jid].pgid && jobs[jid].count_run == 0) {
+            // 当前的作业是前台作业, 而且要放弃前台进程组
+            signal(SIGTTOU, SIG_IGN);
+            tcsetpgrp(0, getpid());
+            signal(SIGTTOU, SIG_DFL);
+        }
+    }
+}
+
+void init_signal_handle() {
+    signal(SIGINT, SIG_IGN);         // ctrl+c
+    signal(SIGQUIT, SIG_IGN);        // ctrl+/
+    signal(SIGTSTP, SIG_IGN);        // ctrl+z
+    signal(SIGCHLD, handle_signal);  // 子进程退出, 暂停, 继续
+}
+
+int run_cmd(cmd_t &cmd) {
     // 处理重定向
-    int ret = handle_redirection(cmd);
-    if (ret != 0)
-        return ret;
+    if (handle_redirection(cmd) != 0)
+        return -1;
     // 处理内置命令
-    if (m.find(cmd.cmd[0]) != m.end())
-        return m[argv[0]](cmd);
+    if (m.find(cmd.cmd_vec[0]) != m.end())
+        return m[cmd.cmd_vec[0]](cmd);
     // 处理非内置命令
     char **argv;
-    argv = (char **)malloc(sizeof(cmd.cmd.size()) + 1);
-    for (size_t i = 0; i < cmd.cmd.size(); ++i)
-        argv[i] = cmd.cmd[i].data();
-    argv[cmd.size()] = NULL;
+    argv = (char **)malloc(sizeof(cmd.cmd_vec.size()) + 1);
+    for (size_t i = 0; i < cmd.cmd_vec.size(); ++i)
+        argv[i] = (char *)cmd.cmd_vec[i].data();
+    argv[cmd.cmd_vec.size()] = NULL;
     execvp(argv[0], argv);
     perror(argv[0]);
     free(argv);
     return -1;
 }
 
-void handle_signal(int sig) {
-    for (;;) {
-        int wstatus;
-        int fd = waitpid(-1, &wstatus, WNOHANG | WUNTRACED);
-        if (fd <= 0)
-            break;
-
-        if (WIFSTOPPED(wstatus)) {
-            // 子进程暂停
-        } else {
-            // 子进程退出
-        }
-
-        WSTOPSIG(wstatus)
-    }
-    while (jobs.find(jid) != jobs.end() && jobs[jid].st == BG &&
-           jobs[jid].counts != 0)
-}
-
-int run_cmd(vector<cmd_t> &cmds, status_t st) {
-    if (cmds.empty()) {
-        // 命令为空, 直接跳过
-        return 0;
-    }
-    // 检测命令是否为空
-    for (size_t i = 0; i < cmds.size(); ++i)
-        if (cmds[i].cmd_vec.empty()) {
-            printf("commond is empty: %s\n", cmds[i].cmd_str.data());
-            return -1;
-        }
-
+void run_cmd() {
+    curr_jid = -1;     // 用于检测作业时, 输出不跳过当前作业
+    if (cmds.empty())  // 命令为空, 直接跳过
+        return;
     // 是否在当前进程处理
-    if (st == BG && cmds.size() == 1 && cmds[0].empty() &&
-        cmds[0].out.empty() && cmds[0].add.empty()) {
+    if (fg && cmds.size() == 1 && cmds[0].in.empty() && cmds[0].out.empty() &&
+        cmds[0].add.empty()) {
         // 非 管道 重定向 以及 后台命令, 才可能在当前进程中运行
-        if (m.find(cmds[0].cmd_vec[0]) != m.end())
-            return m[argv[0]](cmds[0]);
+        if (m.find(cmds[0].cmd_vec[0]) != m.end()) {
+            m[cmds[0].cmd_vec[0]](cmds[0]);
+            return;
+        }
     }
-
-    sigset_t mask_all;
-    sigset_t mask_empty;
-    sigfillset(&mask_all);
-    sigemptyset(&mask_empty);
-
-    sigprocmask(SIG_SETMASK, &mask_all, NULL);  // 阻塞所有信号
-
-    if (jids.empty()) {
-        printf("to many jobs\n");
-        sigprocmask(SIG_UNBLOCK, &mask_all, NULL);  // 解除信号阻塞
-        return -1;
-    }
-    int jid = jids.front();
-    jids.pop();
-
+    // 处理命令
+    sigprocmask(SIG_SETMASK, &mask_child, NULL);  // 阻塞所有信号
     job_t job;
     for (size_t i = 0; i < cmds.size(); ++i) {
         int pipe_fd[2];
         if (i + 1 != cmds.size() && pipe(pipe_fd) < 0) {
             // 不是最后一个命令需要新建管道
             perror("");
-            return -1;
+            return;
         }
         pid_t fd = fork();
-
         if (fd == 0) {
             // 子进程
             setpgid(0, i == 0 ? 0 : job.pgid);  // 设置新的进程组
-
+            if (i + 1 != cmds.size()) {
+                // 将标准输出重定向到管道
+                close(pipe_fd[0]);
+                dup2(pipe_fd[1], STDOUT_FILENO);
+                if (pipe_fd[1] != STDOUT_FILENO)
+                    close(pipe_fd[1]);
+            }
             // 恢复信号处理
             signal(SIGINT, SIG_DFL);   // ctrl+c
             signal(SIGQUIT, SIG_DFL);  // ctrl+/
             signal(SIGTSTP, SIG_DFL);  // ctrl+z
             signal(SIGCHLD, SIG_DFL);  // 子进程退出, 暂停, 继续
-            sigprocmask(SIG_UNBLOCK, &mask_all, NULL);  // 解除信号阻塞
-            if (i + 1 != cmds.size()) {
-                close(pipe_fd[0]);
-                dup2(pipe_fd[1], STDOUT_FILENO);  // 将标准输出重定向到管道
-                close(pipe_fd[1]);
-            }
-            return run_cmd(cmd);
+            sigprocmask(SIG_UNBLOCK, &mask_child, NULL);  // 解除信号阻塞
+            exit(run_cmd(cmds[i]));
         } else {
             // 父进程
-            // 添加作业
             if (i == 0) {
-                job.pgid   = fd;
-                job.status = st;
-                job.counts = 0;
+                job.pgid       = fd;
+                job.count_run  = cmds.size();
+                job.count_stop = 0;
+                job.count_kill = 0;
+                job.count_done = 0;
+                curr_jid       = next_jid++;
             }
-            job.pids.push_back(fd);
-            job.cmds.push_back(cmds[i].cmd_str);
-            job.sts.push_back(RUN);
-            pids[fd] = jjid;
+            task_t task;
+            task.cmd      = cmds[i].cmd_str;
+            task.status   = RUN;
+            job.tasks[fd] = task;
+            pids[fd]      = curr_jid;
 
-            setpgid(0, job.pgid);  // 设置新的进程组
+            setpgid(fd, job.pgid);  // 设置新的进程组
 
             if (i + 1 != cmds.size()) {
+                // 将标准输入重定向到管道
                 close(pipe_fd[1]);
-                dup2(pipe_fd[0], STDIN_FILENO);  // 将标准输入重定向到管道
-                close(pipe_fd[1]);
+                dup2(pipe_fd[0], STDIN_FILENO);
+                if (pipe_fd[0] != STDIN_FILENO)
+                    close(pipe_fd[0]);
+            } else {
+                // 将标准输入重定向到 /dev/tty
+                int shell_tty = open("/dev/tty", O_RDONLY);
+                dup2(shell_tty, STDIN_FILENO);
+                if (shell_tty != STDIN_FILENO)
+                    close(shell_tty);
             }
         }
     }
 
-    jobs.push_back(job);
-    jobs[jid] = job;
+    jobs[curr_jid] = job;
 
-    if (st == BG) {
+    if (fg) {
         // 前台作业
         tcsetpgrp(0, job.pgid);  // 设置前台进程组
         while (tcgetpgrp(0) == job.pgid)
-            sigsuspend(&mask_empty);  // 解阻塞所有信号, 然后暂停
+            sigsuspend(&mask_empty);  // 解阻塞信号, 然后暂停
+    } else {
+        list_job(curr_jid, true);
+        curr_jid = -1;  // 用于检测作业时, 输出不跳过当前作业
     }
-    sigprocmask(SIG_UNBLOCK, &mask_all, NULL);  // 解除信号阻塞
-}
-
-void init() {
-    // 设置信号处理
-    signal(SIGINT, SIG_IGN);         // ctrl+c
-    signal(SIGQUIT, SIG_IGN);        // ctrl+/
-    signal(SIGTSTP, SIG_IGN);        // ctrl+z
-    signal(SIGTTIN, SIG_IGN);        // 后台读
-    signal(SIGTTOU, SIG_IGN);        // 后台写
-    signal(SIGCHLD, handle_signal);  // 子进程退出, 暂停, 继续
-
-    // 初始化作业号
-    for (int i = 1; i <= JOB_MAX; ++i) {
-        jjids.push(i);
-    }
-
-    // 初始化内置命令
-    m["about"]  = do_about;
-    m["exit"]   = do_exit;
-    m["quit"]   = do_quit;
-    m["cd"]     = do_cd;
-    m["ulimit"] = do_ulimit;
-
-    // 初始化用户信息
-    user_id            = getuid();
-    struct passwd *pwd = getpwuid(user_id);
-
-    user_name = pwd->pw_name;
-    user_home = pwd->pw_dir;
+    sigprocmask(SIG_UNBLOCK, &mask_child, NULL);  // 解除信号阻塞
 }
 
 int main() {
-    init();
+    init_user_info();
+    init_cmd_builtin();
+    init_job();
+    init_signal_handle();
 
     for (;;) {
-        // 获取提示符
-        string prompt = get_prompt();
-        // 获取命令行
-        string   cmd;
-        status_t st;
-        if (get_cmd(prompt, cmd, st) == -1)
-            return -1;  // 读到 EOF, 退出
-        // 以管道为分割符解析命令行
-        vector<cmd_t> cmds;
-        if (parse_line(cmd, cmds) == -1)
-            continue;  // 命令不合法, 直接跳过
-        run_cmd(cmds, st);
-        tcsetpgrp(0, getpid());  // 设置前台进程组
+        get_prompt();   // 获取提示符
+        get_input();    // 获取用户输入
+        parse_input();  // 解析命令行
+        run_cmd();      // 运行命令
+        check_job();    // 检测作业
     }
 
     return 0;
