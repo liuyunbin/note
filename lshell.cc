@@ -22,7 +22,9 @@
 
 #include <iostream>
 #include <map>
+#include <queue>
 #include <string>
+#include <utility>
 #include <vector>
 
 // 用户信息
@@ -415,88 +417,88 @@ std::string gid_to_name(gid_t gid) {
     }
 }
 
-void mode_to_letters(int mode, char *str) {
-    strcpy(str, "----------");
+std::string mode_to_str(int mode) {
+    std::string result = "----------";
 
     // 文件类型
     if (S_ISDIR(mode))
-        str[0] = 'd';  // 目录
+        result[0] = 'd';  // 目录
     if (S_ISCHR(mode))
-        str[0] = 'c';  // 设备文件
+        result[0] = 'c';  // 设备文件
     if (S_ISBLK(mode))
-        str[0] = 'b';  // 块文件
+        result[0] = 'b';  // 块文件
 
     // 用户权限
     if (mode & S_IRUSR)
-        str[1] = 'r';
+        result[1] = 'r';
     if (mode & S_IWUSR)
-        str[2] = 'w';
+        result[2] = 'w';
     if (mode & S_IXUSR)
-        str[3] = 'x';
+        result[3] = 'x';
 
     // 组权限
     if (mode & S_IRGRP)
-        str[4] = 'r';
+        result[4] = 'r';
     if (mode & S_IWGRP)
-        str[5] = 'w';
+        result[5] = 'w';
     if (mode & S_IXGRP)
-        str[6] = 'x';
+        result[6] = 'x';
 
     // 其他人权限
     if (mode & S_IROTH)
-        str[7] = 'r';
+        result[7] = 'r';
     if (mode & S_IWOTH)
-        str[8] = 'w';
+        result[8] = 'w';
     if (mode & S_IXOTH)
-        str[9] = 'x';
+        result[9] = 'x';
+    return result;
 }
 
-void show_file_info(const char *file_name, const struct stat *stat_ptr) {
-    char mode_str[11];
-    mode_to_letters(stat_ptr->st_mode, mode_str);
-
-    printf("%s", mode_str);
+void show_file_info(const std::string &file_name, const struct stat *stat_ptr) {
+    printf("%s", mode_to_str(stat_ptr->st_mode).data());
     printf("%4d ", (int)stat_ptr->st_nlink);
     printf("%-8s ", uid_to_name(stat_ptr->st_uid).data());
     printf("%-8s ", gid_to_name(stat_ptr->st_gid).data());
     printf("%8ld ", (long)stat_ptr->st_size);
     printf("%.12s ", 4 + ctime(&stat_ptr->st_mtime));
-    printf("%s\n", file_name);
+    printf("%s\n", file_name.data());
 }
 
-int do_stat(const char *file_name, int dir_fd) {
+int do_stat(const std::string &file_name, int dir_fd) {
     struct stat info;
 
-    if (fstatat(dir_fd, file_name, &info, 0) == -1) {
-        perror(file_name);
+    if (fstatat(dir_fd, file_name.data(), &info, 0) == -1) {
+        perror(file_name.data());
         return -1;
     }
     show_file_info(file_name, &info);
     return 0;
 }
 
-int is_directory(const char *name) {
+int is_directory(const std::string &name) {
     struct stat info;
-    if (stat(name, &info) == -1) {
-        perror(name);
+    if (stat(name.data(), &info) == -1)
         return -1;
-    }
-    return S_ISDIR(info.st_mode) ? 0 : 1;
+    if (S_ISDIR(info.st_mode))
+        return 1;
+    else
+        return 0;
 }
 
 int do_ls(cmd_t &cmd) {
-    const char *name;
+    std::string name;
     if (cmd.cmd_vec.size() == 1)
         name = ".";
     else
-        name = cmd.cmd_vec[1].data();
+        name = cmd.cmd_vec[1];
     int ret = is_directory(name);
     if (ret == -1)
         return -1;
-    if (ret == 0) {  // 目录
-        DIR *dir_ptr = opendir(name);
-        if (dir_ptr == NULL) {  // 无法打开目录
-            perror(name);
+    if (ret == 1) {  // 目录
+        DIR *dir_ptr = opendir(name.data());
+        if (dir_ptr == NULL) {
+            // 无法打开目录
+            perror(name.data());
             return -1;
         }
         struct dirent *dirent_ptr;
@@ -510,6 +512,265 @@ int do_ls(cmd_t &cmd) {
     }
 }
 
+/*
+// do_cp
+int get_absolute_name(const std::string &from, std::string &to) {
+    std::string str;
+    if (from.front() != '/') {
+        // 获取绝对路径
+        char *p = get_current_dir_name();
+        str     = std::string(p) + "/" + from;
+        free(p);
+    } else {
+        str = name;
+    }
+    std::vector<std::string> ve;
+    size_t                   pos_begin = 0;
+    while (pos_begin != std::string::npos) {
+        size_t      pos_end = str.find(pos_begin, "/");
+        std::string current_str;
+        if (pos_end == std::npos) {
+            current_str = str.substr(pos_begin);
+            pos_begin   = std::string::npos;
+        } else {
+            current_str = str.substr(pos_begin, pot_end - pos_begin);
+            pos_begin   = pos_end + 1;
+        }
+        if (current_str == "" || current_str == ".") {
+            // 跳过
+        } else if (current_str == "..") {
+            if (ve.empty()) {
+                printf("invalid filename\n");
+                return -1;
+            }
+            ve.pop_back();
+        } else {
+            ve.push_back(current_str);
+        }
+    }
+    to = "/";
+    for (auto &data : ve)
+        to += "/" + data;
+    if (to.size() > 1)
+        to += "/";
+    return 0;
+}
+
+int argument_is_same(const std::string &left, const std::string &right) {
+    std::string to_left;
+    std::string to_right;
+    if (get_absolute_name(left, to_left) == -1)
+        return -1;
+    if (get_absolute_name(right, to_right) == -1)
+        return -1;
+    return to_left == to_right ? 1 : 0;
+}
+
+std::string get_file_name(const std::string &name) {
+    size_t pos = name.find_last_of('/');
+    if (pos == std::string::npos)
+        return "";
+    return name.substr(pos + 1);
+}
+
+int cp_file(const std::string &from, const std::string &to) {
+    int in_fd = open(from.data(), O_RDONLY);
+    if (in_fd == -1) {
+        perror(from.data());
+        return -1;
+    }
+
+    int out_fd = open(to.data(), O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    if (out_fd == -1) {
+        perror(to.data());
+        return -1;
+    }
+
+    char buf[1024];
+    int  buf_len;
+
+    while ((buf_len = read(in_fd, buf, sizeof(buf))) > 0)
+        if (write(out_fd, buf, buf_len) != buf_len) {
+            perror("");
+            return -1;
+        }
+
+    close(in_fd);
+    close(out_fd);
+    return 0;
+}
+
+int cp_directory(const std::string &from, const std::string &to) {
+    std::queue<std::pair<std::string, std::string>> qu;
+    qu.push(std::make_pair(from, to));
+
+    for (;;) {
+        if (qu.empty())
+            break;
+        auto data = qu.front();
+        qu.pop();
+
+        if (is_directory(data.second) == 0) {
+            // data.second 存在 且 是 文件，失败
+            printf("无法拷贝从目录到文件 且 文件存在的情况\n");
+            return -1;
+        }
+
+        if (is_directory(data.second) == -1) {
+            // data.second 不存在
+            if (mkdir(data.second.data(), 0755) == -1) {
+                perror("");
+                return -1;
+            }
+        }
+
+        DIR *dir_ptr = opendir(data.first.data());
+        if (dir_ptr == NULL) {
+            perror(data.first.data());
+            return -1;
+        }
+
+        struct dirent *dirent_ptr;
+        while ((dirent_ptr = readdir(dir_ptr)) != NULL) {
+            if (is_directory(data.first + "/" + dirent_ptr->d_name) == 0) {
+                // 文件
+                int ret = cp_file(data.first + "/" + dirent_ptr->d_name,
+                                  data.second + "/" + dirent_ptr->d_name);
+                if (ret == -1)
+                    return -1;
+            } else {
+                // 目录
+                if (strcmp(dirent_ptr->d_name, ".") == 0)
+                    continue;
+                if (strcmp(dirent_ptr->d_name, "..") == 0)
+                    continue;
+                qu.push(std::make_pair(data.first + "/" + dirent_ptr->d_name,
+                                       data.second + "/" + dirent_ptr->d_name));
+            }
+        }
+
+        closedir(dir_ptr);
+    }
+    return 0;
+}
+
+// 拷贝 文件 --> 文件，且 文件存在
+int cp_file_to_file(const std::string &from, const std::string &to) {
+    return cp_file(from, to);
+}
+
+// 拷贝 文件 --> 目录，且 目录存在
+int cp_file_to_directory(const std::string &from, const std::string &to) {
+    cp_file(from, to + "/" + get_file_name(from));
+}
+
+// 拷贝 文件 --> 文件 或 目录，且 文件 或 目录 不存在
+int cp_file_to_file_or_directory(const std::string &from,
+                                 const std::string &to) {
+    size_t len = strlen(to);
+
+    if (len > 0 && to[len - 1] == '/') {
+        // to 是目录，失败
+        printf("无法拷贝 文件 --> 目录，且 目录不存在的情况\n");
+        exit(EXIT_FAILURE);
+    } else {
+        // to 是文件
+        cp_file(from, to);
+    }
+}
+
+// 拷贝 目录 --> 文件，且 文件存在，直接失败
+int cp_directory_to_file(const std::string &from, const std::string &to) {
+    printf("无法拷贝 目录 --> 文件，且 文件存在的情况\n");
+    exit(EXIT_FAILURE);
+}
+
+// 拷贝 目录 --> 目录，且 目录存在
+int cp_directory_to_directory(const std::string &from, const std::string &to) {
+    char buf[BUF_SIZE];
+
+    strcpy(buf, from);  // 此处可能会溢出，仅测试
+
+    size_t len = strlen(buf);
+    if (len > 0 && buf[len - 1] == '/')
+        buf[len - 1] = '\0';
+
+    char *p = strrchr(buf, '/');
+    if (p == NULL)
+        p = buf;
+    else
+        p = p + 1;
+
+    cp_directory(from, std::string(to) + "/" + p);
+}
+
+// 拷贝 目录 --> 文件 或 目录，且 文件 或 目录 不存在
+int cp_directory_to_file_or_directory(const std::string &from,
+                                      const std::string &to) {
+    cp_directory(from, to);
+}
+
+int do_cp(cmd_t &cmd) {
+    if (cmd.cmd_vec.size() != 3) {
+        printf("please use : cp ... ...\n");
+        return -1;
+    }
+
+    if (is_directory(cmd.cmd_vec[1]) == -1) {
+        // 第一个文件参数不存在
+        perror(cmd.cmd_vec[1].data());
+        return -1;
+    }
+
+    int ret = argument_is_same(cmd.cmd_vec[1], cmd.cmd_vec[2]);
+    if (ret == -1)
+        return -1;
+    if (ret == 1) {
+        // 源文件或目录 和 目的文件或目录相同
+        printf(" %s and %s is same\n", cmd.cmd_vec[1], cmd.cmd_vec[2]);
+        return -1;
+    }
+
+    if (is_directory(cmd.cmd_vec[1]) == 0 &&
+        is_directory(cmd.cmd_vec[2]) == 0) {
+        // 文件 --> 文件，且 文件存在
+        return cp_file_to_file(cmd.cmd_vec[1], cmd.cmd_vec[2]);
+    }
+
+    if (is_directory(cmd.cmd_vec[1]) == 0 &&
+        is_directory(cmd.cmd_vec[2]) == 1) {
+        // 文件 --> 目录，且 目录存在
+        return cp_file_to_directory(cmd.cmd_vec[1], cmd.cmd_vec[2]);
+    }
+
+    if (is_directory(cmd.cmd_vec[1]) == 0 &&
+        is_directory(cmd.cmd_vec[2]) == -1) {
+        // 文件 --> argv[2]，argv[2] 不存在，argv[2] 可能是文件 或 目录
+        return cp_file_to_file_or_directory(cmd.cmd_vec[1], cmd.cmd_vec[2]);
+    }
+
+    if (is_directory(cmd.cmd_vec[1]) == 1 &&
+        is_directory(cmd.cmd_vec[2]) == 0) {
+        // 目录 --> 文件，且 文件存在
+        return cp_directory_to_file(cmd.cmd_vec[1], cmd.cmd_vec[2]);
+    }
+
+    if (is_directory(cmd.cmd_vec[1]) == 1 &&
+        is_directory(cmd.cmd_vec[2]) == 1) {
+        // 目录 --> 目录，且 目录存在
+        return cp_directory_to_directory(cmd.cmd_vec[1], cmd.cmd_vec[2]);
+    }
+
+    if (is_directory(cmd.cmd_vec[1]) == 1 &&
+        is_directory(cmd.cmd_vec[2]) == -1) {
+        // 目录 --> argv[2]，argv[2] 不存在，argv[2] 可能是文件 或 目录
+        return cp_directory_to_file_or_directory(cmd.cmd_vec[1],
+                                                 cmd.cmd_vec[2]);
+    }
+
+    return 0;
+}
+*/
 int do_jobs(cmd_t &cmd) {
     sigprocmask(SIG_SETMASK, &mask_child, NULL);  // 阻塞信号
     list_job(-1);
