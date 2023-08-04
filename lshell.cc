@@ -512,7 +512,6 @@ int do_ls(cmd_t &cmd) {
     }
 }
 
-/*
 // do_cp
 int get_absolute_name(const std::string &from, std::string &to) {
     std::string str;
@@ -522,18 +521,18 @@ int get_absolute_name(const std::string &from, std::string &to) {
         str     = std::string(p) + "/" + from;
         free(p);
     } else {
-        str = name;
+        str = from;
     }
     std::vector<std::string> ve;
     size_t                   pos_begin = 0;
     while (pos_begin != std::string::npos) {
-        size_t      pos_end = str.find(pos_begin, "/");
+        size_t      pos_end = str.find("/", pos_begin);
         std::string current_str;
-        if (pos_end == std::npos) {
+        if (pos_end == std::string::npos) {
             current_str = str.substr(pos_begin);
             pos_begin   = std::string::npos;
         } else {
-            current_str = str.substr(pos_begin, pot_end - pos_begin);
+            current_str = str.substr(pos_begin, pos_end - pos_begin);
             pos_begin   = pos_end + 1;
         }
         if (current_str == "" || current_str == ".") {
@@ -569,7 +568,7 @@ int argument_is_same(const std::string &left, const std::string &right) {
 std::string get_file_name(const std::string &name) {
     size_t pos = name.find_last_of('/');
     if (pos == std::string::npos)
-        return "";
+        return name;
     return name.substr(pos + 1);
 }
 
@@ -587,13 +586,15 @@ int cp_file(const std::string &from, const std::string &to) {
     }
 
     char buf[1024];
-    int  buf_len;
 
-    while ((buf_len = read(in_fd, buf, sizeof(buf))) > 0)
-        if (write(out_fd, buf, buf_len) != buf_len) {
-            perror("");
+    for (;;) {
+        int buf_len = read(in_fd, buf, sizeof(buf));
+        if (buf_len < 0)
             return -1;
-        }
+        if (buf_len == 0)
+            break;
+        write(out_fd, buf, buf_len);
+    }
 
     close(in_fd);
     close(out_fd);
@@ -611,7 +612,7 @@ int cp_directory(const std::string &from, const std::string &to) {
         qu.pop();
 
         if (is_directory(data.second) == 0) {
-            // data.second 存在 且 是 文件，失败
+            // data.second 存在且是文件，失败
             printf("无法拷贝从目录到文件 且 文件存在的情况\n");
             return -1;
         }
@@ -624,6 +625,7 @@ int cp_directory(const std::string &from, const std::string &to) {
             }
         }
 
+        // data.first 存在且是目录
         DIR *dir_ptr = opendir(data.first.data());
         if (dir_ptr == NULL) {
             perror(data.first.data());
@@ -661,53 +663,44 @@ int cp_file_to_file(const std::string &from, const std::string &to) {
 
 // 拷贝 文件 --> 目录，且 目录存在
 int cp_file_to_directory(const std::string &from, const std::string &to) {
-    cp_file(from, to + "/" + get_file_name(from));
+    return cp_file(from, to + "/" + get_file_name(from));
 }
 
 // 拷贝 文件 --> 文件 或 目录，且 文件 或 目录 不存在
 int cp_file_to_file_or_directory(const std::string &from,
                                  const std::string &to) {
-    size_t len = strlen(to);
-
-    if (len > 0 && to[len - 1] == '/') {
+    if (to.size() > 0 && to.back() == '/') {
         // to 是目录，失败
         printf("无法拷贝 文件 --> 目录，且 目录不存在的情况\n");
-        exit(EXIT_FAILURE);
+        return -1;
     } else {
         // to 是文件
         cp_file(from, to);
+        return 0;
     }
 }
 
 // 拷贝 目录 --> 文件，且 文件存在，直接失败
 int cp_directory_to_file(const std::string &from, const std::string &to) {
     printf("无法拷贝 目录 --> 文件，且 文件存在的情况\n");
-    exit(EXIT_FAILURE);
+    return -1;
 }
 
 // 拷贝 目录 --> 目录，且 目录存在
 int cp_directory_to_directory(const std::string &from, const std::string &to) {
-    char buf[BUF_SIZE];
-
-    strcpy(buf, from);  // 此处可能会溢出，仅测试
-
-    size_t len = strlen(buf);
-    if (len > 0 && buf[len - 1] == '/')
-        buf[len - 1] = '\0';
-
-    char *p = strrchr(buf, '/');
-    if (p == NULL)
-        p = buf;
-    else
-        p = p + 1;
-
-    cp_directory(from, std::string(to) + "/" + p);
+    std::string str = from;
+    if (str.size() > 0 && str.back() == '/')
+        str.pop_back();
+    size_t pos = str.find_last_of('/');
+    if (pos != std::string::npos)
+        str = str.substr(pos + 1);
+    return cp_directory(from, to + "/" + str);
 }
 
 // 拷贝 目录 --> 文件 或 目录，且 文件 或 目录 不存在
 int cp_directory_to_file_or_directory(const std::string &from,
                                       const std::string &to) {
-    cp_directory(from, to);
+    return cp_directory(from, to);
 }
 
 int do_cp(cmd_t &cmd) {
@@ -727,7 +720,9 @@ int do_cp(cmd_t &cmd) {
         return -1;
     if (ret == 1) {
         // 源文件或目录 和 目的文件或目录相同
-        printf(" %s and %s is same\n", cmd.cmd_vec[1], cmd.cmd_vec[2]);
+        printf(" %s and %s is same\n",
+               cmd.cmd_vec[1].data(),
+               cmd.cmd_vec[2].data());
         return -1;
     }
 
@@ -770,7 +765,7 @@ int do_cp(cmd_t &cmd) {
 
     return 0;
 }
-*/
+
 int do_jobs(cmd_t &cmd) {
     sigprocmask(SIG_SETMASK, &mask_child, NULL);  // 阻塞信号
     list_job(-1);
@@ -831,6 +826,7 @@ void init_cmd_builtin() {
     m["bg"]     = do_bg;
     m["fg"]     = do_fg;
     m["ls"]     = do_ls;
+    m["cp"]     = do_cp;
 }
 
 void handle_signal(int sig) {
