@@ -1,0 +1,165 @@
+
+## 官网
+* https://nginx.org/
+
+## 安装 nginx, centos7
+* 安装: sudo yum install nginx
+* 默认的网站目录：/usr/share/nginx/html
+* 默认的配置文件：/etc/nginx/nginx.conf
+
+## 常用命令
+* nginx -s stop    退出 nginx
+* nginx -s quit    工作进程处理完当前请求后, 退出 nginx
+* nginx -s reload  重新加载配置,
+* nginx -s reopen  重新打开日志文件
+
+* systemctl start      nginx   启动 nginx
+* systemctl stop       nginx   停止 nginx
+* systemctl restart    nginx   重启 nginx
+* systemctl status     nginx   查看 nginx 状态
+* systemctl enable     nginx   开机自动启动 nginx
+* systemctl disable    nginx   开机禁止启动 nginx
+* systemctl is-active  nginx   查看 nginx 是否已启动
+* systemctl is-enabled nginx   查看 nginx 是否开机启动
+* systemctl list-unit-files    列出所有可用单元
+
+* firewall-cmd --add-service=http     添加服务
+
+## 常用配置
+* root /usr 指定工作目录
+* location, 位于 server, location 中,
+    * 匹配顺序如下
+        * location  =  /kds {} 精确匹配, 如果匹配, 立即停止匹配其他
+        * location ^~  /kds {} 前缀匹配, 如果匹配, 立即停止匹配其他
+        * location  ~  /kds {} 正则匹配,   区分大小写
+        * location  ~* /kds {} 正则匹配, 不区分大小写, 这两个正则匹配优先级相同, 先匹配的先返回
+        * location     /kds {} 普通前缀匹配, 匹配的越长, 优先级越高
+    * location @405 {} 内部匹配
+* rewrite regex replacement [flag];
+    * 使用正则匹配
+    * 如果 replacement 以 http 或 https 打头, 将直接被重定向
+    * flag 的类型:
+        * last  重新匹配新的 location
+        * break 忽略后续的 rewrite, 并顺序执行
+        * redirect  返回302临时重定向
+        * permanent 返回301永久重定向
+        * 空, 顺序执行
+## 实战
+## TDOD
+alias
+rewrite
+
+expires
+
+mirror
+
+internal
+
+limit_req
+limit_conn
+limit_rate
+
+return
+
+proxy_pass
+proxy_connect_timeout 90;  #nginx跟后端服务器连接超时时间(代理连接超时)
+proxy_send_timeout 90;     #后端服务器数据回传时间(代理发送超时)
+proxy_read_timeout 90;     #连接成功后,后端服务器响应时间(代理接收超时)
+proxy_buffer_size 4k;      #代理服务器（nginx）保存用户头信息的缓冲区大小
+proxy_buffers 4 32k;      #proxy_buffers缓冲区
+proxy_busy_buffers_size 64k;     #高负荷下缓冲大小（proxy_buffers*2）
+proxy_temp_file_write_size 64k;  #设定缓存文件夹大小
+
+
+proxy_set_header：在将客户端请求发送给后端服务器之前，更改来自客户端的请求头信息；
+proxy_connect_timeout：配置 Nginx 与后端代理服务器尝试建立连接的超时时间；
+proxy_read_timeout：配置 Nginx 向后端服务器组发出 read 请求后，等待相应的超时时间；
+proxy_send_timeout：配置 Nginx 向后端服务器组发出 write 请求后，等待相应的超时时间；
+proxy_redirect：用于修改后端服务器返回的响应头中的 Location 和 Refresh。
+
+autoindex               on;    # 开启静态资源列目录
+autoindex_exact_size    off;   # on(默认)显示文件的确切大小，单位是byte；off显示文件大概大小，单位KB、MB、GB
+autoindex_localtime     off;   # off(默认)时显示的文件时间为GMT时间；on显示的文件时间为服务器时间
+
+sendfile on ;
+tcp_nopush on;
+tcp_nodelay on;
+keepalive_timeout 65 :
+client_body_timeout 60s;
+send_timeout 60s;
+
+sendfile on ; : 开启高效文件传输模式，sendfile指令指定nginx是否调用sendfile函数来输出文件，减少用户空间到内核空间的上下文切换。对于普通应用设为 on，如果用来进行下载等应用磁盘IO重负载应用，可设置为off，以平衡磁盘与网络I/O处理速度，降低系统的负载。开启 tcp_nopush on; 和tcp_nodelay on; 防止网络阻塞。
+keepalive_timeout 65 : : 长连接超时时间，单位是秒，这个参数很敏感，涉及浏览器的种类、后端服务器的超时设置、操作系统的设置，可以另外起一片文章了。长连接请求大量小文件的时候，可以减少重建连接的开销，但假如有大文件上传，65s内没上传完成会导致失败。如果设置时间过长，用户又多，长时间保持连接会占用大量资源。
+client_body_timeout 60s; : 用于设置客户端请求主体读取超时时间，默认是60s。如果超过这个时间，客户端还没有发送任何数据，nginx将返回Request time out(408)错误。
+send_timeout : : 用于指定响应客户端的超时时间。这个超时仅限于两个连接活动之间的时间，如果超过这个时间，客户端没有任何活动，Nginx将会关闭连接。
+
+https://www.nginx.org.cn/article/detail/217
+
+
+
+
+proxy_set_header Host $host;
+proxy_set_header X-Forwarder-For $remote_addr;  #获取客户端真实IP
+
+#### 情况一
+
+配置:
+    location  /proxy/ {
+        proxy_pass http://1.2.3.4;
+    }
+请求: http://0.0.0.0/proxy/index.html
+相当于访问:  http://1.2.3.4/proxy/index.html
+
+结论: proxy_pass 的 IP 什么都不跟时, 使用绝对路径, 匹配到的 /proxy/ 也会用到
+
+#### 情况二
+
+配置:
+    location  /proxy/ {
+        proxy_pass http://1.2.3.4/;
+    }
+请求: http://0.0.0.0/proxy/index.html
+
+相当于访问:  http://1.2.3.4/index.html
+
+#### 情况三
+
+配置:
+    location  /proxy/ {
+        proxy_pass http://1.2.3.4/kds/;
+    }
+请求: http://0.0.0.0/proxy/index.html
+相当于访问:  http://1.2.3.4/kds/index.html
+
+#### 情况四
+
+配置:
+    location  /proxy/ {
+        proxy_pass http://1.2.3.4/kds;
+    }
+请求: http://0.0.0.0/proxy/index.html
+相当于访问:  http://1.2.3.4/kdsindex.html
+
+结论: proxy_pass 的 IP 还有内容时, 使用相对路径, 匹配到的 /proxy/ 会被丢弃
+
+#### 情况五
+
+配置:
+    location  /proxy/ {
+        proxy_pass http://1.2.3.4/kds/;
+    }
+请求: http://0.0.0.0/proxy/
+请求: http://0.0.0.0/proxy
+相当于访问:  http://1.2.3.4/kds/
+
+结论:
+当 location 中使用 proxy_pass, fastcgi_pass, uwsgi_pass, scgi_pass, memcached_pass, 或 grpc_pass 时,
+如果请求的内容未添加末尾的 /, 且 匹配失败时, 如果 添加 末尾的 / 可以匹配成功的话, 将导致重定向, 最终返回添加 / 后的结果
+
+见: https://nginx.org/en/docs/http/ngx_http_core_module.html#location
+
+#### 情况六
+www.bing.com 和 www.bing.com/ 意思相同
+
+## 参考资源
+* https://nginx.org/en/docs/ngx_core_module.html
