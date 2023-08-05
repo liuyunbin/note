@@ -10,5 +10,5 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: ./tool.sh install_dependency
-      - run: ./tool.sh build
+#      - run: ./tool.sh install_dependency
+#      - run: ./tool.sh build
