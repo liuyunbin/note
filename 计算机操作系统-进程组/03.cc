@@ -1,4 +1,5 @@
 
+
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -41,17 +42,20 @@ void test(pid_t pid, pid_t pgid) {
 
 int main() {
     log();
-    log("操作系统-进程组: 新建子进程对应的进程组(其他情况)");
+    log("计算机操作系统-进程组: 新建子进程对应的进程组(子进程属于不同的会话)");
     log();
 
     pid_t fd = fork();
     if (fd == 0) {
+        log("子进程新建会话");
+        setsid();
         for (;;)
             ;
     }
     sleep(1);
+    log("父进程会话: " + std::to_string(getsid(getpid())));
+    log("子进程会话: " + std::to_string(getsid(fd)));
     log("新建子进程的进程组: " + std::to_string(fd));
-    ;
     test(fd, fd);
     kill(fd, SIGKILL);
 

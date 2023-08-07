@@ -41,14 +41,20 @@ void test(pid_t pid, pid_t pgid) {
 
 int main() {
     log();
-    log("操作系统-进程组: 新建会话首进程对应的的进程组");
+    log("计算机操作系统-进程组: 新建父进程对应的进程组");
     log();
 
     if (fork() == 0) {
-        log("创建新会话");
-        setsid();
-        test(getpid(), getpid());
-        exit(-1);
+        // 测试的父进程
+        if (fork() == 0) {
+            // 测试的子进程
+            log("新建父进程的进程组: " + std::to_string(getppid()));
+            test(getppid(), getppid());
+            kill(getppid(), SIGKILL);
+            exit(-1);
+        }
+        for (;;)
+            ;
     }
     sleep(1);
 

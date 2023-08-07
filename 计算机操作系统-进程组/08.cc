@@ -41,14 +41,20 @@ void test(pid_t pid, pid_t pgid) {
 
 int main() {
     log();
-    log("操作系统-进程组: 新建自身进程对应的进程组");
+    log("计算机操作系统-进程组: 测试修改进程组(原进程组和目标进程组属于不同会话)");
     log();
 
-    test(getpid(), getpid());
-    if (fork() == 0) {
-        test(getpid(), getpid());
-        exit(-1);
+    pid_t child = fork();
+
+    if (child == 0) {
+        log("子进程创建新会话");
+        setsid();
+        for (;;)
+            ;
     }
+    sleep(1);
+    log("子进程的状态信息");
+    test(getpid(), child);
     sleep(1);
 
     log();
