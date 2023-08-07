@@ -657,75 +657,6 @@ void test_signal() {
  *
  ****************************************/
 
-// 测试孤儿进程组
-void test_orphan_process_group() {
-    log();
-    log("测试孤儿进程组");
-    log();
-
-    log("设置信号处理");
-    struct sigaction act;
-    act.sa_sigaction = handle_signal;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO;
-    sigaction(SIGHUP, &act, NULL);
-    sigaction(SIGCONT, &act, NULL);
-
-    pid_t main_pid = getpid();
-    if (fork() == 0) {
-        // 测试的父进程
-        log("测试的父进程启动: " + std::to_string(getpid()));
-        log("设置新的进程组: " + std::to_string(getpid()));
-        setpgid(getpid(), getpid());
-        pid_t child_1 = fork();
-        if (child_1 == 0) {
-            // 测试的第一个子进程
-            log("测试的第一个子进程启动: " + std::to_string(getpid()));
-            log("测试的第一个子进程使自己暂停");
-            kill(getpid(), SIGSTOP);
-            for (;;)
-                ;
-        } else if (fork() == 0) {
-            // 测试的第二个子进程
-            sleep(1);
-            log("测试的第二个子进程启动: " + std::to_string(getpid()));
-            log("进程状态");
-            std::string cmd = "ps -o pid,ppid,pgid,sid,state,comm -p ";
-            cmd += std::to_string(main_pid) + ",";
-            cmd += std::to_string(child_1) + ",";
-            cmd += std::to_string(getpid()) + ",";
-            cmd += std::to_string(getppid());
-            log("进程状态");
-            system(cmd.data());
-            log("杀死测试的父进程: " + std::to_string(getppid()));
-            kill(getppid(), SIGKILL);
-            sleep(1);
-            sleep(1);
-            cmd = "ps -o pid,ppid,pgid,sid,state,comm -p ";
-            cmd += std::to_string(main_pid) + ",";
-            cmd += std::to_string(child_1) + ",";
-            cmd += std::to_string(getpid()) + ",";
-            cmd += std::to_string(getppid());
-            log("进程状态");
-            system(cmd.data());
-            log("杀死测试的第一个子进程: " + std::to_string(child_1));
-            kill(child_1, SIGKILL);
-            log("测试的第二个子进程退出");
-            return;
-        } else {
-            // 父进程
-            for (;;)
-                ;
-        }
-    }
-
-    sleep(3);
-
-    log();
-    log("主进程正常退出");
-    log();
-}
-
 // 展示 PID PGID SID
 void show_pid_pgid_sid(pid_t pid) {
     log("进程 ", pid, " 进程组 ", getpgid(pid), " 会话 ", getsid(pid));
@@ -1376,12 +1307,6 @@ void test_vfork() {
 void test_process() {
     // 测试僵尸进程
     // test_zombie();
-
-    // 测试孤儿进程
-    // test_orphan_process();
-
-    // 测试孤儿进程组
-    test_orphan_process_group();
 
     // 测试进程组
     // test_pgid();
