@@ -3,7 +3,7 @@ PS1='\[\e[32m\]$(date "+%Y-%m-%d %H:%M:%S %z") \[\e[0m\]'
 
 note=~/github/note
 
-PATH="$PATH:$note:$note/bin"
+PATH="$PATH:$note/bash:$note/bin"
 
 alias lsa="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtu" # 以 文件访问时间     排序, 不准确
 alias lsc="ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtc" # 以 文件属性修改时间 排序
@@ -20,7 +20,8 @@ alias lastlog="tool.sh lastlog"   # 列出用户的最后一次登录
 alias l="lsm"
 #alias p="tool.sh ps"            # 列出进程的常用信息
 alias p="git push gitlab master; git push github master"
-alias t="g test.cc && ./a.out"
+alias t="tool.sh test"
+#alias t="g test.cc && ./a.out"
 alias v='vim -c "e ++enc=utf-8" -c "set nobomb"'
 alias x='tar zxf'
 alias z='tar zcf'

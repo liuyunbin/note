@@ -16,6 +16,16 @@ function do_build() {
     rm -r build
 }
 
+function do_test() {
+    local file_name=test.cc
+
+    if [[ $# != "0" ]]; then
+        file_name=$@
+    fi
+
+    g++ -std=c++11 $file_name && ./a.out
+}
+
 function do_install_command() {
     sudo apt install -y clang-format
     sudo apt install -y cmake
