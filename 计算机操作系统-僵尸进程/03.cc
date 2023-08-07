@@ -17,7 +17,7 @@ void log(const std::string& msg = "") {
 
 int main() {
     log();
-    log("操作系统-僵尸进程-预防: SIGCHLD 处理为 SIG_IGN");
+    log("计算机操作系统-僵尸进程-预防: SIGCHLD 处理为 SIG_IGN");
     log();
 
     log("设置 SIGCHLD 的信号处理");
@@ -35,7 +35,7 @@ int main() {
         pid_t fd = fork();
         if (fd == 0) {
             // 子进程
-            log("子进程启动后退出: " + std::to_string(getpid()));
+            log("子进程(" + std::to_string(getpid()) + ")启动后退出");
             exit(-1);
         } else {
             // 父进程

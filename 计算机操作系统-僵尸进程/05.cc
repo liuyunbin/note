@@ -16,12 +16,12 @@ void log(const std::string& msg = "") {
 }
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获信号 SIGCHLD 来自: " + std::to_string(sig_info->si_pid));
+    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
 }
 
 int main() {
     log();
-    log("操作系统-僵尸进程-预防: SIGCHLD 处理为 SA_NOCLDWAIT");
+    log("计算机操作系统-僵尸进程-预防: SIGCHLD 处理为 SA_NOCLDWAIT");
     log();
 
     log("设置 SIGCHLD 的信号处理: SA_NOCLDWAIT");
@@ -43,7 +43,7 @@ int main() {
         pid_t fd = fork();
         if (fd == 0) {
             // 子进程
-            log("子进程启动后退出: " + std::to_string(getpid()));
+            log("子进程(" + std::to_string(getpid()) + ")启动后退出");
             exit(-1);
         } else {
             // 父进程

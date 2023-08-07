@@ -17,7 +17,7 @@ void log(const std::string& msg = "") {
 
 int main() {
     log();
-    log("操作系统-僵尸进程-测试: 产生僵尸进程不退出");
+    log("计算机操作系统-僵尸进程-测试: 产生僵尸进程不退出");
     log();
 
     pid_t child = fork();
@@ -26,7 +26,7 @@ int main() {
         exit(0);
     }
     sleep(1);  // 保证子进程已启动并退出
-    log("产生僵尸进程: " + std::to_string(child));
+    log("产生僵尸进程(" + std::to_string(child) + ")");
     std::string cmd = "ps -o pid,comm,state -p " + std::to_string(child);
     system(cmd.data());
 

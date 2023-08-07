@@ -16,16 +16,16 @@ void log(const std::string& msg = "") {
 }
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获信号 SIGCHLD, 来自: " + std::to_string(sig_info->si_pid));
+    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
     int fd = waitpid(-1, NULL, WNOHANG);
     if (fd > 0) {
-        log("已退出的子进程是: " + std::to_string(fd));
+        log("已退出的子进程是(" + std::to_string(fd) + ")");
     }
 }
 
 int main() {
     log();
-    log("操作系统-僵尸进程-产生: 未正确处理 SIGCHLD");
+    log("计算机操作系统-僵尸进程-产生: 未正确处理 SIGCHLD");
     log();
 
     log("设置 SIGCHLD 处理为: 调用 waitpid() 一次");
@@ -47,7 +47,7 @@ int main() {
         pid_t fd = fork();
         if (fd == 0) {
             // 子进程
-            log("子进程启动后退出: " + std::to_string(getpid()));
+            log("子进程(" + std::to_string(getpid()) + ")启动后退出");
             exit(-1);
         } else {
             // 父进程
