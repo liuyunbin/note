@@ -1,5 +1,20 @@
 
-#include "log.h"
+
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <unistd.h>
+
+#include <iostream>
+#include <string>
+
+void log(const std::string& msg = "") {
+    time_t     now  = time(NULL);
+    struct tm* info = localtime(&now);
+    char       buf[1024];
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S %z", info);
+    std::cout << buf << " " << msg << std::endl;
+}
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
     log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 SIGCHLD");
@@ -7,7 +22,7 @@ void handle_signal(int sig, siginfo_t* sig_info, void*) {
 
 int main() {
     log();
-    log("操作系统-信号: 子进程状态变化时, 父进程的处理");
+    log("计算机操作系统-信号: 子进程状态变化时, 父进程的处理");
     log("不接收子进程暂停继续产生的 SIGCHLD");
     log();
 

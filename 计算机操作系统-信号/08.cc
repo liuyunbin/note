@@ -18,11 +18,11 @@ void log(const std::string& msg = "") {
 
 int main() {
     log();
-    log("操作系统-信号: SIGABRT 处理为 SIG_IGN");
+    log("计算机操作系统-信号: SIGABRT 处理为 SIG_DFL");
     log();
 
-    log("设置 SIGABRT 处理为 SIG_IGN");
-    signal(SIGABRT, SIG_IGN);
+    log("设置 SIGABRT 处理为 SIG_DFL");
+    signal(SIGABRT, SIG_DFL);
 
     log("调用 abort()");
     abort();

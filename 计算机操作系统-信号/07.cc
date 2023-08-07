@@ -1,4 +1,5 @@
 
+
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <time.h>
@@ -51,39 +52,42 @@ std::map<int, std::string> m{
 };
 
 void handle_signal(int sig, siginfo_t* sig_info, void*) {
-    log("捕获来自 " + std::to_string(sig_info->si_pid) + " 的信号 " + m[sig]);
+    log("捕获信号 " + m[sig]);
+    log("处理信号 " + m[sig] + " 中...");
+    sleep(2);
+    log("处理信号 " + m[sig] + " 完成");
 }
 
 int main() {
     log();
-    log("操作系统-信号-阻塞");
+    log("计算机操作系统-信号: 信号处理过程中阻塞其他信号");
     log();
 
-    log("阻塞所有信号");
-    sigset_t mask;
-    sigfillset(&mask);
-    sigprocmask(SIG_SETMASK, &mask, NULL);
+    log("设置信号处理函数");
+    struct sigaction act;
+    act.sa_sigaction = handle_signal;
+    sigemptyset(&act.sa_mask);
 
-    log("查看被阻塞的信号");
-    sigset_t old_mask;
-    sigprocmask(SIG_SETMASK, NULL, &old_mask);
+    log("设置信号处理过程中阻塞 SIGUSR2");
+    sigaddset(&act.sa_mask, SIGUSR2);
+    act.sa_flags = SA_SIGINFO;
+    sigaction(SIGUSR1, &act, NULL);
+    sigaction(SIGUSR2, &act, NULL);
 
-    for (auto key : m)
-        if (sigismember(&old_mask, key.first))
-            log("已被阻塞的信号: " + m[key.first]);
-
-    log("发送除 " + m[SIGKILL] + " 和 " + m[SIGSTOP] + " 外的所有信号");
-
-    for (auto key : m)
-        if (key.first != SIGKILL && key.first != SIGSTOP)
-            kill(getpid(), key.first);
-
-    log("查看待决的信号");
-    sigset_t new_mask;
-    sigpending(&new_mask);
-    for (auto key : m)
-        if (sigismember(&new_mask, key.first))
-            log("待决的信号: " + m[key.first]);
+    pid_t fd = fork();
+    if (fd == 0) {
+        for (;;)
+            ;
+    } else {
+        sleep(1);
+        log("发送信号 " + m[SIGUSR1]);
+        kill(fd, SIGUSR1);
+        sleep(1);
+        log("发送信号 " + m[SIGUSR2]);
+        kill(fd, SIGUSR2);
+        sleep(5);
+        kill(fd, SIGKILL);
+    }
 
     log();
     log("主进程正常退出");
