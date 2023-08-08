@@ -407,29 +407,6 @@ mkdtemp
     readn
     writen
 
-    mmap
-    munmap
-
-    socket
-    shutdown
-    htonl
-    htons
-    ntohl
-    ntohs
-    bind
-    listen
-    connect
-    accept
-    send
-    sendto
-    sendmsg
-    recv
-    recvfrom
-    recvmsg
-    setsockopt
-
-    socketpair
-
 ### 终端 IO
 * 规范模式: 行缓存
 * 非规范模式:
