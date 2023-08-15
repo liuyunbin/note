@@ -24,7 +24,18 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin) # 设置 二进制�
 # 激活测试
 enable_testing()
 
-add_executable(lshell apue/lshell.cc)
+add_executable(lshell
+               apue/lshell/main.cc
+               apue/lshell/cmd.cc
+               apue/lshell/cmd_builtin.cc
+               apue/lshell/cmd_test.cc
+               apue/lshell/cmd_test_ls.cc
+               apue/lshell/cmd_test_cp.cc
+               apue/lshell/cmd_test_bc.cc
+               apue/lshell/cmd_test_more.cc
+               apue/lshell/lshell.cc
+               apue/lshell/job.cc
+               )
 target_link_libraries(lshell readline)
 
 add_executable(snake apue/snake.cc)

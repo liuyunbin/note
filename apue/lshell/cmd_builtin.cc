@@ -6,46 +6,34 @@
 #include <sys/time.h>      // getrlimit setrlimit
 #include <unistd.h>        // chdir
 
+#include <map>
+
 #include "lshell.h"
 
-int do_about(const cmd& cmd);
-int do_exit(const cmd& cmd);
-int do_quit(const cmd& cmd);
-int do_cd(const cmd& cmd);
-int do_ulimit(const cmd& cmd);
-int do_jobs(const cmd& cmd);
-int do_bg(const cmd& cmd);
-int do_fg(const cmd& cmd);
-
 // 内置命令
-int do_about(cmd_t& cmd) {
+int do_about(int argc, char* argv[]) {
     printf("write by liuyunbin\n");
     return 0;
 }
 
-int do_exit(cmd_t& cmd) {
-    exit(EXIT_SUCCESS);
-    return 0;
+int do_exit(int argc, char* argv[]) {
+    exit(0);
 }
 
-int do_quit(cmd_t& cmd) {
-    exit(EXIT_SUCCESS);
-    return 0;
-}
-
-int do_cd(cmd_t& cmd) {
-    std::string str;
-
-    if (cmd.cmd_vec.size() == 1) {
-        str = get_user_home();
-    } else if (cmd.cmd_vec.size() > 2) {
+int do_cd(int argc, char* argv[]) {
+    if (argc > 2) {
         printf("cd: too many arguments\n");
         return -1;
-    } else {
-        str = cmd.vec[1];
     }
+
+    std::string str;
+    if (argc == 1)
+        str = get_user_home();
+    else
+        str = argv[1];
+
     if (chdir(str.data()) == -1) {
-        printf("cd %s : %s\n", str.data(), strerror(errno));
+        perror("cd");
         return -1;
     }
     return 0;
@@ -68,7 +56,7 @@ int do_cd(cmd_t& cmd) {
         printf("%20s %10s %10s %s\n", #X, s_cur.data(), s_max.data(), name); \
     }
 
-int do_ulimit(cmd_t& cmd) {
+int do_ulimit(int argc, char* argv[]) {
     LIMIT("虚拟内存大小", RLIMIT_AS);
     LIMIT("core 文件大小", RLIMIT_CORE);
     LIMIT("CPU 总的时间大小", RLIMIT_CPU);
@@ -88,12 +76,11 @@ int do_ulimit(cmd_t& cmd) {
     return 0;
 }
 
-std::map<std::string, int (*)(cmd_t&)> m_builtin;
+std::map<std::string, int (*)(int argc, char* argv[])> m_builtin;
 
 void init_cmd_builtin() {
     m_builtin["about"]  = do_about;
     m_builtin["exit"]   = do_exit;
-    m_builtin["quit"]   = do_quit;
     m_builtin["cd"]     = do_cd;
     m_builtin["ulimit"] = do_ulimit;
     m_builtin["jobs"]   = do_jobs;
@@ -101,12 +88,10 @@ void init_cmd_builtin() {
     m_builtin["fg"]     = do_fg;
 }
 
-bool is_cmd_builtin(const cmd& cmd) {
-    return m_builtin.find(cmd.str()) != m_builtin.end();
+bool is_cmd_builtin(const cmd_t& cmd) {
+    return m_builtin.find(cmd.vec[0]) != m_builtin.end();
 }
 
-int run_cmd_builtin(const cmd& cmd) {
-    if (is_cmd_builtin(cmd))
-        return m_builtin[cmd.str](cmd);
-    return -1;
+int run_cmd_builtin(int argc, char* argv[]) {
+    return m_builtin[argv[0]](argc, argv);
 }

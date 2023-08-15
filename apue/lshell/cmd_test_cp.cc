@@ -1,33 +1,13 @@
 
-#include <ctype.h>
-#include <dirent.h>
-#include <errno.h>
-#include <error.h>
-#include <fcntl.h>
-#include <grp.h>
-#include <pwd.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/resource.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <termios.h>
-#include <time.h>
-#include <unistd.h>
+#include <dirent.h>     // opendir
+#include <fcntl.h>      // open
+#include <string.h>     // strcmp
+#include <sys/stat.h>   // open
+#include <sys/types.h>  // opendir
+#include <unistd.h>     // get_current_dir_name
 
-#include <atomic>
-#include <iostream>
 #include <map>
 #include <queue>
-#include <stack>
-#include <string>
-#include <utility>
-#include <vector>
 
 #include "lshell.h"
 
@@ -94,7 +74,7 @@ std::string get_file_name(const std::string &name) {
 int cp_file(const std::string &from, const std::string &to) {
     int in_fd = open(from.data(), O_RDONLY);
     if (in_fd == -1) {
-        perror(from.data());
+        perror("cp");
         return -1;
     }
 
@@ -108,8 +88,10 @@ int cp_file(const std::string &from, const std::string &to) {
 
     for (;;) {
         int buf_len = read(in_fd, buf, sizeof(buf));
-        if (buf_len < 0)
+        if (buf_len < 0) {
+            perror("cp");
             return -1;
+        }
         if (buf_len == 0)
             break;
         write(out_fd, buf, buf_len);
@@ -130,13 +112,13 @@ int cp_directory(const std::string &from, const std::string &to) {
         auto data = qu.front();
         qu.pop();
 
-        if (is_directory(data.second) == 0) {
+        if (is_directory(data.second.data()) == 0) {
             // data.second 存在且是文件，失败
             printf("无法拷贝从目录到文件 且 文件存在的情况\n");
             return -1;
         }
 
-        if (is_directory(data.second) == -1) {
+        if (is_directory(data.second.data()) == -1) {
             // data.second 不存在
             if (mkdir(data.second.data(), 0755) == -1) {
                 perror("");
@@ -147,16 +129,16 @@ int cp_directory(const std::string &from, const std::string &to) {
         // data.first 存在且是目录
         DIR *dir_ptr = opendir(data.first.data());
         if (dir_ptr == NULL) {
-            perror(data.first.data());
+            perror("cp");
             return -1;
         }
 
         struct dirent *dirent_ptr;
         while ((dirent_ptr = readdir(dir_ptr)) != NULL) {
-            if (is_directory(data.first + "/" + dirent_ptr->d_name) == 0) {
+            std::string name = data.first + "/" + dirent_ptr->d_name;
+            if (is_directory(name.data()) == 0) {
                 // 文件
-                int ret = cp_file(data.first + "/" + dirent_ptr->d_name,
-                                  data.second + "/" + dirent_ptr->d_name);
+                int ret = cp_file(name, data.second + "/" + dirent_ptr->d_name);
                 if (ret == -1)
                     return -1;
             } else {
@@ -222,64 +204,55 @@ int cp_directory_to_file_or_directory(const std::string &from,
     return cp_directory(from, to);
 }
 
-int do_cp(cmd_t &cmd) {
-    if (cmd.cmd_vec.size() != 3) {
+int do_cp(int argc, char *argv[]) {
+    if (argc != 3) {
         printf("please use : cp ... ...\n");
         return -1;
     }
 
-    if (is_directory(cmd.cmd_vec[1]) == -1) {
+    if (is_directory(argv[1]) == -1) {
         // 第一个文件参数不存在
-        perror(cmd.cmd_vec[1].data());
+        perror("cp");
         return -1;
     }
 
-    int ret = argument_is_same(cmd.cmd_vec[1], cmd.cmd_vec[2]);
+    int ret = argument_is_same(argv[1], argv[2]);
     if (ret == -1)
         return -1;
     if (ret == 1) {
         // 源文件或目录 和 目的文件或目录相同
-        printf(" %s and %s is same\n",
-               cmd.cmd_vec[1].data(),
-               cmd.cmd_vec[2].data());
+        printf(" %s and %s is same\n", argv[1], argv[2]);
         return -1;
     }
 
-    if (is_directory(cmd.cmd_vec[1]) == 0 &&
-        is_directory(cmd.cmd_vec[2]) == 0) {
+    if (is_directory(argv[1]) == 0 && is_directory(argv[2]) == 0) {
         // 文件 --> 文件，且 文件存在
-        return cp_file_to_file(cmd.cmd_vec[1], cmd.cmd_vec[2]);
+        return cp_file_to_file(argv[1], argv[2]);
     }
 
-    if (is_directory(cmd.cmd_vec[1]) == 0 &&
-        is_directory(cmd.cmd_vec[2]) == 1) {
+    if (is_directory(argv[1]) == 0 && is_directory(argv[2]) == 1) {
         // 文件 --> 目录，且 目录存在
-        return cp_file_to_directory(cmd.cmd_vec[1], cmd.cmd_vec[2]);
+        return cp_file_to_directory(argv[1], argv[2]);
     }
 
-    if (is_directory(cmd.cmd_vec[1]) == 0 &&
-        is_directory(cmd.cmd_vec[2]) == -1) {
+    if (is_directory(argv[1]) == 0 && is_directory(argv[2]) == -1) {
         // 文件 --> argv[2]，argv[2] 不存在，argv[2] 可能是文件 或 目录
-        return cp_file_to_file_or_directory(cmd.cmd_vec[1], cmd.cmd_vec[2]);
+        return cp_file_to_file_or_directory(argv[1], argv[2]);
     }
 
-    if (is_directory(cmd.cmd_vec[1]) == 1 &&
-        is_directory(cmd.cmd_vec[2]) == 0) {
+    if (is_directory(argv[1]) == 1 && is_directory(argv[2]) == 0) {
         // 目录 --> 文件，且 文件存在
-        return cp_directory_to_file(cmd.cmd_vec[1], cmd.cmd_vec[2]);
+        return cp_directory_to_file(argv[1], argv[2]);
     }
 
-    if (is_directory(cmd.cmd_vec[1]) == 1 &&
-        is_directory(cmd.cmd_vec[2]) == 1) {
+    if (is_directory(argv[1]) == 1 && is_directory(argv[2]) == 1) {
         // 目录 --> 目录，且 目录存在
-        return cp_directory_to_directory(cmd.cmd_vec[1], cmd.cmd_vec[2]);
+        return cp_directory_to_directory(argv[1], argv[2]);
     }
 
-    if (is_directory(cmd.cmd_vec[1]) == 1 &&
-        is_directory(cmd.cmd_vec[2]) == -1) {
+    if (is_directory(argv[1]) == 1 && is_directory(argv[2]) == -1) {
         // 目录 --> argv[2]，argv[2] 不存在，argv[2] 可能是文件 或 目录
-        return cp_directory_to_file_or_directory(cmd.cmd_vec[1],
-                                                 cmd.cmd_vec[2]);
+        return cp_directory_to_file_or_directory(argv[1], argv[2]);
     }
 
     return 0;

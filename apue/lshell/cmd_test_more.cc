@@ -1,33 +1,16 @@
 
-#include <ctype.h>
-#include <dirent.h>
-#include <errno.h>
-#include <error.h>
-#include <fcntl.h>
-#include <grp.h>
-#include <pwd.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/resource.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <termios.h>
-#include <time.h>
-#include <unistd.h>
+#include <error.h>      // error
+#include <signal.h>     // signal
+#include <stdio.h>      // snprintf
+#include <string.h>     // strlen
+#include <sys/ioctl.h>  // ioctl
+#include <sys/stat.h>   // stat
+#include <termios.h>    // tcgetattr
+#include <unistd.h>     // isatty
 
 #include <atomic>
 #include <iostream>
 #include <map>
-#include <queue>
-#include <stack>
-#include <string>
-#include <utility>
-#include <vector>
 
 #include "lshell.h"
 
@@ -46,15 +29,9 @@ struct termios old_termios;
 // 当前屏幕的输出行数
 int num_of_lines;
 
-void usage() {
-    fputs("usage:\n", stderr);
-    error(EXIT_SUCCESS, 0, " <file>...");
-}
-
-void bad_usage() {
-    error(EXIT_SUCCESS, 0, "bad usage");
-    fputs("\n", stderr);
-    usage();
+static void usage() {
+    fputs("use more ...\n", stderr);
+    exit(-1);
 }
 
 // 传递数据
@@ -64,26 +41,19 @@ void handle_use_cat(FILE *fp) {
         fputs(buf, stdout);
 }
 
-void process_argv_use_cat(cmd_t &cmd) {
+void process_argv_use_cat(int argc, char *argv[]) {
     bool handle_stdin = isatty(0) ? false : true;
     if (handle_stdin) {
         handle_use_cat(stdin);
-    } else if (cmd.cmd_vec.size() == 1) {
-        bad_usage();
+    } else if (argc == 1) {
+        usage();
         return;
     }
-    for (size_t i = 1; i < cmd.cmd_vec.size(); ++i) {
-        FILE *fp = fopen(cmd.cmd_vec[i].data(), "r");
+    for (int i = 1; i < argc; ++i) {
+        FILE *fp = fopen(argv[i], "r");
         if (fp == NULL) {
-            error(
-                EXIT_SUCCESS, errno, "cannot open  %s", cmd.cmd_vec[i].data());
+            perror("more");
             continue;
-        }
-
-        if (cmd.cmd_vec.size() > 2 || handle_stdin) {
-            printf("::::::::::::::::::::::::::::\n");
-            printf("%s\n", cmd.cmd_vec[i].data());
-            printf("::::::::::::::::::::::::::::\n");
         }
         handle_use_cat(fp);
         fclose(fp);
@@ -172,14 +142,14 @@ void handle_user_input(int read_size, int file_size) {
     handle_user_input(buf);
 }
 
-void signal_handle(int sig) {
+static void signal_handle(int sig) {
     if (sig == SIGWINCH) {
         // 窗口大小改变
         get_tty_row_col();
     }
 }
 
-void set_signal() {
+static void set_signal() {
     struct sigaction act;
     act.sa_handler = signal_handle;
     sigemptyset(&act.sa_mask);
@@ -187,10 +157,10 @@ void set_signal() {
     sigaction(SIGWINCH, &act, NULL);
 }
 
-void process_argv_use_more(cmd_t &cmd) {
+void process_argv_use_more(int argc, char *argv[]) {
     bool handle_stdin = isatty(0) ? false : true;
-    if (handle_stdin == false && cmd.cmd_vec.size() == 1) {
-        bad_usage();
+    if (handle_stdin == false && argc == 1) {
+        usage();
         return;
     }
 
@@ -208,7 +178,6 @@ void process_argv_use_more(cmd_t &cmd) {
     set_signal();
 
     char buf[1024];
-
     num_of_lines = 0;
 
     // 为求简单，并未处理，终端列数大于等于 1024 的情况
@@ -221,30 +190,30 @@ void process_argv_use_more(cmd_t &cmd) {
         }
     }
 
-    for (size_t i = 1; i < cmd.cmd_vec.size(); ++i) {
-        FILE *fp = fopen(cmd.cmd_vec[i].data(), "r");
+    for (int i = 1; i < argc; ++i) {
+        FILE *fp = fopen(argv[i], "r");
         if (fp == NULL) {
             snprintf(buf,
                      sizeof(buf),
                      "cannot open %s：%s",
-                     cmd.cmd_vec[i].data(),
+                     argv[i],
                      strerror(errno));
             goto failure;
         }
 
         // 判断是否是目录
         struct stat info;
-        if (stat(cmd.cmd_vec[i].data(), &info) == -1) {
+        if (stat(argv[i], &info) == -1) {
             snprintf(buf,
                      sizeof(buf),
                      "cannot open %s：%s",
-                     cmd.cmd_vec[i].data(),
+                     argv[i],
                      strerror(errno));
             goto failure;
         }
 
         if (S_ISDIR(info.st_mode)) {
-            snprintf(buf, sizeof(buf), "%s directory", cmd.cmd_vec[i].data());
+            snprintf(buf, sizeof(buf), "%s directory", argv[i]);
             goto failure;
         }
 
@@ -252,7 +221,7 @@ void process_argv_use_more(cmd_t &cmd) {
 
     failure:
 
-        if (i + 1 < cmd.cmd_vec[i].size()) {
+        if (i + 1 < argc) {
             handle_user_input(buf);
         } else {
             fputs(buf, stderr);
@@ -266,14 +235,14 @@ void process_argv_use_more(cmd_t &cmd) {
         int file_size         = info.st_size;
 
         if (i > 1 || handle_stdin) {
-            snprintf(buf, sizeof(buf), "Next file %s", cmd.cmd_vec[i].data());
+            snprintf(buf, sizeof(buf), "next file %s", argv[i]);
             handle_user_input(buf);
         }
 
-        if (cmd.cmd_vec[i].size() > 2 || handle_stdin) {
+        if (argc > 2 || handle_stdin) {
             fputs(":::::::::::::::::::::::::::::::::\n", stdout);
             ++num_of_lines;
-            fputs(cmd.cmd_vec[i].data(), stdout);
+            fputs(argv[i], stdout);
             fputs("\n", stdout);
             ++num_of_lines;
             fputs(":::::::::::::::::::::::::::::::::\n", stdout);
@@ -295,14 +264,14 @@ void process_argv_use_more(cmd_t &cmd) {
     reset_tty();
 }
 
-int do_more(cmd_t &cmd) {
+int do_more(int argc, char *argv[]) {
     if (isatty(1)) {
         // 标准输出是终端
-        process_argv_use_more(cmd);
+        process_argv_use_more(argc, argv);
     } else {
         // 标准输出被重定向到文件 或 管道
         // 仅仅当 cat 使用
-        process_argv_use_cat(cmd);
+        process_argv_use_cat(argc, argv);
     }
 
     return 0;

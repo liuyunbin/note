@@ -1,33 +1,10 @@
 
-#include <ctype.h>
-#include <dirent.h>
-#include <errno.h>
-#include <error.h>
-#include <fcntl.h>
-#include <grp.h>
-#include <pwd.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/resource.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <termios.h>
-#include <time.h>
-#include <unistd.h>
+#include <readline/history.h>   // add_history
+#include <readline/readline.h>  // readline
+#include <stdlib.h>             // strtol
 
-#include <atomic>
 #include <iostream>
-#include <map>
-#include <queue>
 #include <stack>
-#include <string>
-#include <utility>
-#include <vector>
 
 #include "lshell.h"
 
@@ -35,7 +12,7 @@ char            *data = NULL;  // 存储输入字符串
 std::stack<char> stack_char;   // 存储运算符
 std::stack<long> stack_long;   // 存储运算数
 
-void input_bc() {
+static void input() {
     data = readline("> ");
 
     if (data == NULL)  // 读入 EOF
@@ -175,11 +152,10 @@ void output() {
         stack_long.pop();
 }
 
-int do_bc(cmd_t &cmd) {
+int do_bc(int argc, char *argv[]) {
     for (;;) {
-        input_bc();
+        input();
         output();
     }
-
     return 0;
 }

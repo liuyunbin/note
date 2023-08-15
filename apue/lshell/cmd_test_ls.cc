@@ -1,39 +1,14 @@
 
-#include <ctype.h>
-#include <dirent.h>
-#include <errno.h>
-#include <error.h>
-#include <fcntl.h>
-#include <grp.h>
-#include <pwd.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/resource.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <termios.h>
-#include <time.h>
-#include <unistd.h>
-
-#include <atomic>
-#include <iostream>
-#include <map>
-#include <queue>
-#include <stack>
-#include <string>
-#include <utility>
-#include <vector>
+#include <dirent.h>     // opendir
+#include <fcntl.h>      // fstatat
+#include <sys/stat.h>   // fstatat
+#include <sys/types.h>  // opendir
+#include <unistd.h>     // getopt
 
 #include "lshell.h"
 
 std::string mode_to_str(int mode) {
     std::string result = "----------";
-
     // 文件类型
     if (S_ISDIR(mode))
         result[0] = 'd';  // 目录
@@ -68,60 +43,86 @@ std::string mode_to_str(int mode) {
     return result;
 }
 
-void show_file_info(const std::string &file_name, const struct stat *stat_ptr) {
-    printf("%s", mode_to_str(stat_ptr->st_mode).data());
-    printf("%4d ", (int)stat_ptr->st_nlink);
-    printf("%-8s ", uid_to_name(stat_ptr->st_uid).data());
-    printf("%-8s ", gid_to_name(stat_ptr->st_gid).data());
-    printf("%8ld ", (long)stat_ptr->st_size);
-    printf("%.12s ", 4 + ctime(&stat_ptr->st_mtime));
-    printf("%s\n", file_name.data());
-}
-
-int do_stat(const std::string &file_name, int dir_fd) {
+int show_file_info(const char* name, int dir_fd, bool show_detail) {
     struct stat info;
 
-    if (fstatat(dir_fd, file_name.data(), &info, 0) == -1) {
-        perror(file_name.data());
+    if (fstatat(dir_fd, name, &info, 0) == -1) {
+        perror(name);
         return -1;
     }
-    show_file_info(file_name, &info);
+
+    if (show_detail) {
+        printf("%s", mode_to_str(info.st_mode).data());
+        printf("%4d ", (int)info.st_nlink);
+        printf("%-8s ", uid_to_name(info.st_uid).data());
+        printf("%-8s ", gid_to_name(info.st_gid).data());
+        printf("%8ld ", (long)info.st_size);
+        printf("%.12s ", 4 + ctime(&info.st_mtime));
+    }
+    printf("%s\n", name);
+
     return 0;
 }
 
-int is_directory(const std::string &name) {
-    struct stat info;
-    if (stat(name.data(), &info) == -1)
-        return -1;
-    if (S_ISDIR(info.st_mode))
-        return 1;
-    else
-        return 0;
+int list_file(const char* name, bool show_detail) {
+    return show_file_info(name, AT_FDCWD, show_detail);
 }
 
-int do_ls(cmd_t &cmd) {
-    std::string name;
-    if (cmd.cmd_vec.size() == 1)
-        name = ".";
-    else
-        name = cmd.cmd_vec[1];
-    int ret = is_directory(name);
-    if (ret == -1)
+int list_directory(const char* name, bool show_detail) {
+    DIR* dir_ptr = opendir(name);
+    if (dir_ptr == NULL) {
+        // 无法打开目录
+        perror(name);
         return -1;
-    if (ret == 1) {  // 目录
-        DIR *dir_ptr = opendir(name.data());
-        if (dir_ptr == NULL) {
-            // 无法打开目录
-            perror(name.data());
+    }
+    struct dirent* dirent_ptr;
+    while ((dirent_ptr = readdir(dir_ptr)) != NULL)
+        if (show_file_info(dirent_ptr->d_name, dirfd(dir_ptr), show_detail) ==
+            -1)
+            return -1;
+    closedir(dir_ptr);
+    return 0;
+}
+
+int list(const char* name, bool show_detail) {
+    int ret = is_directory(name);
+    if (ret == -1) {
+        perror("ls");
+        return -1;
+    }
+    if (ret == 1)  // 目录
+        return list_directory(name, show_detail);
+    return list_file(name, show_detail);
+}
+
+static int usage() {
+    printf("ls    -------- list simple\n");
+    printf("ls -l -------- list detail\n");
+    printf("ls -h -------- help\n");
+    return 0;
+}
+
+int do_ls(int argc, char* argv[]) {
+    bool show_detail = false;
+
+    int opt;
+    while ((opt = getopt(argc, argv, "hl")) != -1) {
+        switch (opt) {
+        case 'h':
+            return usage();
+        case 'l':
+            show_detail = true;
+            break;
+        default:
             return -1;
         }
-        struct dirent *dirent_ptr;
-        while ((dirent_ptr = readdir(dir_ptr)) != NULL)
-            if (do_stat(dirent_ptr->d_name, dirfd(dir_ptr)) == -1)
-                return -1;
-        closedir(dir_ptr);
-        return 0;
-    } else {  // 普通文件
-        return do_stat(name, AT_FDCWD);
     }
+
+    if (optind == argc)
+        return list(".", show_detail);
+    for (int i = optind; i < argc; ++i)
+        if (list(argv[i], show_detail) == -1)
+            return -1;
+
+    return 0;
 }

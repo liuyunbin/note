@@ -4,6 +4,7 @@
 #include <grp.h>                // getgrgid
 #include <pwd.h>                // getpwuid
 #include <readline/readline.h>  // readline
+#include <sys/stat.h>           // stat
 #include <sys/types.h>          // getuid
 #include <unistd.h>             // getuid, get_current_dir_name
 
@@ -36,6 +37,16 @@ std::string get_user_home() {
     return "";
 }
 
+int is_directory(const char *name) {
+    struct stat info;
+    if (stat(name, &info) == -1)
+        return -1;
+    if (S_ISDIR(info.st_mode))
+        return 1;
+    else
+        return 0;
+}
+
 std::string get_prompt() {
     char       *p        = get_current_dir_name();
     std::string curr_dir = p;
@@ -64,7 +75,7 @@ std::string get_prompt() {
     return prompt;
 }
 
-std::string get_input() {
+void get_input(std::string &input) {
     std::string prompt = get_prompt();
     char       *p      = readline(prompt.data());
 
@@ -73,15 +84,13 @@ std::string get_input() {
         exit(0);
     }
 
-    std::string input;
+    input.clear();
     for (size_t i = 0; p[i] != '\0' && p[i] != '\n'; ++i)
         if (p[i] != '~')
             input += p[i];
         else if (p[i + 1] == ' ' || p[i + 1] == '\0' || p[i + 1] == '/')
-            input += user_home;
+            input += get_user_home();
         else
             input += p[i];
     free(p);
-
-    return input;
 }
