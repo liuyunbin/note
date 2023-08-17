@@ -49,7 +49,6 @@ int do_bg(int argc, char* argv[]);
 int do_fg(int argc, char* argv[]);
 
 // 测试命令
-int do_ls(int argc, char* argv[]);
 int do_cp(int argc, char* argv[]);
 int do_bc(int argc, char* argv[]);
 int do_more(int argc, char* argv[]);

@@ -29,7 +29,6 @@ add_executable(lshell
                apue/lshell/cmd.cc
                apue/lshell/cmd_builtin.cc
                apue/lshell/cmd_test.cc
-               apue/lshell/cmd_test_ls.cc
                apue/lshell/cmd_test_cp.cc
                apue/lshell/cmd_test_bc.cc
                apue/lshell/cmd_test_more.cc
