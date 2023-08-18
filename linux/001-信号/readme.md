@@ -207,3 +207,19 @@
 ## 信号-测试: 捕获所有信号, 用于测试
 测试文件: [15.cc](./15.cc)
 
+## 相关命令
+```
+kill         pid # 通过进程ID发送信号给进程或进程组
+kill -signal pid # 指定信号，默认值为 SIGTERM
+kill -l          # 列出所有信号
+
+killall             # 通过进程名称发送信号给进程或进程组, 进程名称精确匹配
+killall -l          # 列出所有信号
+killall -o 2m a.out # 发给 2 分钟前启动的 a.out
+killall -y 2m a.out # 发给 2 分钟内启动的 a.out
+killall -w    a.out # 等待进程结束
+
+pkill         ... # 杀死进程, 扩展的正则表达式，参数和 pgrep 类似 -- 常用
+pkill -signal ... # 指定信号，默认值为 SIGTERM
+```
+
