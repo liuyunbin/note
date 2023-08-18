@@ -8,10 +8,21 @@
 
 #include <map>
 #include <queue>
+#include <string>
 
-#include "lshell.h"
+int file_type(const std::string &name) {
+    struct stat info;
 
-// do_cp
+    if (stat(name.data(), &info) == -1) {
+        return -1;
+    }
+
+    if (S_ISDIR(info.st_mode))
+        return 1;  // 目录
+    else
+        return 0;  // 文件
+}
+
 int get_absolute_name(const std::string &from, std::string &to) {
     std::string str;
     if (from.front() != '/') {
@@ -46,11 +57,9 @@ int get_absolute_name(const std::string &from, std::string &to) {
             ve.push_back(current_str);
         }
     }
-    to = "/";
+    to.clear();
     for (auto &data : ve)
         to += "/" + data;
-    if (to.size() > 1)
-        to += "/";
     return 0;
 }
 
@@ -80,7 +89,7 @@ int cp_file(const std::string &from, const std::string &to) {
 
     int out_fd = open(to.data(), O_CREAT | O_WRONLY | O_TRUNC, 0644);
     if (out_fd == -1) {
-        perror(to.data());
+        perror("cp");
         return -1;
     }
 
@@ -109,16 +118,17 @@ int cp_directory(const std::string &from, const std::string &to) {
     for (;;) {
         if (qu.empty())
             break;
-        auto data = qu.front();
+        std::pair<std::string, std::string> data = qu.front();
         qu.pop();
 
-        if (is_directory(data.second.data()) == 0) {
+        int type = file_type(data.second);
+        if (type == 0) {
             // data.second 存在且是文件，失败
             printf("无法拷贝从目录到文件 且 文件存在的情况\n");
             return -1;
         }
 
-        if (is_directory(data.second.data()) == -1) {
+        if (type == -1) {
             // data.second 不存在
             if (mkdir(data.second.data(), 0755) == -1) {
                 perror("");
@@ -136,7 +146,10 @@ int cp_directory(const std::string &from, const std::string &to) {
         struct dirent *dirent_ptr;
         while ((dirent_ptr = readdir(dir_ptr)) != NULL) {
             std::string name = data.first + "/" + dirent_ptr->d_name;
-            if (is_directory(name.data()) == 0) {
+            int         type = file_type(name);
+            if (type == -1)
+                return -1;
+            if (type == 0) {
                 // 文件
                 int ret = cp_file(name, data.second + "/" + dirent_ptr->d_name);
                 if (ret == -1)
@@ -204,13 +217,16 @@ int cp_directory_to_file_or_directory(const std::string &from,
     return cp_directory(from, to);
 }
 
-int do_cp(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     if (argc != 3) {
-        printf("please use : cp ... ...\n");
+        printf("please use: cp ... ...\n");
         return -1;
     }
 
-    if (is_directory(argv[1]) == -1) {
+    int file_type_argv_1 = file_type(argv[1]);
+    int file_type_argv_2 = file_type(argv[2]);
+
+    if (file_type_argv_1 == -1) {
         // 第一个文件参数不存在
         perror("cp");
         return -1;
@@ -225,35 +241,29 @@ int do_cp(int argc, char *argv[]) {
         return -1;
     }
 
-    if (is_directory(argv[1]) == 0 && is_directory(argv[2]) == 0) {
-        // 文件 --> 文件，且 文件存在
+    // 文件 --> 文件，且 文件存在
+    if (file_type_argv_1 == 0 && file_type_argv_2 == 0)
         return cp_file_to_file(argv[1], argv[2]);
-    }
 
-    if (is_directory(argv[1]) == 0 && is_directory(argv[2]) == 1) {
-        // 文件 --> 目录，且 目录存在
+    // 文件 --> 目录，且 目录存在
+    if (file_type_argv_1 == 0 && file_type_argv_2 == 1)
         return cp_file_to_directory(argv[1], argv[2]);
-    }
 
-    if (is_directory(argv[1]) == 0 && is_directory(argv[2]) == -1) {
-        // 文件 --> argv[2]，argv[2] 不存在，argv[2] 可能是文件 或 目录
+    // 文件 --> argv[2]，argv[2] 不存在，argv[2] 可能是文件 或 目录
+    if (file_type_argv_1 == 0 && file_type_argv_2 == -1)
         return cp_file_to_file_or_directory(argv[1], argv[2]);
-    }
 
-    if (is_directory(argv[1]) == 1 && is_directory(argv[2]) == 0) {
-        // 目录 --> 文件，且 文件存在
+    // 目录 --> 文件，且 文件存在
+    if (file_type_argv_1 == 1 && file_type_argv_2 == 0)
         return cp_directory_to_file(argv[1], argv[2]);
-    }
 
-    if (is_directory(argv[1]) == 1 && is_directory(argv[2]) == 1) {
-        // 目录 --> 目录，且 目录存在
+    // 目录 --> 目录，且 目录存在
+    if (file_type_argv_1 == 1 && file_type_argv_2 == 1)
         return cp_directory_to_directory(argv[1], argv[2]);
-    }
 
-    if (is_directory(argv[1]) == 1 && is_directory(argv[2]) == -1) {
-        // 目录 --> argv[2]，argv[2] 不存在，argv[2] 可能是文件 或 目录
+    // 目录 --> argv[2]，argv[2] 不存在，argv[2] 可能是文件 或 目录
+    if (file_type_argv_1 == 1 && file_type_argv_2 == -1)
         return cp_directory_to_file_or_directory(argv[1], argv[2]);
-    }
 
     return 0;
 }
