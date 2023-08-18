@@ -12,8 +12,6 @@
 #include <iostream>
 #include <map>
 
-#include "lshell.h"
-
 // 由于信号处理函数会修改下面两个变量的值
 // 为避免程序拿到一半的值，所以采用原子变量
 // 以下两个变量分别表示终端的行数和列数
@@ -31,7 +29,7 @@ int num_of_lines;
 
 static void usage() {
     fputs("use more ...\n", stderr);
-    exit(-1);
+    exit(0);
 }
 
 // 传递数据
@@ -264,15 +262,11 @@ void process_argv_use_more(int argc, char *argv[]) {
     reset_tty();
 }
 
-int do_more(int argc, char *argv[]) {
-    if (isatty(1)) {
-        // 标准输出是终端
+int main(int argc, char *argv[]) {
+    if (isatty(1))  // 标准输出是终端
         process_argv_use_more(argc, argv);
-    } else {
-        // 标准输出被重定向到文件 或 管道
-        // 仅仅当 cat 使用
+    else  // 标准输出被重定向到文件 或 管道, 仅仅当 cat 使用
         process_argv_use_cat(argc, argv);
-    }
 
     return 0;
 }
