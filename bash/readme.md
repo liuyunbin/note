@@ -806,16 +806,6 @@ gdb> thread	                 # 切换到指定线程
 gdb> watch	                 # 监视某一个变量的值是否发生变化
 gdb> ptype	                 # 查看变量类型
 
-kill         pid # 通过进程ID发送信号给进程或进程组
-kill -signal pid # 指定信号，默认值为 SIGTERM
-kill -l          # 列出所有信号
-
-killall             # 通过进程名称发送信号给进程或进程组, 进程名称精确匹配
-killall -l          # 列出所有信号
-killall -o 2m a.out # 发给 2 分钟前启动的 a.out
-killall -y 2m a.out # 发给 2 分钟内启动的 a.out
-killall -w    a.out # 等待进程结束
-
                              # 多个命令之间取或
 ps -U RUID -G RGID           # 实际的用户和组
 ps -u EUID -g EGID           # 有效的用户和组
@@ -892,9 +882,6 @@ pgrep -x  ... # 精确匹配，默认不需要完全匹配
 pgrep -w  ... # 列出线程ID
 
 pidof    # 进程名称 => PID, 精确匹配, 没有长度限制
-
-pkill         ... # 杀死进程, 扩展的正则表达式，参数和 pgrep 类似 -- 常用
-pkill -signal ... # 指定信号，默认值为 SIGTERM
 
 pwdx pid # 列出进程的当前工作目录
 

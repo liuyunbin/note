@@ -209,9 +209,6 @@ setpriority
 
 times
 
-getpgid
-setpgid
-
 setsid()
 getsid()
 tcgetpgrp()
