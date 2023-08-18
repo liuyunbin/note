@@ -1,30 +1,21 @@
 
-#include <readline/history.h>   // add_history
-#include <readline/readline.h>  // readline
-#include <stdlib.h>             // strtol
+#include <stdlib.h>  // strtol
 
 #include <iostream>
 #include <stack>
+#include <string>
 
-#include "lshell.h"
-
-char            *data = NULL;  // 存储输入字符串
-std::stack<char> stack_char;   // 存储运算符
-std::stack<long> stack_long;   // 存储运算数
+char             data[1024];  // 存储输入字符串
+std::stack<char> stack_char;  // 存储运算符
+std::stack<long> stack_long;  // 存储运算数
 
 static void input() {
-    data = readline("> ");
-
-    if (data == NULL)  // 读入 EOF
+    if (fgets(data, sizeof(data), stdin) == NULL)  // 读入 EOF
         exit(EXIT_SUCCESS);
-
-    if (data[0] != '\0')
-        add_history(data);
-
     // 移除多余的空格
     int k = 0;
     for (size_t i = 0; data[i] != '\0'; ++i)
-        if (data[i] != ' ')
+        if (data[i] != ' ' && data[i] != '\n')
             data[k++] = data[i];
     if (k > 0 && data[k - 1] == '=')
         data[k - 1] = '\0';
@@ -141,10 +132,6 @@ void output() {
     if (solve() == false)
         std::cout << "输入格式错误" << std::endl;
 
-    if (data != NULL) {
-        free(data);
-        data = NULL;
-    }
     // 清空栈，避免影响下次计算
     while (!stack_char.empty())
         stack_char.pop();
@@ -152,7 +139,7 @@ void output() {
         stack_long.pop();
 }
 
-int do_bc(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     for (;;) {
         input();
         output();
