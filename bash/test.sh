@@ -126,3 +126,8 @@ test_array
 
 log_info
 
+read lyb <<< "123 456"
+
+echo $lyb
+
+
