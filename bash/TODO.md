@@ -1,4 +1,12 @@
 
+
+netstat -i  # 网络接口的信息
+netstat -in # 网络接口的信息, 使用数字
+netstat -rn # 路由表
+
+
+
+
 docker run ubuntu:15.10 -d --name "lyb"           # 启动 docker, 给起一个名字
 docker run ubuntu:15.10 -d --net=host             # 主机和 docker 共享 IP 和 端口号
 docker run ubuntu:15.10 -d -P                     # docke 内使用随机端口映射主机端口
