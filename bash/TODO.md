@@ -1,4 +1,55 @@
 
+wget ... -O ...                    # 指定文件名称
+wget ... -o ...                    # 指定日志文件
+wget ... -c                        # 断点续传
+wget ... -t ...                    # 指定重试的次数
+wget ... -t 0                      # 不停重试
+wget ... --mirror --convert-links  # 镜像下载, 递归, 并转换为本地 url
+wget ... --user ... --password ... # 指定用户名和密码
+wget ... --limit-rate ...          # 限制下载速度
+wget ... --quota      ...          # 限制最大下载量
+
+curl ...                    # 下载到标准输出
+curl ... -O                 # 下载到文件, 文件名称从 url 中获取
+curl ... -o ...             # 下载到文件
+curl ... --silent           # 不显示进度信息
+curl ... -C -               # 断点续传
+curl ... --referer ...      # 表明客户端是从哪儿跳过来的
+curl ... --cookie  ...      # 指明 cookie
+curl ... --cookie-jar ...   # 指明 cookie, 使用文件
+curl ... --user-agent ...   # 指明用户的客户端
+curl ... -H ...             # 指明请求头部信息
+curl ... --limit-rate ...   # 限制下载速度
+curl ... --max-filesize ... # 限制最大下载量
+curl ... -u user:pass       # 指定用户名和密码
+curl ... -I                 # 只打印 http 头部信息
+curl ... --head             # 只打印 http 头部信息
+
+ping      www.bing.com #
+ping -c 3 www.bing.com # 设置测试的次数
+ping -i 3 www.bing.com # 设置间隔的秒数
+ping -I 3 www.bing.com # 设置发送的接口, 自身的 IP
+ping -w 3 www.bing.com # 设置耗时的上限
+ping -t 3 www.bing.com # 设置使用的 TTL 大小
+ping -f   www.bing.com # 高速率极限测试, 需要 root 权限
+ping -r   www.bing.com # 跳过路由表
+
+traceroute ... # 查看数据包经过的路径
+
+ss       # 显示已连接的 UDP, TCP, unix domain sockets
+ss -u    #          UDP
+ss -t    # 已连接的 TCP
+ss -tl   #   监听的 TCP
+ss -ta   # 已连接和监听的 TCP
+ss -tln  # 服务使用数字而不是名称
+ss -tlnp # 列出监听的进程号, 需要root 权限
+ss -s    # 显示统计
+ss src   192.168.198.128:22  # 通过源  IP和端口号筛选信息
+ss dst   192.168.198.1:51932 # 通过目的IP和端口号筛选信息
+ss sport OP 22               # 通过源  端口号过滤数据
+ss dport OP 22               # 通过目的端口号过滤数据
+                             # OP 可以是空, >(gt) >=(ge) <(lt) <=(le) ==(eq) !=(ne), 注意转义
+
 
 netstat -i  # 网络接口的信息
 netstat -in # 网络接口的信息, 使用数字
@@ -39,23 +90,6 @@ systemctl disable    nginx   # 开机禁止启动 nginx
 systemctl is-active  nginx   # 查看 nginx 是否启动成功
 systemctl is-failed  nginx   # 查看 nginx 是否启动失败
 systemctl is-enabled nginx   # 查看 nginx 是否开机启动
-
-traceroute: 查看数据包经过的路径
-
-ss       # 显示已连接的 UDP, TCP, unix domain sockets
-ss -x    # unix domain sockets
-ss -u    #          UDP
-ss -t    # 已连接的 TCP
-ss -tl   #   监听的 TCP
-ss -ta   # 已连接和监听的 TCP
-ss -tln  # 服务使用数字而不是名称
-ss -tlnp # 列出监听的进程号, 需要root 权限
-ss -s    # 显示统计
-ss src   192.168.198.128:22  # 通过源  IP和端口号筛选信息
-ss dst   192.168.198.1:51932 # 通过目的IP和端口号筛选信息
-ss sport OP 22               # 通过源  端口号过滤数据
-ss dport OP 22               # 通过目的端口号过滤数据
-                             # OP 可以是空, >(gt) >=(ge) <(lt) <=(le) ==(eq) !=(ne), 注意转义
 
 host     ...       #
 nslookup baidu.com # 查询 域名 对应 的 IP
@@ -109,12 +143,6 @@ tcpdump ether broadcast      # 基于广播过滤
 tcpdump ether multicast      # 基于多播过滤
 tcpdump ip broadcast         # 基于广播过滤
 tcpdump ip multicast         # 基于多播过滤
-
-ping      www.bing.com # 使用 ICMP ping 主机
-ping -c 3 www.bing.com # 使用 ICMP ping 主机, 设置测试的次数
-ping -i 3 www.bing.com # 使用 ICMP ping 主机, 设置间隔的秒数
-ping -w 3 www.bing.com # 使用 ICMP ping 主机, 设置耗时的上限
-ping -f   www.bing.com # 使用 ICMP ping 主机, 高速率极限测试, 需要 root 权限
 
 ntpdate -s time-b.nist.gov          # 使用时间服务器更新时间
 
@@ -211,8 +239,6 @@ iperf -c 127.0.0.1 -L 9090 -r # 客户端(TCP), 客户端连服务端结束后, 
 iperf -c 127.0.0.1 -P 30      # 客户端(TCP), 客户端线程数为 30
 iperf -c 127.0.0.1 -u         # 客户端(UDP)
 
-```
-curl -I ... # 只打印头部信息
 firewall-cmd --list-ports                      # 查看所有打开的端口
 firewall-cmd --list-services                   # 查看所有打开的服务
 firewall-cmd --get-services                    # 查看所有的服务
@@ -233,30 +259,4 @@ firewall-cmd --add-forward-port=proto=80:proto=tcp:toaddr=192.168.0.1:toport=808
 firewall-cmd --add-forward-port=proto=80:proto=tcp:toaddr=192.168.0.1:toport=8080 --permanent
                                                # 端口转发, 永久生效, 需要重新加载配置
 firewall-cmd --runtime-to-permanent            # 将当前防火墙的规则永久保存
-
-wget ... -O ...                    # 指定文件名称
-wget ... -o ...                    # 指定日志文件
-wget ... -c                        # 断点续传
-wget ... -t ...                    # 指定重试的次数
-wget ... -t 0                      # 不停重试
-wget ... --mirror --convert-links  # 镜像下载, 递归, 并转换为本地 url
-wget ... --user ... --password ... # 指定用户名和密码
-wget ... --limit-rate ...          # 限制下载速度
-wget ... --quota      ...          # 限制最大下载量
-
-curl ...        # 下载到标准输出
-curl ... -O     # 下载到文件, 文件名称从 url 中获取
-curl ... -o ... # 下载到文件
-curl ... --silent # 不显示进度信息
-curl ... -C -     # 断点续传
-curl ... --referer ... # 表明客户端是从哪儿跳过来的
-curl ... --cookie  ... # 指明 cookie
-curl ... --cookie-jar ... # 指明 cookie, 使用文件
-curl ... --user-agent ... # 指明用户的客户端
-curl ... -H ...           # 指明请求头部信息
-curl ... --limit-rate ... # 限制下载速度
-curl ... --max-filesize ... # 限制最大下载量
-curl ... -u user:pass       # 指定用户名和密码
-curl ... -I                 # 只打印 http 头部信息
-curl ... --head             # 只打印 http 头部信息
 
