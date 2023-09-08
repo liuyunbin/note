@@ -263,7 +263,6 @@ uname -r # 内核版本
 uptime -s # 列出系统启动时间
 ```
 
-
 ## 网络相关的命令
 ```
 netstat -i  # 网络接口的信息
@@ -350,6 +349,7 @@ curl ... --cookie  ...      # 指明 cookie
 curl ... --cookie-jar ...   # 指明 cookie, 使用文件
 curl ... --user-agent ...   # 指明用户的客户端
 curl ... -H ...             # 指明请求头部信息
+curl ... -d ...             # 发送post请求
 curl ... --limit-rate ...   # 限制下载速度
 curl ... --max-filesize ... # 限制最大下载量
 curl ... -u user:pass       # 指定用户名和密码

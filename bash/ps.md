@@ -1,23 +1,4 @@
 
-## core 不能生成的原因
-* 设置了 SUID, 进程的实际用户不是可执行文件的所有者
-* 设置了 SGID, 进程的实际组不是可执行文件组的所有者
-* 没有写当前目录的权限
-* 文件已存在, 但无权限修改
-* 文件太大, 受 ulimit 的限制
-
-## ubuntu 生成 core
-1. ulimit -c unlimited -- 设置 core 文件大小的软限制不受限制
-2. /etc/sysctl.conf ----- 添加 `kernel.core_pattern=%e.%p` -- 文件名, 进程号
-    * %% --- %
-    * %p --- pid
-    * %u --- uid
-    * %g --- gid
-    * %s --- 导致dump的信号
-    * %t --- 时间
-    * %e --- 执行文件的名称
-    * %h --- hostname
-3. sudo sysctl -p ------- 配置生效
 
 ## 常用命令
 ```

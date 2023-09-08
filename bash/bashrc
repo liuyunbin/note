@@ -1,6 +1,8 @@
 
 PS1='\[\e[32m\]$(date "+%Y-%m-%d %H:%M:%S %z") \[\e[0m\]'
 
+ulimit -c unlimited
+
 note=~/github/note
 
 PATH="$PATH:$note/bash:$note/bin"
