@@ -3,6 +3,7 @@
 主目录权限不能是 777
 
 ### 常用命令
+```
 ssh -N -D A_PORT B_IP
             # 功能:
             #   动态端口转发
@@ -77,4 +78,5 @@ ListenAddress 1.2.3.4      # 监听地址
 PasswordAuthentication     # 指定是否允许密码登录，默认值为 yes
 Port 22                    # 监听端口号
 GatewayPorts no            # 远程转发时, 是否允许其他主机使改端口号, 默认不允许
+```
 
