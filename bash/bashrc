@@ -1,5 +1,5 @@
 
-PS1='\[\e[32m\]$(date "+%Y-%m-%d %H:%M:%S %z") \[\e[0m\]'
+PS1='\[\e[1m\]$(date "+%Y-%m-%d %H:%M:%S %z") \[\e[0m\]'
 
 ulimit -c unlimited
 
