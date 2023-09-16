@@ -31,3 +31,5 @@ alias z='tar zcf'
 alias addeol="vim -c 'set eol'       -c 'wq!'"  # 文件末尾 无换行符 => 有换行符
 alias deleol="vim -c 'set bin noeol' -c 'wq!'"  # 文件末尾 有换行符 => 无换行符
 
+alias vps="ssh root@144.168.57.124"
+
