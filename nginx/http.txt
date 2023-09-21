@@ -1,0 +1,49 @@
+
+## http 请求
+* 请求行:
+    * 请求方法 请求的内容 请求的协议及其版本号
+    * GET / http/1.1
+* 请求头部
+    * Host	 www.bing.com   # 服务器名称,  对应 Nginx 的 server_name
+    * Accept text/html      # 客户端能够接收的数据类型，Nginx 会通过 types 指令域中的内容做匹配
+    * Cookie  ...           # 客户端请求的 cookie
+    * Referer ...	        # 从哪个网站跳过来的
+    * Cache-Control	...     # 当前客户端缓存机制
+    * Connection keep-alive # 长连接机制，HTTP/1.1 默认启用保持连接
+    * If-None-Match	...     # 缓存文件及其大小
+    * If_modified_since	... # 缓存文件的最后修改时间
+    * User-Agent ...        # 浏览器信息
+* 空行
+* 请求体
+
+## http 响应
+* 响应行: 响应协议及其版本号 状态码 状态描述
+    * 200 响应成功
+    * 204 无响应体
+    * 206 返回部分内容
+    * 301 永久重定向:
+        * 重新发起请求, GET 请求不变, POST 请求会变成 GET
+        * 浏览器会显示新的 url
+    * 302 临时重定向:
+        * 所有请求方法都变成 GET
+        * 浏览器会显示新的 url
+    * 304 文件未修改, 客户端可以使用缓存
+    * 307 临时重定向: 只修改请求的 url, 其他保持不变
+    * 308 永久重定向: 重新发起请求, GET POST 都不变
+    * 400 错误请求
+    * 403 拒绝访问
+    * 404 资源未找到
+    * 408 请求超时
+
+* 响应头部
+    * Content-Type	text/html;   # 响应的数据类型
+    * charset=utf-8              # 响应的编码
+    * Connection keep-alive      # 告知客户端是否启用保持连接机制
+    * Cache-Control	no-cache     # 告知客户端对缓存机制的控制
+    * ETag ...                   # 缓存相关, 文件大小
+    * Last_modified_time ...     # 缓存相关, 文件最后修改时间
+    * Location https://bing.com/ # 告知客户端跳转到指定的 URI
+    * Set-Cookie ....            # 响应的 cookie
+* 空行
+* 响应体
+

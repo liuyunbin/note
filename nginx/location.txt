@@ -1,0 +1,63 @@
+
+## location 匹配优先级
+1. location  =  /kds {} 精确匹配, 如果匹配, 立即停止匹配其他
+2. location ^~  /kds {} 前缀匹配, 如果匹配, 立即停止匹配其他
+3. location  ~  /kds {} 正则匹配,   区分大小写
+4. location  ~* /kds {} 正则匹配, 不区分大小写, 正则匹配优先级相同, 先匹配的先返回
+5. location     /kds {} 普通前缀匹配, 匹配的越长, 优先级越高
+6. location     @405 {} 内部匹配
+
+## location 和代理
+内部包含代理类指令时 -- proxy_pass fastcgi_pass uwsgi_pass scgi_pass memcached_pass grpc_pass
+如果代理类之类的末尾包含 uri (URL 去掉协议 域名 端口号 名称 参数)
+转发请求时, 会将匹配到的 uri 删除掉, 否则, 会保留匹配到的 uri
+如果 location 匹配失败, 且满足以下条件, 还会匹配成功
+* 请求的 uri 的末尾不包含 /
+* 请求的 url 的末尾添加 / 后, 能与某个前缀匹配匹配上
+
+## 其他相关命令
+root ----- 指明根目录
+alias ---- 重写 location 匹配到的部分
+rewrite regex replacement [flag] -- 重写整个请求的 uri
+  * 使用正则匹配
+  * 如果 replacement 以 http 或 https 打头, 将返回客户端重定向
+  * flag 的类型:
+      * 空 --------- 顺序执行
+      * permanent -- 返回客户端 301 永久重定向
+                     一般不和代理一起用
+                     浏览器显示新 url
+      * redirect --- 返回客户端 302 临时重定向
+                     一般不和代理一起用
+                     浏览器显示新 url
+      * last ------- 直接跳转到新的 url, 重新 location 匹配
+                     一般不和代理一起用
+                     浏览器显示旧 url
+      * break ------ 跳过本模块的 rewrite, 顺序执行, return 也会跳过
+                     一般和代理一起用
+                     浏览器显示旧 url
+rewrite_log -- 是否打印 log
+set ---- 定义变量
+if ----- 条件
+break -- 中止后续指令
+return code; ------- code 需要标准定义的
+return code text; -- 显示提示用户的消息, 所以不能是 30*
+return code  url; -- 重定向, 所以只能是 30*
+return url; -------- 默认 302
+try_files ---------- 尝试判断文件是否存在
+internal ----------- 只能内部使用
+mirror ------------- 镜像网站
+
+expires 24h;           # 相对时间, 有效期为   24h, 同时修改响应头部的 Expires 和 Cache-Control
+expires modified +24h; # 相对时间, 有效期增加 24h, 同时修改响应头部的 Expires 和 Cache-Control
+expires @15h;          # 绝对时间, 同时修改响应头部的 Expires 和 Cache-Control
+expires -1;            # 无缓存, 响应头部的 Cache-Control 修改为 no-cache
+expires epoch;         # 无缓存, 响应头部的 Expires 为 1970-01-01, Cache-Control 修改为 no-cache
+expires max;           # 响应头部的 Expires 为 1937-01-01, Cache-Control 修改为 10 年
+expires off;           # 不添加修改响应头部的 Expires 和 Cache-Control
+
+error_page 500 502 503 504 /50x.html; # 错误码对应的页面
+error_page 404 = @fallback;           # 返回的错误码将转化为 200
+error_page 404 =202 /empty.gif;       # 返回的错误码将转化为 202
+
+recursive_error_pages on; # 错误递归跳转
+

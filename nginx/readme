@@ -1,165 +1,249 @@
 
-## 官网
-* https://nginx.org/
+## wrk 安装
+apt install -y wrk
 
-## 安装 nginx, centos7
-* 安装: sudo yum install nginx
-* 默认的网站目录：/usr/share/nginx/html
-* 默认的配置文件：/etc/nginx/nginx.conf
+## wrk2 安装
+1. apt install -y make gcc libssl-dev zlib1g-dev
+2. cd ~/github
+3. git clone git@github.com:giltene/wrk2
+4. cd wrk2 && make
+5. ln -s ~/github/wrk2/wrk /usr/bin/wrk2
+
+## nginx 安装
+https://nginx.org/en/linux_packages.html
+
+## openresty 安装
+https://openresty.org/cn/installation.html
 
 ## 常用命令
-* nginx -s stop    退出 nginx
-* nginx -s quit    工作进程处理完当前请求后, 退出 nginx
-* nginx -s reload  重新加载配置,
-* nginx -s reopen  重新打开日志文件
+$ nginx            # 启动
+$ nginx -s stop    # 退出
+$ nginx -s quit    # 工作进程处理完当前请求后, 退出
+$ nginx -s reload  # 重新加载配置
+$ nginx -s reopen  # 重新打开日志文件
 
-* systemctl start      nginx   启动 nginx
-* systemctl stop       nginx   停止 nginx
-* systemctl restart    nginx   重启 nginx
-* systemctl status     nginx   查看 nginx 状态
-* systemctl enable     nginx   开机自动启动 nginx
-* systemctl disable    nginx   开机禁止启动 nginx
-* systemctl is-active  nginx   查看 nginx 是否已启动
-* systemctl is-enabled nginx   查看 nginx 是否开机启动
-* systemctl list-unit-files    列出所有可用单元
+$ systemctl start      nginx   # 启动 nginx
+$ systemctl stop       nginx   # 停止 nginx
+$ systemctl restart    nginx   # 重启 nginx
+$ systemctl status     nginx   # 查看 nginx 状态
+$ systemctl enable     nginx   # 开机自动启动 nginx
+$ systemctl disable    nginx   # 开机禁止启动 nginx
+$ systemctl is-active  nginx   # 查看 nginx 是否已启动
+$ systemctl is-enabled nginx   # 查看 nginx 是否开机启动
+$ systemctl list-unit-files    # 列出所有可用单元
 
-* firewall-cmd --add-service=http     添加服务
+$ sudo firewall-cmd --add-service=http # 添加 http 服务
+
+## 常用变量
+$ancient_browser ------------- 客户端浏览器信息
+$arg_name -------------------- 请求行某个参数的值, name 可替换为 key
+$args ------------------------ 请求行参数
+$binary_remote_addr ---------- 客户端 IP 的二进制形式 ------------------ 限速会用到
+$body_bytes_sent ------------- 发送给客户端的响应体大小 ---------------- 常用
+$bytes_received -------------- 接收到的字节数 -------------------------- 常用
+$bytes_sent ------------------ 发送给客户端的大小 ---------------------- 常用
+$connection ------------------ 连接的序列号
+$connection_requests --------- 此连接请求的次数
+$connection_time ------------- nginx 的连接时间
+$connections_active ---------- 当前连接的活跃的数量
+$connections_reading --------- 当前连接的  读的数量
+$connections_waiting --------- 当前连接的  写的数量
+$connections_writing --------- 当前连接的等待的数量
+$content_length -------------- 请求头的 Content-Length
+$content_type ---------------- 请求头的 Content-Type
+$cookie_name ----------------- cookie 的某个值
+$date_gmt -------------------- 日期
+$date_local ------------------ 日期
+$document_root --------------- 同 $uri
+$document_uri ---------------- 同 $uri
+$fastcgi_path_info ----------- fastcgi 路径信息
+$fastcgi_script_name --------- fastcgi 脚本名称
+$host ------------------------ 请求的目标主机
+$hostname -------------------- 请求的目标主机名称
+$http2 ----------------------- http2 协议
+$http3 ----------------------- http3 协议
+$http_name ------------------- 请求头部的一些字段  ---------------- 常用
+$https ----------------------- 是否开启 https
+$invalid_referer ------------- 跳转前的界面是否存在
+$is_args --------------------- 请求行是否有参数
+$limit_conn_status ----------- 连接状态
+$limit_rate ------------------ 限速
+$limit_req_status ------------ 请求状态
+$modern_browser -------------- 浏览器信息
+$msec ------------------------ 当前时间
+$nginx_version --------------- nginx 版本
+$pid ------------------------- 工作进程的进程IP
+$protocol -------------------- TCP  UDP
+$proxy_add_x_forwarded_for --- 向后台服务器传递客户端真实的信息
+$proxy_host ------------------ 代理服务器的信息
+$proxy_port ------------------ 代理服务器的端口号
+$proxy_protocol_addr --------- 被代理服务器的客户端地址
+$proxy_protocol_port --------- 被代理服务器的客户端端口号
+$proxy_protocol_server_addr -- 被代理服务器的服务端地址
+$proxy_protocol_server_port -- 被代理服务器的服务端端口号
+$query_string ---------------- 请求行参数
+$realip_remote_addr ---------- 真实的 IP
+$realip_remote_port ---------- 真实的 端口号
+$realpath_root --------------- 请求 uri 的绝对路径
+$remote_addr ----------------- 客户端 IP ---------------------- 常用
+$remote_port ----------------- 客户端端口号 ------------------- 常用
+$remote_user ----------------- 客户端认证的用户
+$request --------------------- 未被修改的请求行 --------------- 常用
+$request_body ---------------- 请求体
+$request_body_file ----------- 保存请求体的临时文件
+$request_completion ---------- 请求是否完成
+$request_filename ------------ 未被修改的 uri (无参数)
+$request_id ------------------ 请求的ID, 随机数
+$request_length -------------- 请求的长度
+$request_method -------------- 请求的方法 GET POST
+$request_time ---------------- 请求的时间 --------------------- nginx 接到请求到将请求发给客户端的时间
+$request_uri ----------------- 未被修改的 uri + 参数
+$scheme ---------------------- http https --------------------- 常用
+$sent_http_name -------------- 响应的 http 头部的字段 --------- 常用
+$sent_trailer_name ----------- 同上, 但是后缀匹配, 部分匹配
+$server_addr ----------------- 服务器 IP
+$server_name ----------------- 服务器名称
+$server_port ----------------- 服务器端口号
+$server_protocol ------------- 响应的 http 版本
+$status ---------------------- 响应的状态
+$time_iso8601 ---------------- 系统时间 ISO 8601
+$time_local ------------------ 系统时间
+$upstream_addr --------------- 上游服务器地址
+$upstream_bytes_received ----- 上游服务器接收到的字节数
+$upstream_bytes_sent --------- 上游服务器发送的字节数
+$upstream_cache_status ------- 上游服务器缓存状态
+$upstream_connect_time ------- 上游服务器连接时间
+$upstream_cookie_name -------- 上游服务器响应的 cookie 的字段
+$upstream_first_byte_time ---- 上游服务器接收到第一个字节的时间
+$upstream_header_time -------- 上游服务器请求头部时间
+$upstream_http_name ---------- 上游服务器请求头部字段
+$upstream_queue_time --------- 上游服务器排队时间
+$upstream_response_length ---- 上游服务器响应长度
+$upstream_response_time ------ 上游服务器响应时间 --------- 也应该常用
+$upstream_session_time ------- 上游服务器 session 时间
+$upstream_status ------------- 请求状态
+$upstream_trailer_name ------- 请求头的字段, 后缀匹配, 部分匹配
+$uri ------------------------- 修改过的 uri, 无参数
 
 ## 常用配置
-* root /usr 指定工作目录
-* location, 位于 server, location 中,
-    * 匹配顺序如下
-        * location  =  /kds {} 精确匹配, 如果匹配, 立即停止匹配其他
-        * location ^~  /kds {} 前缀匹配, 如果匹配, 立即停止匹配其他
-        * location  ~  /kds {} 正则匹配,   区分大小写
-        * location  ~* /kds {} 正则匹配, 不区分大小写, 这两个正则匹配优先级相同, 先匹配的先返回
-        * location     /kds {} 普通前缀匹配, 匹配的越长, 优先级越高
-    * location @405 {} 内部匹配
-* rewrite regex replacement [flag];
-    * 使用正则匹配
-    * 如果 replacement 以 http 或 https 打头, 将直接被重定向
-    * flag 的类型:
-        * last  重新匹配新的 location
-        * break 忽略后续的 rewrite, 并顺序执行
-        * redirect  返回302临时重定向
-        * permanent 返回301永久重定向
-        * 空, 顺序执行
-## 实战
-## TDOD
-alias
-rewrite
+fastcgi_pass	             ...;
+fastcgi_pass_request_body	 ...; #	是否给后台发送客户端的请求体
+fastcgi_pass_request_headers ...; # 是否给后台发送客户端的请求头部
+fastcgi_hide_header	    	 ...; # 隐藏 FastCGI 响应头部的一些字段
+fastcgi_pass_header	         ...; #	传输 FastCGI 响应头部的一些字段
+fastcgi_ignore_headers       ...; #	忽略 FastCGI 响应头部的一些字段
+fastcgi_keep_conn            ...; # 长连接
+fastcgi_socket_keepalive     ...; # 长连接的心跳
+fastcgi_limit_rate           ...; # FastCGI 的限速
+fastcgi_store	             ...; # 缓存 FastCGI 的响应
+fastcgi_cache                ...; # 共享内存作为缓存
+fastcgi_index                ...; # 默认 index 文件
+fastcgi_connect_timeout	     ...; # 连接超时
+fastcgi_read_timeout	     ...; # 读超时
+fastcgi_send_timeout         ...; # 发送超时
+fastcgi_socket_keepalive     ...; # 长连接
+fastcgi_param	             ...; # 传递参数
 
-expires
+proxy_pass	                 ...;
+proxy_pass_request_body	     ...; # 是否给后台发送客户端的请求体
+proxy_pass_request_headers	 ...; # 是否给后台发送客户端的请求头部
+proxy_hide_header	         ...; # 隐藏 proxy 响应头部的一些字段
+proxy_pass_header	         ...; # 传递 proxy 响应头部的一些字段
+proxy_ignore_headers	     ...; # 忽略 proxy 响应头部的一些字段
+proxy_set_header	         ...; # 修改请求头部
+proxy_set_body	             ...; # 修改请求体
+proxy_connect_timeout	     ...; # 连接超时
+proxy_read_timeout           ...; # 读超时
+proxy_send_timeout	         ...; # 发送超时
+proxy_method	             ...; # 修改请求方法
+proxy_http_version	         ...; # http 版本号
+proxy_limit_rate             ...; # 代理的限速
+proxy_socket_keepalive	     ...; # 长连接的心跳
+proxy_ssl_certificate        ...; # SSL 证书文件
+proxy_ssl_certificate_key	 ...; # SSL 私钥
 
-mirror
+upstream name {
+    least_conn;           # 保证每个服务器的连接数大致相同
+    least_time header;    # 选取头部响应时间最短的服务器
+    least_time last_byte; # 选取整体响应时间最短的服务器
+    ip_hash;              # 保证相同的 IP 连接到相同的机器
 
-internal
+    keepalive 16;  # 最大空连接数
 
-limit_req
-limit_conn
-limit_rate
+    server 1.2.3.4:80 weight=5;         # 修改权重
+    server 1.2.3.5:80 max_fails=3;      # 发生错误的次数超过 n 次, 就放弃
+    server 1.2.3.6:80 fail_timeout=30s; # 发生错误的机器 30s 内不会去调用他
+    server 1.2.3.7:80 down;             # 停用
+    server 1.2.3.7:80 backup;           # 备用服务器, 其他服务器都不能用才用它
+}
 
-return
+autoindex            on; # 文件找不到时, 显示目录
+autoindex_exact_size on; # 显示文件的确切大小, 默认显示大概大小
+autoindex_localtime  on; # 显示文件时间, 使用服务器时间, 默认使用 GMT 时间
 
-proxy_pass
-proxy_connect_timeout 90;  #nginx跟后端服务器连接超时时间(代理连接超时)
-proxy_send_timeout 90;     #后端服务器数据回传时间(代理发送超时)
-proxy_read_timeout 90;     #连接成功后,后端服务器响应时间(代理接收超时)
-proxy_buffer_size 4k;      #代理服务器（nginx）保存用户头信息的缓冲区大小
-proxy_buffers 4 32k;      #proxy_buffers缓冲区
-proxy_busy_buffers_size 64k;     #高负荷下缓冲大小（proxy_buffers*2）
-proxy_temp_file_write_size 64k;  #设定缓存文件夹大小
+keepalive_requests 100; # 单个连接允许发送的请求数量
+keepalive_time     1h;  # 单次连接的最长时间
+keepalive_timeout  60;  # 连接接超时时间
 
+ssl on;                   # 使用 ssl
+ssl_certificate .......;  # 证书
+ssl_certificate_key ...;  # 私钥
 
-proxy_set_header：在将客户端请求发送给后端服务器之前，更改来自客户端的请求头信息；
-proxy_connect_timeout：配置 Nginx 与后端代理服务器尝试建立连接的超时时间；
-proxy_read_timeout：配置 Nginx 向后端服务器组发出 read 请求后，等待相应的超时时间；
-proxy_send_timeout：配置 Nginx 向后端服务器组发出 write 请求后，等待相应的超时时间；
-proxy_redirect：用于修改后端服务器返回的响应头中的 Location 和 Refresh。
+limit_except GET {        # 限制或允许某些 IP 的某些 方法
+    allow 192.168.1.0/32;
+    deny  all;
+}
 
-autoindex               on;    # 开启静态资源列目录
-autoindex_exact_size    off;   # on(默认)显示文件的确切大小，单位是byte；off显示文件大概大小，单位KB、MB、GB
-autoindex_localtime     off;   # off(默认)时显示的文件时间为GMT时间；on显示的文件时间为服务器时间
+user  nobody;                 # nginx 的用户和组
 
-sendfile on ;
-tcp_nopush on;
-tcp_nodelay on;
-keepalive_timeout 65 :
-client_body_timeout 60s;
-send_timeout 60s;
+master_process on;            # on --- 一个主进程, 多个工作进程
+                              # off -- 只有一个进程
+daemon  on;                   # 后台运行
 
-sendfile on ; : 开启高效文件传输模式，sendfile指令指定nginx是否调用sendfile函数来输出文件，减少用户空间到内核空间的上下文切换。对于普通应用设为 on，如果用来进行下载等应用磁盘IO重负载应用，可设置为off，以平衡磁盘与网络I/O处理速度，降低系统的负载。开启 tcp_nopush on; 和tcp_nodelay on; 防止网络阻塞。
-keepalive_timeout 65 : : 长连接超时时间，单位是秒，这个参数很敏感，涉及浏览器的种类、后端服务器的超时设置、操作系统的设置，可以另外起一片文章了。长连接请求大量小文件的时候，可以减少重建连接的开销，但假如有大文件上传，65s内没上传完成会导致失败。如果设置时间过长，用户又多，长时间保持连接会占用大量资源。
-client_body_timeout 60s; : 用于设置客户端请求主体读取超时时间，默认是60s。如果超过这个时间，客户端还没有发送任何数据，nginx将返回Request time out(408)错误。
-send_timeout : : 用于指定响应客户端的超时时间。这个超时仅限于两个连接活动之间的时间，如果超过这个时间，客户端没有任何活动，Nginx将会关闭连接。
+worker_processes        auto; # 进程数自动分配
+worker_priority            0; # 工作进程优先级 [-20, 20) 数字越小, 优先级越高
+worker_cpu_affinity     auto; # 工作进程和 CPU 绑定
+worker_shutdown_timeout  10s; # 工作进程等待关闭的时间
+worker_rlimit_nofile   65535; # 每个进程打开的最多文件描述符数目
+worker_rlimit_core     1000M; # core 文件的最大大小
+working_directory       logs; # core 文件的生成目录
 
-https://www.nginx.org.cn/article/detail/217
+pid       logs/nginx.pid;       # 进程号存储的文件
+error_log logs/error.log error; # 日志路径以及级别
 
+events {
+    use epoll;
+    worker_connections  1024;   # 每个进程允许的最多连接数
+}
 
+http {
+    include       mime.types;               # 文件扩展名与文件类型映射表
+    default_type  application/octet-stream; # 默认文件类型
 
+    tcp_nodelay   on;
 
-proxy_set_header Host $host;
-proxy_set_header X-Forwarder-For $remote_addr;  #获取客户端真实IP
+    ignore_invalid_headers off; # 忽略非法的头部
+    client_header_timeout 180s; # 请求头超时时间
+    client_body_timeout   120s; # 请求体超时时间
+    client_max_body_size 100m;  # 请求体的最大值
+    send_timeout 60s; # 响应超时时间
 
-#### 情况一
+    set_real_ip_from   ...; # 设置信任的在头部添加客户端原始你 IP 的机器 -- 感觉还是复杂
+    real_ip_header     ...; # 真实 IP 在请求头部的字段
+    real_ip_recursive   on; # 递归
 
-配置:
-    location  /proxy/ {
-        proxy_pass http://1.2.3.4;
-    }
-请求: http://0.0.0.0/proxy/index.html
-相当于访问:  http://1.2.3.4/proxy/index.html
+    if_modified_since  before;  # before -- 服务器静态文件的修改时间必须大于等于请求头的时间
+                                # off ----- 关闭改功能
+                                # exact --- 服务器静态文件的修改时间必须完全和请求头的时间相同
+    etag off;                   # on ------ 响应头部添加文件的最后修改时间 last_modified_time 和文件大小 Etag
+                                # off ----- 不添加
 
-结论: proxy_pass 的 IP 什么都不跟时, 使用绝对路径, 匹配到的 /proxy/ 也会用到
+    log_format  main  ...;             # 接收日志格式
+                                       # bytes_sent ----------- 发送给客户端的字节数
+                                       # connection_requests -- 同一个连接的请求次数
+                                       # request_length ------- 请求的长度
+                                       # request_time --------- 响应时间
+                                       # status --------------- 响应状态
+    access_log  logs/access.log  main; # 接收日志日志配置
+}
 
-#### 情况二
-
-配置:
-    location  /proxy/ {
-        proxy_pass http://1.2.3.4/;
-    }
-请求: http://0.0.0.0/proxy/index.html
-
-相当于访问:  http://1.2.3.4/index.html
-
-#### 情况三
-
-配置:
-    location  /proxy/ {
-        proxy_pass http://1.2.3.4/kds/;
-    }
-请求: http://0.0.0.0/proxy/index.html
-相当于访问:  http://1.2.3.4/kds/index.html
-
-#### 情况四
-
-配置:
-    location  /proxy/ {
-        proxy_pass http://1.2.3.4/kds;
-    }
-请求: http://0.0.0.0/proxy/index.html
-相当于访问:  http://1.2.3.4/kdsindex.html
-
-结论: proxy_pass 的 IP 还有内容时, 使用相对路径, 匹配到的 /proxy/ 会被丢弃
-
-#### 情况五
-
-配置:
-    location  /proxy/ {
-        proxy_pass http://1.2.3.4/kds/;
-    }
-请求: http://0.0.0.0/proxy/
-请求: http://0.0.0.0/proxy
-相当于访问:  http://1.2.3.4/kds/
-
-结论:
-当 location 中使用 proxy_pass, fastcgi_pass, uwsgi_pass, scgi_pass, memcached_pass, 或 grpc_pass 时,
-如果请求的内容未添加末尾的 /, 且 匹配失败时, 如果 添加 末尾的 / 可以匹配成功的话, 将导致重定向, 最终返回添加 / 后的结果
-
-见: https://nginx.org/en/docs/http/ngx_http_core_module.html#location
-
-#### 情况六
-www.bing.com 和 www.bing.com/ 意思相同
-
-## 参考资源
-* https://nginx.org/en/docs/ngx_core_module.html
