@@ -5,49 +5,50 @@
 * Git 只是版本管理的工具, 未必需要做到, 知其然并知其所以然, 够用就好
 
 ## 基本说明
-### 三个工作区域：
-1. Git 仓库
-2. 暂存区域
-3. 工作目录
+### 三个工作区域
+* Git 仓库
+* 暂存区域
+* 工作目录
 
 ### 文件和目录的分类：
-1. 未跟踪的（untracked），位于工作目录
-2. 已暂存的（staged），属于暂存区域，位于 Git 仓库目录
-3. 已提交的（committed），位于 Git 仓库目录
-4. 已修改的（modified），位于工作目录
-5. 已忽略的文件或目录，位于工作目录
+* 未跟踪的(untracked), 位于工作目录
+* 已暂存的(staged), 属于暂存区域, 位于 Git 仓库目录
+* 已提交的(committed), 位于 Git 仓库目录
+* 已修改的(modified), 位于工作目录
+* 已忽略的文件或目录, 位于工作目录
 
 ### 忽略文件或目录
-在文件 .gitignore 中添加要忽略的文件或目录，规则如下：
-1. 空行或以 `#` 开头的行将被忽略
-2. 以 `/` 开头防止递归
-3. 以 `/` 结尾表示目录
-4. 以 `!` 开头，表示不忽略文件或目录
-5. `*` 匹配任意字符（不包括 `/`）
-6. `**` 匹配任意字符
-7. `[abc]` 表示匹配方括号内的任意单个字符
-8. `[0-9]` 表示匹配范围 [0, 9] 内的任意单个个字符
-9. `?` 匹配任意单个字符
+在文件 .gitignore 中添加要忽略的文件或目录, 规则如下：
+* 空行或以 `#` 开头的行将被忽略
+* 以 `/` 开头防止递归
+* 以 `/` 结尾表示目录
+* 以 `!` 开头, 表示不忽略文件或目录
+* `*` 匹配任意字符(不包括 `/`)
+* `**` 匹配任意字符
+* `[abc]` 表示匹配方括号内的任意单个字符
+* `[0-9]` 表示匹配范围 [0, 9] 内的任意单个个字符
+* `?` 匹配任意单个字符
 
 ## 本地配置基础环境连接 GitHub
 ```
-$ sudo apt install git                                 # 安装 Git
+$ sudo apt install git                                 # 0. 安装 Git
 $                                                      #
-$ git config --global user.name  liuyunbin             # 配置用户名
-$ git config --global user.email yunbinliu@outlook.com # 配置邮箱
-$ git config --global core.editor vim                  # 配置默认编辑器
+$ git config --global user.name  liuyunbin             # 1. 配置用户名
+$ git config --global user.email yunbinliu@outlook.com # 2. 配置邮箱
+$ git config --global core.editor vim                  # 3. 配置默认编辑器
 $ git config --global log.date iso                     # 配置日志使用 年月日 时分秒 时区 的格式
-$
-$ git config --global alias.lg "log --pretty=format:'%Cgreen%ad%Creset %h %s %C(yellow)%d%Creset %Cblue%an%Creset'"                                                 # 添加别名
+$ git config --global alias.lg "log --pretty=format:'%ad %h %s %d %C(bold)%an%Creset' --graph"
+$                                                      # 4. 添加别名, 优化日志的显示
+$ git config --global core.quotepath false             # 5. 引用路径不使用八进制, 中文名不再乱码
 $                                                      #
-$ git config --list --global                           # 查看当前用户的配置信息
+$ git config --list --global                           # 6. 查看当前用户的配置信息
 $                                                      #
-$ ssh-keygen -t rsa                                    # 生成密钥
-$                                                      # 复制公钥到 GitHub
-$                                                      #     将文件 `~/.ssh/id_rsa.pub` 里的公钥添加到
-$                                                      #     https://github.com/settings/keys
-$                                                      # 到此可以免密码使用 GitHub
-$ ssh -T git@github.com                                # 测试是否成功
+$ ssh-keygen -t rsa                                    # 7. 生成密钥
+$                                                      # 8. 复制公钥到 GitHub
+$                                                      #    将文件 `~/.ssh/id_rsa.pub` 里的公钥添加到
+$                                                      #    https://github.com/settings/keys
+$                                                      # 9. 到此可以免密码使用 GitHub
+$ ssh -T git@github.com                                # 10. 测试是否成功
 ```
 
 ## 常用命令
@@ -94,6 +95,7 @@ git clone git@github.com:liuyunbin/note.git # TODO: 和上一个有什么区别
 git commit -a -m "message"   # 已修改 --> 已暂存 --> 已提交
 git commit    -m "message"   #            已暂存 --> 已提交
 git commit --amend           # 将要修改的内容合并到最后一次提交中, 并修改提交信息, 旧的提交将删除
+                             # --amend 不影响作者提交的日期, 只影响提交者提交的日期
 git commit --amend -m ...    # 将要修改的内容合并到最后一次提交中, 并修改提交信息, 旧的提交将删除
 git commit --amend --no-edit # 同上, 但不需要修改提交信息
 
@@ -134,7 +136,9 @@ git diff --cached    # 暂存区域 和 Git 仓库 的差异
 git diff --submodule # 获取子模块的修改
 
 git fetch [remote-name] # 从远程仓库获取数据
+                        # tag 对应的提交未推送时, 默认不会拉起该 tag
 git fetch -a            # 从所有远程仓库获取数据
+git fetch --tag         # 拉起所有的 tag
 
 git for-each-ref --format='%(committerdate:iso) %(refname) %(authorname)'
                         # 查看所有远程分支最后一次的提交
@@ -158,10 +162,10 @@ git log --pretty=format:'%Cgreen%ad%Creset %h %s %C(yellow)%d%Creset %Cblue%an%C
                             # %p 父提交的简写哈希值
                             # %an 作者名字
                             # %ae 作者的邮箱
-                            # %ad 作者修订日期
+                            # %ad 作者提交的日期
                             # %cn 提交者的名字
                             # %ce 提交者的邮箱
-                            # %cd 提交日期
+                            # %cd 提交者提交的日期
                             # %d  ref名称 -- 包括tag等
                             # %s 提交说明
                             # %Cred	切换到红色
@@ -211,11 +215,10 @@ git push origin v1.0                            # 将指定 标签 推送到远�
 git push origin --tags                          # 将所有 标签 推送到远程
 git push origin --delete v1.0                   # 删除远程 标签
 git push orign feature/test -f                  # 强推本地分支
-git push origin --delete feature/test           # 删除远程分支
 
 git rebase master server-branch        # 将 server-branch 分支变基到 master
-git rebase -i HEAD~6                   # 之后，使用 f 取消掉不需要的内容，合并提交
-git rebase orign/develop               # 将 orign/develop 上的内容，变基到 当前分支
+git rebase -i HEAD~6                   # 之后, 使用 f 取消掉不需要的内容, 合并提交
+git rebase orign/develop               # 将 orign/develop 上的内容, 变基到 当前分支
 git rebase --onto master server client # 将在 server 上存在, 不在 client 上的内容变基到 master
 
 git remote                          # 查看远程仓库
@@ -234,7 +237,7 @@ git reset         HEAD~           #
 git reset --mixed HEAD~           # 将 HEAD 指到 HEAD~, 使用 HEAD 指向的数据重置暂存区, 工作目录保持不变
                                   # 有可能会丢失 HEAD~ 之后的数据, 以及已暂存的数据
                                   # 已提交 => 已修改
-git reset --hard  HEAD~           # 将 HEAD 指到 HEAD~, 使用 HEAD 指向的数据重置暂存区和工作目录
+git reset --hard  HEAD~           # 将 HEAD 指到 HEAD~, 使用 HEAD 指向的数据重置暂存区和工作目录 -- 常用
                                   # 会丢失 HEAD~ 之后的数据, 以及已暂存, 已修改的数据
                                   # 已提交 => 已删除
 git reset --soft  HEAD~ -- README # 非法
@@ -256,7 +259,8 @@ git restore --staged --worktree --source HEAD~2 README
                                        # 和 git checkout HEAD~2 README 意思相同
 git restore --source HEAD~2 README     # 使用 HEAD~2 的 README 覆盖当前目录 中的 README, 暂存区的内容保持不变
 
-git revert -m 1 HEAD # 撤销提交
+git revert      HEAD # 撤销普通提交
+git revert -m 1 HEAD # 撤销合并提交, 指定保留的分支
 
 git rm          README # 从 暂存区域 和 本地目录 中移除文件, 如果该文件已修改 或 已暂存,   会失败
 git rm  -f      README # 从 暂存区域 和 本地目录 中移除文件, 如果该文件已修改 或 已暂存, 也会成功
