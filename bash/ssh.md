@@ -67,7 +67,7 @@ Port 2222                       # 远程端口号
 BindAddress 192.168.10.235      # 本地 IP
 User lyb                        # 用户名
 IdentityFile ~/.ssh/id.rsa      # 密钥文件
-                                # 此时, 使用 ssh 123 相当于使用 ssh -p 2222 lyb@1.2.3.4
+                                # 此时, 使用 ssh 123 相当于使用 ssh -p 2222 lyb@1.2.3.4 -i ~/.ssh/id.rsa
 DynamicForward 1080             # 指定动态转发端口
 LocalForward  1234 1.2.3.4:5678 # 指定本地端口转发
 RemoteForward 1234 1.2.3.4:5678 # 指定远程端口转发
