@@ -110,6 +110,7 @@ find . \( -type f -a   -name lyb \)   # 同上
 find .    -type f      -name lyb      # 同上, 默认多个条件同时成立
 find . \( -type f -or  -name lyb \)   # 或, 多个条件成立一个即可
 find . \( -type f -o   -name lyb \)   # 同上
+find . -empty                         # 查找空文件
 
 getopts # 处理参数, -- 表示可选参数的终止
 
