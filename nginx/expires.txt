@@ -1,0 +1,72 @@
+
+# 缓存
+## 目的
+降低服务器以及网络的负载, 提高响应时间
+
+## 客户端和服务器的交互
+1. 客户端首次向服务端发送请求
+    * Cache-Control
+        * max-age	             缓存的最大可用时间 ------------- 浏览器强制重新加载时可能用到
+        * max-stale	             缓存过期后的可用时间
+        * min-fresh              缓存的最小刷新时间
+        * no-cache    	         必须和服务端验证缓存是否过期 --- 浏览器强制重新加载时可能用到
+        * no-store	             必须从服务器重新下载资源 ------- 浏览器强制重新加载时可能用到
+        * no-transform	         不允许修改缓存的内容, 比如编码
+        * only-if-cached         只从缓存中获取数据
+        * stale-if-error         当缓存过期后, 如果调用服务器失败, 缓存继续可以使用的时间
+2. 服务端响应
+    * Expires 过期时间, 绝对时间 -- 由于不同机器时间可能不同步, 所以不建议使用
+    * Cache-Control
+        * max-age                本地缓存过期时间, 相对时间 ---------------------- 常用
+        * s-maxage               共享缓存过期时间, 相对时间
+        * no-store               不能缓存, 每次请求都需要重新下载 ---------------- 常用
+        * no-cache               能缓存, 但每次使用前都需要和服务端验证是否过期 -- 常用
+        * public                 允许共享和本地缓存
+        * private                只能本地缓存
+        * must-revalidate        本地缓存数据过期后, 必须和服务器验证后才可以给客户使用
+        * proxy-revalidate       共享缓存数据过期后, 必须和服务器验证后才可以给客户使用
+        * no-transform           不允许修改缓存的内容, 比如编码
+        * must-understand        不懂, 貌似基于状态码, TODO
+        * immutable              缓存的内容永不更新
+        * stale-while-revalidate 当缓存过期后, 如果和服务器验证缓存依然有效, 缓存继续可以使用的时间
+        * stale-if-error         当缓存过期后, 如果调用服务器失败,           缓存继续可以使用的时间
+    • 不附加过期信息，浏览器会自己确定一个的过期日期。
+    * Last-Modified 上次修改时间
+    * Etag 内容标识符
+3. 客户端再次发送请求, 如果缓存未过期, 则直接返回缓存的数据
+4. 否则, 浏览器会向服务端确认内容是否已修改 -- 再验证
+    * If-Unmodified-since
+    * If-Modified-Since 指定日期后是否已修改, 值为服务端返回的 Last-Modified
+    * If-Match
+    * If-None-Match 使用文本标识符判断文件是否修改, 比日期更灵活, 值为服务端返回的 Etag
+5. 服务端响应:
+    * 304 -- 未修改 --------------------   命中
+    * 200 -- 已修改, 返回修改后的内容 -- 未命中
+    * 404 -- 已删除 -------------------- 未命中
+
+## 和 nginx 相关配置
+* add_header             # 在 http header 的头部添加内容
+* add_trailer            # 在 http header 的末尾添加内容
+* expires 2h;            # 相对时间, 有效期为 2h ------------------------------ 常用
+                         # 响应头部的 Expires       修改为: (当前时间+2h)
+                         # 响应头部的 Cache-Control 修改为: max-age=7200
+* expires modified +2h;  # 使用文件修改时间+2h 作为绝对过期时间 -- 貌似现在不生效
+                         # 响应头部的 Expires 修改为: 上述计算时间
+                         # 如果 计算时间 < 当前时间
+                         #     响应头部的 Cache-Control 修改为: no-cache
+                         # 否则
+                         #     响应头部的 Cache-Control 修改为: max-age=(计算时间-当前时间)
+* expires @15h;          # 过期时间为下一个 15h
+                         # 响应头部的 Expires       修改为: 下一个 15h
+                         # 响应头部的 Cache-Control 修改为: max-age=(下一个 15h-当前时间)
+* expires -1;            # 无缓存 ---------------------------------------------- 常用
+                         # 响应头部的 Expires       修改为: 当前时间
+                         # 响应头部的 Cache-Control 修改为: no-cache
+* expires epoch;         # 无缓存
+                         # 响应头部的 Expires       修改为: Thu, 01 Jan 1970 00:00:01 GMT
+                         # 响应头部的 Cache-Control 修改为: no-cache
+* expires max;           # 最大缓存
+                         # 响应头部的 Expires       修改为: Thu, 31 Dec 2037 23:55:55 GMT
+                         # 响应头部的 Cache-Control 修改为: 315360000
+* expires off;           # 不修改响应头部的 Expires 和 Cache-Control
+

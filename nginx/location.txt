@@ -47,14 +47,6 @@ try_files ---------- 尝试判断文件是否存在
 internal ----------- 只能内部使用
 mirror ------------- 镜像网站
 
-expires 24h;           # 相对时间, 有效期为   24h, 同时修改响应头部的 Expires 和 Cache-Control
-expires modified +24h; # 相对时间, 有效期增加 24h, 同时修改响应头部的 Expires 和 Cache-Control
-expires @15h;          # 绝对时间, 同时修改响应头部的 Expires 和 Cache-Control
-expires -1;            # 无缓存, 响应头部的 Cache-Control 修改为 no-cache
-expires epoch;         # 无缓存, 响应头部的 Expires 为 1970-01-01, Cache-Control 修改为 no-cache
-expires max;           # 响应头部的 Expires 为 1937-01-01, Cache-Control 修改为 10 年
-expires off;           # 不添加修改响应头部的 Expires 和 Cache-Control
-
 error_page 500 502 503 504 /50x.html; # 错误码对应的页面
 error_page 404 = @fallback;           # 返回的错误码将转化为 200
 error_page 404 =202 /empty.gif;       # 返回的错误码将转化为 202
