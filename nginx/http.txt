@@ -4,15 +4,22 @@
     * 请求方法 请求的内容 请求的协议及其版本号
     * GET / http/1.1
 * 请求头部
-    * Host	 www.bing.com   # 服务器名称,  对应 Nginx 的 server_name
-    * Accept text/html      # 客户端能够接收的数据类型，Nginx 会通过 types 指令域中的内容做匹配
-    * Cookie  ...           # 客户端请求的 cookie
-    * Referer ...	        # 从哪个网站跳过来的
-    * Cache-Control	...     # 当前客户端缓存机制
-    * Connection keep-alive # 长连接机制，HTTP/1.1 默认启用保持连接
-    * If-None-Match	...     # 缓存文件及其大小
-    * If_modified_since	... # 缓存文件的最后修改时间
-    * User-Agent ...        # 浏览器信息
+    * Accept text/html      告诉服务器能够发送哪些数据类型, Nginx 会通过 types 指令域中的内容做匹配
+    * Accept-Charset        告诉服务器能够发送哪些字符集
+    * Accept-Encoding       告诉服务器能够发送哪些编码方式
+    * Accept-Language       告诉服务器能够发送哪些语言
+    * Authorization         包含了客户端提供给服务器，以便对其自身进行认证的数据
+    * Connection keep-alive 长连接机制，HTTP/1.1 默认启用保持连接
+    * Cookie  ...           客户端请求的 cookie
+    * Date                  报文创建的日期
+    * Host	 www.bing.com   服务器名称,  对应 Nginx 的 server_name
+    * If-Range              获取部分内容
+    * Max-Forward           代理的最大次
+    * Proxy-Authorization   与代理服务器的认证
+    * Proxy-Connection      与代理服务器的长连接
+    * Range                 如果服务器支持范围请求，就请求资源的指定范围 1
+    * Referer ...	        从哪个网站跳过来的
+    * User-Agent ...        浏览器信息
 * 空行
 * 请求体
 
@@ -30,20 +37,34 @@
     * 304 文件未修改, 客户端可以使用缓存
     * 307 临时重定向: 只修改请求的 url, 其他保持不变
     * 308 永久重定向: 重新发起请求, GET POST 都不变
-    * 400 错误请求
+    * 400 非法请求
+    * 401 需要认证
     * 403 拒绝访问
     * 404 资源未找到
     * 408 请求超时
-
 * 响应头部
-    * Content-Type	text/html;   # 响应的数据类型
-    * charset=utf-8              # 响应的编码
-    * Connection keep-alive      # 告知客户端是否启用保持连接机制
-    * Cache-Control	no-cache     # 告知客户端对缓存机制的控制
-    * ETag ...                   # 缓存相关, 文件大小
-    * Last_modified_time ...     # 缓存相关, 文件最后修改时间
-    * Location https://bing.com/ # 告知客户端跳转到指定的 URI
-    * Set-Cookie ....            # 响应的 cookie
-* 空行
-* 响应体
+    * Accept-Ranges             可接受的范围类型
+    * Age                       响应生成到现在的时间
+    * Allow                     列出了可以对此实体执行的请求方法
+    * Cache-Control	no-cache    告知客户端对缓存机制的控制
+    * Connection keep-alive     告知客户端是否启用保持连接机制
+    * Content-Encoding          body 的编码方式
+    * Content-Language          body 的语言
+    * Content-Length ...        body 的长度
+    * Content-Location          body 资源实际所处的位置
+    * Content-MD5               body MD5 校验和
+    * Content-Range             body 的字节范围
+    * Content-Type	text/html;  body 的数据类型
+    * Date                      报文创建的日期
+    * Location                  重定向使用
+    * Retry-After               在此日期或时间后重试
+    * Server                    服务器应用程序软件的名称和版本
+    * Set-Cookie
+    * Set-Cookie2
+    * charset=utf-8             响应的编码
+
+## 提高效率
+* 并行
+* 长连接
+* 管道化
 
