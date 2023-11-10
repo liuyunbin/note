@@ -1,11 +1,16 @@
-#!/usr/bin/lua
 
--- 这是注释
+## 单行注释
+-- 单行注释
 
+## 多行注释
 --[[
  多行注释
  多行注释
 --]]
+
+
+## 变量类型
+
 
 -- 类型
 
@@ -17,12 +22,12 @@ v5 = [[
     123
     456
 ]]
-v6 = "123" .. "456"  -- 字符串连接
-v7 = "123" +  "456"  -- 数字相加
-v8 = #v6             -- 字符串大小
+v6 = "123" .. "456" -- 字符串连接
+v7 = "123" +  "456" -- 数字相加
+v8 = #v6            -- 字符串大小
 v9 = {789, 123, 456} -- 字典, key 未指定时, 使用索引作为 key, 索引以 1 开始
 v9[111] = 222
-local v10 = 123      -- 局部变量
+local v10 = 123   -- 局部变量
 v10 = "abc ABC abc ABC 123"
 
 print("测试 nil           : ", v111)
@@ -35,15 +40,15 @@ print("测试 字符串(  连接): ", v6)
 print("测试 字符串(  相加): ", v7)
 print("测试 字符串(  大小): ", v8)
 
-print("测试字符串大写: ",     string.upper(v10))
-print("测试字符串小写: ",     string.lower(v10))
-print("测试字符串逆序: ",     string.reverse(v10))
-print("测试字符串格式化: ",   string.format("格式化: %s", v10))
-print("测试字符串长度: ",     string.len(v10))
-print("测试字符串重复: ",     string.rep(v10, 3))
+print("测试字符串大写: ", string.upper(v10))
+print("测试字符串小写: ", string.lower(v10))
+print("测试字符串逆序: ", string.reverse(v10))
+print("测试字符串格式化: ", string.format("格式化: %s", v10))
+print("测试字符串长度: ", string.len(v10))
+print("测试字符串重复: ", string.rep(v10, 3))
 print("测试字符 =>   数字: ", string.byte(v10))
 print("测试数字 => 字符串: ", string.char(97, 98, 99, 100))
-print("测试字符串子串: ",     string.sub(v10, 2))
+print("测试字符串子串: ", string.sub(v10, 2))
 print()
 print("测试字符串    : ", v10)
 print()
@@ -54,9 +59,9 @@ print("测试字符串替换: ", v12, ", 次数: ", count)
 v12, count = string.gsub(v10,"%l","123") -- 全部替换(正则)
 print("测试字符串替换: ", v12, ", 次数: ", count)
 
-left, right = string.find(v10, "abc") ------------ 查找, 只返回第一次
+left, right = string.find(v10, "abc") -- 查找, 只返回第一次
 print("测试字符串查找: 起始索引: ", left, ", 结束索引: ", right)
-left, right = string.find(v10, "%l%l") ----------- 查找(正则), 只返回第一次
+left, right = string.find(v10, "%l%l") -- 查找(正则), 只返回第一次
 print("测试字符串查找: 起始索引: ", left, ", 结束索引: ", right)
 left, right = string.find(v10, "%l%l", 1, true) -- 查找(非正则, 普通查找), 只返回第一次 -- 一般不用
 print("测试字符串查找: 起始索引: ", left, ", 结束索引: ", right)
@@ -272,7 +277,7 @@ r = Rectangle:new(10,20)
 print(r.length)
 r:printArea()
 
-#!/usr/bin/lua
+-- #!/usr/bin/lua
 
 -- 执行 shell 命令
 

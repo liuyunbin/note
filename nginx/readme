@@ -1,14 +1,4 @@
 
-## wrk 安装
-apt install -y wrk
-
-## wrk2 安装
-1. apt install -y make gcc libssl-dev zlib1g-dev
-2. cd ~/github
-3. git clone git@github.com:giltene/wrk2
-4. cd wrk2 && make
-5. ln -s ~/github/wrk2/wrk /usr/bin/wrk2
-
 ## nginx 安装
 https://nginx.org/en/linux_packages.html
 
