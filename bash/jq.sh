@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# 参考资源: https://jqlang.github.io/jq/
+
+# JSON 结构
+# * 对象: 大括号包含的 key value 串, key 只能是字符串. 最好不要以数子开头, val 任意
+# * 数组: 值任意
+# * 字符串
+# * 数字: 包括整数和浮点数
+# * true
+# * false
+# * null
+# * 最外层必须是对象或数组
+
+# sudo apt install -y jq
+
+json_obj='{"abc": "123", "defghi":"456"}'
+json_arr='[{"abc": "123"}, {"def":"456"}, {"hij":"789"}]'
+
+## 获取对象的值
+echo -e "\n获取整个 JSON"
+echo $json_obj | jq
+echo $json_obj | jq .
+
+echo -e "\n获取对象的某个 key 的值"
+echo $json_obj | jq '.abc'
+
+echo -e "\n获取对象的某个 key 的值, 并组合成数组"
+echo $json_obj | jq '[.abc]'
+
+echo -e "\n获取对象的某个 key 的值, 并组合成对象"
+echo $json_obj | jq '{test: .abc}'
+
+echo -e "\n获取对象的多个值"
+echo $json_obj | jq '.abc,.def'
+
+echo -e "\n获取对象的所有 key, 并组成数组"
+echo $json_obj | jq keys
+
+echo -e "\n获取对象的所有值"
+echo $json_obj | jq .[]
+
+echo -e "\n获取对象的所有值, 并将结果组合成数组"
+echo $json_obj | jq '[.[]]'
+
+## 获取数组的值
+echo -e "\n获取数组的所有值"
+echo $json_arr | jq .[]
+
+echo -e "\n获取数组指定索引的值"
+echo $json_arr | jq .[1]
+
+echo -e "\n获取数组指定索引范围的值, 并组成数组, 左闭右开"
+echo $json_arr | jq .[1:3]
+
+echo -e "\n获取数组指的长度"
+echo $json_arr | jq '.|length'
+
+echo -e "\n获取数组指的长度"
+echo $json_arr | jq '.|length'
+
+## 获取字符串的长度
+echo -e "\n获取字符串的长度"
+echo $json_obj | jq '.abc|length'
+
+## 组合结果
+echo -e "\n组和数组"
+echo $json_obj | jq '[.[]]'
+
+## 其他高级特性
+# map         对数组的每一项操作
+# map_values  对对象的每一项操作
+# select      过滤
+# |           分割多次操作
+# length      获取对象或数组或字符串的长度
+# +           字符串拼接
+# join        使用指定字符连接结果, 生成字符串
+# split       字符串切割
+# del         删除
+
+# jq . -c                输出在一行
+# jq . -S                排序
+# jq . --tab --indent 4  使用 TAB 缩进, 指定缩进大小
+
