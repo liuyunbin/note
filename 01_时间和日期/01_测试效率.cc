@@ -8,14 +8,17 @@
 #include <string>
 
 void test_help(const std::string& str, std::function<void()> f) {
+    const unsigned long long count = 2000000;
+
     struct timeval t1;
     gettimeofday(&t1, NULL);
-    for (int i = 0; i < 2000000; ++i)
+    for (int i = 0; i < count; ++i)
         f();
     struct timeval t2;
     gettimeofday(&t2, NULL);
-    int res = (t2.tv_sec - t1.tv_sec) * 1000 + (t2.tv_usec - t1.tv_usec) / 1000;
-    std::cout << str << ", 耗时 " << res << " 豪秒" << std::endl;
+    double res =
+        (t2.tv_sec - t1.tv_sec) + (t2.tv_usec - t1.tv_usec) * 1.0 / 1000 / 1000;
+    std::cout << str << ":  " << int(count / res) << "qps" << std::endl;
 }
 
 void test(const std::string& prompt, std::function<void()> f) {
