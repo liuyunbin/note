@@ -8,9 +8,14 @@ function log_erro() { echo -e "\033[31m$(date +'%Y-%m-%d %H:%M:%S %z') $@\033[0m
 
 log_info
 log_info "测试浮点数计算"
-awk 'BEGIN { n = 0;}
-     { for (i = 1; i <= NF; ++i) arr[n++] = $i }
-     END {
+awk 'BEGIN {
+        n = 0;
+    }
+    {
+        for (i = 1; i <= NF; ++i)
+            arr[n++] = $i
+    }
+    END {
         sum = 0
         printf("  输入的元素: ")
         for (i in arr) {
