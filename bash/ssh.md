@@ -58,8 +58,10 @@ ssh-keygen -R username@host    # 将 username@host 的公钥移出 known_hosts �
 
 ssh-copy-id -i ~/id_rsa username@host # 添加公钥到服务器中的 ~/.ssh/authorized_keys
                                       # -i 未指定时, 将使用 ~/.ssh/id_rsa.pub
+```
 
 #### ssh 客户端的常见配置: ~/.ssh/config, /etc/ssh/ssh_config, man ssh_config
+```
 Host *                          # 对所有机器都生效, 使用 通配符, 配置直到下一个 host
 Host 123                        # 可以起一个别名
 HostName 1.2.3.4                # 远程主机
@@ -71,8 +73,10 @@ IdentityFile ~/.ssh/id.rsa      # 密钥文件
 DynamicForward 1080             # 指定动态转发端口
 LocalForward  1234 1.2.3.4:5678 # 指定本地端口转发
 RemoteForward 1234 1.2.3.4:5678 # 指定远程端口转发
+```
 
 #### ssh 服务端的常见配置: /etc/ssh/sshd_config, man sshd_config
+```
 AllowTcpForwarding yes     # 是否允许端口转发, 默认允许
 ListenAddress 1.2.3.4      # 监听地址
 PasswordAuthentication     # 指定是否允许密码登录，默认值为 yes
