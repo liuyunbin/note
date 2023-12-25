@@ -24,9 +24,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin) # 设置 二进制�
 # 激活测试
 enable_testing()
 
-add_executable(lshell apue/lshell.cc)
-target_link_libraries(lshell readline)
-
 add_executable(snake apue/snake.cc)
 target_link_libraries(snake ncurses)
 
