@@ -386,6 +386,7 @@ docker exec     容器ID ls  # 对于在后台运行的容器, 执行命令
 redis flushdb # 清空数据
 redis -c ...  # 集群时需要使用 -c 启动, 否则查不到数据
 
+systemctl -a                 # 查看所有启动的服务
 systemctl start      nginx   # 启动 nginx
 systemctl stop       nginx   # 停止 nginx
 systemctl restart    nginx   # 重启 nginx

@@ -1,4 +1,15 @@
 
+## 限制
+* 限制同一进程的最大连接数量
+* 限制同一进程可以使用的文件描述符的最大数量
+* 限制同一 IP 的最大连接数量 -- limit_conn
+    * 超出的连接直接报错
+* 限制每个请求的最大响应速率
+    * limit_rate -------- 限制速率
+    * limit_rate_after -- 发送一定数据后再限速
+    * proxy_limit_rate -- 限制代理的速度
+* 限制同一 IP 的最大请求数量
+
 ## limit_req -- 限制同一 IP 的请求数 -- 限速是以毫秒为单位的
 
 limit_req_zone $binary_remote_addr zone=mylimit:10m rate=1r/s;
@@ -52,20 +63,6 @@ limit_req zone=mylimit burst=2 delay=1;
 
 limit_req_log_level error;  # 超过限制后的日志报错的类别
 limit_req_status    code;   # 超过限制后的返回客户端的错误码
-
-## limit_conn -- 限制同一 IP 的连接数
-
-limit_conn_zone      $binary_remote_addr zone=addr:10m;
-limit_conn           addr 1;
-limit_conn_log_level error; # 超过限制后的日志报错的类别
-limit_conn_status    code;  # 超过限制后的返回客户端的错误码
-
-## limit_rate -- 限制每一个连接的速率
-
-limit_rate         4k; # 限制速率
-limit_rate_after 500k; # 发送一定数据后再限速
-
-proxy_limit_rate rate; # 限制代理的速度
 
 ## 限流算法
 * 固定窗口计数器
