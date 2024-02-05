@@ -1,8 +1,5 @@
 
-
 ## 常用命令
-
-
 ### curl
 ```
 $ # 发送 POST 的 JSON 请求
@@ -12,7 +9,7 @@ $ # 发送 POST 的 JSON 请求(JSON 存储在文件中)
 $ curl -X POST -H "Content-Type: application/json" https://yunbinliu.com/api/remote -d @1.json
 ```
 
-### 即将删除
+### 即将删除-TODO
 ```
 curl ...                    # 下载到标准输出
 curl ... -O                 # 下载到文件, 文件名称从 url 中获取
