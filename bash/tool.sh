@@ -6,56 +6,6 @@ function log_info() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty;  
 function log_warn() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty;          }
 function log_erro() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty; exit -1; }
 
-function do_build() {
-    mkdir -p build
-    cd build
-    cmake ..
-    make
-    # make test
-    cd ..
-    rm -r build
-}
-
-function do_test() {
-    local file_name=test.cc
-
-    if [[ $# != "0" ]]; then
-        file_name=$@
-    fi
-
-    g++ -std=c++11 $file_name && ./a.out
-}
-
-function do_install_command() {
-    sudo apt install -y clang-format
-    sudo apt install -y cmake
-    sudo apt install -y g++
-    sudo apt install -y vim
-    sudo apt install -y jq
-
-    #sudo apt install -y icdiff
-    #sudo apt install -y libgoogle-glog-dev
-    #sudo apt install -y libgtest-dev
-}
-
-function do_install_dependency() {
-    sudo apt install -y cmake
-    sudo apt install -y g++
-    sudo apt install -y libreadline-dev
-
-    ##sudo apt install libevent-dev -y
-    #
-    #sudo apt install libgoogle-glog-dev -y
-    #
-    #sudo apt install libgtest-dev -y
-    #
-    ##sudo apt install libncurses5-dev libncursesw5-dev -y
-    #
-    ##sudo apt install libprotobuf-dev -y
-    #
-    ##sudo apt install protobuf-compiler -y
-}
-
 function do_lastlog() {
     lastlog $@ | awk '
         NR > 1 && NF > 6 {
@@ -73,7 +23,7 @@ function do_ps() {
     argv=
     for key in $@; do
         [[ "$argv" != "" ]] && argv=${argv},
-        argv=$argv$(pgrep -d, $key || log_erro "未找到进程 $key")
+        argv=$argv$(pgrep -d, $key || log_erro "not find $key")
     done
 
     ps -o etimes,ruser:10,pid,nlwp,cmd --sort=-etime --no-headers -p $argv | awk '

@@ -1,0 +1,169 @@
+
+crontab -l # 查询任务表
+crontab -e # 编辑任务表
+crontab -r # 删除任务表
+           # 格式为: 分钟 小时 日 月 星期 执行的程序
+           # *     : 每分钟执行
+           # 1-3   : 1 到 3分钟内执行
+           # */3   : 每 3 分钟执行一次
+           # 1-10/3: 1-10 分钟内, 每 3 分钟执行
+           # 1,3,5 : 1,3,5 分钟执行
+           # crontab 不会自动执行 .bashrc, 如果需要, 需要在脚本中手动执行
+
+curl -I ... # 只打印头部信息
+
+docker run ubuntu:15.10 -d --name "lyb"           # 启动 docker, 给起一个名字
+docker run ubuntu:15.10 -d --net=host             # 主机和 docker 共享 IP 和 端口号
+docker run ubuntu:15.10 -d -P                     # docke 内使用随机端口映射主机端口
+docker run ubuntu:15.10 -d -p 2000:3000           # 本机:2000 绑定 docker:3000
+docker run ubuntu:15.10 -d -v /home/123:/home/456 # 本机:/home/123 绑定 docker:/home/456
+
+docker port     容器ID     # 查看端口号映射
+docker ps                  # 列出当前运行的容器
+docker ps -a               # 列出所有容器
+docker start    容器ID     # 启动容器
+docker stop     容器ID     # 停止容器
+docker restart  容器ID     # 重新启动容器
+docker rm -f    容器ID     # 删除容器
+docker exec     容器ID ls  # 对于在后台运行的容器, 执行命令
+
+firewall-cmd --list-ports                       # 查看所有打开的端口
+firewall-cmd --list-services                    # 查看所有打开的服务
+firewall-cmd --get-services                     # 查看所有的服务
+firewall-cmd --reload                           # 重新加载配置
+firewall-cmd --complete-reload                  # 重启服务
+firewall-cmd             --add-service=http     # 添加服务
+firewall-cmd --permanent --add-service=http     # 添加服务, 永久生效, 需要重新加载配置
+firewall-cmd             --remove-service=http  # 移除服务
+firewall-cmd             --add-port=80/tcp      # 添加端口
+firewall-cmd --permanent --add-port=80/tcp      # 添加端口, 永久生效, 需要重新加载配置
+firewall-cmd             --remove-port=80/tcp   # 移除端口
+firewall-cmd             --query-masquerade     # 检查是否允许伪装IP
+firewall-cmd               --add-masquerade     # 允许防火墙伪装IP
+firewall-cmd --permanent   --add-masquerade     # 允许防火墙伪装IP, 永久生效, 需要重新加载配置
+firewall-cmd            --remove-masquerade     # 禁止防火墙伪装IP
+firewall-cmd --add-forward-port=proto=80:proto=tcp:toaddr=192.168.0.1:toport=8080
+                                                # 端口转发, 0.0.0.0:80 --> 192.168.0.1:8080
+firewall-cmd --add-forward-port=proto=80:proto=tcp:toaddr=192.168.0.1:toport=8080 --permanent
+                                                # 端口转发, 永久生效, 需要重新加载配置
+firewall-cmd --runtime-to-permanent             # 将当前防火墙的规则永久保存
+
+free -h                 # 内存使用情况
+
+ss -ntp | grep 9100
+
+ssh -N -D A_PORT B_IP
+            # 功能:
+            #   动态端口转发
+            #   将本地到 A_PORT 的请求转发到 B_IP
+            #   使用 SOCKS5 协议
+ssh -N -L A_PORT:C_IP:C_PORT B_IP
+            # 功能:
+            #   本地端口转发
+            # 目标:
+            #    A_IP:A_PORT --> C_IP:C_PORT
+            # 现状:
+            #    A_IP --> C_IP 失败
+            #    B_IP --> C_IP 成功
+            #    A_IP --> B_IP 成功
+            #    B_IP --> A_IP 成功 或 失败都行
+            # 实现:
+            #   * 在 A_IP 机器上执行: ssh -N -L A_PORT:C_IP:C_PORT B_IP
+            #   * 发往 A_IP 机器的端口号 A_PORT 的请求, 经由 B_IP 机器, 转发到 C_IP 机器的 C_PORT 端口
+            #   * 即: A_IP:A_PORT --> B_IP --> C_IP:C_PORT
+ssh -N -R A_PORT:C_IP:C_PORT A_IP
+            # 功能:
+            #   远程端口转发
+            # 目标:
+            #    A_IP:A_PORT --> C_IP:C_PORT
+            # 现状:
+            #    A_IP --> C_IP 失败
+            #    B_IP --> C_IP 成功
+            #    A_IP --> B_IP 成功 或 失败都行
+            #    B_IP --> A_IP 成功
+            # 实现:
+            #   * 在 B_IP 机器上执行: ssh -N -R A_PORT:C_IP:C_PORT A_IP
+            #   * 发往 A_IP 机器的端口号 A_PORT 的请求, 经由 B_IP 机器, 转发到 C_IP 机器的 C_PORT 端口
+            #   * 即: A_IP:A_PORT --> B_IP --> C_IP:C_PORT
+            #   * 如果要支持其他主机通过 A_IP 访问 C_IP, 需要在 A_IP 的 ssh 配置 GatewayPorts
+ssh -N             # 不登录 shell, 只用于端口转发
+ssh -p port        # 指定服务器端口号
+ssh -f             # 在后台运行
+ssh -t             # 开启交互式 shell
+ssh -C             # 压缩数据
+ssh -F             # 指定配置文件
+ssh -q             # 不输出任何警告信息
+ssh -l lyb 1.2.3.4
+ssh        1.2.3.4
+ssh    lyb@1.2.3.4
+ssh -i ~/.ssh/id_rsa lyb # 指定私钥文件名
+
+ssh-keygen -t rsa              # 指定密钥算法, 默认就是 rsa
+ssh-keygen -b 1024             # 指定密钥的二进制位数
+ssh-keygen -C username@host    # 指定注释
+ssh-keygen -f lyb              # 指定密钥的文件
+ssh-keygen -R username@host    # 将 username@host 的公钥移出 known_hosts 文件
+
+ssh-copy-id -i ~/id_rsa username@host # 添加公钥到服务器中的 ~/.ssh/authorized_keys
+                                      # -i 未指定时, 将使用 ~/.ssh/id_rsa.pub
+
+#### ssh 客户端的常见配置: ~/.ssh/config, /etc/ssh/ssh_config, man ssh_config
+Host *                          # 对所有机器都生效, 使用 通配符, 配置直到下一个 host
+Host 123                        # 可以起一个别名
+HostName 1.2.3.4                # 远程主机
+Port 2222                       # 远程端口号
+BindAddress 192.168.10.235      # 本地 IP
+User lyb                        # 用户名
+IdentityFile ~/.ssh/id.rsa      # 密钥文件
+                                # 此时, 使用 ssh 123 相当于使用 ssh -p 2222 lyb@1.2.3.4
+DynamicForward 1080             # 指定动态转发端口
+LocalForward  1234 1.2.3.4:5678 # 指定本地端口转发
+RemoteForward 1234 1.2.3.4:5678 # 指定远程端口转发
+
+#### ssh 服务端的常见配置: /etc/ssh/sshd_config, man sshd_config
+AllowTcpForwarding yes     # 是否允许端口转发, 默认允许
+ListenAddress 1.2.3.4      # 监听地址
+PasswordAuthentication     # 指定是否允许密码登录，默认值为 yes
+Port 22                    # 监听端口号
+GatewayPorts no            # 远程转发时, 是否允许其他主机使改端口号, 默认不允许
+
+systemctl start      nginx   # 启动 nginx
+systemctl stop       nginx   # 停止 nginx
+systemctl restart    nginx   # 重启 nginx
+systemctl status     nginx   # 查看 nginx 状态
+systemctl enable     nginx   # 开机自动启动 nginx
+systemctl disable    nginx   # 开机禁止启动 nginx
+systemctl is-active  nginx   # 查看 nginx 是否启动成功
+systemctl is-failed  nginx   # 查看 nginx 是否启动失败
+systemctl is-enabled nginx   # 查看 nginx 是否开机启动
+
+sz          #  虚拟机  向 windows 发送数据
+
+netstat
+nc
+ss
+
+                   # lsof -- sudo yum install lsof
+lsof -iTCP         # 查看 TCP 信息
+lsof -i :22        # 查看指定 端口号 的信息
+lsof -i@1.2.3.4:22 # 查看是否连接到指定 IP 和 端口号上
+lsof -p 1234       # 指定 进程号
+lsof -d 0,1,2,3    # 指定 文件描述符
+lsof -t            # 仅获取进程ID
+
+ulimit              # 限制资源使用, 包括:
+                    #   内存, 虚拟内存, CPU
+                    #   进程数, 线程数
+                    #   文件锁数, 文件描述符数, 写入文件大小
+                    #   待处理的信号数
+                    #   core 文件大小
+                    # 也可指定是硬限制还是软限制
+ulimit -a           # 列出资源的限制
+ulimit -c unlimited # 允许 core 文件
+
+uname -a # 全部信息
+uname -m # x86_64 等
+uname -r # 内核版本
+
+uptime -s # 列出系统启动时间
+
