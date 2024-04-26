@@ -1,9 +1,0 @@
-
-syntax = "proto3";
-
-package chat;
-message message_unit
-{
-  string user = 1;
-  string data = 2;
-}

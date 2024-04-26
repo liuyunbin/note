@@ -6,15 +6,13 @@
 #include <stdlib.h>  // exit
 
 char data[9][9];                   // 用于存储数独
-int  solution_count      = 0;      // 用于表示解的个数
+int solution_count = 0;            // 用于表示解的个数
 bool output_all_solution = false;  // 用于表示是否输出所有解
 
 void usage(int status) {
     if (status == EXIT_FAILURE) {
-        fprintf(stderr,
-                "Try '%s --help or %s -h' for more information.\n",
-                program_invocation_name,
-                program_invocation_name);
+        fprintf(stderr, "Try '%s --help or %s -h' for more information.\n",
+                program_invocation_name, program_invocation_name);
     } else if (status == EXIT_SUCCESS) {
         printf("使用：\n");
         printf("\t %s [可选项]... [文件名]...\n", program_invocation_name);
@@ -74,18 +72,14 @@ void input_from_file(const char *file_name) {
     fclose(fp);
 }
 
-void input_from_stdin() {
-    input_sudoku(stdin);
-}
+void input_from_stdin() { input_sudoku(stdin); }
 
 void output_sudoku() {
     for (int row = 0; row != 9; ++row) {
-        if (row != 0 && row % 3 == 0)
-            printf("\n");
+        if (row != 0 && row % 3 == 0) printf("\n");
 
         for (int col = 0; col != 9; ++col) {
-            if (col != 0 && col % 3 == 0)
-                printf("\t");
+            if (col != 0 && col % 3 == 0) printf("\t");
             printf("%c ", data[row][col]);
         }
         printf("\n");
@@ -94,13 +88,11 @@ void output_sudoku() {
 
 bool check_current_value_is_valid(int row, int col, char ch) {
     for (int i = 0; i != 9; ++i)
-        if (data[row][i] == ch || data[i][col] == ch)
-            return false;
+        if (data[row][i] == ch || data[i][col] == ch) return false;
 
     for (int i = 0; i != 3; ++i)
         for (int j = 0; j != 3; ++j)
-            if (data[row / 3 * 3 + i][col / 3 * 3 + j] == ch)
-                return false;
+            if (data[row / 3 * 3 + i][col / 3 * 3 + j] == ch) return false;
 
     return true;
 }
@@ -109,7 +101,7 @@ bool check_current_sudoku_is_valid() {
     for (int row = 0; row != 9; ++row)
         for (int col = 0; col != 9; ++col)
             if (data[row][col] != '0') {
-                char ch        = data[row][col];  // 暂时修改数据
+                char ch = data[row][col];  // 暂时修改数据
                 data[row][col] = '0';
                 if (!check_current_value_is_valid(row, col, ch)) {
                     data[row][col] = ch;  // 恢复数据
@@ -128,16 +120,14 @@ bool DFS(int row, int col) {
 
     if (row == 9) {
         ++solution_count;
-        if (solution_count == 1)
-            printf("\n该数独的解为：\n\n");
+        if (solution_count == 1) printf("\n该数独的解为：\n\n");
         if (output_all_solution)
             printf("\n第 %d 种解法为：\n\n", solution_count);
         output_sudoku();
         return true;
     }
 
-    if (data[row][col] != '0')
-        return DFS(row, col + 1);
+    if (data[row][col] != '0') return DFS(row, col + 1);
 
     for (char ch = '1'; ch <= '9'; ++ch)
         if (check_current_value_is_valid(row, col, ch)) {
@@ -161,8 +151,7 @@ void solve_sudoku() {
     }
 
     DFS(0, 0);
-    if (solution_count == 0)
-        printf("\n此数独无解\n");
+    if (solution_count == 0) printf("\n此数独无解\n");
 }
 
 void solve_sudoku(int argc, char *argv[], const char *file_name) {
@@ -182,12 +171,10 @@ void solve_sudoku(int argc, char *argv[], const char *file_name) {
 }
 
 int main(int argc, char *argv[]) {
-    struct option long_options[] = {
-        {"all",  no_argument,       NULL, 'a'},
-        {"file", required_argument, NULL, 'f'},
-        {"help", no_argument,       NULL, 'h'},
-        {NULL,   0,                 NULL, 0  }
-    };
+    struct option long_options[] = {{"all", no_argument, NULL, 'a'},
+                                    {"file", required_argument, NULL, 'f'},
+                                    {"help", no_argument, NULL, 'h'},
+                                    {NULL, 0, NULL, 0}};
     const char *file_name = NULL;
 
     for (;;) {
@@ -197,25 +184,25 @@ int main(int argc, char *argv[]) {
         }
 
         switch (c) {
-        case 'a':
-            output_all_solution = true;
-            break;
+            case 'a':
+                output_all_solution = true;
+                break;
 
-        case 'h':
-            usage(EXIT_SUCCESS);
-            break;
+            case 'h':
+                usage(EXIT_SUCCESS);
+                break;
 
-        case 'f':
-            file_name = optarg;
-            break;
+            case 'f':
+                file_name = optarg;
+                break;
 
-        case '?':
-            usage(EXIT_FAILURE);
-            break;
+            case '?':
+                usage(EXIT_FAILURE);
+                break;
 
-        default:
-            usage(EXIT_FAILURE);
-            break;
+            default:
+                usage(EXIT_FAILURE);
+                break;
         }
     }
 
