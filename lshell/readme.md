@@ -1,11 +1,4 @@
 
-## 使用
-```
-$ sudo apt install libreadline-dev # 安装依赖
-$ make                             # 编译
-$ ./a.out                          # 使用
-```
-
 ## 功能
 1. 支持管道, 重定向, 作业控制
 
