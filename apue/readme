@@ -1,0 +1,12 @@
+
+## ubuntu 下设置生成 core
+```
+$ ulimit -c unlimited           # 设置允许生成的 core 文件大小不受限制
+$                               # 可以考虑写入配置项 bashrc
+$ echo "kernel.core_pattern=%e.%p" >> /etc/sysctl.conf
+$                               # 将core命名方式写入配置文件: 文件名.进程号
+$ sudo sysctl -p                # 使配置生效
+$ sudo systemctl stop    apport # 停止此服务, 该服务会自动收集 core 文件
+$ sudo systemctl disable apport # 禁止改服务自动启动
+```
+
