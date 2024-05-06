@@ -1,4 +1,4 @@
 
 a.out: *.cc
-	g++ *.cc -lreadline
+	g++ $^ -o $@ -std=c++11 -lreadline
 
