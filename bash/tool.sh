@@ -36,6 +36,21 @@ function do_ps() {
         }'
 }
 
+function do_lnet() {
+     sudo ss -Htlnp | \
+         awk '{print $4, $6}' | \
+         awk '{
+             sub(/users.*pid=/, "");
+             sub(/,fd.*/, "");
+             sub(/.*:/, "");
+             print
+         }' | sort -n | uniq | awk '{
+                 cmd = "ps -o pid,user,comm --no-headers -p " $2;
+                 cmd | getline detail;
+                 close(cmd);
+                 print $1, detail }' | column -t
+}
+
 cmd=$1
 shift
 do_$cmd $@
