@@ -1,4 +1,12 @@
 
+## 常用命令
+$ apt install -y certbot                         # 安装命令
+$ certbot certonly --standalone -d yunbinliu.com # 签证书, 此时 443 端口号不能被占用
+$ /usr/bin/certbot renew --force-renewal         # 更新证书, 此时 443 端口号不能被占用
+$ certbot certificates                           # 查看证书信息
+
+$ /usr/bin/certbot renew --force-renewal --pre-hook "/usr/bin/openresty -s stop" --post-hook "/usr/bin/docker restart gost; /usr/bin/openresty"
+
 ## 数字证书认证过程
 1. 服务器将自己的公钥以及相关信息发送给数字证书认证中心
 2. 数字证书认证中心使用服务端的信息生成摘要信息
@@ -12,13 +20,13 @@
 
 ## 证书检验过程
 1. 服务器将自己的数字证书发给客户端
-2. 客户端检验一下基本信息, 比如有效期
+2. 客户端检验一下基本信息, 比如有效期, 域名
 3. 客户端计算服务器信息的摘要信息
 4. 客户端使用认证中心的公钥进行解密
-5. 比较 4 5 的摘要信息是否一致, 一致表明, 改公钥确实是指定服务器的
+5. 比较 4 5 的摘要信息是否一致, 一致表明, 该证书确实是指定域名的
 
-### 浏览器输入 https://www.bing.com 后的行为
-1. 解析 www.bing.com. 找到域名 bing.com. 查找对应 IP, 顺序查找,
+## 浏览器输入 https://www.bing.com 后的行为
+1. 解析到域名 www.bing.com.. 查找对应 IP, 顺序查找,
     * DNS cache
     * 本地 host 文件
     * DNS 服务器
