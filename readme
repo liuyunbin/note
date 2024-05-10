@@ -1,33 +1,13 @@
 Yunbin Liu's note
 
-多个文件描述符对相同的文件进行读和写
-
-## 申明和定义
-* 是否需要申明和定义
-* 申明和定义有区别吗?
-
-## 函数
-* 参数传递, 值传递还是引用
-
-readelf
-strings
-
-libevent
-lua
-nginx
-openresty
-redis
-muduo
-workflow
-
-## 卡组织
-* VISA
-* Mastercard
-* JCB
-* American Express
-* Union Pay ------- 银联
-* Discovery
-
-* 信用卡
-* 储蓄卡
+## TODO
+* 练习打字
+* 熟悉 lua
+* 熟悉 vim
+* 熟悉 openresty
+* 熟悉 html
+* 熟悉 设计模式
+* 熟悉 redis
+* 熟悉 mysql
+* 熟悉 workflow
 
