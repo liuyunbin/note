@@ -2,7 +2,7 @@
 PS1='\[\e[1m\]$(date "+%Y-%m-%d %H:%M:%S %z") \[\e[0m\]'
 
 note=~/github/note
-PATH=$PATH:$note/bash
+PATH=$PATH:$note
 
 alias c="cd $note; pwd"
 alias g="g++ -g -std=c++11"
