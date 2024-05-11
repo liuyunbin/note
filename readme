@@ -11,3 +11,444 @@ Yunbin Liu's note
 * 熟悉 mysql
 * 熟悉 workflow
 
+
+ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtu" # 以 文件访问时间     排序, 不准确
+ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtc" # 以 文件属性修改时间 排序
+ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrt"  # 以 文件内容修改时间 排序
+ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtd" # 以 文件内容修改时间 排序, 只列出目录本身
+ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrS"  # 以 文件大小         排序
+ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrv"  # 以 文件名为版本号   排序
+
+bc <<< "scale=2; 10/2" # 使用两位小数,   输出: 5.00
+bc <<< "ibase=2;  100" # 输入使用二进制, 输出: 4
+bc <<< "obase=2;   10" # 输出使用二进制, 输出: 1010
+
+dd if=/dev/zero bs=1M count=1000 | nc 127.0.0.1 9999 # 测速-客户端
+
+iconv -f gbk -t utf-8 1.txt -o 1.txt
+
+uptime -s # 列出系统启动时间
+
+wget www.google.com
+wget www.google.com -O 1.html                 # 指定目标文件名称
+wget www.google.com -o 1.log                  # 指定日志文件
+wget www.google.com -c                        # 断点续传
+wget www.google.com -t 3                      # 指定重试的次数, 0 不停的尝试
+wget www.google.com --limit-rate 10k          # 限速
+wget www.google.com --quota 100M              # 限制最大下载量
+wget www.google.com --mirror --convert-links  # 镜像下载, 递归, 并转换为本地 url
+wget www.google.com --user ... --password ... # 指定用户名和密码
+
+curl www.google.com
+curl www.google.com -o 1.html                   # 指定目标文件名称
+curl www.google.com --silent                    # 不显示进度信息
+curl www.google.com -C -                        # 断点续传
+curl www.google.com --referer http://google.com # 指定跳转前的界面
+curl www.google.com --cookie ...                # 指定 cookie
+curl www.google.com --user-agent "Mozilla/5.0"  # 设置浏览器信息
+curl www.google.com -H ...                      # 指定其他header
+curl www.google.com --limit-rate 20k            # 限速
+curl www.google.com --max-filesize 100M         # 设置最大大小
+curl www.google.com -u user:pass                # 设置用户名和密码
+curl www.google.com --head                      # 只打印响应头部
+curl 127.0.0.1/test -X POST -H "Content-Type: application/json" -d '{}" # 发送 POST 请求, 数据为 JSON
+
+docker run ubuntu:15.10 -d --name "lyb"           # 启动 docker, 给起一个名字
+docker run ubuntu:15.10 -d --net=host             # 主机和 docker 共享 IP 和 端口号
+docker run ubuntu:15.10 -d -P                     # docke 内使用随机端口映射主机端口
+docker run ubuntu:15.10 -d -p 2000:3000           # 本机:2000 绑定 docker:3000
+docker run ubuntu:15.10 -d -v /home/123:/home/456 # 本机:/home/123 绑定 docker:/home/456
+
+docker port     容器ID     # 查看端口号映射
+docker ps                  # 列出当前运行的容器
+docker ps -a               # 列出所有容器
+docker start    容器ID     # 启动容器
+docker stop     容器ID     # 停止容器
+docker restart  容器ID     # 重新启动容器
+docker rm -f    容器ID     # 删除容器
+docker exec     容器ID ls  # 对于在后台运行的容器, 执行命令
+
+redis flushdb # 清空数据
+redis -c ...  # 集群时需要使用 -c 启动, 否则查不到数据
+
+systemctl -a                 # 查看所有启动的服务
+systemctl start      nginx   # 启动 nginx
+systemctl stop       nginx   # 停止 nginx
+systemctl restart    nginx   # 重启 nginx
+systemctl status     nginx   # 查看 nginx 状态
+systemctl enable     nginx   # 开机自动启动 nginx
+systemctl disable    nginx   # 开机禁止启动 nginx
+systemctl is-active  nginx   # 查看 nginx 是否启动成功
+systemctl is-failed  nginx   # 查看 nginx 是否启动失败
+systemctl is-enabled nginx   # 查看 nginx 是否开机启动
+
+                                        # 注意, 有不同版本的 nc, 参数不一定相同
+nc -l             8080                  # 服务端(tcp), 接收单个连接
+nc -lk            8080                  # 服务端(tcp), 接收多个连接
+nc -lv            8080                  # 服务端(tcp), 显示连接信息
+nc -lu            8080                  # 服务端(udp)
+nc      127.0.0.1 8080                  # 客户端(tcp)
+nc -n   127.0.0.1 8080                  # 客户端(tcp), 不进行域名解析, 节省时间
+nc -N   127.0.0.1 8080                  # 客户端(tcp), 收到 EOF 后, 退出(有的版本不需要此参数, 会自动退出)
+nc -w 3 127.0.0.1 8080                  # 客户端(tcp), 设置超时时间
+nc -vz  127.0.0.1 8080                  # 客户端(tcp), 不发送信息, 只显示连接信息(测试单个端口)
+nc -vz  127.0.0.1 8080-8090             # 客户端(tcp), 不发送信息, 只显示连接信息(测试多个端口)
+nc -u   127.0.0.1 8080                  # 客户端(udp)
+nc -lk            8080 | pv > /dev/null # 测速-服务端, 注意重定向, 否则会受限于终端的写速率
+nc      127.0.0.1 8080      < /dev/zero # 测试-客户端
+
+nmap             127.0.0.1 # 主机发现 -> 端口扫描, 默认扫描 1000 个端口
+nmap -p  80      127.0.0.1 # 主机发现 -> 端口扫描, 指定端口号
+nmap -p  80-85   127.0.0.1 # 主机发现 -> 端口扫描, 指定端口号
+nmap -p  80,8080 127.0.0.1 # 主机发现 -> 端口扫描, 指定端口号
+nmap -Pn         127.0.0.1 # 跳过主机发现, 直接端口扫描
+nmap -sn         127.0.0.1 # 主机发现
+
+                              # 使用 iperf 测试的时候需要关掉防火墙: sudo systemctl stop firewalld
+iperf -s                      # 服务器(TCP), 端口号为 5001
+iperf -s -p 8080              # 服务器(TCP), 端口号为 8080
+iperf -s -f MB                # 服务器(TCP), 端口号为 5001, 设置输出的单位
+iperf -s -i 10                # 服务器(TCP), 端口号为 5001, 设置报告的时间间隔为 10s
+iperf -s -D                   # 服务器(TCP), 端口号为 5001, 服务器在后台启动
+iperf -s -1                   # 服务器(TCP), 端口号为 5001, 只接受一个客户端
+iperf -s -N                   # 服务器(TCP), 端口号为 5001, 使用 TCP nodelay 算法
+iperf -s -u                   # 服务器(UDP), 端口号为 5001
+iperf -c 127.0.0.1            # 客户端(TCP), 服务器端口号为 5001
+iperf -c 127.0.0.1 -p 8080    # 客户端(TCP), 服务器端口号为 8080
+iperf -c 127.0.0.1 -i 1       # 客户端(TCP), 服务器端口号为 5001, 设置报告的时间间隔为 1s
+iperf -c 127.0.0.1 -t 10      # 客户端(TCP), 服务器端口号为 5001, 设置测试时间为 10s
+iperf -c 127.0.0.1 -f MB      # 客户端(TCP), 服务器端口号为 5001, 设置输出的单位
+iperf -c 127.0.0.1 -b 100M    # 客户端(TCP), 服务器端口号为 5001, 设置发送速率
+iperf -c 127.0.0.1 -n 100M    # 客户端(TCP), 服务器端口号为 5001, 设置测试的数据的大小
+iperf -c 127.0.0.1 -k 100M    # 客户端(TCP), 服务器端口号为 5001, 设置测试的数据包的数量
+iperf -c 127.0.0.1 -R         # 客户端(TCP), 服务器端口号为 5001, 反向测试, 服务端连客户端
+iperf -c 127.0.0.1         -d # 客户端(TCP), 客户端连服务端的同时, 服务端同时连客户端, 端口号为 5001
+iperf -c 127.0.0.1 -L 9090 -d # 客户端(TCP), 客户端连服务端的同时, 服务端同时连客户端, 端口号为 9090
+iperf -c 127.0.0.1         -r # 客户端(TCP), 客户端连服务端结束后, 服务端连回客户端,   端口号为 5001
+iperf -c 127.0.0.1 -L 9090 -r # 客户端(TCP), 客户端连服务端结束后, 服务端连回客户端,   端口号为 9090
+iperf -c 127.0.0.1 -P 30      # 客户端(TCP), 客户端线程数为 30
+iperf -c 127.0.0.1 -u         # 客户端(UDP)
+
+firewall-cmd --list-ports                      # 查看所有打开的端口
+firewall-cmd --list-services                   # 查看所有打开的服务
+firewall-cmd --get-services                    # 查看所有的服务
+firewall-cmd --reload                          # 重新加载配置
+firewall-cmd --complete-reload                 # 重启服务
+firewall-cmd --permanent --add-service=http    # 添加服务, 永久生效, 需要重新加载配置
+firewall-cmd             --remove-service=http # 移除服务
+firewall-cmd --permanent --add-port=80/tcp     # 添加端口, 永久生效, 需要重新加载配置
+firewall-cmd             --remove-port=80/tcp  # 移除端口
+firewall-cmd             --query-masquerade    # 检查是否允许伪装IP
+firewall-cmd --permanent   --add-masquerade    # 允许防火墙伪装IP, 永久生效, 需要重新加载配置
+firewall-cmd            --remove-masquerade    # 禁止防火墙伪装IP
+firewall-cmd --add-forward-port=proto=80:proto=tcp:toaddr=192.168.0.1:toport=8080
+                                               # 端口转发, 0.0.0.0:80 --> 192.168.0.1:8080
+firewall-cmd --add-forward-port=proto=80:proto=tcp:toaddr=192.168.0.1:toport=8080 --permanent
+                                               # 端口转发, 永久生效, 需要重新加载配置
+firewall-cmd --runtime-to-permanent            # 将当前防火墙的规则永久保存
+
+ps -o pmem,rsz,vsz           # 内存百分比,内存,内存(含交换分区)
+ps -o pcpu,c,bsdtime,cputime # cpu: 百分比,百分比整数,user+system,system
+ps -o lstart,etime,etimes    # 启动时间,运行时间,运行时间(秒), 无法对 etimes 进行排序
+
+top     # 第一行 系统时间 运行时间 用户数 平均负载
+        # 第二行 进程总结
+        # 第三行 CPU 总结
+        # 第四行 物理内存总结
+        # 第五行 虚拟内存总结
+        # 交互命令
+        #   空格 或 回车 刷新
+        #   l 切换负载的显示
+        #   t 切换任务的显示
+        #   m 切换内存的显示
+        #   f 选择展示的字段
+        #   R 反向排序
+        #   c 显示命令名称 或 完整命令行
+        #   i 显示空闲任务
+        #   u 显示特定用户的进程
+        #   k 结束任务
+        #   h 帮助
+        #   L 搜索字符串
+        #   H 显示线程
+        #   0 不显示统计值为 0 的项
+        #   1   显示所有的cpu信息
+        #   < 排序字段左移
+        #   > 排序字段右移
+        #   M 内存排序   --- 常用
+        #   P CPU 排序   --- 常用
+        #   T 时间排序   --- 常用
+top -n 1   # 刷新次数
+top -b     # 方便写入文件
+top -c     # 显示完整命令行
+top -p ... # 指定 PID
+top -u lyb # 指定用户
+
+unzip    1.zip -d ... # 解压缩到指定目录
+unzip -j 1.zip        # 解压时, 文件都移到顶层路径
+unzip -o 1.zip        # 解压时, 直接覆盖重复的文件, 不提醒
+unzip -n 1.zip        # 解压时,   不覆盖重复的文件
+unzip -l 1.zip        # 列出 1.zip 的目录结构, 简单
+unzip -v 1.zip        # 列出 1.zip 的目录结构, 详细点
+
+unrar    v 1.rar          # 列出压缩包信息, 详细
+unrar    l 1.rar          # 列出压缩包信息, 简易
+unrar    l 1.rar ...      # 列出压缩包内的指定文件或目录
+unrar    e 1.rar ...      # 解压缩到指定路径, 忽略压缩包内的路径
+unrar    x 1.rar ...      # 解压缩到指定路径, 使用完整的压缩包路径
+unrar    x 1.rar ... ...  # 解压缩到指定路径, 使用完整的压缩包路径, 只解压部分文件
+
+tcpdump -nn -i any host 127.0.0.1 and port 9999 -w 1.pcap
+
+passwd -stdin     # 修改 root 密码, 从标准输入读取
+
+sudo -u USERNAME COMMAND                      # 指定用户执行命令
+sudo -S date -s "20210722 10:10:10" <<< "123" # 脚本中免密码使用
+
+ntpdate -s time-b.nist.gov # 使用时间服务器更新时间
+
+
+## 申明和定义
+* 变量使用前必须申明或定义
+* 多个文件使用相同的变量时, 注意防止重复定义, 使用前确保初始化已完成
+
+## 初始化
+* 全局变量
+    * 在 main 函数运行之前 或 动态库装载时初始化
+    * 不同的文件的变量的初始化顺序不一定
+* 静态全局变量
+    * 同上
+* 类静态变量
+    * 同上
+* 函数静态变量
+    * 在第一次经过的时候才初始化
+    * C++11 及以后是线程安全的
+
+       const int i = 1; # 只在本文件内有效
+extern const int i = 1; # 可以在其他文件中使用
+
+std::getline(std::cin, str); // 读取一行, 包括换行符, str 不会存储换行符
+
+整数除以整数, 无论正负, 小数部分直接舍弃
+商的符号由除数和被除数决定
+余数的符号只由被除数决定
+
+     static_cast -- 不含底层const的转换, 明确定义, 比如, long -> int, void* -> int*
+      const_cast --     底层const的转换, 比如, const int* => int*
+reinterpret_cast -- 重新解释底层存储, 比如 long* -> double*
+    dynamic_cast
+
+mutable 类可变成员
+
+explicit
+
+string 短字符串优化, 所以 swap 可能会真正交换元素, 而不是拷贝指针
+
+thread --------- 线程
+  joinable() --- 判断线程是否可以回收
+  join() ------- 等待线程退出
+  detach() ----- 使线程处于分离状态
+sleep_for() ---- 休眠
+sleep_until() -- 休眠, 直到
+
+atomic -------- 原子操作
+mutex --------- 互斥锁, 需要手动加解锁
+shared_mutex -- 共享锁, 应该很少用
+
+lock_guard --- 构造函数对互斥锁加锁, 析构函数对互斥锁解锁, 一次只能针对一个互斥锁
+unique_lock -- 一般和条件变量一起使用
+scoped_lock -- 构造函数对互斥锁加锁, 析构函数对互斥锁解锁, 一次可以针对多个互斥锁 -- C++17
+shared_lock -- 处理共享锁, 应该很少用
+
+defer_lock --- 不加锁
+try_to_lock -- 会尝试加锁, 失败就退出
+adopt_lock --- 如果当前线程已加锁, 则不再加锁, 否则, 正常加锁
+
+condition_variable -- 条件变量, 和 unique_lock 一起用
+    notify_one ------ 通知一个
+    notify_all ------ 通知所以
+    wait ------------ 等待
+
+std::shared_ptr
+	* 初始化
+	    * std::shared_ptr<T>(p)    -- p 指向动态分配的内存 -- 不建议
+		* std::shared_ptr<T>(q, d) -- p 可以是普通指针, d 为析构时的处理
+		* std::make_shared -- 建议
+	p.use_count()
+	p.unique()
+	p.get()
+	p.reset(...)
+std::unique_ptr
+	初始化
+	    * std::unique_ptr<T>(p)    -- p 指向动态分配的内存 -- 不建议
+		* std::shared_ptr<T, D>(q, d) -- p 可以是普通指针, d 为析构时的处理, 处于效率的考虑, 删除器使用模板
+		* std::make_unique -- 建议, C++14
+	p.release() -- 放弃指针的占用, 并返回
+	p.reset(...)
+std::weak_ptr -- 不影响引用计数
+	w.reset()
+	w.unique()
+	w.use_count()
+	w.expired() -- 所关联的智能指针是否存在
+	w.lock() -- 返回智能指针
+
+使用动态分配内存的场景
+1. 不知道有多少元素(std::vector)
+2. 不知道对象的准确类型
+3. 多个对象共享数据
+
+## 高级特性
+* 对于普通程序员来说，模板元编程只需明白原理，实现能看懂即可, 一般也不会用到
+
+
+## ubuntu 下设置生成 core
+```
+$ ulimit -c unlimited           # 设置允许生成的 core 文件大小不受限制
+$                               # 可以考虑写入配置项 bashrc
+$ echo "kernel.core_pattern=%e.%p" >> /etc/sysctl.conf
+$                               # 将core命名方式写入配置文件: 文件名.进程号
+$ sudo sysctl -p                # 使配置生效
+$ sudo systemctl stop    apport # 停止此服务, 该服务会自动收集 core 文件
+$ sudo systemctl disable apport # 禁止改服务自动启动
+```
+
+
+# 计算机网络
+## 基础知识
+```
+硬盘: 1T = 1000G = 1000 * 1000 * 1000 * 1000B = ... / 1024 / 1024 /1024 GB = 931GB
+网卡: 1000M = 1000Mbps = 125MB (网速也一样)
+
+  带宽: 网速, 上限由网卡控制
+吞吐量: 有效数据的速度, 速度小于带宽
+  延时: 客户端发送数据到收到数据的时差
+
+kmg(1000), KMG(1024), B(字节), b(位)
+```
+
+## 网络接口层(帧)(以太网)
+* MTU 最大传输单元 (链路层)
+* 通过MAC可以区分是单播还是(组播或广播)
+* 以太网
+* WiFi
+
+* 集线器: 无脑转发数据到所有出口(不知道 MAC 和 IP) -- 很少使用了
+* 交换机: 将指定数据直接发送到目标机器(知道 MAC) ---- 机器数量过大时, 会很难处理
+
+## 网络层(数据包)
+* IPv4
+* IPv6
+
+* 路由器: 连接不同的网络(知道 MAC 和 IP)
+
+## 传输层(段)
+* TCP: 面向连接的可靠的字节流协议
+* UDP: 无连接, 固定长度的不可靠的数据报协议
+
+## 应用层(消息)
+* DHCP(广播, UDP)
+    1. 新机器(IP: 0.0.0.0)发送信息给当前网络(IP: 255.255.255.255)的所有机器(不会跨网关)
+    2. 包含 DHCP 服务器的机器发送新的 IP 给新机器(IP: 255.255.255.255)
+    3. 新机器(IP: 新IP)发送确认信息给 DHCP 服务器
+* http
+* DNS
+    * A ------------------ 域名 => IPv4
+    * AAAA --------------- 域名 => IPv6
+    * CNAME -------------- 域名 => 另一域名
+    * /etc/resolv.conf --- DNS 服务器的地址
+    * /etc/hosts --------- 域名 和 IP 的对应关系
+* ICMP(传输控制协议 不使用端口号) -- ping 实现
+
+
+## 为什么不能去掉IP(32位)
+* 为了划分子网, 方便路由, 传送数据到子网
+
+## 为什么不能去掉MAC(48位, 一般无法改变)
+1. 网络协议分层, 不同层实现不同的功能, 交换机会使用其传递数据
+2. 直接使用 IP 其实也可以, 这个就是历史原因了
+
+## 端口号
+```
+* [0, 1024)      # 公认端口号, 需要 root 启动, 比如 80
+* [1024, 32768)  # 注册端口, 可以自己注册一些常用服务
+* [32768, 60990) # 动态端口, 进程未指定端口号时, 将从这个范围内获取一个端口号
+                 # 可通过文件 /proc/sys/net/ipv4/ip_local_port_range 获取
+* [60990, 65535)
+```
+
+## 单播(一般的网络服务都是单播)
+1. 源 IP 和目标 IP 属于同一个子网时, 利用 arp 获取目标的 MAC, 然后利用交换机发送数据到指定机器
+2. 否则, 利用路由表获取下一跳的 IP 地址
+3. 利用 arp 获取下一跳的 MAC, 然后利用交换机发送数据到下一跳的机器
+4. 默认网关会修改源 MAC, 然后再查找下一跳或指定机器
+5. 数据传输过程中, 源 IP 和目标 IP 一般不变, 除了 NAT 等
+
+## 组播(IGMP 直播 电视)(TCP 不支持)
+1. 组播源注册: 服务器(组播源IP)向中介机构(RP)注册组播IP(2.2.2.2)
+2. 客户端向中介机构(RP)申请加入组播IP: 生成基于中介机构(RP)的树(RPT), 同时获取组播源IP
+3. 客户端向服务器(组播源IP)申请加入组播IP: 生成基于源的树(SPT), 废弃掉 RPT(SPT路径更优)
+4. 服务器通过SPT, 向所有的注册组播IP的用户发送数据
+    * 源IP和MAC填自己的数据
+    * 目的IP为组播地址
+    * 目的MAC为: 01:00:5e + 组播IP 地址低 23 bit(区分单播 组播 广播)
+    * 由于目的IP为组播IP, 无法获取确切的MAC, 指定某一机器, 所以只能采用广播向所有机器发送数据
+5. 客户端或者路由器通过接收到的数据的组播地址来确定是不是自己所需要的数据
+
+## 广播(ARP, 使用DHCP申请IP地址时)(TCP 不支持)
+* 发送所有数据到当前网络的所有机器
+* 一般不能跨网络
+
+## 任播(TCP 不支持)
+* 最近或最合适的客户
+
+## 防火墙
+```
+包过滤防火墙: 过滤某些不必要的流量, 依靠 IP 端口号 协议类型(ICMP)
+代理防火墙: http 代理
+            socks 代理
+```
+
+## socket 选项
+```
+SO_BROADCAST -- 广播
+SO_KEEPALIVE -- 保持连接
+SO_LINGER ----- close() 之后的内核行为
+SO_RCVBUF ----- 接收缓冲区
+SO_SNDBUF ----- 发送缓冲区
+SO_RCVLOWAT --- 接收低水位值
+SO_SNDLOWAT --- 发送低水位值
+SO_RCVTIMEO --- 接收超时
+SO_SNDTIMEO --- 发送超时
+SO_REUSEADDR
+    * 通用 IP + 端口号 已绑定时, 不能再 bind() 其他的 IP + 此端口号
+    * 端口号 已有连接时, 仍可以 bind()
+    * 端口号处于 TIME_WAIT 仍可以 bind()
+SO_REUSEPORT -- 允许使用完全相同的绑定, 内核实现负载均衡
+
+TCP_MAXSEG ---- 最大分节大小
+TCP_NODELAY --- 禁止 Nagle 算法
+
+IP_TTL -------- TTL 大小
+```
+
+## 服务器
+1. 迭代服务器
+2. 每个客户生成一个进程
+3. 每个客户生成一个线程
+4. 非阻塞 IO + IO 复用
+5. 进程池
+6. 线程池
+
+#### 查看 Linux 临时端口号的范围
+```
+cat /proc/sys/net/ipv4/ip_local_port_range
+32768   60999
+``
+
+* [0, 1024) 公认端口号, 需要 root 启动, 比如 80
+* [1024, 32768) 注册端口, 可以自己注册一些常用服务
+* [32768, 60990) 动态端口, 进程未指定端口号时, 将从这个范围内获取一个端口号
+* [60990, 65535)
+
+# 查询 域名 对应 的 IP
+* nslookup baidu.com
+
