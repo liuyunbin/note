@@ -1,23 +1,5 @@
 
-#include <fcntl.h>
-#include <grp.h>
-#include <pwd.h>
-#include <readline/history.h>
-#include <readline/readline.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/resource.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
-#include <map>
-#include <string>
-#include <vector>
+#include "lshell.h"
 
 uid_t       user_id;    // 用户 ID
 std::string user_name;  // 用户 名称
@@ -195,12 +177,14 @@ int handle_redirection(const cmd_t& cmd) {
     if (handle_redirection(cmd.in, O_RDONLY, STDIN_FILENO) != 0)
         return -1;
     // 输出重定向
-    if (handle_redirection(
-            cmd.out, O_WRONLY | O_CREAT | O_TRUNC, STDOUT_FILENO) != 0)
+    if (handle_redirection(cmd.out,
+                           O_WRONLY | O_CREAT | O_TRUNC,
+                           STDOUT_FILENO) != 0)
         return -1;
     // 添加重定向
-    if (handle_redirection(
-            cmd.add, O_WRONLY | O_CREAT | O_APPEND, STDOUT_FILENO) != 0)
+    if (handle_redirection(cmd.add,
+                           O_WRONLY | O_CREAT | O_APPEND,
+                           STDOUT_FILENO) != 0)
         return -1;
     return 0;
 }
