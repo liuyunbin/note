@@ -12,13 +12,6 @@ Yunbin Liu's note
 * 熟悉 workflow
 
 
-ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtu" # 以 文件访问时间     排序, 不准确
-ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtc" # 以 文件属性修改时间 排序
-ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrt"  # 以 文件内容修改时间 排序
-ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtd" # 以 文件内容修改时间 排序, 只列出目录本身
-ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrS"  # 以 文件大小         排序
-ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrv"  # 以 文件名为版本号   排序
-
 bc <<< "scale=2; 10/2" # 使用两位小数,   输出: 5.00
 bc <<< "ibase=2;  100" # 输入使用二进制, 输出: 4
 bc <<< "obase=2;   10" # 输出使用二进制, 输出: 1010
