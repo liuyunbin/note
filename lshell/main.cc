@@ -5,37 +5,13 @@ uid_t       user_id;    // 用户 ID
 std::string user_name;  // 用户 名称
 std::string user_home;  // 用户 主目录
 
-// 用户提示符
-std::string prompt;
-
-void get_prompt() {
-    char*       p        = get_current_dir_name();
-    std::string curr_dir = p;
-    free(p);
-
-    prompt = user_name + ":";
-    if (curr_dir == user_home)
-        prompt += "~";
-    else if (curr_dir < user_home)
-        prompt += curr_dir;
-    else if (curr_dir.compare(0, user_home.size(), user_home) != 0)
-        prompt += curr_dir;
-    else if (curr_dir[user_home.size()] != '/')
-        prompt += curr_dir;
-    else
-        prompt += "~" + std::string(curr_dir.data() + user_home.size());
-
-    if (user_id == 0)
-        prompt += "# ";
-    else
-        prompt += "$ ";
-}
-
 // 用户输入
 std::string input;
 
 void get_input() {
-    char* p = readline(prompt.data());
+    // 用户提示符
+    std::string prompt = get_prompt();  // 获取用户提示符
+    char*       p      = readline(prompt.data());
 
     if (p == NULL) {
         // printf("read EOF, exit\n");
@@ -52,14 +28,6 @@ void get_input() {
             input += p[i];
     free(p);
 }
-
-struct cmd_t {
-    std::vector<std::string> vec;
-    std::string              str;
-    std::string              in;
-    std::string              out;
-    std::string              add;
-};
 
 std::vector<cmd_t> cmds;  // 用户输入 -> 命令数组
 bool               fg;    // 前台还是后台作业
@@ -189,8 +157,6 @@ int handle_redirection(const cmd_t& cmd) {
     return 0;
 }
 
-std::map<std::string, int (*)(int argc, char* argv[])> m;  // 存储内置命令
-
 // 运行命令
 int run_cmd(const cmd_t& cmd) {
     // 处理重定向
@@ -203,9 +169,9 @@ int run_cmd(const cmd_t& cmd) {
     argv[cmd.vec.size()] = NULL;
     int ret;
 
-    if (m.find(argv[0]) != m.end()) {
+    if (is_builtin(cmd)) {
         // 处理内置命令
-        ret = m[argv[0]](argc, argv);
+        ret = run_builtin(argc, argv);
     } else {
         // 处理非内置命令
         ret = execvp(argv[0], argv);
@@ -421,7 +387,7 @@ void handle_job() {
     if (fg && cmds.size() == 1 && cmds[0].in.empty() && cmds[0].out.empty() &&
         cmds[0].add.empty()) {
         // 非 管道 重定向 以及 后台命令, 才可能在当前进程中运行
-        if (m.find(cmds[0].vec[0]) != m.end()) {  // 是否是内置命令
+        if (is_builtin(cmds[0])) {  // 是否是内置命令
             run_cmd(cmds[0]);
             return;
         }
@@ -496,72 +462,6 @@ void handle_job() {
     sigprocmask(SIG_UNBLOCK, &mask_child, NULL);  // 解除信号阻塞
 }
 
-// 内置命令
-int do_about(int argc, char* argv[]) {
-    printf("write by liuyunbin\n");
-    return 0;
-}
-
-int do_exit(int argc, char* argv[]) {
-    exit(0);
-}
-
-int do_cd(int argc, char* argv[]) {
-    if (argc > 2) {
-        printf("cd: too many arguments\n");
-        return -1;
-    }
-
-    std::string str;
-    if (argc == 1)
-        str = user_home;
-    else
-        str = argv[1];
-
-    if (chdir(str.data()) == -1) {
-        perror("cd");
-        return -1;
-    }
-    return 0;
-}
-
-#define LIMIT(name, X)                                                       \
-    {                                                                        \
-        struct rlimit rlim;                                                  \
-        getrlimit(X, &rlim);                                                 \
-        std::string s_cur;                                                   \
-        if (rlim.rlim_cur == RLIM_INFINITY)                                  \
-            s_cur = "unlimited";                                             \
-        else                                                                 \
-            s_cur = std::to_string(rlim.rlim_cur);                           \
-        std::string s_max;                                                   \
-        if (rlim.rlim_max == RLIM_INFINITY)                                  \
-            s_max = "unlimited";                                             \
-        else                                                                 \
-            s_max = std::to_string(rlim.rlim_max);                           \
-        printf("%20s %10s %10s %s\n", #X, s_cur.data(), s_max.data(), name); \
-    }
-
-int do_ulimit(int argc, char* argv[]) {
-    LIMIT("虚拟内存大小", RLIMIT_AS);
-    LIMIT("core 文件大小", RLIMIT_CORE);
-    LIMIT("CPU 总的时间大小", RLIMIT_CPU);
-    LIMIT("数据段(初始化数据, 未初始化数据, 堆)", RLIMIT_DATA);
-    LIMIT("文件大小", RLIMIT_FSIZE);
-    LIMIT("文件锁的个数", RLIMIT_LOCKS);
-    LIMIT("内存中可以锁定的大小", RLIMIT_MEMLOCK);
-    LIMIT("消息队列的大小", RLIMIT_MSGQUEUE);
-    LIMIT("进程优先级的上限", RLIMIT_NICE);
-    LIMIT("文件描述符的最大限制", RLIMIT_NOFILE);
-    LIMIT("用户的进程线程数", RLIMIT_NPROC);
-    LIMIT("物理内存大小", RLIMIT_RSS);
-    LIMIT("调度的优先级", RLIMIT_RTPRIO);
-    LIMIT("调度时 CPU 的最大耗时 毫秒", RLIMIT_RTTIME);
-    LIMIT("信号队列的长度", RLIMIT_SIGPENDING);
-    LIMIT("栈大小", RLIMIT_STACK);
-    return 0;
-}
-
 void init() {
     // 初始化用户信息
     user_id = getuid();
@@ -573,15 +473,6 @@ void init() {
     } else {
         user_name = std::to_string(user_id);
     }
-
-    // 初始化内置命令
-    m["about"]  = do_about;
-    m["exit"]   = do_exit;
-    m["cd"]     = do_cd;
-    m["ulimit"] = do_ulimit;
-    m["jobs"]   = do_jobs;
-    m["bg"]     = do_bg;
-    m["fg"]     = do_fg;
 
     // 初始化信号
     signal(SIGINT, SIG_IGN);         // ctrl+c
@@ -600,10 +491,10 @@ void init() {
 }
 
 int main() {
+    init_builtin();
     init();
 
     for (;;) {
-        get_prompt();   // 获取用户提示符
         get_input();    // 获取用户输入
         parse_input();  // 解析用户输入
         handle_job();   // 处理作业

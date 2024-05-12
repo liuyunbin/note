@@ -1,7 +1,5 @@
 
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+#include "lshell.h"
 
 bool number          = false;  // 行号包括空行
 bool number_nonblank = false;  // 行号不包括空行
@@ -47,7 +45,7 @@ void handle_cat(FILE* fp) {
     }
 }
 
-int main(int argc, char* argv[]) {
+int do_cat(int argc, char* argv[]) {
     int opt;
     while ((opt = getopt(argc, argv, "bhnsT")) != -1) {
         switch (opt) {

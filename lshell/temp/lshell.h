@@ -1,26 +1,6 @@
 #ifndef LSHELL_H_
 #define LSHELL_H_
 
-#include <fcntl.h>
-#include <grp.h>
-#include <pwd.h>
-#include <readline/history.h>
-#include <readline/readline.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/resource.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
-#include <map>
-#include <string>
-#include <vector>
-
 struct cmd_t {
     std::vector<std::string> vec;
     std::string              str;
@@ -33,18 +13,10 @@ struct cmd_t {
 void init_signal();
 void handle_signal(int sig);
 
-// prompt.cc
-std::string get_prompt();
-
 // input.cc
 std::string get_input(const std::string& prompt);
 int         parse_input(std::vector<cmd_t>& cmds, std::string& str);
 void handle_input(std::vector<cmd_t>& cmds, bool& fg, std::string& input);
-
-// builtin.cc
-void init_builtin();
-bool is_builtin(const cmd_t& cmd);
-bool run_builtin(int argc, char* argv[]);
 
 // cmd.cc
 int handle_redirection(const std::string& filename, int flag, int fd_new);

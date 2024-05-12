@@ -21,4 +21,29 @@
 #include <string>
 #include <vector>
 
+struct cmd_t {
+    std::vector<std::string> vec;
+    std::string              str;
+    std::string              in;
+    std::string              out;
+    std::string              add;
+};
+
+// prompt.cc
+std::string get_prompt();
+
+int do_ulimit(int argc, char* argv[]);
+int do_cat(int argc, char* argv[]);
+int do_about(int argc, char* argv[]);
+int do_exit(int argc, char* argv[]);
+int do_cd(int argc, char* argv[]);
+int do_jobs(int argc, char* argv[]);
+int do_bg(int argc, char* argv[]);
+int do_fg(int argc, char* argv[]);
+
+// builtin.cc
+void init_builtin();
+bool is_builtin(const cmd_t& cmd);
+bool run_builtin(int argc, char* argv[]);
+
 #endif
