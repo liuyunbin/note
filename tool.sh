@@ -36,7 +36,7 @@ function do_ps() {
         }'
 }
 
-function do_lnet() {
+function do_lsnet() {
      sudo ss -Htlnp | \
          awk '{print $4, $6}' | \
          awk '{
