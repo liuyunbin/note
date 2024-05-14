@@ -1,11 +1,65 @@
 
-## 常用命令
-$ apt install -y certbot                         # 安装命令
-$ certbot certonly --standalone -d yunbinliu.com # 签证书, 此时 443 端口号不能被占用
-$ /usr/bin/certbot renew --force-renewal         # 更新证书, 此时 443 端口号不能被占用
-$ certbot certificates                           # 查看证书信息
+##  申请独立的域名证书
+### 1. 安装命令
+```
+$ apt install -y certbot
+```
 
+### 2. 签证书, 此时 80 和 443 端口号不能被占用
+```
+$ certbot certonly --standalone -d yunbinliu.com
+```
+
+### 3. 更新证书, 此时 80 和 443 端口号不能被占用
+```
+$ /usr/bin/certbot renew --force-renewal
+```
+
+### 4. 查看证书信息
+```
+$ certbot certificates
+```
+
+### 5. 更新证书前, 自动停止 openresty, 更新证书后, 自动启动 openresty 和 gost
+```
 $ /usr/bin/certbot renew --force-renewal --pre-hook "/usr/bin/openresty -s stop" --post-hook "/usr/bin/docker restart gost; /usr/bin/openresty"
+```
+
+## 申请通配符的域名证书
+### 1. 安装 certbot 和 certbot-dns-cloudflare
+```
+$ apt remove certbot
+$ snap install --classic certbot
+$ ln -s /snap/bin/certbot /usr/bin/certbot
+$ snap set certbot trust-plugin-with-root=ok
+$ snap install certbot-dns-cloudflare
+```
+
+### 2. 生成 cloudflare 的 Edit zone DNS 的 api-token
+https://dash.cloudflare.com/profile/api-tokens
+
+### 3. 将申请的值配入文件 /etc/letsencrypt/cloudflare.ini
+```
+dns_cloudflare_api_token = .....
+```
+
+### 4. 生成证书
+```
+$ certbot certonly \
+  --dns-cloudflare \
+  --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini \
+  -d yunbinliu.com \
+  -d "*.yunbinliu.com"
+```
+
+### 5. 配置 通配的 DNS 的 A 记录的解析
+https://dash.cloudflare.com/a6a241765ac65eac8573d33e11409814/yunbinliu.com/dns/records
+
+### 6. 一段时间后, 就可以看到解析成功了(可能得半个小时)
+
+### 7. 参考资源
+* https://certbot-dns-cloudflare.readthedocs.io/en/stable/
+* https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal&tab=wildcard
 
 ## 数字证书认证过程
 1. 服务器将自己的公钥以及相关信息发送给数字证书认证中心
