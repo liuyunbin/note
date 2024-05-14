@@ -61,6 +61,9 @@ https://dash.cloudflare.com/a6a241765ac65eac8573d33e11409814/yunbinliu.com/dns/r
 * https://certbot-dns-cloudflare.readthedocs.io/en/stable/
 * https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal&tab=wildcard
 
+### 8. 注意
+1. 通配域名不能跨级, 即 1.yunbinliu.com 可以, 1.2.yunbinliu.com 不行
+
 ## 数字证书认证过程
 1. 服务器将自己的公钥以及相关信息发送给数字证书认证中心
 2. 数字证书认证中心使用服务端的信息生成摘要信息
