@@ -2,167 +2,150 @@
 
 import requests
 import json
+import os
+import time
 from lxml import etree
 
-# url_base = "https://www.stats.gov.cn"
+def save_file(name, results):
+    with open(name + ".json", 'w', encoding='utf-8') as f:
+        json.dump(results, f, ensure_ascii=False)
 
-def get_url_etree_xpath(url, path):
+# url_base = "https://www.stats.gov.cn"
+def access(value):
+    if value:
+        return value[0].strip()
+    return ""
+
+def access_url(value, url_base):
+    url = access(value)
+    if url != "":
+        url = url_base + url
+    return url
+
+def handle_url(url, encode):
     headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
     }
 
     try:
+        print("handle", url)
         response = requests.get(url=url, headers=headers)
-        tree = etree.HTML(response.content, parser=etree.HTMLParser(encoding="utf-8"))
-        return tree.xpath(path)
+        tree     = etree.HTML(response.content, parser=etree.HTMLParser(encoding=encode))
+        return tree
     except Exception as e:
-        print("调用报错, 可能临时被封, 强行暂停一分钟, 然后重新请求")
-        time.sleep(60)
-        return get_url_etree(url)
+        print("调用报错, 可能临时被封, 强行暂停 10 秒, 然后重新请求")
+        time.sleep(10)
+        return get_url(url, encode)
 
-# 年份的数据
-# https://www.stats.gov.cn/sj/tjbz/qhdm/
-# 结构: div class="list-content" => ul => li => a
-# 返回: https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html 或 /sj/tjbz/tjyqhdmhcxhfdm/2022/index.html
-# 目标: https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html
-def get_years():
-    url      = "https://www.stats.gov.cn/sj/tjbz/qhdm/"
-    path     = "//div[@class='list-content']//li"
-    url_base = "https://www.stats.gov.cn"
+# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/28/140728202.html -- 村数据
+# 结构: tr class="villagetr"(多) => td(3) (code=td[1].text(), code_villagetr=td[2].text(), name=td[3].text())
+def handle_villagetrs(url, encode):
+    results    = []
+    tree       = handle_url(url, encode)
+    villagetrs = tree.xpath("//tr[@class='villagetr']")
+    url_base   = os.path.dirname(url) + "/"
+    for v in villagetrs:
+        villagetr                   = {}
+        villagetr["code"]           = access(v.xpath("./td[1]//text()"))
+        villagetr["code_villagetr"] = access(v.xpath("./td[2]//text()"))
+        villagetr["name"]           = access(v.xpath("./td[3]//text()"))
+        results.append(villagetr)
+    return results
+#print(handle_villagetrs("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/28/140728202.html", "utf-8"))
 
-    years = []
-    path = get_url_etree_xpath(url, path)
-    for v in path:
-        url  = v.xpath("./a[1]/@href")[0].strip()
-        year = v.xpath("./a[1]/text()")[0].strip()[:4]
-        if (not url.startswith("http")):
-            url = url_base + url
-        print(year, url)
-        years.append([year, url])
-    return years
-
-# 获取省数据
-# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html
-# 结构: tr class="provincetr" => td => a
-# 返回: 14.html
-# 目标: https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14.html
-def get_province(year):
-    url      = year[1]
-    url_base = "https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/" + year[0] + "/";
-    path     = "//tr[@class='provincetr']//a"
-
-    provinces = []
-    path = get_url_etree_xpath(url, path)
-    for v in path:
-        url      = url_base + v.xpath("./@href")[0].strip()
-        province = v.xpath("./text()")[0].strip()
-        print(province, url)
-        provinces.append([province, url])
-    return provinces
-
-# 获取市数据
-# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14.html
-# 结构: tr class="citytr" => td => a
-# 返回: 14/1407.html
-# 目标: https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/1407.html
-def get_city(province, year):
-    url      = province[1]
-    url_base = "https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/" + year + "/";
-    path     = "//tr[@class='citytr']"
-
-    citys = []
-    path = get_url_etree_xpath(url, path)
-    for v in path:
-        url      = url_base + v.xpath("./td[1]/a/@href")[0].strip()
-        code     = v.xpath("./td[1]/a/text()")[0].strip()
-        city     = v.xpath("./td[2]/a/text()")[0].strip()
-        print(city, code, url)
-        citys.append([city, code, url])
-    return citys
-
-# 获取县区数据
-# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/1407.html
-# 结构: tr class="countytr" => td => a
-# 返回: 07/140728.html
-# 目标: https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/140728.html
-def get_county(city, year):
-    url      = city[2]
-    url_base = "https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/" + year + "/" + city[1][:2] + "/";
-    path     = "//tr[@class='countytr']"
-
-    countys = []
-    path = get_url_etree_xpath(url, path)
-    for v in path:
-
-        url      = v.xpath("./td[1]/a/@href")
-        if url:
-            url  = url_base + url[0].strip()
-        else:
-            url  = ""
-        code     = v.xpath("./td[1]//text()")[0].strip()
-        county   = v.xpath("./td[2]//text()")[0].strip()
-        print(county, code, url)
-        countys.append([county, code, url])
-    return countys
-
-# 获取乡镇数据
-# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/140728.html
-# 结构: tr class="towntr" => td => a
+# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/140728.html -------- 乡镇数据
+# 结构: tr class="towntr"(多) => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
 # 返回: 28/140728202.html
-# 目标: https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/28/140728202.html
-def get_town(county, year):
-    url      = county[2]
-    url_base = "https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/" + year + "/" + county[1][:2] + "/" + county[1][2:4] + "/";
-    path     = "//tr[@class='towntr']"
+def handle_towns(url, encode):
+    results  = []
+    tree     = handle_url(url, encode)
+    towns    = tree.xpath("//tr[@class='towntr']")
+    url_base = os.path.dirname(url) + "/"
+    for v in towns:
+        town = {}
+        town["code"] = access(v.xpath("./td[1]//text()"))
+        town["name"] = access(v.xpath("./td[2]//text()"))
+        url  = access_url(v.xpath("./td[1]/a/@href"), url_base)
+        if url != "":
+            town["children"] = handle_villagetrs(url, encode)
+        results.append(town)
+    return results
+#print(handle_towns("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/140728.html", "utf-8"))
 
-    towns = []
-    path = get_url_etree_xpath(url, path)
-    for v in path:
+# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/1407.html ------------- 县区数据
+# 结构: tr class="countytr"(多) => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
+# 返回: 07/140728.html
+def handle_countys(url, encode):
+    results  = []
+    tree     = handle_url(url, encode)
+    countys  = tree.xpath("//tr[@class='countytr']")
+    url_base = os.path.dirname(url) + "/"
+    for v in countys:
+        county         = {}
+        county["code"] = access(v.xpath("./td[1]//text()"))
+        county["name"] = access(v.xpath("./td[2]//text()"))
+        url  = access_url(v.xpath("./td[1]/a/@href"), url_base)
+        if url != "" and False:
+            county["children"] = handle_towns(url, encode)
+        results.append(county)
+    return results
+#print(handle_countys("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/1407.html", "utf-8"))
 
-        url      = v.xpath("./td[1]/a/@href")
-        if url:
-            url  = url_base + url[0].strip()
-        else:
-            url  = ""
-        code = v.xpath("./td[1]//text()")[0].strip()
-        town = v.xpath("./td[2]//text()")[0].strip()
-        print(town, code, url)
-        towns.append([town, code, url])
-    return towns
+# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14.html ------------------ 市数据
+# 结构: tr class="citytr"(多) => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
+# 返回: 14/1407.html
+def handle_citys(url, encode):
+    results  = []
+    tree     = handle_url(url, encode)
+    citys    = tree.xpath("//tr[@class='citytr']")
+    url_base = os.path.dirname(url) + "/"
+    for v in citys:
+        city         = {}
+        city["code"] = access(v.xpath("./td[1]/a/text()"))
+        city["name"] = access(v.xpath("./td[2]/a/text()"))
+        url  = access_url(v.xpath("./td[1]/a/@href"), url_base)
+        if url != "" and False:
+            city["children"] = handle_countys(url, encode)
+        results.append(city)
+    return results
+#print(handle_citys("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14.html", "utf-8"))
 
-# 获取村数据
-# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/28/140728202.html
-# 结构: tr class="villagetr" => td
-def get_village(url):
-    path     = "//tr[@class='villagetr']"
+# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html --------------- 省数据
+# 结构: tr class="provincetr" => td(多) => a (url=href, name=text())
+# 返回: 14.html
+def handle_provinces(url, encode):
+    results   = []
+    tree      = handle_url(url, encode)
+    provinces = tree.xpath("//tr[@class='provincetr']//a")
+    url_base  = os.path.dirname(url) + "/"
+    for v in provinces:
+        province         = {}
+        province["name"] = access(v.xpath("./text()"))
+        url  = access_url(v.xpath("./@href"), url_base)
+        if url != "":
+            province["children"] = handle_citys(url, encode)
+        results.append(province)
+    return results
+#print(handle_provinces("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html", "utf-8"))
 
-    villages = []
-    path = get_url_etree_xpath(url, path)
-    for v in path:
-        code1   = v.xpath("./td[1]//text()")[0].strip()
-        code2   = v.xpath("./td[2]//text()")[0].strip()
-        village = v.xpath("./td[3]//text()")[0].strip()
-        print(village, code1, code2)
-        villages.append([village, code1, code2])
-    return villages
+# https://www.stats.gov.cn/sj/tjbz/qhdm/ ---------------------------------------- 年份数据
+# 返回 http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html 或 /sj/tjbz/tjyqhdmhcxhfdm/2022/index.html
+# 结构: div class="list-content" => ul => li(多) => a(3) (url=href, year=text())
+def handle_years(url, encode):
+    tree     = handle_url(url, encode)
+    years    = tree.xpath("//div[@class='list-content']//li")
+    url_base = "https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/"
+    for v in years:
+        year = access(v.xpath("./a[1]/text()"))[:4]
+        url  = url_base + access(v.xpath("./a[1]/@href"))[-15:]
+        encode = "utf-8"
+        if year <= "2020":
+            encode = "gbk"
+        results = handle_provinces(url, encode)
+        save_file(year, results)
 
-# 年数据
-years = get_years()
+start_time = time.time()
+handle_years("https://www.stats.gov.cn/sj/tjbz/qhdm/", "utf-8")
+end_time = time.time()
+print("总共耗时: %d 秒" % (end_time - start_time))
 
-# 省数据
-provinces = get_province(years[0])
-
-# 市数据
-citys = get_city(provinces[3], years[0][0])
-
-# 区县数据
-countys = get_county(citys[6], years[0][0])
-
-# 乡镇数据
-towns = get_town(countys[9], years[0][0])
-
-# # 村数据
-get_village(towns[10][2])
-
-##with open('1.html', 'w', encoding='ISO-8859-1') as f:
-##    f.write(response.text)
