@@ -6,6 +6,8 @@ import os
 import time
 from lxml import etree
 
+test = True
+
 def save_file(name, results):
     with open(name + ".json", 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False)
@@ -53,13 +55,15 @@ def handle_villagetrs(url, encode, results):
         villagetr["code_villagetr"] = access(v.xpath("./td[2]//text()"))
         villagetr["name"]           = access(v.xpath("./td[3]//text()"))
         results.append(villagetr)
+        if test:
+            break;
 #print(handle_villagetrs("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/28/140728202.html", "utf-8"))
 
 # https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/140728.html -------- 乡镇数据
 # 结构: tr class="towntr"(多) => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
 # 返回: 28/140728202.html
 def handle_towns(url, encode, results):
-    if url == "" or True:
+    if url == "":
         return
     results["children"] = []
     results  = results["children"]
@@ -68,11 +72,13 @@ def handle_towns(url, encode, results):
     url_base = os.path.dirname(url) + "/"
     for v in towns:
         town = {}
-        town["code"] = access(v.xpath("./td[1]//text()"))
+        town["code"] = access(v.xpath("./td[1]//text()"))[:9]
         town["name"] = access(v.xpath("./td[2]//text()"))
         url  = access_url(v.xpath("./td[1]/a/@href"), url_base)
         handle_villagetrs(url, encode, town)
         results.append(town)
+        if test:
+            break;
 #print(handle_towns("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/140728.html", "utf-8"))
 
 # https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/1407.html ------------- 县区数据
@@ -88,11 +94,13 @@ def handle_countys(url, encode, results):
     url_base = os.path.dirname(url) + "/"
     for v in countys:
         county         = {}
-        county["code"] = access(v.xpath("./td[1]//text()"))
+        county["code"] = access(v.xpath("./td[1]//text()"))[:6]
         county["name"] = access(v.xpath("./td[2]//text()"))
         url  = access_url(v.xpath("./td[1]/a/@href"), url_base)
         handle_towns(url, encode, county)
         results.append(county)
+        if test:
+            break;
 #print(handle_countys("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/1407.html", "utf-8"))
 
 # https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14.html ------------------ 市数据
@@ -108,11 +116,13 @@ def handle_citys(url, encode, results):
     url_base = os.path.dirname(url) + "/"
     for v in citys:
         city         = {}
-        city["code"] = access(v.xpath("./td[1]/a/text()"))
+        city["code"] = access(v.xpath("./td[1]/a/text()"))[:4]
         city["name"] = access(v.xpath("./td[2]/a/text()"))
         url  = access_url(v.xpath("./td[1]/a/@href"), url_base)
         handle_countys(url, encode, city)
         results.append(city)
+        if test:
+            break;
 #print(handle_citys("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14.html", "utf-8"))
 
 # https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html --------------- 省数据
@@ -127,7 +137,10 @@ def handle_provinces(url, encode, results):
         province["name"] = access(v.xpath("./text()"))
         url  = access_url(v.xpath("./@href"), url_base)
         handle_citys(url, encode, province)
+        province["code"] = province["children"][0]["code"][:2]
         results.append(province)
+        if test:
+            break;
 #print(handle_provinces("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html", "utf-8"))
 
 # https://www.stats.gov.cn/sj/tjbz/qhdm/ ---------------------------------------- 年份数据
