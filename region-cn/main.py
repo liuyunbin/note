@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 
-import requests
-import json
-import os
-import time
 from lxml import etree
+import json
+import logging
+import os
+import requests
+import time
+
+logging.basicConfig(filename='log.txt',
+                    level=logging.INFO,
+                    format='%(asctime)s %(message)s',
+                    datefmt="%Y-%m-%d %H:%M:%S %z"
+                    )
 
 test = True
 
@@ -30,14 +37,14 @@ def handle_url(url, encode):
     }
 
     try:
-        print("handle", url)
+        logging.info("handle %s" % url)
         response = requests.get(url=url, headers=headers)
         tree     = etree.HTML(response.content, parser=etree.HTMLParser(encoding=encode))
         return tree
     except Exception as e:
-        print("调用报错, 可能临时被封, 强行暂停 10 秒, 然后重新请求")
+        logging.info("调用报错, 可能临时被封, 强行暂停 10 秒, 然后重新请求")
         time.sleep(10)
-        return get_url(url, encode)
+        return handle_url(url, encode)
 
 # https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/28/140728202.html -- 村数据
 # 结构: tr class="villagetr"(多) => td(3) (code=td[1].text(), code_villagetr=td[2].text(), name=td[3].text())
@@ -57,7 +64,7 @@ def handle_villagetrs(url, encode, results):
         results.append(villagetr)
         if test:
             break;
-#print(handle_villagetrs("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/28/140728202.html", "utf-8"))
+#logging.info(handle_villagetrs("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/28/140728202.html", "utf-8"))
 
 # https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/140728.html -------- 乡镇数据
 # 结构: tr class="towntr"(多) => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
@@ -79,7 +86,7 @@ def handle_towns(url, encode, results):
         results.append(town)
         if test:
             break;
-#print(handle_towns("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/140728.html", "utf-8"))
+#logging.info(handle_towns("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/140728.html", "utf-8"))
 
 # https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/1407.html ------------- 县区数据
 # 结构: tr class="countytr"(多) => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
@@ -101,7 +108,7 @@ def handle_countys(url, encode, results):
         results.append(county)
         if test:
             break;
-#print(handle_countys("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/1407.html", "utf-8"))
+#logging.info(handle_countys("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/1407.html", "utf-8"))
 
 # https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14.html ------------------ 市数据
 # 结构: tr class="citytr"(多) => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
@@ -123,7 +130,7 @@ def handle_citys(url, encode, results):
         results.append(city)
         if test:
             break;
-#print(handle_citys("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14.html", "utf-8"))
+#logging.info(handle_citys("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14.html", "utf-8"))
 
 # https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html --------------- 省数据
 # 结构: tr class="provincetr" => td(多) => a (url=href, name=text())
@@ -141,7 +148,7 @@ def handle_provinces(url, encode, results):
         results.append(province)
         if test:
             break;
-#print(handle_provinces("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html", "utf-8"))
+#logging.info(handle_provinces("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html", "utf-8"))
 
 # https://www.stats.gov.cn/sj/tjbz/qhdm/ ---------------------------------------- 年份数据
 # 返回 http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html 或 /sj/tjbz/tjyqhdmhcxhfdm/2022/index.html
@@ -163,5 +170,5 @@ def handle_years(url, encode):
 start_time = time.time()
 handle_years("https://www.stats.gov.cn/sj/tjbz/qhdm/", "utf-8")
 end_time = time.time()
-print("总共耗时: %d 秒" % (end_time - start_time))
+logging.info("总共耗时: %d 秒" % (end_time - start_time))
 
