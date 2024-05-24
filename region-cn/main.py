@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
 from lxml import etree
+import aiohttp
 import json
 import logging
 import os
 import requests
 import time
+import asyncio
+import functools
 
 logging.basicConfig(filename='log.txt',
                     level=logging.INFO,
@@ -14,10 +17,6 @@ logging.basicConfig(filename='log.txt',
                     )
 
 test = True
-
-def save_file(name, results):
-    with open(name + ".json", 'w', encoding='utf-8') as f:
-        json.dump(results, f, ensure_ascii=False)
 
 # url_base = "https://www.stats.gov.cn"
 def access(value):
@@ -31,144 +30,142 @@ def access_url(value, url_base):
         url = url_base + url
     return url
 
-def handle_url(url, encode):
+async def get_url(result):
     headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
     }
 
     try:
-        logging.info("handle %s" % url)
-        response = requests.get(url=url, headers=headers)
-        tree     = etree.HTML(response.content, parser=etree.HTMLParser(encoding=encode))
-        return tree
+        async with aiohttp.ClientSession() as session:
+            async with await session.get(url=result["url"], headers=headers) as response:
+                content          = await response.read()
+                tree             = etree.HTML(content, parser=etree.HTMLParser(encoding=result["encode"]))
+                result["xpaths"] = tree.xpath(result["xpath"])
+                logging.info("handle %s success", result["url"])
+                return result
     except Exception as e:
-        logging.info("调用报错, 可能临时被封, 强行暂停 10 秒, 然后重新请求")
+        logging.exception(e)
+        print(result)
+        logging.info("handle fail, sleep 10 seconds: %s", result["url"])
         time.sleep(10)
-        return handle_url(url, encode)
+        return await get_url(result)
 
-# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/28/140728202.html -- 村数据
-# 结构: tr class="villagetr"(多) => td(3) (code=td[1].text(), code_villagetr=td[2].text(), name=td[3].text())
-def handle_villagetrs(url, encode, results):
-    if url == "":
-        return
-    results["children"] = []
-    results  = results["children"]
-    tree       = handle_url(url, encode)
-    villagetrs = tree.xpath("//tr[@class='villagetr']")
-    url_base   = os.path.dirname(url) + "/"
-    for v in villagetrs:
-        villagetr                   = {}
-        villagetr["code"]           = access(v.xpath("./td[1]//text()"))
-        villagetr["code_villagetr"] = access(v.xpath("./td[2]//text()"))
-        villagetr["name"]           = access(v.xpath("./td[3]//text()"))
-        results.append(villagetr)
-        if test:
-            break;
-#logging.info(handle_villagetrs("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/28/140728202.html", "utf-8"))
+# tr class="villagetr"(多) => td(3) (code=td[1].text(), code_villagetr=td[2].text(), name=td[3].text())
+# tr class="towntr"(多)    => td(2)  => a (url=td[1].href, code=td[1].text(), name=td[2].text())
+# tr class="countytr"(多)  => td(2)  => a (url=td[1].href, code=td[1].text(), name=td[2].text())
+# tr class="citytr"(多)    => td(2)  => a (url=td[1].href, code=td[1].text(), name=td[2].text())
+# tr class="provincetr"    => td(多) => a (url=href, name=text())
+# div class="list-content" => ul => li(多) => a(3) (url=href, year=text())
+def handle_villagetrs(child, v, url_base):
+    child["villagetr"] = access(v.xpath("./td[2]//text()"))
+    child["name"]      = access(v.xpath("./td[3]//text()"))
 
-# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/140728.html -------- 乡镇数据
-# 结构: tr class="towntr"(多) => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
-# 返回: 28/140728202.html
-def handle_towns(url, encode, results):
-    if url == "":
-        return
-    results["children"] = []
-    results  = results["children"]
-    tree     = handle_url(url, encode)
-    towns    = tree.xpath("//tr[@class='towntr']")
-    url_base = os.path.dirname(url) + "/"
-    for v in towns:
-        town = {}
-        town["code"] = access(v.xpath("./td[1]//text()"))[:9]
-        town["name"] = access(v.xpath("./td[2]//text()"))
-        url  = access_url(v.xpath("./td[1]/a/@href"), url_base)
-        handle_villagetrs(url, encode, town)
-        results.append(town)
-        if test:
-            break;
-#logging.info(handle_towns("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/07/140728.html", "utf-8"))
+def handle_towns(child, v, url_base):
+    child["xpath"]    = "//tr[@class='villagetr']"
+    child["callback"] = handle_villagetrs
+    child["code"]     = child["code"][:9]
 
-# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/1407.html ------------- 县区数据
-# 结构: tr class="countytr"(多) => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
-# 返回: 07/140728.html
-def handle_countys(url, encode, results):
-    if url == "":
-        return
-    results["children"] = []
-    results  = results["children"]
-    tree     = handle_url(url, encode)
-    countys  = tree.xpath("//tr[@class='countytr']")
-    url_base = os.path.dirname(url) + "/"
-    for v in countys:
-        county         = {}
-        county["code"] = access(v.xpath("./td[1]//text()"))[:6]
-        county["name"] = access(v.xpath("./td[2]//text()"))
-        url  = access_url(v.xpath("./td[1]/a/@href"), url_base)
-        handle_towns(url, encode, county)
-        results.append(county)
-        if test:
-            break;
-#logging.info(handle_countys("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14/1407.html", "utf-8"))
+def handle_countys(child, v, url_base):
+    child["xpath"]    = "//tr[@class='towntr']"
+    child["callback"] = handle_towns
+    child["code"]     = child["code"][:6]
 
-# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14.html ------------------ 市数据
-# 结构: tr class="citytr"(多) => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
-# 返回: 14/1407.html
-def handle_citys(url, encode, results):
-    if url == "":
-        return
-    results["children"] = []
-    results  = results["children"]
-    tree     = handle_url(url, encode)
-    citys    = tree.xpath("//tr[@class='citytr']")
-    url_base = os.path.dirname(url) + "/"
-    for v in citys:
-        city         = {}
-        city["code"] = access(v.xpath("./td[1]/a/text()"))[:4]
-        city["name"] = access(v.xpath("./td[2]/a/text()"))
-        url  = access_url(v.xpath("./td[1]/a/@href"), url_base)
-        handle_countys(url, encode, city)
-        results.append(city)
-        if test:
-            break;
-#logging.info(handle_citys("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/14.html", "utf-8"))
+def handle_citys(child, v, url_base):
+    child["xpath"]    = "//tr[@class='countytr']"
+    child["callback"] = handle_countys
+    child["code"]     = child["code"][:4]
 
-# https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html --------------- 省数据
-# 结构: tr class="provincetr" => td(多) => a (url=href, name=text())
-# 返回: 14.html
-def handle_provinces(url, encode, results):
-    tree      = handle_url(url, encode)
-    provinces = tree.xpath("//tr[@class='provincetr']//a")
-    url_base  = os.path.dirname(url) + "/"
-    for v in provinces:
-        province         = {}
-        province["name"] = access(v.xpath("./text()"))
-        url  = access_url(v.xpath("./@href"), url_base)
-        handle_citys(url, encode, province)
-        province["code"] = province["children"][0]["code"][:2]
-        results.append(province)
-        if test:
-            break;
-#logging.info(handle_provinces("https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html", "utf-8"))
+def handle_provinces(child, v, url_base):
+    child["xpath"]    = "//tr[@class='citytr']"
+    child["callback"] = handle_citys
 
-# https://www.stats.gov.cn/sj/tjbz/qhdm/ ---------------------------------------- 年份数据
-# 返回 http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2023/index.html 或 /sj/tjbz/tjyqhdmhcxhfdm/2022/index.html
-# 结构: div class="list-content" => ul => li(多) => a(3) (url=href, year=text())
-def handle_years(url, encode):
-    tree     = handle_url(url, encode)
-    years    = tree.xpath("//div[@class='list-content']//li")
+    child["name"]   = access(v.xpath("./text()"))
+    child["url"]    = access_url(v.xpath("./@href"), url_base)
+
+def handle_years(child, v, url_base):
+    child["xpath"]    = "//tr[@class='provincetr']//a"
+    child["callback"] = handle_provinces
+
     url_base = "https://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/"
-    for v in years:
-        year = access(v.xpath("./a[1]/text()"))[:4]
-        url  = url_base + access(v.xpath("./a[1]/@href"))[-15:]
-        encode = "utf-8"
-        if year <= "2020":
-            encode = "gbk"
-        results = []
-        handle_provinces(url, encode, results)
-        save_file(year, results)
 
-start_time = time.time()
-handle_years("https://www.stats.gov.cn/sj/tjbz/qhdm/", "utf-8")
-end_time = time.time()
-logging.info("总共耗时: %d 秒" % (end_time - start_time))
+    child["year"]     = access(v.xpath("./a[1]/text()"))[:4]
+    child["url"]      = url_base + access(v.xpath("./a[1]/@href"))[-15:]
+    if child["year"] <= "2020":
+        child["encode"] = "gbk"
+
+def handle_base(task, callback):
+    result = task.result()
+    url    = result["url"]
+    encode = result["encode"]
+
+    result["children"] = []
+    children = result["children"]
+
+    url_base  = os.path.dirname(url) + "/"
+    for v in result["xpaths"]:
+        child = {}
+        child["encode"] = encode
+        child["code"]   = access(v.xpath("./td[1]//text()"))
+        child["name"]   = access(v.xpath("./td[2]//text()"))
+        child["url"]    = access_url(v.xpath("./td[1]//@href"), url_base)
+        callback(child, v, url_base)
+        children.append(child)
+
+def use_aiohttp(children):
+    if len(children) == 0:
+        return
+    tasks = []
+    for v in children:
+        if v["url"] == "":
+            continue
+        c = get_url(v)
+        task = asyncio.ensure_future(c)
+        if "callback" in v:
+            task.add_done_callback(functools.partial(handle_base, callback=v["callback"]))
+        tasks.append(task)
+    if len(tasks) != 0:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(asyncio.wait(tasks))
+    for v in children:
+        if "children" in v:
+            print(v["children"])
+            use_aiohttp(v["children"])
+            print(v["children"])
+
+def del_key(result):
+    if result:
+        for v in result:
+            keys = ["url", "encode", "xpath", "xpaths", "callback"]
+            for i in keys:
+                if i in v:
+                    del v[i]
+            if "children" in v:
+                del_key(v["children"])
+
+def main():
+    start_time = time.time()
+
+    results = []
+    result             = {}
+    result["url"]      = "https://www.stats.gov.cn/sj/tjbz/qhdm/"
+    result["encode"]   = "utf-8"
+    result["xpath"]    = "//div[@class='list-content']//li"
+    result["callback"] = handle_years
+    results.append(result)
+
+    print(results)
+    use_aiohttp(results)
+    print(results)
+    del_key(results)
+    print(results)
+
+    for v in result["children"]:
+        with open(v["year"] + ".json", 'w', encoding='utf-8') as f:
+            print(v)
+            json.dump(v, f, ensure_ascii=False)
+
+    end_time = time.time()
+    logging.info("总共耗时: %d 秒" % (end_time - start_time))
+
+main()
 
