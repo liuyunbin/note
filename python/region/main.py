@@ -2,6 +2,7 @@
 
 from lxml import etree
 from requests_html import HTMLSession
+from enum import Enum
 import aiohttp
 import datetime
 import asyncio
@@ -19,8 +20,6 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(message)s',
                     datefmt="%Y-%m-%d %H:%M:%S %z"
                     )
-count_cur = 0
-count_all = 0
 #        async with aiohttp.ClientSession() as session:
 #            async with await session.get(url=result["url"], headers=headers) as response:
 #                content = await response.read()
@@ -34,15 +33,15 @@ count_all = 0
 #        results = [ results ]
 #    index = 0
 #    while index < len(results):
-#        count = 0
+#        count_cur = 0
 #        tasks = []
-#        while index < len(results) and count < count_max:
+#        while index < len(results) and count_cur < count_max:
 #            value = results[index]
 #            if value["url"] != "":
 #                c = handle_url(value)
 #                task = asyncio.ensure_future(c)
 #                tasks.append(task)
-#                count = count + 1
+#                count_cur = count_cur + 1
 #            index = index + 1
 #        loop = asyncio.get_event_loop()
 #        loop.run_until_complete(asyncio.wait(tasks))
@@ -66,14 +65,14 @@ def handle_years(v):
     for x in v.find("a"):
         year        = x.text[:4]
         url         = access_url(x.absolute_links)
-        years[year] = url
+        results[index.year.value][year] = url
 
 # tr class="provincetr" => td(多) => a (url=href, name=text())
 def handle_provinces(v):
     for x in v.find("a"):
         name = x.text
         url  = access_url(x.absolute_links)
-        provinces.append({"name":name, "url":url})
+        results[index.province.value].append({"name":name, "url":url})
 
 # tr class="citytr" => td(2)  => a (url=td[1].href, code=td[1].text(), name=td[2].text())
 def handle_citys(v):
@@ -81,7 +80,7 @@ def handle_citys(v):
     code = tds[0].text[:4]
     url  = access_url(tds[0].absolute_links)
     name = tds[1].text
-    citys.append({"name":name, "url":url, "code":code})
+    results[index.city.value].append({"name":name, "url":url, "code":code})
 
 # tr class="countytr" => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
 def handle_countys(v):
@@ -89,7 +88,7 @@ def handle_countys(v):
     code = tds[0].text[:6]
     url  = access_url(tds[0].absolute_links)
     name = tds[1].text
-    countys.append({"name":name, "url":url, "code":code})
+    results[index.county.value].append({"name":name, "url":url, "code":code})
 
 # tr class="towntr" => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
 def handle_towns(v):
@@ -97,7 +96,7 @@ def handle_towns(v):
     code = tds[0].text[:9]
     url  = access_url(tds[0].absolute_links)
     name = tds[1].text
-    towns.append({"name":name, "url":url, "code":code})
+    results[index.town.value].append({"name":name, "url":url, "code":code})
 
 # tr class="villagetr" => td(3) (code=td[1].text(), code_villagetr=td[2].text(), name=td[3].text())
 def handle_villages(v):
@@ -105,7 +104,7 @@ def handle_villages(v):
     code    = tds[0].text
     village = tds[1].text
     name    = tds[2].text
-    villages.append({"name":name, "village":village, "code":code})
+    results[index.village.value].append({"name":name, "village":village, "code":code})
 
 funs = {
     ".list-content": handle_years,
@@ -118,7 +117,8 @@ funs = {
 
 def handle_urls(url):
     global count_cur
-    global count_all
+    global count_pre
+
     headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
     }
@@ -128,8 +128,8 @@ def handle_urls(url):
         return
     if url == "":
         count_cur = count_cur + 1
-        if count_cur % 100 == 0:
-            logging.info("总共: %d , 已处理: %d", count_all, count_cur)
+        if count_cur % 100 == 0 or count_cur == count_pre or count_cur == 0:
+            logging.info(f'{prompt} 需处理: {count_pre} 已处理: {count_cur} 待处理: {count_pre - count_cur}')
         return
 
     try:
@@ -142,8 +142,8 @@ def handle_urls(url):
             for v in res:
                 f(v)
             count_cur = count_cur + 1
-            if count_cur % 100 == 0:
-                logging.info("总共: %d , 已处理: %d", count_all, count_cur)
+            if count_cur % 100 == 0 or count_cur == count_pre or count_cur == 0:
+                logging.info(f'{prompt} 需处理: {count_pre} 已处理: {count_cur} 待处理: {count_pre - count_cur}')
             return
             logging.info("%s 接口调用成功, 但解析失败, 可能被封, 暂停 %ds", url, 60)
             time.sleep(60)
@@ -154,10 +154,10 @@ def handle_urls(url):
         time.sleep(60)
         handle_urls(url)
 
-def save_csv(file_name, results):
-    with open(year + "-" +file_name + ".csv", 'w', encoding='utf-8', newline='') as f:
+def save_csv(i):
+    with open(year + "-" + i.name + ".csv", 'w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
-        for result in results:
+        for result in results[i.value]:
             v = []
             v.append(result["code"])
             v.append(result["name"])
@@ -165,66 +165,68 @@ def save_csv(file_name, results):
                 v.append(result["villagetr"])
             writer.writerow(v)
 
-def handle_help(results, prompt):
+def handle_help(level, urls = None):
+    global count_cur
+    global count_pre
+    global prompt
 
-    logging.info("获取...")
+    count_cur = 0
+    prompt = f'获取 {year} 年的{key[level]}数据'
 
-
-
+    if isinstance(urls, str):
+        handle_urls(urls)
+    elif isinstance(urls, dict):
+        count_pre = 1
+        handle_urls(urls["url"])
+    else:
+        for v in results[level-1]:
+            handle_urls(v["url"])
+            if level == 2:
+                v["code"] = results[level][-1]["code"][:2]
+    count_pre = len(results[level])
+    logging.info(f'{prompt} 共获取: {count_pre}')
 
 start_time = time.time()
 
+class index(Enum):
+     year     = 0
+     province = 1
+     city     = 2
+     county   = 3
+     town     = 4
+     village  = 5
+
+key       = ["年", "省", "市", "区县", "乡镇", "村"]
+years     = {}
+results   = [ {}, [], [], [], [], [] ]
+year      = datetime.datetime.today().year
+count_cur = 0
+count_pre = 1
+prompt    = ""
+url       = "https://www.stats.gov.cn/sj/tjbz/qhdm/"
+
 # 获取年数据
-logging.info("获取年数据...")
-url   = "https://www.stats.gov.cn/sj/tjbz/qhdm/"
-years = {}
-handle_urls(url)
-logging.info("总共: %d", len(years))
+handle_help(index.year.value, url)
 
-for year, url in years.items():
-    provinces = []
-    citys     = []
-    countys   = []
-    towns     = []
-    villages  = []
+for year, url in results[index.year.value].items():
+    results = [results[:1], [], [], [], [], []]
 
-    logging.info("获取省数据...")
-    count_cur = 0
-    count_all = 1
-    handle_urls(url)
-    logging.info("总共: %d", len(provinces))
+    handle_help(index.province.value, url)
+    handle_help(index.city.value)
 
-    logging.info("获取市数据...")
-    count_cur = 0
-    count_all = len(provinces)
-    for province in provinces:
-        handle_urls(province["url"])
-        province["code"] = citys[-1]["code"][:2]
-    logging.info("总共: %d", len(citys))
-    save_csv("provinces", provinces) # 保存省数据
-    save_csv("citys",     citys)     # 保存市数据
+    save_csv(index.province) # 保存省数据
+    save_csv(index.city)     # 保存市数据
 
-    logging.info("获取区县数据...")
-    count_cur = 0
-    count_all = len(citys)
-    handle_urls(citys)
-    logging.info("总共: %d", len(countys))
-    save_csv("countys", countys) # 保存区县数据
+    handle_help(index.county.value)
+    save_csv(index.county) # 保存区县数据
 
     continue
-    logging.info("获取乡镇数据...")
-    count_cur = 0
-    count_all = len(countys)
-    handle_urls(countys)
-    logging.info("总共: %d", len(towns))
-    save_csv("towns", towns) # 保存区县数据
+    handle_help(index.town)
+    save_csv(index.towns) # 保存区县数据
+    break
 
-    logging.info("获取村数据...")
-    count_cur = 0
-    count_all = len(towns)
-    handle_urls(towns)
-    logging.info("总共: %d", len(villages))
-    save_csv("villages", villages) # 保存区县数据
+    handle_help(index.village.value)
+    save_csv(index.village) # 保存村数据
     break
 
 end_time = time.time()
