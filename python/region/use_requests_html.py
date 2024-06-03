@@ -3,7 +3,6 @@
 from lxml import etree
 from requests_html import HTMLSession
 from enum import Enum
-import aiohttp
 import datetime
 import asyncio
 import csv
@@ -16,38 +15,7 @@ import requests
 import time
 import logging
 
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s %(message)s',
-                    datefmt="%Y-%m-%d %H:%M:%S %z"
-                    )
-#        async with aiohttp.ClientSession() as session:
-#            async with await session.get(url=result["url"], headers=headers) as response:
-#                content = await response.read()
-#                tree    = etree.HTML(content, parser=etree.HTMLParser(encoding=encode))
-#
-#def use_aiohttp(results, type_str, seconds = 1):
-#    count_max = 35 # 每次次请求的最大数量
-#    if isinstance(results, str):
-#        results = { "url":results}
-#    if isinstance(results, dict):
-#        results = [ results ]
-#    index = 0
-#    while index < len(results):
-#        count_cur = 0
-#        tasks = []
-#        while index < len(results) and count_cur < count_max:
-#            value = results[index]
-#            if value["url"] != "":
-#                c = handle_url(value)
-#                task = asyncio.ensure_future(c)
-#                tasks.append(task)
-#                count_cur = count_cur + 1
-#            index = index + 1
-#        loop = asyncio.get_event_loop()
-#        loop.run_until_complete(asyncio.wait(tasks))
-#        logging.info("处理 %s 年的 %s 数据 总共: %d 已获取: %d 休眠 %ds" % (year, type_str, len(results), index, seconds))
-#        time.sleep(seconds)
-#
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
 session = HTMLSession()
 
 def access(value):
@@ -220,7 +188,6 @@ for year, url in results[index.year.value].items():
     handle_help(index.county.value)
     save_csv(index.county) # 保存区县数据
 
-    continue
     handle_help(index.town)
     save_csv(index.towns) # 保存区县数据
     break
