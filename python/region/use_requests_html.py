@@ -2,6 +2,7 @@
 
 from lxml import etree
 from requests_html import HTMLSession
+from requests_html import AsyncHTMLSession
 from enum import Enum
 import datetime
 import asyncio
@@ -17,6 +18,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
 session = HTMLSession()
+asession = AsyncHTMLSession()
 
 def access(value):
     if value:
@@ -28,172 +30,133 @@ def access_url(urls):
         return urls.pop()
     return ""
 
+def add_result(code, name, level, pcode = "0", category = "0"):
+    results.append({
+            "code":code,
+            "name":name,
+            "level":level,
+            "pcode":pcode,
+            "category":category
+            })
+
 # div class="list-content" => ul => li(多) => a(3) (url=href, year=text())
-def handle_years(v):
-    for x in v.find("a"):
-        year        = x.text[:4]
-        url         = access_url(x.absolute_links)
-        results[index.year.value][year] = url
-
-# tr class="provincetr" => td(多) => a (url=href, name=text())
-def handle_provinces(v):
-    for x in v.find("a"):
-        name = x.text
-        url  = access_url(x.absolute_links)
-        results[index.province.value].append({"name":name, "url":url})
-
-# tr class="citytr" => td(2)  => a (url=td[1].href, code=td[1].text(), name=td[2].text())
-def handle_citys(v):
-    tds  = v.find("td")
-    code = tds[0].text[:4]
-    url  = access_url(tds[0].absolute_links)
-    name = tds[1].text
-    results[index.city.value].append({"name":name, "url":url, "code":code})
-
-# tr class="countytr" => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
-def handle_countys(v):
-    tds  = v.find("td")
-    code = tds[0].text[:6]
-    url  = access_url(tds[0].absolute_links)
-    name = tds[1].text
-    results[index.county.value].append({"name":name, "url":url, "code":code})
-
-# tr class="towntr" => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
-def handle_towns(v):
-    tds  = v.find("td")
-    code = tds[0].text[:9]
-    url  = access_url(tds[0].absolute_links)
-    name = tds[1].text
-    results[index.town.value].append({"name":name, "url":url, "code":code})
-
-# tr class="villagetr" => td(3) (code=td[1].text(), code_villagetr=td[2].text(), name=td[3].text())
-def handle_villages(v):
-    tds     = v.find("td")
-    code    = tds[0].text
-    village = tds[1].text
-    name    = tds[2].text
-    results[index.village.value].append({"name":name, "village":village, "code":code})
-
-funs = {
-    ".list-content": handle_years,
-    ".provincetr": handle_provinces,
-    ".citytr": handle_citys,
-    ".countytr": handle_countys,
-    ".towntr": handle_towns,
-    ".villagetr": handle_villages
-}
-
-def handle_urls(url):
-    global count_cur
-    global count_pre
+# tr  class="provincetr"   => td(多) => a (url=href, name=text())
+# tr  class="citytr"       => td(2)  => a (url=td[1].href, code=td[1].text(), name=td[2].text())
+# tr  class="countytr"     => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
+# tr  class="towntr"       => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
+# tr  class="villagetr"    => td(3) (code=td[1].text(), code_villagetr=td[2].text(), name=td[3].text())
+async def handle_url_async(url):
+    if url == "":
+        return
 
     headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
     }
-    if isinstance(url, list):
-        for v in url:
-            handle_urls(v["url"])
-        return
-    if url == "":
-        count_cur = count_cur + 1
-        if count_cur % 100 == 0 or count_cur == count_pre or count_cur == 0:
-            logging.info(f'{prompt} 需处理: {count_pre} 已处理: {count_cur} 待处理: {count_pre - count_cur}')
-        return
+
+    logging.info("handle %s", url)
 
     try:
         reponse = session.get(url=url, headers=headers)
 
-        for k, f in funs.items():
-            res = reponse.html.find(k)
-            if len(res) == 0:
-                continue
-            for v in res:
-                f(v)
-            count_cur = count_cur + 1
-            if count_cur % 100 == 0 or count_cur == count_pre or count_cur == 0:
-                logging.info(f'{prompt} 需处理: {count_pre} 已处理: {count_cur} 待处理: {count_pre - count_cur}')
+        res_year     = reponse.html.find(".list-content a")
+        res_province = reponse.html.find(".provincetr a")
+        res_city     = reponse.html.find(".citytr")
+        res_county   = reponse.html.find(".countytr")
+        res_town     = reponse.html.find(".towntr")
+        res_village  = reponse.html.find(".villagetr")
+
+        if len(res_year) > 0:
+            for v in res_year:
+                year        = v.text[:4]
+                url         = access_url(v.absolute_links)
+                years[year] = url
             return
-            logging.info("%s 接口调用成功, 但解析失败, 可能被封, 暂停 %ds", url, 60)
-            time.sleep(60)
-            handle_urls(url)
-    except Exception as e:
-        logging.info("%s 接口调用失败, 可能被封, 暂停 %ds", url, 60)
-        logging.info(e)
+        if len(res_province) > 0:
+            for v in res_province:
+                url  = access_url(v.absolute_links)
+                code = await handle_url_async(url)
+                name = v.text
+                add_result(code, name, 1)
+            return
+        if len(res_city) > 0:
+            for v in res_city:
+                tds   = v.find("td")
+                url   = access_url(tds[0].absolute_links)
+                code  = tds[0].text
+                name  = tds[1].text
+                pcode = code[:2] + "0000000000"
+                add_result(code, name, 2, pcode)
+                next_urls.append(url)
+            return pcode
+        if len(res_county) > 0:
+            for v in res_county:
+                tds   = v.find("td")
+                url   = access_url(tds[0].absolute_links)
+                code  = tds[0].text
+                name  = tds[1].text
+                pcode = code[:4] + "00000000"
+                add_result(code, name, 3, pcode)
+                next_urls.append(url)
+            return pcode
+        if len(res_town) > 0:
+            for v in res_town:
+                tds   = v.find("td")
+                url   = access_url(tds[0].absolute_links)
+                code  = tds[0].text
+                name  = tds[1].text
+                pcode = code[:6] + "000000"
+                add_result(code, name, 4, pcode)
+                next_urls.append(url)
+            return pcode
+        if len(res_village) > 0:
+            for v in res_village:
+                tds      = v.find("td")
+                code     = tds[0].text
+                category = tds[1].text
+                name     = tds[2].text
+                pcode = code[:9] + "000"
+                add_result(code, name, 5, pcode, category)
+            return pcode
+        logging.info("%s 接口调用成功, 但解析失败, 可能被封, 暂停 %ds", url, 60)
         time.sleep(60)
-        handle_urls(url)
+        await handle_url_async(url)
+    except Exception as e:
+        logging.info(e)
+        logging.info("%s 接口调用失败, 可能被封, 暂停 %ds", url, 60)
+        time.sleep(60)
+        await handle_url_async(url)
 
-def save_csv(i):
-    with open(year + "-" + i.name + ".csv", 'w', encoding='utf-8', newline='') as f:
-        writer = csv.writer(f)
-        for result in results[i.value]:
-            v = []
-            v.append(result["code"])
-            v.append(result["name"])
-            if "villagetr" in result:
-                v.append(result["villagetr"])
-            writer.writerow(v)
-
-def handle_help(level, urls = None):
-    global count_cur
-    global count_pre
-    global prompt
-
-    count_cur = 0
-    prompt = f'获取 {year} 年的{key[level]}数据'
-
-    if isinstance(urls, str):
-        handle_urls(urls)
-    elif isinstance(urls, dict):
-        count_pre = 1
-        handle_urls(urls["url"])
-    else:
-        for v in results[level-1]:
-            handle_urls(v["url"])
-            if level == 2:
-                v["code"] = results[level][-1]["code"][:2]
-    count_pre = len(results[level])
-    logging.info(f'{prompt} 共获取: {count_pre}')
+def get_code(item):
+    return item["code"]
 
 start_time = time.time()
 
-class index(Enum):
-     year     = 0
-     province = 1
-     city     = 2
-     county   = 3
-     town     = 4
-     village  = 5
-
-key       = ["年", "省", "市", "区县", "乡镇", "村"]
 years     = {}
-results   = [ {}, [], [], [], [], [] ]
-year      = datetime.datetime.today().year
-count_cur = 0
-count_pre = 1
-prompt    = ""
-url       = "https://www.stats.gov.cn/sj/tjbz/qhdm/"
 
 # 获取年数据
-handle_help(index.year.value, url)
+url  = "https://www.stats.gov.cn/sj/tjbz/qhdm/"
+task = lambda url=url: handle_url_async(url)
+asession.run(task)
 
-for year, url in results[index.year.value].items():
-    results = [results[:1], [], [], [], [], []]
+for year, url in years.items():
+    next_urls = [ url ]
 
-    handle_help(index.province.value, url)
-    handle_help(index.city.value)
+    results = []
+    count  = 0
+    while len(next_urls) != 0:
+        count = count + 1
+        logging.info(f"第 {count} 次, 长度为: {len(next_urls)}")
+        tasks = []
+        for url in next_urls:
+            tasks.append( lambda url=url: handle_url_async(url))
+        next_urls = []
+        asession.run(*tasks)
 
-    save_csv(index.province) # 保存省数据
-    save_csv(index.city)     # 保存市数据
-
-    handle_help(index.county.value)
-    save_csv(index.county) # 保存区县数据
-
-    handle_help(index.town)
-    save_csv(index.towns) # 保存区县数据
-    break
-
-    handle_help(index.village.value)
-    save_csv(index.village) # 保存村数据
+    results.sort(key=get_code)
+    with open(year + ".csv", 'w', encoding='utf-8', newline='') as f:
+        writer = csv.writer(f)
+        for result in results:
+            writer.writerow([result["code"], result["name"], result["level"], result["pcode"], result["category"]])
     break
 
 end_time = time.time()
