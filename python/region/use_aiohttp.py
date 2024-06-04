@@ -200,12 +200,14 @@ for v in years:
 
     use_aiohttp(countys, "乡镇", 10) # 获取乡镇数据
     save_csv("towns", towns)     # 保存乡镇数据
+    break
 
     use_aiohttp(towns, "存", 10)    # 获取村数据
     save_csv("villages", villages) # 保存村数据
 
     print(year, "年的数据处理完成, 暂时休眠 60s")
     time.sleep(60)
+    break
 
 end_time = time.time()
 print("took: %ds" % (end_time - start_time))

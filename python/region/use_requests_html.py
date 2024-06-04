@@ -1,23 +1,15 @@
 #!/usr/bin/env python3
 
-from lxml import etree
-from requests_html import HTMLSession
 from requests_html import AsyncHTMLSession
-from enum import Enum
-import datetime
 import asyncio
 import csv
 import datetime
-import functools
-import itertools
-import json
-import os
-import requests
-import time
 import logging
+import time
+
+until_county = True # 只查到区县
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
-session = HTMLSession()
 asession = AsyncHTMLSession()
 
 def access(value):
@@ -56,7 +48,7 @@ async def handle_url_async(url):
     logging.info("handle %s", url)
 
     try:
-        reponse = session.get(url=url, headers=headers)
+        reponse = await asession.get(url=url, headers=headers)
 
         res_year     = reponse.html.find(".list-content a")
         res_province = reponse.html.find(".provincetr a")
@@ -96,9 +88,12 @@ async def handle_url_async(url):
                 name  = tds[1].text
                 pcode = code[:4] + "00000000"
                 add_result(code, name, 3, pcode)
-                next_urls.append(url)
+                if until_county == False:
+                    next_urls.append(url)
             return pcode
         if len(res_town) > 0:
+            if until_county:
+                return
             for v in res_town:
                 tds   = v.find("td")
                 url   = access_url(tds[0].absolute_links)
@@ -109,6 +104,8 @@ async def handle_url_async(url):
                 next_urls.append(url)
             return pcode
         if len(res_village) > 0:
+            if until_county:
+                return
             for v in res_village:
                 tds      = v.find("td")
                 code     = tds[0].text
@@ -153,10 +150,20 @@ for year, url in years.items():
         asession.run(*tasks)
 
     results.sort(key=get_code)
+
     with open(year + ".csv", 'w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
         for result in results:
-            writer.writerow([result["code"], result["name"], result["level"], result["pcode"], result["category"]])
+            code     = result["code"]
+            name     = result["name"]
+            level    = result["level"]
+            pcode    = result["pcode"]
+            category = result["category"]
+
+            if until_county:
+                code  = code[:6]
+                pcode = pcode[:6]
+            writer.writerow([code, name, level, pcode, category])
     break
 
 end_time = time.time()
