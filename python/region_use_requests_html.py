@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-from requests_html import AsyncHTMLSession
-import asyncio
+from requests_html import HTMLSession
 import csv
 import datetime
 import logging
@@ -10,7 +9,7 @@ import time
 until_county = True # 只查到区县
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
-asession = AsyncHTMLSession()
+session = HTMLSession()
 
 def access(value):
     if value:
@@ -37,7 +36,7 @@ def add_result(code, name, level, pcode = "0", category = "0"):
 # tr  class="countytr"     => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
 # tr  class="towntr"       => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
 # tr  class="villagetr"    => td(3) (code=td[1].text(), code_villagetr=td[2].text(), name=td[3].text())
-async def handle_url_async(url):
+def handle_url(url):
     if url == "":
         return
 
@@ -48,7 +47,7 @@ async def handle_url_async(url):
     logging.info("handle %s", url)
 
     try:
-        reponse = await asession.get(url=url, headers=headers)
+        reponse = session.get(url=url, headers=headers)
 
         res_year     = reponse.html.find(".list-content a")
         res_province = reponse.html.find(".provincetr a")
@@ -66,7 +65,7 @@ async def handle_url_async(url):
         if len(res_province) > 0:
             for v in res_province:
                 url  = access_url(v.absolute_links)
-                code = await handle_url_async(url)
+                code = handle_url(url)
                 name = v.text
                 add_result(code, name, 1)
             return
@@ -78,7 +77,7 @@ async def handle_url_async(url):
                 name  = tds[1].text
                 pcode = code[:2] + "0000000000"
                 add_result(code, name, 2, pcode)
-                next_urls.append(url)
+                handle_url(url)
             return pcode
         if len(res_county) > 0:
             for v in res_county:
@@ -89,7 +88,7 @@ async def handle_url_async(url):
                 pcode = code[:4] + "00000000"
                 add_result(code, name, 3, pcode)
                 if until_county == False:
-                    next_urls.append(url)
+                    handle_url(url)
             return pcode
         if len(res_town) > 0:
             if until_county:
@@ -101,7 +100,7 @@ async def handle_url_async(url):
                 name  = tds[1].text
                 pcode = code[:6] + "000000"
                 add_result(code, name, 4, pcode)
-                next_urls.append(url)
+                handle_url(url)
             return pcode
         if len(res_village) > 0:
             if until_county:
@@ -116,12 +115,12 @@ async def handle_url_async(url):
             return pcode
         logging.info("%s 接口调用成功, 但解析失败, 可能被封, 暂停 %ds", url, 60)
         time.sleep(60)
-        await handle_url_async(url)
+        handle_url(url)
     except Exception as e:
         logging.info(e)
         logging.info("%s 接口调用失败, 可能被封, 暂停 %ds", url, 60)
         time.sleep(60)
-        await handle_url_async(url)
+        handle_url(url)
 
 def get_code(item):
     return item["code"]
@@ -132,23 +131,11 @@ years     = {}
 
 # 获取年数据
 url  = "https://www.stats.gov.cn/sj/tjbz/qhdm/"
-task = lambda url=url: handle_url_async(url)
-asession.run(task)
+handle_url(url)
 
 for year, url in years.items():
-    next_urls = [ url ]
-
     results = []
-    count  = 0
-    while len(next_urls) != 0:
-        count = count + 1
-        logging.info(f"第 {count} 次, 长度为: {len(next_urls)}")
-        tasks = []
-        for url in next_urls:
-            tasks.append( lambda url=url: handle_url_async(url))
-        next_urls = []
-        asession.run(*tasks)
-
+    handle_url(url)
     results.sort(key=get_code)
 
     with open(year + ".csv", 'w', encoding='utf-8', newline='') as f:
@@ -164,7 +151,6 @@ for year, url in years.items():
                 code  = code[:6]
                 pcode = pcode[:6]
             writer.writerow([code, name, level, pcode, category])
-    break
 
 end_time = time.time()
 logging.info("took: %ds", end_time - start_time)
