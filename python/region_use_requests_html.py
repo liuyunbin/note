@@ -40,14 +40,10 @@ def handle_url(url):
     if url == "":
         return
 
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
-    }
-
     logging.info("handle %s", url)
 
     try:
-        reponse = session.get(url=url, headers=headers)
+        reponse = session.get(url=url)
 
         res_year     = reponse.html.find(".list-content a")
         res_province = reponse.html.find(".provincetr a")
