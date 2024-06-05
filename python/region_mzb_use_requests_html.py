@@ -39,6 +39,12 @@ def handle_2021(v):
         if li[0] == "设立":
             results.append([li[2], li[1], li[0]])
 
+def handle(v):
+    for v in reponse.html.find("tr"):
+        li = v.text.split("\n")
+        if len(li) == 2 and li[0].isdigit():
+            results.append([li[0], li[1]])
+
 start_time = time.time()
 
 # 获取年数据
@@ -73,27 +79,28 @@ for year, url in years.items():
     if year > "2010":
         reponse = handle_url(url)
         res = reponse.html.find(".content a")
-#        while len(res) > 1:
-#            res.pop() # 只保留第一个
         years[year] = res[0].absolute_links.pop()
 
-for year, url in years.items():
+for year in sorted(years):
     logging.info(f"获取 {year} 的数据...")
-    results = []
+    url = years[year]
 
-    reponse = handle_url(url)
-    if year == "2021":
-        handle_2021(v) # 2021 年只列了新增和撤销
-    else:
-        for v in reponse.html.find("tr"):
-            li = v.text.split("\n")
-            if len(li) == 2 and li[0].isdigit():
-                results.append([li[0], li[1]])
+    while True:
+        results = []
+        reponse = handle_url(url)
+        if year == "2021":
+            handle_2021(v) # 2021 年只列了新增和撤销
+        else:
+            handle(v)
+        if len(results) > 0:
+            break
+        logging.info(f"{year} 的数据获取失败, 暂停 10 秒后重试...")
+        time.sleep(10)
 
+    logging.info(f"存储 {year} 的数据...")
     with open(year + "-mzb.csv", 'w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
-        for result in results:
-            writer.writerow(result)
+        writer.writerows(results)
 
 end_time = time.time()
 logging.info("took: %ds", end_time - start_time)
