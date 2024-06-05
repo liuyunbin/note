@@ -26,9 +26,6 @@ def handle_url(url):
         time.sleep(60)
         return handle_url(url)
 
-def get_code(item):
-    return item["code"]
-
 def handle_2021(v):
     for v in reponse.html.find("td"):
         li = v.text.split("\n")
