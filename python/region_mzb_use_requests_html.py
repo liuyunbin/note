@@ -9,18 +9,13 @@ import time
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
 session = HTMLSession()
 
-def access(value):
-    if value:
-        return value[0].strip()
-    return ""
-
 def access_url(urls):
     if len(urls) > 0:
         return urls.pop()
     return ""
 
 def handle_url(url):
-    logging.info("handle %s", url)
+#    logging.info("handle %s", url)
 
     try:
         reponse = session.get(url=url)
@@ -47,18 +42,18 @@ def handle_2021(v):
 start_time = time.time()
 
 # 获取年数据
-print("获取年数据")
+logging.info("获取年数据...")
+years = {}
+
 url     = "https://www.mca.gov.cn/n156/n186/index.html"
 reponse = handle_url(url)
-
-years = {}
 for v in reponse.html.find(".artitlelist"):
     year = v.text[:4]
     url  = access_url(v.absolute_links)
     years[year] = url
 
 # 处理翻页
-print("处理翻页")
+logging.info("处理翻页...")
 for v in reponse.html.find("div > a"):
     if v.text:
         continue
@@ -73,17 +68,17 @@ for v in reponse.html.find("div > a"):
 
 # 2010 及之前的 url 是直接的url
 # 2010 之后需要特殊处理
-print("2010 之前的特殊的 url")
+logging.info("处理 2010 之后的间接的 url...")
 for year, url in years.items():
     if year > "2010":
         reponse = handle_url(url)
         res = reponse.html.find(".content a")
-        if len(res) > 1:
-            res.pop()
-        years[year] = res.pop().absolute_links.pop()
+#        while len(res) > 1:
+#            res.pop() # 只保留第一个
+        years[year] = res[0].absolute_links.pop()
 
 for year, url in years.items():
-    print(f"获取 {year} 的数据")
+    logging.info(f"获取 {year} 的数据...")
     results = []
 
     reponse = handle_url(url)
@@ -91,14 +86,9 @@ for year, url in years.items():
         handle_2021(v) # 2021 年只列了新增和撤销
     else:
         for v in reponse.html.find("tr"):
-            tds = v.find("td")
-            if len(tds) < 2:
-                continue
-            code = tds[1].text
-            name = tds[2].text
-            if code.isdigit():
-                results.append([code, name])
-#            print(code, name)
+            li = v.text.split("\n")
+            if len(li) == 2 and li[0].isdigit():
+                results.append([li[0], li[1]])
 
     with open(year + "-mzb.csv", 'w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
