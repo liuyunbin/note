@@ -34,6 +34,16 @@ def handle_url(url):
 def get_code(item):
     return item["code"]
 
+def handle_2021(v):
+    for v in reponse.html.find("td"):
+        li = v.text.split("\n")
+        if len(li) != 3:
+            continue
+        if li[2] == "撤销":
+            results.append([li[1], li[0], li[2]])
+        if li[0] == "设立":
+            results.append([li[2], li[1], li[0]])
+
 start_time = time.time()
 
 # 获取年数据
@@ -78,31 +88,22 @@ for year, url in years.items():
 
     reponse = handle_url(url)
     if year == "2021":
-        for v in reponse.html.find("td"):
-            fonts = v.find("font")
-            if len(fonts) == 2 or len(fonts) == 4:
-                print(v.text)
-                print("")
-        break
-
-
-
-    for v in reponse.html.find("tr"):
-        tds = v.find("td")
-        if len(tds) < 2:
-            continue
-        code = tds[1].text
-        name = tds[2].text
-        if code.isdigit():
-            results.append({"code":code, "name":name})
+        handle_2021(v) # 2021 年只列了新增和撤销
+    else:
+        for v in reponse.html.find("tr"):
+            tds = v.find("td")
+            if len(tds) < 2:
+                continue
+            code = tds[1].text
+            name = tds[2].text
+            if code.isdigit():
+                results.append([code, name])
 #            print(code, name)
 
     with open(year + "-mzb.csv", 'w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
         for result in results:
-            code     = result["code"]
-            name     = result["name"]
-            writer.writerow([code, name])
+            writer.writerow(result)
 
 end_time = time.time()
 logging.info("took: %ds", end_time - start_time)
