@@ -5,6 +5,7 @@ import csv
 import datetime
 import logging
 import time
+import os
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
 session = HTMLSession()
@@ -80,8 +81,13 @@ for year, url in years.items():
 
 for year in sorted(years):
     logging.info(f"获取 {year} 的数据...")
-    url = years[year]
 
+    file_name = year + "-mzb.csv"
+    if os.path.exists(file_name):
+        logging.info(f"{year} 的数据已存在, 跳过")
+        continue
+
+    url = years[year]
     while True:
         results = []
         reponse = handle_url(url)
@@ -95,7 +101,7 @@ for year in sorted(years):
         time.sleep(10)
 
     logging.info(f"存储 {year} 的数据...")
-    with open(year + "-mzb.csv", 'w', encoding='utf-8', newline='') as f:
+    with open(file_name, 'w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
         writer.writerows(results)
 
