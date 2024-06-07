@@ -19,8 +19,8 @@ def handle_url(url):
 #    logging.info("handle %s", url)
 
     try:
-        reponse = session.get(url=url)
-        return reponse
+        response = session.get(url=url)
+        return response
     except Exception as e:
         logging.info(e)
         logging.info("%s 接口调用失败, 可能被封, 暂停 %ds", url, 60)
@@ -28,7 +28,7 @@ def handle_url(url):
         return handle_url(url)
 
 def handle_2021(v):
-    for v in reponse.html.find("td"):
+    for v in response.html.find("td"):
         li = v.text.split("\n")
         if len(li) != 3:
             continue
@@ -38,7 +38,7 @@ def handle_2021(v):
             results.append([li[2], li[1], li[0]])
 
 def handle(v):
-    for v in reponse.html.find("tr"):
+    for v in response.html.find("tr"):
         li = v.text.split("\n")
         if len(li) == 2 and li[0].isdigit():
             results.append([li[0], li[1]])
@@ -46,24 +46,24 @@ def handle(v):
 start_time = time.time()
 
 # 获取年数据
-logging.info("获取年数据...")
+logging.info("获取年 url...")
 years = {}
 
-url     = "https://www.mca.gov.cn/n156/n186/index.html"
-reponse = handle_url(url)
-for v in reponse.html.find(".artitlelist"):
+url      = "https://www.mca.gov.cn/n156/n186/index.html"
+response = handle_url(url)
+for v in response.html.find(".artitlelist"):
     year = v.text[:4]
     url  = access_url(v.absolute_links)
     years[year] = url
 
 # 处理翻页
 logging.info("处理翻页...")
-for v in reponse.html.find("div > a"):
+for v in response.html.find("div > a"):
     if v.text:
         continue
-    url     = access_url(v.absolute_links)
-    reponse = handle_url(url)
-    for w in reponse.html.find(".artitlelist"):
+    url      = access_url(v.absolute_links)
+    response = handle_url(url)
+    for w in response.html.find(".artitlelist"):
         year        = w.text[:4]
         if not year.isdigit():
             continue
@@ -72,15 +72,15 @@ for v in reponse.html.find("div > a"):
 
 # 2010 及之前的 url 是直接的url
 # 2010 之后需要特殊处理
-logging.info("处理 2010 之后的间接的 url...")
+logging.info("处理 2010 年之后的间接的 url...")
 for year, url in years.items():
     if year > "2010":
-        reponse = handle_url(url)
-        res = reponse.html.find(".content a")
+        response = handle_url(url)
+        res = response.html.find(".content a")
         years[year] = res[0].absolute_links.pop()
 
 for year in sorted(years):
-    logging.info(f"获取 {year} 的数据...")
+    logging.info(f"获取 {year} 年的数据...")
 
     file_name = year + "-mzb.csv"
     if os.path.exists(file_name):
@@ -90,7 +90,7 @@ for year in sorted(years):
     url = years[year]
     while True:
         results = []
-        reponse = handle_url(url)
+        response = handle_url(url)
         if year == "2021":
             handle_2021(v) # 2021 年只列了新增和撤销
         else:
@@ -100,7 +100,7 @@ for year in sorted(years):
         logging.info(f"{year} 的数据获取失败, 暂停 10 秒后重试...")
         time.sleep(10)
 
-    logging.info(f"存储 {year} 的数据...")
+    #logging.info(f"存储 {year} 年的数据...")
     with open(file_name, 'w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
         writer.writerows(results)
