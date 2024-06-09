@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 
 from requests_html import HTMLSession
+from requests_html import AsyncHTMLSession
 import csv
 import datetime
 import logging
 import time
+import asyncio
 import os
 
 until_county = False # 只查到区县
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
 session = HTMLSession()
+asession = AsyncHTMLSession()
 
 def access(value):
     if value:
@@ -31,20 +34,48 @@ def add_result(code, name, level, pcode = "0", category = "0"):
             "category":category
             })
 
-def handle_year(res_year):
+
+async def handle_year(response):
+    global count_all
+    global count_failed
+    global count_failed_all
+    global count_success
+    global count_success_all
+    global urls
+    global next_urls
+    global count_current
+    res_year     = response.html.find(".list-content a")
     for v in res_year:
         year        = v.text[:4]
         url         = access_url(v.absolute_links)
         years[year] = url
 
-def handle_province(res_province):
+async def handle_province(response):
+    global count_all
+    global count_failed
+    global count_failed_all
+    global count_success
+    global count_success_all
+    global urls
+    global next_urls
+    global count_current
+    res_province = response.html.find(".provincetr a")
     for v in res_province:
         url  = access_url(v.absolute_links)
-        code = handle_url(url)
+        code = await handle_url(url)
         name = v.text
         add_result(code, name, 1)
 
-def handle_city(res_city):
+async def handle_city(response):
+    global count_all
+    global count_failed
+    global count_failed_all
+    global count_success
+    global count_success_all
+    global urls
+    global next_urls
+    global count_current
+    res_city = response.html.find(".citytr")
     for v in res_city:
         tds   = v.find("td")
         url   = access_url(tds[0].absolute_links)
@@ -52,10 +83,19 @@ def handle_city(res_city):
         name  = tds[1].text
         pcode = code[:2] + "0000000000"
         add_result(code, name, 2, pcode)
-        handle_url(url)
+        next_urls.append(url)
     return pcode
 
-def handle_county(res_county):
+async def handle_county(response):
+    global count_all
+    global count_failed
+    global count_failed_all
+    global count_success
+    global count_success_all
+    global urls
+    global next_urls
+    global count_current
+    res_county   = response.html.find(".countytr")
     for v in res_county:
         tds   = v.find("td")
         url   = access_url(tds[0].absolute_links)
@@ -64,11 +104,20 @@ def handle_county(res_county):
         pcode = code[:4] + "00000000"
         add_result(code, name, 3, pcode)
         if until_county == False:
-            handle_url(url)
+            next_urls.append(url)
 
-def handle_town(res_town):
+async def handle_town(response):
+    global count_all
+    global count_failed
+    global count_failed_all
+    global count_success
+    global count_success_all
+    global urls
+    global next_urls
+    global count_current
     if until_county:
         return
+    res_town     = response.html.find(".towntr")
     for v in res_town:
         tds   = v.find("td")
         url   = access_url(tds[0].absolute_links)
@@ -76,11 +125,20 @@ def handle_town(res_town):
         name  = tds[1].text
         pcode = code[:6] + "000000"
         add_result(code, name, 4, pcode)
-        handle_url(url)
+        next_urls.append(url)
 
-def handle_village(res_village):
+async def handle_village(response):
+    global count_all
+    global count_failed
+    global count_failed_all
+    global count_success
+    global count_success_all
+    global urls
+    global next_urls
+    global count_current
     if until_county:
         return
+    res_village  = response.html.find(".villagetr")
     for v in res_village:
         tds      = v.find("td")
         code     = tds[0].text
@@ -95,51 +153,87 @@ def handle_village(res_village):
 # tr  class="countytr"     => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
 # tr  class="towntr"       => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
 # tr  class="villagetr"    => td(3) (code=td[1].text(), code_villagetr=td[2].text(), name=td[3].text())
-def handle_url(url):
+async def handle_url(url):
+    global count_all
+    global count_failed
+    global count_failed_all
+    global count_success
+    global count_success_all
+    global urls
+    global next_urls
+    global count_current
+
     if url == "":
         return
 
     logging.info("handle %s", url)
 
     try:
-        reponse = session.get(url=url)
+        response = await asession.get(url=url)
 
-        res_year     = reponse.html.find(".list-content a")
-        res_province = reponse.html.find(".provincetr a")
-        res_city     = reponse.html.find(".citytr")
-        res_county   = reponse.html.find(".countytr")
-        res_town     = reponse.html.find(".towntr")
-        res_village  = reponse.html.find(".villagetr")
+        func = {
+            ".wrapper-list-title": handle_year,
+            ".provincehead": handle_province,
+            ".cityhead": handle_city,
+            ".countyhead": handle_county,
+            ".townhead": handle_town,
+            ".villagehead": handle_village
+        }
+        for k, f in func.items():
+            if len(response.html.find(k)) > 0:
+                count_success_all = count_success_all + 1
+                count_success = count_success + 1
+                return await f(response)
 
-        if len(res_year) > 0:
-            return handle_year(res_year)
-        if len(res_province) > 0:
-            return handle_province(res_province)
-        if len(res_city) > 0:
-            return handle_city(res_city)
-        if len(res_county) > 0:
-            return handle_county(res_county)
-        if len(res_town) > 0:
-            return handle_town(res_town)
-        if len(res_village) > 0:
-            return handle_village(res_village)
-
-        # 有些页面没有值
-        for v in [".wrapper-list-title", ".provincehead", ".cityhead", ".countyhead",".townhead", ".villagehead"]:
-            if len(reponse.html.find(v)) > 0:
-                return
-
-        logging.info("%s 接口调用成功, 但解析失败, 可能被封, 暂停 %ds", url, 60)
-        time.sleep(60)
-        handle_url(url)
+        count_failed = count_failed + 1
+        count_failed_all = count_failed_all + 1
+        logging.info("%s 接口调用成功, 但解析失败, 可能被封, 暂停 %ds", url, 10*60)
+        logging.info(f"总任务: {count_all} 总成功: {count_success_all} 总失败: {count_failed_all} 当前获取: {count_current} 当前成功: {count_success} 当前失败: {count_failed}")
+        await asyncio.sleep(10 * 60)
+        return await handle_url(url)
     except Exception as e:
+        count_failed = count_failed + 1
+        count_failed_all = count_failed_all + 1
         logging.info(e)
         logging.info("%s 接口调用失败, 可能被封, 暂停 %ds", url, 60)
-        time.sleep(60)
-        handle_url(url)
+        logging.info(f"总任务: {count_all} 总成功: {count_success_all} 总失败: {count_failed_all} 当前获取: {count_current} 当前成功: {count_success} 当前失败: {count_failed}")
+        await asyncio.sleep(60)
+        return await handle_url(url)
 
 def get_code(item):
     return item["code"]
+
+def use_async():
+    global count_all
+    global count_failed
+    global count_failed_all
+    global count_success
+    global count_success_all
+    global urls
+    global next_urls
+    global count_current
+
+    count_all = len(urls)
+    count_failed_all = 0
+    count_success_all = 0
+
+    count_index = 0
+    count_current = 50
+
+    while count_index < len(urls):
+        if count_index + count_current > len(urls):
+            count_current = len(urls) - count_index
+
+        count_failed = 0
+        count_success = 0
+        tasks = []
+        for i in range(count_index, count_index + count_current):
+            tasks.append( lambda url=urls[i]: handle_url(url))
+        asession.run(*tasks)
+        logging.info(f"总任务: {count_all} 总成功: {count_success_all} 总失败: {count_failed_all} 当前获取: {count_current} 当前成功: {count_success} 当前失败: {count_failed}")
+        logging.info("暂停 %ds", 10)
+        time.sleep(5)
+        count_index = count_index + count_current
 
 start_time = time.time()
 
@@ -147,8 +241,16 @@ years     = {}
 
 # 获取年数据
 url  = "https://www.stats.gov.cn/sj/tjbz/qhdm/"
-handle_url(url)
+urls = [ url ]
+next_urls = []
+use_async()
 
+count_all         = 0
+count_failed      = 0
+count_failed_all  = 0
+count_success     = 0
+count_success_all = 0
+count_current  = 0
 for year, url in years.items():
     logging.info(f"获取 {year} 的数据...")
 
@@ -156,13 +258,30 @@ for year, url in years.items():
         file_name = year + "-tjj.csv"
     else:
         file_name = year + "-tjj-all.csv"
+#    file_name = "test.csv"
 
     if os.path.exists(file_name):
         logging.info(f"{year} 的数据已存在, 跳过")
         continue
 
     results = []
-    handle_url(url)
+
+    urls = [ url ]
+    next_urls = []
+    use_async() # 省市数据
+
+    urls = next_urls
+    next_urls = []
+    use_async() # 区县数据
+
+    urls = next_urls
+    next_urls = []
+    use_async() # 乡镇数据
+
+    urls = next_urls
+    next_urls = []
+    use_async() # 村数据
+
     results.sort(key=get_code)
 
     logging.info(f"存储 {year} 的数据...")
