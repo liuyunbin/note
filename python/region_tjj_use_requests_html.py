@@ -7,7 +7,7 @@ import logging
 import time
 import os
 
-until_county = True # 只查到区县
+until_county = False # 只查到区县
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
 session = HTMLSession()
@@ -110,7 +110,6 @@ def handle_url(url):
         res_county   = reponse.html.find(".countytr")
         res_town     = reponse.html.find(".towntr")
         res_village  = reponse.html.find(".villagetr")
-        villagehead  = reponse.html.find(".villagehead")
 
         if len(res_year) > 0:
             return handle_year(res_year)
@@ -124,8 +123,12 @@ def handle_url(url):
             return handle_town(res_town)
         if len(res_village) > 0:
             return handle_village(res_village)
-        if len(villagehead) > 0: # 有些乡镇没有村数据
-            return
+
+        # 有些页面没有值
+        for v in [".wrapper-list-title", ".provincehead", ".cityhead", ".countyhead",".townhead", ".villagehead"]:
+            if len(reponse.html.find(v)) > 0:
+                return
+
         logging.info("%s 接口调用成功, 但解析失败, 可能被封, 暂停 %ds", url, 60)
         time.sleep(60)
         handle_url(url)
