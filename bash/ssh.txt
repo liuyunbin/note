@@ -1,4 +1,9 @@
 
+## ubuntu 24.04 修改 sshd 端口号
+1. 修改 /usr/lib/systemd/system/ssh.socket 里的 ListenStream
+2. 重新加载配置: systemctl daemon-reload
+3. 重启服务: systemctl restart ssh.socket
+
 ### 密钥登录
 主目录权限不能是 777
 
