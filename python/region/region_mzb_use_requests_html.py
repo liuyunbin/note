@@ -28,20 +28,28 @@ def handle_url(url):
         return handle_url(url)
 
 def handle_2021(v):
+    # 先处理撤销, 在处理设立, 避免同时删除和设立同时存在时, 误删的情况
     for v in response.html.find("td"):
         li = v.text.split("\n")
         if len(li) != 3:
             continue
         if li[2] == "撤销":
-            results.append([li[1], li[0], li[2]])
+            results.remove([li[1], li[0]])
+    for v in response.html.find("td"):
+        li = v.text.split("\n")
+        if len(li) != 3:
+            continue
         if li[0] == "设立":
-            results.append([li[2], li[1], li[0]])
+            results.append([li[2], li[1]])
 
 def handle(v):
     for v in response.html.find("tr"):
         li = v.text.split("\n")
         if len(li) == 2 and li[0].isdigit():
             results.append([li[0], li[1]])
+
+def get_code(item):
+    return item[0]
 
 start_time = time.time()
 
@@ -89,17 +97,19 @@ for year in sorted(years):
 
     url = years[year]
     while True:
-        results = []
-        response = handle_url(url)
         if year == "2021":
+            response = handle_url(url)
             handle_2021(v) # 2021 年只列了新增和撤销
         else:
+            results = []
+            response = handle_url(url)
             handle(v)
         if len(results) > 0:
             break
         logging.info(f"{year} 的数据获取失败, 暂停 10 秒后重试...")
         time.sleep(10)
 
+    results.sort(key=get_code)
     #logging.info(f"存储 {year} 年的数据...")
     with open(file_name, 'w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
