@@ -7,7 +7,7 @@ import logging
 import time
 import os
 
-until_county = True # 只查到区县
+until_county = False # True 只查到区县, False 查所有
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
 session = HTMLSession()
