@@ -45,7 +45,7 @@ def handle_2021(v):
 def handle(v):
     for v in response.html.find("tr"):
         li = v.text.split("\n")
-        if len(li) == 2 and li[0].isdigit():
+        if len(li) == 2 and li[0].isdigit() and len(li[0]) == 6:
             results.append([li[0], li[1]])
 
 def get_code(item):
