@@ -6,9 +6,12 @@ import datetime
 import logging
 import time
 import os
+import html2text
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
 session = HTMLSession()
+text_maker = html2text.HTML2Text()
+text_maker.ignore_tables  = True
 
 def access_url(urls):
     if len(urls) > 0:
@@ -20,6 +23,7 @@ def handle_url(url):
 
     try:
         response = session.get(url=url)
+        response.encoding = 'utf-8'
         return response
     except Exception as e:
         logging.info(e)
@@ -27,7 +31,12 @@ def handle_url(url):
         time.sleep(60)
         return handle_url(url)
 
-def handle_2021(v):
+def handle_2021(response):
+    # 获取 2020 年的数据
+    file_name =  "2020-mzb.csv"
+    with open(file_name, 'r', encoding='utf-8', newline='') as f:
+        reader = csv.reader(f)
+        results = list(reader)
     # 先处理撤销, 在处理设立, 避免同时删除和设立同时存在时, 误删的情况
     for v in response.html.find("td"):
         li = v.text.split("\n")
@@ -41,12 +50,16 @@ def handle_2021(v):
             continue
         if li[0] == "设立":
             results.append([li[2], li[1]])
+    return results
 
-def handle(v):
-    for v in response.html.find("tr"):
-        li = v.text.split("\n")
-        if len(li) == 2 and li[0].isdigit() and len(li[0]) == 6:
-            results.append([li[0], li[1]])
+def handle(response):
+    results = []
+    text = text_maker.handle(response.text)
+    for v in text.split('\n'):
+        result = v.split()
+        if len(result) == 2 and result[0].isdigit():
+            results.append(result)
+    return results
 
 def get_code(item):
     return item[0]
@@ -81,31 +94,36 @@ for v in response.html.find("div > a"):
 # 2010 及之前的 url 是直接的url
 # 2010 之后需要特殊处理
 logging.info("处理 2010 年之后的间接的 url...")
+all_data = {}
 for year, url in years.items():
     if year > "2010":
         response = handle_url(url)
         res = response.html.find(".content a")
         years[year] = res[0].absolute_links.pop()
 
+        if year == "2012" or year == "2013":
+            all_data[year + "-all"] = res[1].absolute_links.pop()
+
+years.update(all_data)
+
 for year in sorted(years):
     logging.info(f"获取 {year} 年的数据...")
 
-    file_name = year + "-mzb.csv"
+    file_name = year[:4] + "-mzb" + year[4:] + ".csv"
     if os.path.exists(file_name):
         logging.info(f"{year} 的数据已存在, 跳过")
         continue
 
     url = years[year]
     while True:
+        response = handle_url(url)
         if year == "2021":
-            response = handle_url(url)
-            handle_2021(v) # 2021 年只列了新增和撤销
+            results = handle_2021(response) # 2021 年只列了新增和撤销
         else:
-            results = []
-            response = handle_url(url)
-            handle(v)
+            results = handle(response)
         if len(results) > 0:
             break
+        logging.info(url)
         logging.info(f"{year} 的数据获取失败, 暂停 10 秒后重试...")
         time.sleep(10)
 
