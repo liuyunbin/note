@@ -32,23 +32,20 @@ def add_result(code, name, level, pcode = "0", category = "0"):
             })
 
 
-def handle_year(response):
-    res_year = response.html.find(".list-content a")
+def handle_year(res_year):
     for v in res_year:
         year        = v.text[:4]
         url         = access_url(v.absolute_links)
         years[year] = url
 
-def handle_province(response):
-    res_province = response.html.find(".provincetr a")
+def handle_province(res_province):
     for v in res_province:
         url  = access_url(v.absolute_links)
         code = handle_url(url)
         name = v.text
         add_result(code, name, 1)
 
-def handle_city(response):
-    res_city = response.html.find(".citytr")
+def handle_city(res_city):
     for v in res_city:
         tds   = v.find("td")
         url   = access_url(tds[0].absolute_links)
@@ -59,8 +56,7 @@ def handle_city(response):
         handle_url(url)
     return pcode
 
-def handle_county(response):
-    res_county = response.html.find(".countytr")
+def handle_county(res_county):
     for v in res_county:
         tds   = v.find("td")
         url   = access_url(tds[0].absolute_links)
@@ -71,10 +67,9 @@ def handle_county(response):
         if until_county == False:
             handle_url(url)
 
-def handle_town(response):
+def handle_town(res_town):
     if until_county:
         return
-    res_town = response.html.find(".towntr")
     for v in res_town:
         tds   = v.find("td")
         url   = access_url(tds[0].absolute_links)
@@ -84,10 +79,9 @@ def handle_town(response):
         add_result(code, name, 4, pcode)
         handle_url(url)
 
-def handle_village(response):
+def handle_village(res_village):
     if until_county:
         return
-    res_village  = response.html.find(".villagetr")
     for v in res_village:
         tds      = v.find("td")
         code     = tds[0].text
@@ -112,17 +106,30 @@ def handle_url(url):
     try:
         response = session.get(url=url)
 
-        func = {
-            ".wrapper-list-title": handle_year,
-            ".provincehead": handle_province,
-            ".cityhead": handle_city,
-            ".countyhead": handle_county,
-            ".townhead": handle_town,
-            ".villagehead": handle_village
-        }
-        for k, f in func.items():
-            if len(response.html.find(k)) > 0:
-                return f(response)
+        res_year     = response.html.find(".list-content a")
+        res_province = response.html.find(".provincetr a")
+        res_city     = response.html.find(".citytr")
+        res_county   = response.html.find(".countytr")
+        res_town     = response.html.find(".towntr")
+        res_village  = response.html.find(".villagetr")
+
+        if len(res_year) > 0:
+            return handle_year(res_year)
+        if len(res_province) > 0:
+            return handle_province(res_province)
+        if len(res_city) > 0:
+            return handle_city(res_city)
+        if len(res_county) > 0:
+            return handle_county(res_county)
+        if len(res_town) > 0:
+            return handle_town(res_town)
+        if len(res_village) > 0:
+            return handle_village(res_village)
+
+        # 有些页面没有值
+        for v in [".wrapper-list-title", ".provincehead", ".cityhead", ".countyhead",".townhead", ".villagehead"]:
+            if len(reponse.html.find(v)) > 0:
+                return
 
         logging.info("%s 接口调用成功, 但解析失败, 可能被封, 暂停 %ds", url, 10*60)
         time.sleep(10 * 60)
