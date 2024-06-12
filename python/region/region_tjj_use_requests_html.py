@@ -6,8 +6,12 @@ import datetime
 import logging
 import time
 import os
+import sys
 
 until_county = False # True 只查到区县, False 查所有
+
+if "until_county" in sys.argv:
+    until_county = True
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
 session = HTMLSession()
@@ -159,7 +163,10 @@ for year, url in years.items():
         file_name = year + "-tjj-all.csv"
 
     if os.path.exists(file_name):
-        logging.info(f"{year} 的数据已存在, 跳过")
+        if until_county:
+            logging.info(f"{year} 的 省 市 区县 数据已存在, 跳过")
+        else:
+            logging.info(f"{year} 的 省 市 区县 乡镇 村 数据已存在, 跳过")
         continue
 
     results = []

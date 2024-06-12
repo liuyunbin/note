@@ -1,4 +1,19 @@
 
+## 脚本说明
+* 执行: `./region_mzb_use_requests_html.py`
+* 说明: 获取民政部的数据
+* 结果:
+    * *-mzb.csv ------- 省 市 区县 数据
+    * *-mzb-all.csv --- 省 市 区县 乡镇 数据
+
+* 执行: `./region_tjj_use_requests_html.py`
+* 说明: 获取统计局的数据 省 市 区县 乡镇 村 数据
+* 结果: *-tjj-all.csv -- 数据量太大了, 太慢, 已压缩存储 *-tjj-all.csv.tgz
+
+* 执行: `./region_tjj_use_requests_html.py until_county`
+* 说明: 获取统计局的数据 省 市 区县 数据
+* 结果:  *-tjj.csv
+
 ## 代码说明
 * 民政统计代码编制规则: https://www.mca.gov.cn/n156/n186/c110788/content.html
 * 统计上使用的县以下行政区划代码编制规则: https://www.mca.gov.cn/n156/n186/c110787/content.html
@@ -29,10 +44,6 @@
 * 所有网页均未处理 乡镇 的变更
 * 网页: 使用 UTF-8 编码
 * 本脚本只获取 省 市 区县 的区划代码
-* 执行: `./region_mzb_use_requests_html.py`
-* 结果:
-    * *-mzb.csv ------- 省 市 区县 数据
-    * *-mzb-all.csv --- 省 市 区县 乡镇 数据
 
 ## 统计局 的行政区划代码
 * 官网: https://www.stats.gov.cn/sj/tjbz/qhdm/
@@ -44,10 +55,6 @@
     * 除了直辖市, 其他市的直辖区没有下一级, 比如: 2023-太原市-市辖区
     * 有些市没有下一级, 比如: 2023-雄安新区
     * 有些乡镇没有村, 比如: 2015-天津-红桥区-大胡同街道(网页为空)
-* 执行: `./region_tjj_use_requests_html.py`
-* 结果:
-    * *-tjj.csv ------- 省 市 区县 数据 --- 需要修改脚本变量 until_county 为 True
-    * *-tjj-all.csv --- 省 市 区县 乡镇 村 数据 -- 数据量太大了, 太慢, 已压缩存储 *-tjj-all.csv.tgz
 
 ## 中国政府网: 1949年-2006年 县级及以上行政区划变更情况
 * http://www.gov.cn/test/2006-02/27/content_212020.htm
