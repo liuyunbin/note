@@ -50,7 +50,7 @@ for v in response.html.find("tbody tr td"):
 for year in sorted(years):
     logging.info(f"获取 {year} 的数据...")
 
-    file_name = year[:4] + "-desc" + year[4:] + ".txt"
+    file_name = "./mzb-desc-1949/" + year[:4] + "-desc" + year[4:] + ".txt"
     if os.path.exists(file_name):
         logging.info(f"{year} 的数据已存在, 跳过")
         continue
@@ -60,7 +60,7 @@ for year in sorted(years):
     text = text_maker.handle(response.text)
 
     #logging.info(f"存储 {year} 年的数据...")
-    with open("./mzb-desc-1949/" + file_name, 'w', encoding='utf-8', newline='') as f:
+    with open(file_name, 'w', encoding='utf-8', newline='') as f:
         f.write(text)
 
 end_time = time.time()
