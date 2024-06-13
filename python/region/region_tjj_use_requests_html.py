@@ -155,18 +155,14 @@ url  = "https://www.stats.gov.cn/sj/tjbz/qhdm/"
 handle_url(url)
 
 for year, url in years.items():
-    logging.info(f"获取 {year} 的数据...")
-
     if until_county:
-        file_name = year + "-tjj.csv"
+        file_name = year + "-tjj-base.csv"
     else:
         file_name = year + "-tjj-all.csv"
 
+    logging.info(f"获取 {file_name} 的数据...")
     if os.path.exists(file_name):
-        if until_county:
-            logging.info(f"{year} 的 省 市 区县 数据已存在, 跳过")
-        else:
-            logging.info(f"{year} 的 省 市 区县 乡镇 村 数据已存在, 跳过")
+        logging.info(f"{file_name} 数据已存在, 跳过")
         continue
 
     results = []
