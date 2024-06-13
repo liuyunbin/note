@@ -33,7 +33,7 @@ def handle_url(url):
 
 def handle_2021(response):
     # 获取 2020 年的数据
-    file_name =  "2020-mzb.csv"
+    file_name = "2020-mzb-base.csv"
     with open(file_name, 'r', encoding='utf-8', newline='') as f:
         reader = csv.reader(f)
         results = list(reader)
@@ -94,30 +94,30 @@ for v in response.html.find("div > a"):
 # 2010 及之前的 url 是直接的url
 # 2010 之后需要特殊处理
 logging.info("处理 2010 年之后的间接的 url...")
-all_data = {}
+all_urls = {}
 for year, url in years.items():
     if year > "2010":
         response = handle_url(url)
         res = response.html.find(".content a")
-        years[year] = res[0].absolute_links.pop()
+        all_urls[year + "-base"] = res[0].absolute_links.pop()
 
         if year == "2012" or year == "2013":
-            all_data[year + "-all"] = res[1].absolute_links.pop()
+            all_urls[year + "-all"] = res[1].absolute_links.pop()
+    else:
+        all_urls[year + "-base"] = url
 
-years.update(all_data)
-
-for year in sorted(years):
-    logging.info(f"获取 {year} 年的数据...")
+for year in sorted(all_urls):
+    logging.info(f"获取 {year} 的数据...")
 
     file_name = year[:4] + "-mzb" + year[4:] + ".csv"
     if os.path.exists(file_name):
         logging.info(f"{year} 的数据已存在, 跳过")
         continue
 
-    url = years[year]
+    url = all_urls[year]
     while True:
         response = handle_url(url)
-        if year == "2021":
+        if year == "2021-base":
             results = handle_2021(response) # 2021 年只列了新增和撤销
         else:
             results = handle(response)

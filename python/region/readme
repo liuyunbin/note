@@ -3,7 +3,7 @@
 * 执行: `./region_mzb_use_requests_html.py`
 * 说明: 获取民政部的数据
 * 结果:
-    * *-mzb.csv ------- 省 市 区县 数据
+    * *-mzb-base.csv ------- 省 市 区县 数据
     * *-mzb-all.csv --- 省 市 区县 乡镇 数据
 
 * 执行: `./region_tjj_use_requests_html.py`
@@ -12,7 +12,7 @@
 
 * 执行: `./region_tjj_use_requests_html.py until_county`
 * 说明: 获取统计局的数据 省 市 区县 数据
-* 结果:  *-tjj.csv
+* 结果:  *-tjj-base.csv
 
 ## 代码说明
 * 民政统计代码编制规则: https://www.mca.gov.cn/n156/n186/c110788/content.html
