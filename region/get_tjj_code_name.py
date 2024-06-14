@@ -60,11 +60,11 @@ def handle_county(res_county):
         name  = tds[1].text
         pcode = code[:4] + "00000000"
         add_result(code, name, 3, pcode)
-        if until_county == False:
+        if all_data:
             handle_url(url)
 
 def handle_town(res_town):
-    if until_county:
+    if not all_data:
         return
     for v in res_town:
         tds   = v.find("td")
@@ -76,7 +76,7 @@ def handle_town(res_town):
         handle_url(url)
 
 def handle_village(res_village):
-    if until_county:
+    if not all_data:
         return
     for v in res_village:
         tds      = v.find("td")
@@ -144,15 +144,15 @@ start_time = time.time()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
 session = HTMLSession()
 
-until_county = False # True 只查到区县, False 查所有
+all_data = False # True 只查到区县, False 查所有
 
-if "until_county" in sys.argv:
-    until_county = True
+if "all_data" in sys.argv:
+    all_data = True
 
-if until_county:
-    path_name = "tjj-code-name"
-else:
+if all_data:
     path_name = "tjj-code-name-all"
+else:
+    path_name = "tjj-code-name"
 
 if not os.path.exists(path_name):
     os.makedirs(path_name)
@@ -184,7 +184,7 @@ for year, url in years.items():
             pcode    = result["pcode"]
             category = result["category"]
 
-            if until_county:
+            if not all_data:
                 code  = code[:6]
                 pcode = pcode[:6]
             writer.writerow([code, name, level, pcode, category])
