@@ -1,5 +1,5 @@
 
-## 获取 1980-至今 民政部的 省 市 区县 数据
+## 获取和更新 1980-至今 民政部的 省 市 区县 数据
 * 官网: https://www.mca.gov.cn/n156/n186/index.html
 * 编码: UTF-8
 * 说明:
@@ -11,7 +11,7 @@
 * 执行: [`./get_code_name_gov_mca.py`](./get_code_name_gov_mca.py)
 * 目录: [code-name-gov-mca](code-name-gov-mca)
 
-## 获取 2009-至今 统计局的 省 市 区县 数据
+## 获取和更新 2009-至今 统计局的 省 市 区县 数据
 * 官网: https://www.stats.gov.cn/sj/tjbz/qhdm/
 * 编码: 2020 及其之前的网页使用 GBK, 2020 之后的网页使用 UTF-8
 * 说明:
@@ -22,18 +22,19 @@
 * 执行: [`./get_code_name_gov_stats.py`](./get_code_name_gov_stats.py)
 * 目录: [code-name-gov-stats](code-name-gov-stats)
 
-## 获取 2009-至今 统计局的 省 市 区县 乡镇 村 数据
+## 获取和更新 2009-至今 统计局的 省 市 区县 乡镇 村 数据
 * 执行: [`./get_code_name_gov_stats_all.sh`](./get_code_name_gov_stats_all.sh)
 * 目录: [code-name-gov-stats-all](code-name-gov-stats-all)
+* 注意: 执行脚本前, 先将该目录下的 tgz 文件解压, 避免重复下载
 * 其他部分同上一节
 
-## 获取 1949-2006 中国政府网 县级及以上行政区划变更情况
+## 获取和更新 1949-2006 中国政府网 县级及以上行政区划变更情况
 * 官网: http://www.gov.cn/test/2006-02/27/content_212020.htm
 * 说明: 2003 2005 2006 的数据暂时缺失, 使用的是之前的数据
 * 执行: [`./get_desc_gov.py`](./get_desc_gov.py)
 * 目录: [desc-gov](desc-gov)
 
-## 获取 1999-至今 民政部 县级及以上行政区划变更情况
+## 获取和更新 1999-至今 民政部 县级及以上行政区划变更情况
 * 官网: http://xzqh.mca.gov.cn/description?dcpid=1
 * 说明: 2022 的数据暂时缺失, 使用的是之前的数据
 * 执行: [`./get_desc_gov_mca.py`](./get_desc_gov_mca.py)
@@ -56,7 +57,4 @@
 * 第十位: 村: 0和1-居民委员会 2和3-村民委员会
 * 第十一位:
 * 第十二位:
-
-## 民政部: 1999年及以后 县级及以上行政区划变更情况
-* http://xzqh.mca.gov.cn/description?dcpid=1
 
