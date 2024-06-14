@@ -8,8 +8,8 @@
     * 2014-2020 有 省 市 区县 的区划代码, 有 乡镇 的区划代码的变更情况
     * 2021 有 省 市 区县 乡镇 的区划代码的变更情况 -- 已处理 省 市 区县 变更, 并存储变更后的结果
     * 2022-至今 有 省 市 区县 的区划代码, 有 乡镇 的区划代码的变更情况
-* 执行: `./get_code_name_gov_mca.py`
-* 目录: code-name-gov-mca
+* 执行: [`./get_code_name_gov_mca.py`](./get_code_name_gov_mca.py)
+* 目录: [code-name-gov-mca](code-name-gov-mca)
 
 ## 获取 2009-至今 统计局的 省 市 区县 数据
 * 官网: https://www.stats.gov.cn/sj/tjbz/qhdm/
