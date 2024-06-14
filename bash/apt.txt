@@ -9,6 +9,9 @@ apt update      # 更新软件源                          -- 常用
 apt show    vim # 列出软件包的信息
 apt upgrade     # 更新软件                            -- 常用
 apt remove  vim # 卸载软件包                          -- 常用
+使用代理:
+1. 在 /etc/apt/apt.conf.d/ 下新建文件
+2. 文件内添加  Acquire::http::Proxy "http://username:password@yourproxyaddress:proxyport";
 
                    # dpkg 为 apt 的后端
 dpkg -i ...        # 安装本地的包                                 -- 常用
