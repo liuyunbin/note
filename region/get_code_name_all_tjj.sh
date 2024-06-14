@@ -2,4 +2,4 @@
 
 set -ueo pipefail
 
-./get_tjj_code_name.py all_data
+./get_code_name_tjj.py all_data
