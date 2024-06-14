@@ -8,10 +8,6 @@ import time
 import os
 import html2text
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
-session = HTMLSession()
-text_maker = html2text.HTML2Text()
-
 def access_url(urls):
     if len(urls) > 0:
         return urls.pop()
@@ -35,6 +31,15 @@ def get_code(item):
 
 start_time = time.time()
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
+session = HTMLSession()
+text_maker = html2text.HTML2Text()
+
+path_name = "mzb-desc-1949"
+if not os.path.exists(path_name):
+    os.makedirs(path_name)
+os.chdir(path_name)
+
 # 获取年数据
 logging.info("获取年 url...")
 years = {}
@@ -48,11 +53,11 @@ for v in response.html.find("tbody tr td"):
         years[year] = url
 
 for year in sorted(years):
-    logging.info(f"获取 {year} 的数据...")
+    logging.info(f"获取 {year} 年的数据...")
 
-    file_name = "./mzb-desc-1949/" + year[:4] + "-desc" + year[4:] + ".txt"
+    file_name = year + ".txt"
     if os.path.exists(file_name):
-        logging.info(f"{year} 的数据已存在, 跳过")
+        logging.info(f"{year} 年的数据已存在, 跳过")
         continue
 
     url = years[year]
