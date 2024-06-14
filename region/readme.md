@@ -30,8 +30,8 @@
 ## 获取 1949-2006 中国政府网 县级及以上行政区划变更情况
 * 官网: http://www.gov.cn/test/2006-02/27/content_212020.htm
 * 说明: 2003 2005 2006 的数据暂时缺失, 使用的是之前的数据
-* 执行: ./get_desc_gov.py
-* 目录: desc-gov
+* 执行: [`./get_desc_gov.py`](./get_desc_gov.py)
+* 目录: [desc-gov](desc-gov)
 
 ## 代码说明
 * 民政统计代码编制规则: https://www.mca.gov.cn/n156/n186/c110788/content.html
