@@ -19,8 +19,6 @@ def access_url(urls):
     return ""
 
 def handle_url(url):
-#    logging.info("handle %s", url)
-
     try:
         response = session.get(url=url)
         response.encoding = 'utf-8'
@@ -33,7 +31,7 @@ def handle_url(url):
 
 def handle_2021(response):
     # 获取 2020 年的数据
-    file_name = "2020-mzb-base.csv"
+    file_name = "2020.csv"
     with open(file_name, 'r', encoding='utf-8', newline='') as f:
         reader = csv.reader(f)
         results = list(reader)
@@ -65,6 +63,11 @@ def get_code(item):
     return item[0]
 
 start_time = time.time()
+
+path_name = "mzb-code-name"
+if not os.path.exists(path_name):
+    os.makedirs(path_name)
+os.chdir(path_name)
 
 # 获取年数据
 logging.info("获取年 url...")
@@ -99,32 +102,27 @@ for year, url in years.items():
     if year > "2010":
         response = handle_url(url)
         res = response.html.find(".content a")
-        all_urls[year + "-base"] = res[0].absolute_links.pop()
+        years[year] = res[0].absolute_links.pop()
 
-        if year == "2012" or year == "2013":
-            all_urls[year + "-all"] = res[1].absolute_links.pop()
-    else:
-        all_urls[year + "-base"] = url
+for year in sorted(years):
+    logging.info(f"获取 {year} 年的数据...")
 
-for year in sorted(all_urls):
-    logging.info(f"获取 {year} 的数据...")
-
-    file_name = year[:4] + "-mzb" + year[4:] + ".csv"
+    file_name = year + ".csv"
     if os.path.exists(file_name):
-        logging.info(f"{year} 的数据已存在, 跳过")
+        logging.info(f"{year} 年的数据已存在, 跳过")
         continue
 
-    url = all_urls[year]
+    url = years[year]
     while True:
         response = handle_url(url)
-        if year == "2021-base":
+        if year == "2021":
             results = handle_2021(response) # 2021 年只列了新增和撤销
         else:
             results = handle(response)
         if len(results) > 0:
             break
         logging.info(url)
-        logging.info(f"{year} 的数据获取失败, 暂停 10 秒后重试...")
+        logging.info(f"{year} 年的数据获取失败, 暂停 10 秒后重试...")
         time.sleep(10)
 
     results.sort(key=get_code)
