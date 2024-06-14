@@ -150,9 +150,9 @@ if "all_data" in sys.argv:
     all_data = True
 
 if all_data:
-    path_name = "tjj-code-name-all"
+    path_name = "code-name-all-tjj"
 else:
-    path_name = "tjj-code-name"
+    path_name = "code-name-tjj"
 
 if not os.path.exists(path_name):
     os.makedirs(path_name)
