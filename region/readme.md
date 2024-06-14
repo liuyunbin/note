@@ -33,6 +33,12 @@
 * 执行: [`./get_desc_gov.py`](./get_desc_gov.py)
 * 目录: [desc-gov](desc-gov)
 
+## 获取 1999-至今 民政部 县级及以上行政区划变更情况
+* 官网: http://xzqh.mca.gov.cn/description?dcpid=1
+* 说明: 2022 的数据暂时缺失, 使用的是之前的数据
+* 执行: [`./get_desc_gov_mca.py`](./get_desc_gov_mca.py)
+* 目录: [desc-gov-mca](desc-gov-mca)
+
 ## 代码说明
 * 民政统计代码编制规则: https://www.mca.gov.cn/n156/n186/c110788/content.html
 * 统计上使用的县以下行政区划代码编制规则: https://www.mca.gov.cn/n156/n186/c110787/content.html
