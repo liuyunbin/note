@@ -8,11 +8,6 @@ import time
 import os
 import html2text
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
-session = HTMLSession()
-text_maker = html2text.HTML2Text()
-text_maker.ignore_tables  = True
-
 def access_url(urls):
     if len(urls) > 0:
         return urls.pop()
@@ -63,6 +58,11 @@ def get_code(item):
     return item[0]
 
 start_time = time.time()
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
+session = HTMLSession()
+text_maker = html2text.HTML2Text()
+text_maker.ignore_tables  = True
 
 path_name = "mzb-code-name"
 if not os.path.exists(path_name):
