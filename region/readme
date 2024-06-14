@@ -1,18 +1,13 @@
 
+## 目录说明:
+mzb-code-name ----------- 民政部的 省 市 区县 数据
+tjj-code-name ----------- 统计局的 省 市 区县 数据
+tjj-code-name-all ------- 统计局的 省 市 区县 乡镇 村 数据
+
 ## 脚本说明
-* 执行: `./region_mzb_use_requests_html.py`
-* 说明: 获取民政部的数据
-* 结果:
-    * *-mzb-base.csv ------- 省 市 区县 数据
-    * *-mzb-all.csv --- 省 市 区县 乡镇 数据
-
-* 执行: `./region_tjj_use_requests_html.py`
-* 说明: 获取统计局的数据 省 市 区县 乡镇 村 数据
-* 结果: *-tjj-all.csv -- 数据量太大了, 太慢, 已压缩存储 *-tjj-all.csv.tgz
-
-* 执行: `./region_tjj_use_requests_html.py until_county`
-* 说明: 获取统计局的数据 省 市 区县 数据
-* 结果:  *-tjj-base.csv
+./get_mzb_code_name.py -------- 获取和更新 民政部的 省 市 区县 数据
+./get_tjj_code_name.py -------- 获取和更新 统计局的 省 市 区县 数据
+./get_tjj_code_name_all.sh ---- 获取和更新 统计局的 省 市 区县 乡镇 村 数据
 
 ## 代码说明
 * 民政统计代码编制规则: https://www.mca.gov.cn/n156/n186/c110788/content.html
@@ -43,7 +38,6 @@
     * 2022-至今 有 省 市 区县 的区划代码, 有 乡镇 的区划代码的变更情况
 * 所有网页均未处理 乡镇 的变更
 * 网页: 使用 UTF-8 编码
-* 本脚本只获取 省 市 区县 的区划代码
 
 ## 统计局 的行政区划代码
 * 官网: https://www.stats.gov.cn/sj/tjbz/qhdm/
