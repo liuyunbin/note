@@ -102,7 +102,7 @@ def handle_village(res_village):
         category = tds[1].text
         name     = tds[2].text
         pcode    = code[:9] + "000"
-        add_result(results, code, name, [], 5, pcode)
+        add_result(results, code, name, [], 5, pcode, category)
     return results
 
 # div class="list-content" => ul => li(多) => a(3) (url=href, year=text())
