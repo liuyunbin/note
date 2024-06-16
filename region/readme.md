@@ -33,8 +33,8 @@
     * 目录: [code-name-gov-stats-json-all](code-name-gov-stats-json-all)
     * 注意: 执行脚本前, 先将该目录下的 tgz 文件解压, 避免重复下载
 * 由 JSON 文件生成 CSV 文件
-    * 执行: [get_code_name_gov_stats_csv.py](./get_code_name_gov_stats_csv.py)
-    * 目录: [code-name-gov-stats-csv](code-name-gov-stats-csv)
+    * 执行: [get_code_name_gov_stats_csv_all.py](./get_code_name_gov_stats_csv_all.py)
+    * 目录: [code-name-gov-stats-csv-all](code-name-gov-stats-csv-all)
 * 其他部分同上一节
 
 ## 获取和更新 1949-2006 中国政府网 县级及以上行政区划变更情况
