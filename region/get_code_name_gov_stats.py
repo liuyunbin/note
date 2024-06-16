@@ -5,6 +5,7 @@ import csv
 import datetime
 import logging
 import time
+import json
 import os
 import sys
 
@@ -18,73 +19,91 @@ def access_url(urls):
         return urls.pop()
     return ""
 
-def add_result(code, name, level, pcode = "0", category = "0"):
-    results.append({
-            "code":code,
-            "name":name,
-            "level":level,
-            "pcode":pcode,
-            "category":category
-            })
-
+def add_result(results, code, name, children, level, pcode = "0", category = "0"):
+    result = {}
+    result["code"]     = code
+    result["name"]     = name
+    result["level"]    = level
+    result["pcode"]    = pcode
+    result["category"] = category
+    if children and len(children) > 0:
+        result["children"] = children
+    results.append(result)
 
 def handle_year(res_year):
+    years = {}
     for v in res_year:
         year        = v.text[:4]
         url         = access_url(v.absolute_links)
         years[year] = url
+    return years
 
 def handle_province(res_province):
+    results = []
     for v in res_province:
-        url  = access_url(v.absolute_links)
-        code = handle_url(url)
-        name = v.text
-        add_result(code, name, 1)
+        url      = access_url(v.absolute_links)
+        name     = v.text
+        children = handle_url(url)
+        if children and len(children) > 0:
+            code = children[0]["code"][:2] + "0000000000"
+        else:
+            code = ""
+        add_result(results, code, name, children, 1)
+    return results
 
 def handle_city(res_city):
+    results = []
     for v in res_city:
-        tds   = v.find("td")
-        url   = access_url(tds[0].absolute_links)
-        code  = tds[0].text
-        name  = tds[1].text
-        pcode = code[:2] + "0000000000"
-        add_result(code, name, 2, pcode)
-        handle_url(url)
-    return pcode
+        tds      = v.find("td")
+        url      = access_url(tds[0].absolute_links)
+        code     = tds[0].text
+        name     = tds[1].text
+        pcode    = code[:2] + "0000000000"
+        children = handle_url(url)
+        add_result(results, code, name, children, 2, pcode)
+    return results
 
 def handle_county(res_county):
+    results = []
     for v in res_county:
-        tds   = v.find("td")
-        url   = access_url(tds[0].absolute_links)
-        code  = tds[0].text
-        name  = tds[1].text
-        pcode = code[:4] + "00000000"
-        add_result(code, name, 3, pcode)
+        tds      = v.find("td")
+        url      = access_url(tds[0].absolute_links)
+        code     = tds[0].text
+        name     = tds[1].text
+        pcode    = code[:4] + "00000000"
         if all_data:
-            handle_url(url)
+            children = handle_url(url)
+        else:
+            children = []
+        add_result(results, code, name, children, 3, pcode)
+    return results
 
 def handle_town(res_town):
     if not all_data:
         return
+    results = []
     for v in res_town:
-        tds   = v.find("td")
-        url   = access_url(tds[0].absolute_links)
-        code  = tds[0].text
-        name  = tds[1].text
-        pcode = code[:6] + "000000"
-        add_result(code, name, 4, pcode)
-        handle_url(url)
+        tds      = v.find("td")
+        url      = access_url(tds[0].absolute_links)
+        code     = tds[0].text
+        name     = tds[1].text
+        pcode    = code[:6] + "000000"
+        children = handle_url(url)
+        add_result(results, code, name, children, 4, pcode)
+    return results
 
 def handle_village(res_village):
     if not all_data:
         return
+    results = []
     for v in res_village:
         tds      = v.find("td")
         code     = tds[0].text
         category = tds[1].text
         name     = tds[2].text
-        pcode = code[:9] + "000"
-        add_result(code, name, 5, pcode, category)
+        pcode    = code[:9] + "000"
+        add_result(results, code, name, [], 5, pcode)
+    return results
 
 # div class="list-content" => ul => li(多) => a(3) (url=href, year=text())
 # tr  class="provincetr"   => td(多) => a (url=href, name=text())
@@ -95,7 +114,7 @@ def handle_village(res_village):
 def handle_url(url):
 
     if url == "":
-        return
+        return None
 
     logging.info("handle %s", url)
 
@@ -125,7 +144,7 @@ def handle_url(url):
         # 有些页面没有值
         for v in [".wrapper-list-title", ".provincehead", ".cityhead", ".countyhead",".townhead", ".villagehead"]:
             if len(reponse.html.find(v)) > 0:
-                return
+                return None
 
         logging.info("%s 接口调用成功, 但解析失败, 可能被封, 暂停 %ds", url, 10*60)
         time.sleep(10 * 60)
@@ -138,6 +157,20 @@ def handle_url(url):
 
 def get_code(item):
     return item["code"]
+
+def sort_and_format(results):
+    results.sort(key=get_code)
+    for result in results:
+        if "children" in result:
+            sort_and_format(result["children"])
+        if not all_data:
+            result["code"]  = int(result["code"][:6])
+            result["pcode"] = int(result["pcode"][:6])
+            del result["category"]
+        else:
+            result["code"]     = int(result["code"])
+            result["pcode"]    = int(result["pcode"])
+            result["category"] = int(result["category"])
 
 start_time = time.time()
 
@@ -159,35 +192,23 @@ if not os.path.exists(path_name):
 os.chdir(path_name)
 
 # 获取年数据
-years     = {}
-url  = "https://www.stats.gov.cn/sj/tjbz/qhdm/"
-handle_url(url)
+url   = "https://www.stats.gov.cn/sj/tjbz/qhdm/"
+years = handle_url(url)
 
 for year, url in years.items():
     logging.info(f"获取 {year} 年的数据...")
-    file_name = year + ".csv"
+
+    file_name = year + ".json"
     if os.path.exists(file_name):
         logging.info(f"{year} 年数据已存在, 跳过")
         continue
 
-    results = []
-    handle_url(url)
-    results.sort(key=get_code)
+    results = handle_url(url)
+    sort_and_format(results)
 
     logging.info(f"存储 {year} 年的数据...")
-    with open(file_name, 'w', encoding='utf-8', newline='') as f:
-        writer = csv.writer(f)
-        for result in results:
-            code     = result["code"]
-            name     = result["name"]
-            level    = result["level"]
-            pcode    = result["pcode"]
-            category = result["category"]
-
-            if not all_data:
-                code  = code[:6]
-                pcode = pcode[:6]
-            writer.writerow([code, name, level, pcode, category])
+    with open(file_name, 'w',  encoding='utf-8') as f:
+        json.dump(results, f, ensure_ascii=False)
 
 end_time = time.time()
 logging.info("took: %ds", end_time - start_time)
