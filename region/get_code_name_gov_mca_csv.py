@@ -128,7 +128,7 @@ for year in sorted(years):
     results.sort(key=get_code)
     #logging.info(f"存储 {year} 年的数据...")
     with open(file_name, 'w', encoding='utf-8', newline='') as f:
-        writer = csv.writer(f)
+        writer = csv.writer(f, lineterminator='\n')
         writer.writerows(results)
 
 end_time = time.time()
