@@ -58,7 +58,7 @@ for file_name_json in files:
     results.sort(key=get_code)
 
     with open(file_name_csv, 'w',  encoding='utf-8') as f:
-        writer = csv.writer(f)
+        writer = csv.writer(f, lineterminator='\n')
         writer.writerows(results)
 
 end_time = time.time()
