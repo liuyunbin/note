@@ -19,7 +19,7 @@
     * 除了直辖市, 其他市的直辖区没有下一级, 比如: 2023-太原市-市辖区
     * 有些市没有下一级, 比如: 2023-雄安新区
     * 有些乡镇没有村, 比如: 2015-天津-红桥区-大胡同街道(网页为空)
-* 执行: [`./get_code_name_gov_stats.py`](./get_code_name_gov_stats.py)
+* 执行: [`./get_code_name_gov_stats_json.py`](./get_code_name_gov_stats_json.py)
 * 目录: [code-name-gov-stats-json](code-name-gov-stats-json)
 
 ## 获取和更新 2009-至今 统计局的 省 市 区县 乡镇 村 数据
