@@ -21,12 +21,22 @@ start_time = time.time()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
 
+all_data = False # True 只查到区县, False 查所有
+
+if "all_data" in sys.argv:
+    all_data = True
+
 path_name_csv = "code-name-gov-stats-csv"
+if all_data:
+    path_name_csv = path_name_csv + "-all"
+
 if not os.path.exists(path_name_csv):
     os.makedirs(path_name_csv)
 path_name_csv = os.path.abspath(path_name_csv)
 
 path_name_json = "code-name-gov-stats-json"
+if all_data:
+    path_name_json = path_name_json + "-all"
 os.chdir(path_name_json)
 
 files = os.listdir(".")
