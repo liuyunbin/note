@@ -10,7 +10,10 @@ import sys
 
 def get_results(results, data):
     for v in data:
-        results.append([v["code"], v["name"], v["level"], v["pcode"]])
+        result = [v["code"], v["name"], v["level"], v["pcode"]]
+        if "category" in v:
+            result.append(v["category"])
+        results.append(result)
         if "children" in v:
             get_results(results, v["children"])
 
@@ -48,15 +51,11 @@ for file_name_json in files:
     with open(file_name_json, 'r', encoding='utf-8', newline='') as f:
         data = json.load(f)
 
-    file_name_csv = path_name_csv + "/" + file_name_json[:4] + ".csv"
-    if os.path.exists(file_name_csv):
-        logging.info(f"{file_name_csv} 数据已存在, 跳过")
-        continue
-
     results = []
     get_results(results, data)
     results.sort(key=get_code)
 
+    file_name_csv = path_name_csv + "/" + file_name_json[:4] + ".csv"
     with open(file_name_csv, 'w',  encoding='utf-8') as f:
         writer = csv.writer(f, lineterminator='\n')
         writer.writerows(results)
