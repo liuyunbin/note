@@ -64,7 +64,7 @@ session = HTMLSession()
 text_maker = html2text.HTML2Text()
 text_maker.ignore_tables  = True
 
-path_name = "code-name-gov-mca"
+path_name = "code-name-gov-mca-csv"
 if not os.path.exists(path_name):
     os.makedirs(path_name)
 os.chdir(path_name)
