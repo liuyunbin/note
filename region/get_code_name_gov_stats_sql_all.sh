@@ -8,9 +8,11 @@ mkdir -p $path_gcov_stats_sql
 cd code-name-gov-stats-csv-all
 
 echo "解压缩..."
-for v in *.tgz; do
-    tar xf $v
-done
+if [[ -f *.tgz ]]; then
+    for v in *.tgz; do
+        tar xf $v
+    done
+fi
 
 for file_name_csv in *.csv; do
     echo "handle $file_name_csv..."
@@ -57,8 +59,11 @@ EOF
     mysqldump testdb gov_stats_all_$year > $file_name_sql
 done
 
+echo "压缩..."
 cd $path_gcov_stats_sql
-for v in *.sql; do
-    tar acf $v.tgz $v
-done
+if [[ -f *.sql ]]; then
+    for v in *.sql; do
+        tar acf $v.tgz $v
+    done
+fi
 

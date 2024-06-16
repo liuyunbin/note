@@ -5,13 +5,25 @@ set -ueo pipefail
 mkdir -p code-name-gov-stats-json-all
 
 cd code-name-gov-stats-json-all
-for v in ./*.tgz:
-    tar xf $v
+
+echo "解压缩..."
+if [[ -f *.tgz ]]; then
+    for v in *.tgz; do
+        tar xf $v
+    done
+fi
+
 cd ..
 
-./get_code_name_gov_stats_json.py all_data
+./get_code_name_gov_stats_csv.py all_data
 
+mkdir -p code-name-gov-stats-csv-all
+
+echo "压缩..."
 cd code-name-gov-stats-csv-all
-for v in ./*.csv:
-    tar acf $v.tgz $v
+if [[ -f *.csv ]]; then
+    for v in *.csv; do
+        tar acf $v.tgz $v
+    done
+fi
 
