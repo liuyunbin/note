@@ -41,6 +41,9 @@
 * 由 JSON 文件生成 CSV 文件
     * 执行: [get_code_name_gov_stats_csv_all.sh](./get_code_name_gov_stats_csv_all.sh)
     * 目录: [code-name-gov-stats-csv-all](code-name-gov-stats-csv-all)
+* 由 CSV 文件生成 SQL 文件
+    * 执行: [./get_code_name_gov_stats_sql_all.sh](./get_code_name_gov_stats_sql_all.sh)
+    * 目录: [code-name-gov-stats-sql-all](code-name-gov-stats-sql-all)
 * 其他部分同上一节
 
 ## 获取和更新 1949-2006 中国政府网 县级及以上行政区划变更情况
