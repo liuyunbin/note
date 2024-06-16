@@ -12,7 +12,7 @@
     * 执行: [./get_code_name_gov_mca_csv.py](./get_code_name_gov_mca_csv.py)
     * 目录: [code-name-gov-mca-csv](code-name-gov-mca-csv)
 * 由 CSV 文件生成 SQL 文件
-    * 执行: [./get_code_name_gov_mca_sql.py](./get_code_name_gov_mca_sql.py)
+    * 执行: [./get_code_name_gov_mca_sql.sh](./get_code_name_gov_mca_sql.sh)
     * 目录: [code-name-gov-mca-sql](code-name-gov-mca-sql)
 
 ## 获取和更新 2009-至今 统计局的 省 市 区县 数据
@@ -29,6 +29,9 @@
 * 由 JSON 文件生成 CSV 文件
     * 执行: [get_code_name_gov_stats_csv.py](./get_code_name_gov_stats_csv.py)
     * 目录: [code-name-gov-stats-csv](code-name-gov-stats-csv)
+* 由 CSV 文件生成 SQL 文件
+    * 执行: [./get_code_name_gov_stats_sql.sh](./get_code_name_gov_stats_sql.sh)
+    * 目录: [code-name-gov-stats-sql](code-name-gov-stats-sql)
 
 ## 获取和更新 2009-至今 统计局的 省 市 区县 乡镇 村 数据
 * 从数据源获取 JSON 文件
