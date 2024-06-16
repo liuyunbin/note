@@ -183,9 +183,9 @@ if "all_data" in sys.argv:
     all_data = True
 
 if all_data:
-    path_name = "code-name-gov-stats-all"
+    path_name = "code-name-gov-stats-json-all"
 else:
-    path_name = "code-name-gov-stats"
+    path_name = "code-name-gov-stats-json"
 
 if not os.path.exists(path_name):
     os.makedirs(path_name)
