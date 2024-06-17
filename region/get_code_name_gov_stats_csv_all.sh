@@ -2,28 +2,28 @@
 
 set -ueo pipefail
 
+function log_info() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty;          }
+function log_warn() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty;          }
+function log_erro() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty; exit -1; }
+
 mkdir -p code-name-gov-stats-json-all
 
 cd code-name-gov-stats-json-all
 
-echo "解压缩..."
-if [[ -f *.tgz ]]; then
-    for v in *.tgz; do
-        tar xf $v
-    done
-fi
+log_info "解压缩..."
+for v in *; do
+    [[ "$v" =~ ^.*\.tgz$ ]] && tar xf $v || true
+done
 
 cd ..
 
-./get_code_name_gov_stats_csv.py all_data
+./get_code_name_gov_stats_csv.py all_data || true
 
 mkdir -p code-name-gov-stats-csv-all
 
-echo "压缩..."
+log_info "压缩..."
 cd code-name-gov-stats-csv-all
-if [[ -f *.csv ]]; then
-    for v in *.csv; do
-        tar acf $v.tgz $v
-    done
-fi
+for v in *; do
+    [[ $v =~ ^.*\.csv$ ]] && tar acf $v.tgz $v || true
+done
 

@@ -2,20 +2,22 @@
 
 set -ueo pipefail
 
+function log_info() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty;          }
+function log_warn() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty;          }
+function log_erro() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty; exit -1; }
+
 path_gcov_stats_sql=$(pwd)/code-name-gov-stats-sql-all/
 mkdir -p $path_gcov_stats_sql
 
 cd code-name-gov-stats-csv-all
 
-echo "解压缩..."
-if [[ -f *.tgz ]]; then
-    for v in *.tgz; do
-        tar xf $v
-    done
-fi
+log_info "解压缩..."
+for v in *; do
+    [[ "$v" =~ ^.*\.tgz$ ]] && tar xf $v || true
+done
 
 for file_name_csv in *.csv; do
-    echo "handle $file_name_csv..."
+    log_info "handle $file_name_csv..."
     year=${file_name_csv::-4}
     file_name_sql=${path_gcov_stats_sql}${year}.sql
 
@@ -59,11 +61,15 @@ EOF
     mysqldump testdb gov_stats_all_$year > $file_name_sql
 done
 
-echo "压缩..."
+log_info "压缩..."
 cd $path_gcov_stats_sql
 if [[ -f *.sql ]]; then
     for v in *.sql; do
         tar acf $v.tgz $v
     done
 fi
+
+for v in *; do
+    [[ $v =~ ^.*\.sql$ ]] && tar acf $v.tgz $v || true
+done
 
