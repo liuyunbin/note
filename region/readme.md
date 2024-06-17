@@ -56,6 +56,7 @@
 ## 获取和更新 1999-至今 民政部 县级及以上行政区划变更情况
 * 官网: http://xzqh.mca.gov.cn/description?dcpid=1
 * 说明: 2022 的数据暂时缺失, 使用的是之前的数据
+* 注意: 境外的 IP 貌似访问不了
 * 从数据源获取相关文件
     * 执行: [./get_desc_gov_mca.py](./get_desc_gov_mca.py)
     * 目录: [desc-gov-mca](desc-gov-mca)
