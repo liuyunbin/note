@@ -17,30 +17,30 @@ for file_name_csv in *; do
     file_name_sql=${path_gcov_stats_sql}${year}.sql
 
     cat > $file_name_sql <<'EOF'
-DROP TABLE IF EXISTS `gov_stats`;
-CREATE TABLE `gov_stats` (
-  `code`     bigint  unsigned NOT NULL COMMENT '区划代码',
-  `name`     varchar(128)     NOT NULL COMMENT '名称',
-  `level`    tinyint          NOT NULL COMMENT '级别1-5,省市县镇村',
-  `pcode`    bigint           NOT NULL COMMENT '父级区划代码',
-   PRIMARY KEY (`code`),
-           KEY `name` (`name`),
-           KEY `level` (`level`),
-           KEY `pcode` (`pcode`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+drop table if exists `gov_stats`;
+create table `gov_stats` (
+  `code`  bigint      not null comment '区划代码',
+  `name`  varchar(40) not null comment '名称',
+  `level` tinyint     not null comment '级别1-5,省市县镇村',
+  `pcode` bigint      not null comment '父级区划代码',
+   primary key (`code`),
+   index `name`  (`name`),
+   index `level` (`level`),
+   index `pcode` (`pcode`)
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_unicode_ci;
 
-LOCK TABLES `gov_stats` WRITE;
+lock tables `gov_stats` write;
 EOF
 
     awk -F, '
         BEGIN {
-            str = "INSERT INTO `gov_stats` VALUES "
+            str = "insert into `gov_stats` values "
         }
 
         {
             if (NR % 1000 == 0) {
                 print(str)
-                str = "INSERT INTO `gov_stats` VALUES "
+                str = "insert into `gov_stats` values "
             }
 
             str = str"("$1",'\''"$2"'\'',"$3","$4"),"

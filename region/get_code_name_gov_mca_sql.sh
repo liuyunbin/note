@@ -17,26 +17,26 @@ for file_name_csv in *; do
     file_name_sql=${path_gcov_mca_sql}${year}.sql
 
     cat > $file_name_sql <<'EOF'
-DROP TABLE IF EXISTS `gov_mca`;
-CREATE TABLE `gov_mca` (
-  `code`     bigint  unsigned NOT NULL COMMENT '区划代码',
-  `name`     varchar(128)     NOT NULL COMMENT '名称',
-   PRIMARY KEY (`code`),
-           KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+drop table if exists `gov_mca`;
+create table `gov_mca` (
+  `code` bigint      not null comment '区划代码',
+  `name` varchar(40) not null comment '名称',
+   primary key (`code`),
+   index `name` (`name`)
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_unicode_ci;
 
-LOCK TABLES `gov_mca` WRITE;
+lock tables `gov_mca` write;
 EOF
 
     awk -F, '
         BEGIN {
-            str = "INSERT INTO `gov_mca` VALUES "
+            str = "insert into `gov_mca` values "
         }
 
         {
             if (NR % 1000 == 0) {
                 print(str)
-                str = "INSERT INTO `gov_mca` VALUES "
+                str = "insert into `gov_mca` values "
             }
 
             str = str"("$1",'\''"$2"'\''),"

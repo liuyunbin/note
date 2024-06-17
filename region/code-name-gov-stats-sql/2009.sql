@@ -23,8 +23,8 @@ DROP TABLE IF EXISTS `gov_stats_2009`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `gov_stats_2009` (
-  `code` bigint(20) unsigned NOT NULL COMMENT '区划代码',
-  `name` varchar(128) NOT NULL COMMENT '名称',
+  `code` bigint(20) NOT NULL COMMENT '区划代码',
+  `name` varchar(40) NOT NULL COMMENT '名称',
   `level` tinyint(4) NOT NULL COMMENT '级别1-5,省市县镇村',
   `pcode` bigint(20) NOT NULL COMMENT '父级区划代码',
   PRIMARY KEY (`code`),
@@ -53,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-06-16 10:07:56
+-- Dump completed on 2024-06-17  9:36:46

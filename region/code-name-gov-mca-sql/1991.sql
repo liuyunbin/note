@@ -23,8 +23,8 @@ DROP TABLE IF EXISTS `gov_mca_1991`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `gov_mca_1991` (
-  `code` bigint(20) unsigned NOT NULL COMMENT '区划代码',
-  `name` varchar(128) NOT NULL COMMENT '名称',
+  `code` bigint(20) NOT NULL COMMENT '区划代码',
+  `name` varchar(40) NOT NULL COMMENT '名称',
   PRIMARY KEY (`code`),
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -49,4 +49,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-06-16  9:48:18
+-- Dump completed on 2024-06-17  9:34:39
