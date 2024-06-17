@@ -48,7 +48,7 @@ files.sort()
 for file_name_json in files:
     logging.info(f"处理 {file_name_json} 数据...")
 
-    with open(file_name_json, 'r', encoding='utf-8', newline='') as f:
+    with open(file_name_json, 'r', encoding='utf-8') as f:
         data = json.load(f)
 
     results = []
@@ -56,7 +56,7 @@ for file_name_json in files:
     results.sort(key=get_code)
 
     file_name_csv = path_name_csv + "/" + file_name_json[:4] + ".csv"
-    with open(file_name_csv, 'w',  encoding='utf-8') as f:
+    with open(file_name_csv, 'w',  encoding='utf-8', newline='') as f:
         writer = csv.writer(f, lineterminator='\n')
         writer.writerows(results)
 

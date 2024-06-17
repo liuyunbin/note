@@ -65,7 +65,7 @@ for year in sorted(years):
     text = text_maker.handle(response.text)
 
     #logging.info(f"存储 {year} 年的数据...")
-    with open(file_name, 'w', encoding='utf-8', newline='') as f:
+    with open(file_name, 'w', encoding='utf-8') as f:
         f.write(text)
 
 end_time = time.time()
