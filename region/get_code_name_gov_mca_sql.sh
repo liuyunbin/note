@@ -2,13 +2,17 @@
 
 set -ueo pipefail
 
+function log_info() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@";          }
+function log_warn() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@";          }
+function log_erro() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@"; exit -1; }
+
 path_gcov_mca_sql=$(pwd)/code-name-gov-mca-sql/
 mkdir -p $path_gcov_mca_sql
 
 cd code-name-gov-mca-csv
 
 for file_name_csv in *; do
-    echo "handle $file_name_csv"
+    log_info "handle $file_name_csv"
     year=${file_name_csv::-4}
     file_name_sql=${path_gcov_mca_sql}${year}.sql
 

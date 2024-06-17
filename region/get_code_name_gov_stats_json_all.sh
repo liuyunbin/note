@@ -2,9 +2,9 @@
 
 set -ueo pipefail
 
-function log_info() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty;          }
-function log_warn() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty;          }
-function log_erro() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty; exit -1; }
+function log_info() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@";          }
+function log_warn() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@";          }
+function log_erro() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@"; exit -1; }
 
 mkdir -p code-name-gov-stats-json-all
 
