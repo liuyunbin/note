@@ -1,12 +1,17 @@
 
 ## 数据文件说明
-* 为节省空间, 使用压缩包上传数据文件
-* 解压当前目录下的压缩包: `ls *.tgz | xargs -i tar xvf {}`
+```
+*.tgz           # 为节省空间, 使用压缩包, 解压 ls *.tgz | xargs -i tar xvf {}
+gov-mca-*.tgz   # 民政部数据
+gov-stats-*.tgz # 统计局数据
+gov-desc        # 中国政府网县级及以上行政区划变更情况
+gov-mca-desc    # 民政部县级及以上行政区划变更情况
+```
 
 ## 脚本说明
 ```
 get_gov_desc.py                       # 获取和更新中国政府网县级及以上行政区划变更情况
-get_gov_mca_desc.py                   # 获取和更新民政部县级及以上行政区划变更情况
+get_gov_mca_desc.py                   # 获取和更新民政部县级及以上行政区划变更情况(境外的 IP 貌似访问不了)
 get_gov_mca_code_name_csv.py          # 获取和更新民政部数据
 get_gov_mca_code_name_csv_to_sql.sh   # 将民政部数据存入数据库, 并生成 sql 文件(注意修改脚本中数据库的名称等)
 get_gov_stats_code_name_csv.py        # 获取和更新统计局数据
@@ -113,13 +118,10 @@ get_gov_stats_code_name_sum.py        # 获取简单的统计结果
 #### 3. 1949-2006 中国政府网 县级及以上行政区划变更情况
 * 官网: http://www.gov.cn/test/2006-02/27/content_212020.htm
 * 说明: 2003 2005 2006 的数据暂时缺失, 使用的是之前的数据
-* 目录: desc-gov
 
 #### 4. 1999-至今 民政部 县级及以上行政区划变更情况
 * 官网: http://xzqh.mca.gov.cn/description?dcpid=1
 * 说明: 2022 的数据暂时缺失, 使用的是之前的数据
-* 注意: 境外的 IP 貌似访问不了
-* 目录: desc-gov-mca
 
 ## 代码说明
 * 民政统计代码编制规则: https://www.mca.gov.cn/n156/n186/c110788/content.html
