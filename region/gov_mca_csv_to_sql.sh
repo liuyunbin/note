@@ -3,7 +3,6 @@
 set -ueo pipefail
 
 function log_info() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@";          }
-function log_warn() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@";          }
 function log_erro() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@"; exit -1; }
 
 for file_name_csv in ./gov-mca-*.csv; do
