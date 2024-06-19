@@ -2,11 +2,10 @@
 
 from requests_html import HTMLSession
 import csv
-import datetime
-import logging
-import time
-import os
 import html2text
+import logging
+import os
+import time
 
 def access_url(urls):
     if len(urls) > 0:
@@ -26,9 +25,9 @@ def handle_url(url):
 
 def handle_2021(response):
     # 获取 2020 年的数据
-    file_name = "2020.csv"
+    file_name = "gov-mca-" + "2020" + ".csv"
     with open(file_name, 'r', encoding='utf-8', newline='') as f:
-        reader = csv.reader(f)
+        reader  = csv.reader(f)
         results = list(reader)
     # 先处理撤销, 在处理设立, 避免同时删除和设立同时存在时, 误删的情况
     for v in response.html.find("td"):
@@ -60,14 +59,10 @@ def get_code(item):
 start_time = time.time()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
-session = HTMLSession()
+session    = HTMLSession()
 text_maker = html2text.HTML2Text()
-text_maker.ignore_tables  = True
 
-path_name = "code-name-gov-mca-csv"
-if not os.path.exists(path_name):
-    os.makedirs(path_name)
-os.chdir(path_name)
+text_maker.ignore_tables = True
 
 # 获取年数据
 logging.info("获取年 url...")
@@ -107,7 +102,7 @@ for year, url in years.items():
 for year in sorted(years):
     logging.info(f"获取 {year} 年的数据...")
 
-    file_name = year + ".csv"
+    file_name = "gov-mca-" + year + ".csv"
     if os.path.exists(file_name):
         logging.info(f"{year} 年的数据已存在, 跳过")
         continue
