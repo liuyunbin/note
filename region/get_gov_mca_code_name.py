@@ -15,7 +15,7 @@ def access_url(urls):
 
 def handle_url(url):
     try:
-        response = session.get(url=url)
+        response = session.get(url=url, timeout=5)
         response.encoding = 'utf-8'
         return response
     except Exception as e:
