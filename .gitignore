@@ -1,7 +1,6 @@
 
 *.out
 
-region/code-name-gov-stats-csv-all/*.csv
-region/code-name-gov-stats-sql-all/*.sql
-region/code-name-gov-stats-json-all/*.json
+region/gov-*.csv
+region/gov-*.sql
 
