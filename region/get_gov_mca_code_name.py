@@ -53,9 +53,6 @@ def handle(response):
             results.append(result)
     return results
 
-def get_code(item):
-    return item[0]
-
 start_time = time.time()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
@@ -120,7 +117,7 @@ for year in sorted(years):
         logging.info(f"{year} 年的数据获取失败, 暂停 10 秒后重试...")
         time.sleep(10)
 
-    results.sort(key=get_code)
+    results.sort(key=lambda v : v[0])
     #logging.info(f"存储 {year} 年的数据...")
     with open(file_name, 'w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f, lineterminator='\n')
