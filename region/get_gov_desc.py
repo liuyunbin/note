@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 from requests_html import HTMLSession
-import csv
-import datetime
 import logging
 import time
 import os
@@ -32,10 +30,10 @@ def get_code(item):
 start_time = time.time()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
-session = HTMLSession()
+session    = HTMLSession()
 text_maker = html2text.HTML2Text()
 
-path_name = "desc-gov"
+path_name = "gov-desc"
 if not os.path.exists(path_name):
     os.makedirs(path_name)
 os.chdir(path_name)
