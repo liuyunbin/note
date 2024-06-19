@@ -16,7 +16,7 @@ get_gov_mca_code_name_csv.py          # 获取和更新民政部数据
 get_gov_mca_code_name_csv_to_sql.sh   # 将民政部数据存入数据库, 并生成 sql 文件(注意修改脚本中数据库的名称等)
 get_gov_stats_code_name_csv.py        # 获取和更新统计局数据
 get_gov_stats_code_name_csv_to_sql.sh # 将民政部数据存入数据库, 并生成 sql 文件(注意修改脚本中数据库的名称等)
-get_gov_stats_code_name_sum.py        # 获取简单的统计结果
+get_gov_stats_code_name_sum.py        # 获取简单的统计结果(通过调用数据库)
 ```
 
 ## 简要汇总
