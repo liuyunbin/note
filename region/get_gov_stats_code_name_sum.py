@@ -12,7 +12,7 @@ def get_change_year():
 
     results = [["年份", "省", "市", "区县", "乡镇", "村"], ["--", "--", "--", "--", "--", "--"]]
     for item in tables:
-        year = item[0]
+        year  = item[0]
         table = item[1]
         cursor.execute("select count(*) from " + table + " group by level order by level")
         result = [year]
@@ -41,32 +41,10 @@ def get_change_province(province_code):
         year  = item[0]
         table = item[1]
 
-        cursor.execute("select code from " + table + " where pcode = " + province_code)
-        citys = []
-        for city in cursor.fetchall():
-            citys.append(city[0])
-
-        cursor.execute("select code from " + table + " where pcode in " + str(tuple(citys))[:-2] + ")" )
-        countys = []
-        for county in cursor.fetchall():
-            countys.append(county[0])
-
-        cursor.execute("select code from " + table + " where pcode in " + str(tuple(countys))[:-2] + ")" )
-        towns = []
-        for town in cursor.fetchall():
-            towns.append(town[0])
-
-        cursor.execute("select code from " + table + " where pcode in " + str(tuple(towns))[:-2] + ")" )
-        villages = []
-        for village in cursor.fetchall():
-            villages.append(village[0])
-
-        results.append([year,
-                        str(len(citys)),
-                        str(len(countys)),
-                        str(len(towns)),
-                        str(len(villages))
-                       ])
+        cursor.execute("select count(*) from " + table + " where province = " + province_code + " group by level order by level")
+        data = cursor.fetchall()
+        result = [year, str(data[0][0]), str(data[1][0]), str(data[2][0]), str(data[3][0])]
+        results.append(result)
 
     result = [results[2][0] + "-" + results[-1][0]]
     for i in range(1, 5):
@@ -78,183 +56,29 @@ def get_change_province(province_code):
         print('|' + '|'.join(result) + '|')
     print("")
 
-# 历年 某个市 的县区乡镇村 的变化
-def get_change_city(city_code):
-    cursor.execute("select name, pcode from " + tables[-1][1] + " where code = " + city_code)
-    data = cursor.fetchall()
-    city_name = data[0][0]
-
-    province_code = data[0][1]
-    cursor.execute("select name, pcode from " + tables[-1][1] + " where code = " + str(province_code))
-    data = cursor.fetchall()
-    province_name = data[0][0]
-
-    results = [["年份", "区县", "乡镇", "村"], ["--", "--", "--", "--"]]
-    for item in tables:
-        year  = item[0]
-        table = item[1]
-
-        cursor.execute("select code from " + table + " where pcode = " + city_code)
-        countys = []
-        for county in cursor.fetchall():
-            countys.append(county[0])
-
-        cursor.execute("select code from " + table + " where pcode in " + str(tuple(countys))[:-2] + ")" )
-        towns = []
-        towns = []
-        for town in cursor.fetchall():
-            towns.append(town[0])
-
-        cursor.execute("select code from " + table + " where pcode in " + str(tuple(towns))[:-2] + ")" )
-        villages = []
-        for village in cursor.fetchall():
-            villages.append(village[0])
-
-        results.append([year,
-                        str(len(countys)),
-                        str(len(towns)),
-                        str(len(villages))
-                       ])
-
-    result = [results[2][0] + "-" + results[-1][0]]
-    for i in range(1, 4):
-        result.append(str(int(results[-1][i]) - int(results[2][i])))
-    results.append(result)
-
-    print("#### " + results[-1][0] + " " + province_name + " " + city_name + " 区县乡镇村数量的汇总")
-    for result in results:
-        print('|' + '|'.join(result) + '|')
-    print("")
-
-# 历年 某个县 的 乡镇村 的变化
-def get_change_county(county_code):
-    cursor.execute("select name, pcode from " + tables[-1][1] + " where code = " + county_code)
-    data = cursor.fetchall()
-    county_name = data[0][0]
-
-    city_code = data[0][1]
-    cursor.execute("select name, pcode from " + tables[-1][1] + " where code = " + str(city_code))
-    data = cursor.fetchall()
-    city_name = data[0][0]
-
-    province_code = data[0][1]
-    cursor.execute("select name, pcode from " + tables[-1][1] + " where code = " + str(province_code))
-    data = cursor.fetchall()
-    province_name = data[0][0]
-
-    results = [["年份", "乡镇", "村"], ["--", "--", "--"]]
-    for item in tables:
-        year  = item[0]
-        table = item[1]
-
-        cursor.execute("select code from " + table + " where pcode = " + county_code)
-        towns = []
-        for town in cursor.fetchall():
-            towns.append(town[0])
-
-        cursor.execute("select code from " + table + " where pcode in " + str(tuple(towns))[:-2] + ")" )
-        villages = []
-        for village in cursor.fetchall():
-            villages.append(village[0])
-
-        results.append([year,
-                        str(len(towns)),
-                        str(len(villages))
-                       ])
-
-    result = [results[2][0] + "-" + results[-1][0]]
-    for i in range(1, 3):
-        result.append(str(int(results[-1][i]) - int(results[2][i])))
-    results.append(result)
-
-    print("#### " + results[-1][0] + " " + province_name + " " + city_name + " " + county_name + " 乡镇村数量的汇总")
-    for result in results:
-        print('|' + '|'.join(result) + '|')
-    print("")
-
-# 历年 某个乡镇 的 村 的变化
-def get_change_town(town_code):
-    cursor.execute("select name, pcode from " + tables[-1][1] + " where code = " + town_code)
-    data = cursor.fetchall()
-    town_name = data[0][0]
-
-    county_code = data[0][1]
-    cursor.execute("select name, pcode from " + tables[-1][1] + " where code = " + str(county_code))
-    data = cursor.fetchall()
-    county_name = data[0][0]
-
-    city_code = data[0][1]
-    cursor.execute("select name, pcode from " + tables[-1][1] + " where code = " + str(city_code))
-    data = cursor.fetchall()
-    city_name = data[0][0]
-
-    province_code = data[0][1]
-    cursor.execute("select name, pcode from " + tables[-1][1] + " where code = " + str(province_code))
-    data = cursor.fetchall()
-    province_name = data[0][0]
-
-    results = [["年份", "乡镇", "村"], ["--", "--", "--"]]
-    for item in tables:
-        year  = item[0]
-        table = item[1]
-
-        cursor.execute("select code from " + table + " where pcode = " + town_code)
-        villages = []
-        for village in cursor.fetchall():
-            villages.append(village[0])
-
-        results.append([year,
-                        str(len(villages))
-                       ])
-
-    result = [results[2][0] + "-" + results[-1][0]]
-    for i in range(1, 2):
-        result.append(str(int(results[-1][i]) - int(results[2][i])))
-    results.append(result)
-
-    print("#### " + results[-1][0] + " " + province_name + " " + city_name + " " + county_name + " " +  town_name + " 村数量的汇总")
-    for result in results:
-        print('|' + '|'.join(result) + '|')
-    print("")
-
 def get_detail_new():
     year  = tables[-1][0]
     table = tables[-1][1]
 
     results = [["代码", "省", "市", "区县", "乡镇", "村"], ["---", "---", "--", "--", "--", "--"]]
-    cursor.execute("select code, name from " + table + " where pcode = 0 order by code")
+    cursor.execute("select code, name from " + table + " where level = 1 order by code")
     provinces = cursor.fetchall()
     for item in provinces:
-        province_code = item[0]
+        province_code = str(item[0])
         province_name = item[1]
 
-        cursor.execute("select code from " + table + " where pcode = " + str(province_code))
-        citys = []
-        for city in cursor.fetchall():
-            citys.append(city[0])
+        cursor.execute("select count(*) from " + table + " where province = " + province_code + " group by level order by level")
+        data = cursor.fetchall()
+        result = [province_code, province_name, str(data[0][0]), str(data[1][0]), str(data[2][0]), str(data[3][0])]
+        results.append(result)
 
-        cursor.execute("select code from " + table + " where pcode in " + str(tuple(citys))[:-2] + ")" )
-        countys = []
-        for county in cursor.fetchall():
-            countys.append(county[0])
-
-        cursor.execute("select code from " + table + " where pcode in " + str(tuple(countys))[:-2] + ")" )
-        towns = []
-        for town in cursor.fetchall():
-            towns.append(town[0])
-
-        cursor.execute("select code from " + table + " where pcode in " + str(tuple(towns))[:-2] + ")" )
-        villages = []
-        for village in cursor.fetchall():
-            villages.append(village[0])
-
-        results.append([str(province_code),
-                        province_name,
-                        str(len(citys)),
-                        str(len(countys)),
-                        str(len(towns)),
-                        str(len(villages))
-                       ])
+    result = [" ", "全国", 0, 0, 0, 0]
+    for i in range(2, len(results)):
+        for j in range(2, 6):
+            result[j] = result[j] + int(results[i][j])
+    for i in range(2, 6):
+        result[i] = str(result[i])
+    results.append(result)
 
     print("#### " + year + " 省市区县乡镇村数量的汇总")
     for result in results:
@@ -286,14 +110,8 @@ for v in cursor.fetchall():
 tables.sort(key=lambda v: v[0])
 
 get_change_year()
-
 get_detail_new()
-
 get_change_province("140000000000")
-#get_change_city("140700000000")
-#get_change_county("140728000000")
-#get_change_town("140728202000")
-
 
 end_time = time.time()
 logging.info("took: %ds", end_time - start_time)
