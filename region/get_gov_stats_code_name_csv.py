@@ -11,8 +11,8 @@ def access_url(urls):
         return urls.pop()
     return ""
 
-def add_result(code, name, level, pcode = "0", category = "0"):
-    results.append([code, name, level, pcode, category])
+def add_result(code, name, level, province = "0", city = "0", county = "0", town = "0", category = "0"):
+    results.append([code, name, level, province, city, county, town, category])
 
 def handle_year(res_year):
     for v in res_year:
@@ -29,43 +29,40 @@ def handle_province(res_province):
 
 def handle_city(res_city):
     for v in res_city:
-        tds   = v.find("td")
-        url   = access_url(tds[0].absolute_links)
-        code  = tds[0].text
-        name  = tds[1].text
-        pcode = code[:2] + "0000000000"
-        add_result(code, name, 2, pcode)
-        handle_url(url)
-    return pcode
+        tds      = v.find("td")
+        url      = access_url(tds[0].absolute_links)
+        code     = tds[0].text
+        name     = tds[1].text
+        province = code[:2] + "0000000000"
+        add_result(code, name, 2, province)
+        handle_url(url, province, code)
+    return province
 
-def handle_county(res_county):
+def handle_county(res_county, province, city):
     for v in res_county:
-        tds   = v.find("td")
-        url   = access_url(tds[0].absolute_links)
-        code  = tds[0].text
-        name  = tds[1].text
-        pcode = code[:4] + "00000000"
-        add_result(code, name, 3, pcode)
-        handle_url(url)
+        tds    = v.find("td")
+        url    = access_url(tds[0].absolute_links)
+        code   = tds[0].text
+        name   = tds[1].text
+        add_result(code, name, 3, province, city)
+        handle_url(url, province, city, code)
 
-def handle_town(res_town):
+def handle_town(res_town, province, city, county):
     for v in res_town:
         tds   = v.find("td")
         url   = access_url(tds[0].absolute_links)
         code  = tds[0].text
         name  = tds[1].text
-        pcode = code[:6] + "000000"
-        add_result(code, name, 4, pcode)
-        handle_url(url)
+        add_result(code, name, 4, province, city, county)
+        handle_url(url, province, city, county, code)
 
-def handle_village(res_village):
+def handle_village(res_village, province, city, county, town):
     for v in res_village:
         tds      = v.find("td")
         code     = tds[0].text
         category = tds[1].text
         name     = tds[2].text
-        pcode    = code[:9] + "000"
-        add_result(code, name, 5, pcode, category)
+        add_result(code, name, 5, province, city, county, town, category)
 
 # div class="list-content" => ul => li(多) => a(3) (url=href, year=text())
 # tr  class="provincetr"   => td(多) => a (url=href, name=text())
@@ -73,7 +70,7 @@ def handle_village(res_village):
 # tr  class="countytr"     => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
 # tr  class="towntr"       => td(2) => a (url=td[1].href, code=td[1].text(), name=td[2].text())
 # tr  class="villagetr"    => td(3) (code=td[1].text(), code_villagetr=td[2].text(), name=td[3].text())
-def handle_url(url):
+def handle_url(url, province = "0", city = "0", county = "0", town = "0"):
     if url == "":
         return None
 
@@ -96,11 +93,11 @@ def handle_url(url):
         if len(res_city) > 0:
             return handle_city(res_city)
         if len(res_county) > 0:
-            return handle_county(res_county)
+            return handle_county(res_county, province, city)
         if len(res_town) > 0:
-            return handle_town(res_town)
+            return handle_town(res_town, province, city, county)
         if len(res_village) > 0:
-            return handle_village(res_village)
+            return handle_village(res_village, province, city, county, town)
 
         # 有些页面没有值
         for v in [".wrapper-list-title", ".provincehead", ".cityhead", ".countyhead",".townhead", ".villagehead"]:
@@ -109,12 +106,12 @@ def handle_url(url):
 
         logging.info("%s 接口调用成功, 但解析失败, 可能被封, 暂停 %ds", url, 10*60)
         time.sleep(10 * 60)
-        return handle_url(url)
+        return handle_url(url, province, city, county, town)
     except Exception as e:
         logging.info(e)
         logging.info("%s 接口调用失败, 可能被封, 暂停 %ds", url, 60)
         time.sleep(60)
-        return handle_url(url)
+        return handle_url(url, province, city, county, town)
 
 start_time = time.time()
 
