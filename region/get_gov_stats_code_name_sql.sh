@@ -16,12 +16,18 @@ create table `gov_stats` (
   `code`     bigint      not null comment '区划代码',
   `name`     varchar(40) not null comment '名称',
   `level`    tinyint     not null comment '级别1-5,省市县镇村',
-  `pcode`    bigint      not null comment '父级区划代码',
+  `province` bigint      not null comment '省代码',
+  `city`     bigint      not null comment '市代码',
+  `county`   bigint      not null comment '区县代码',
+  `town`     bigint      not null comment '乡镇代码',
   `category` int         not null comment '城乡分类',
    primary key (`code`),
    index `name`     (`name`),
    index `level`    (`level`),
-   index `pcode`    (`pcode`),
+   index `province` (`province`),
+   index `city`     (`city`),
+   index `county`   (`county`),
+   index `town`     (`town`),
    index `category` (`category`)
 ) engine=innodb default charset=utf8mb4 collate=utf8mb4_unicode_ci;
 
@@ -39,7 +45,7 @@ EOF
                 str = "insert into `gov_stats` values "
             }
 
-            str = str"("$1",'\''"$2"'\'',"$3","$4","$5"),"
+            str = str"("$1",'\''"$2"'\'',"$3","$4","$5","$6","$7","$8"),"
         }
         END {
             print(str)
