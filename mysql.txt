@@ -5,6 +5,9 @@ mysqldump database_name table_name > 1.sql      # 导出到文件
 select .. into outfile .. fields terminated by ',' optionally enclosed by '"' lines terminated by '\n' from ..
                                                 # 保存数据到文件
 
+mysql_install_db --user=mysql --ldata=/var/lib/mysql # 添加用户 mysql 使mysqld 可以使用 systemctl 启动
+SET PASSWORD FOR 'root'@'localhost' = PASSWORD('root'); # 设置 root 密码
+
 set global max_allowed_packet=64*1024*1024 # 设置插入的上限
 
 select user,host,passwd from mysql.user; # 查看用户 密码
