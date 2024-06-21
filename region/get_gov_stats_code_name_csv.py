@@ -101,7 +101,7 @@ def handle_url(url, province = "0", city = "0", county = "0", town = "0"):
 
         # 有些页面没有值
         for v in [".wrapper-list-title", ".provincehead", ".cityhead", ".countyhead",".townhead", ".villagehead"]:
-            if len(reponse.html.find(v)) > 0:
+            if len(response.html.find(v)) > 0:
                 return None
 
         logging.info("%s 接口调用成功, 但解析失败, 可能被封, 暂停 %ds", url, 10*60)
