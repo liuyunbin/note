@@ -59,8 +59,8 @@ function do_init_git() {
     git config --global log.date iso
     git config --global alias.lg "log --pretty=format:'%ad %h %s %d %C(bold)%an%Creset' --graph"
     git config --global core.quotepath false
-    log_info "查看 Git 配置"
-    git config --global --list
+#    log_info "查看 Git 配置"
+#    git config --global --list
     log_info "生成密钥"
     [[ -f ~/.ssh/id_rsa.pub ]] || ssh-keygen -t rsa
     cat ~/.ssh/id_rsa.pub
