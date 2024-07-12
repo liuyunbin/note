@@ -16,21 +16,6 @@ $ sudo systemctl disable apport # 禁止改服务自动启动
 * 指定目录的指定文件已存在, 但改进程无权修改
 
 
-git config --global user.name "Yunbin Liu"           # 配置用户名
-git config --global user.email yunbinliu@outlook.com # 配置邮箱
-git config --global core.editor vim                  # 配置默认编辑器
-git config --global log.date iso                     # 配置日志使用 年月日 时分秒 时区 的格式
-git config --global alias.lg "log --pretty=format:'%ad %h %s %d %C(bold)%an%Creset' --graph"
-                                                     # 添加别名, 优化日志的显示
-git config --global core.quotepath false             # 引用路径不使用八进制, 中文名不再乱码
-git config --global --list                           # 查看当前用户的配置信息
-ssh-keygen -t rsa                                    # 生成密钥
-                                                     # 复制公钥到 GitHub
-                                                     # 将文件 `~/.ssh/id_rsa.pub` 里的公钥添加到
-                                                     # https://github.com/settings/keys
-                                                     # 到此可以免密码使用 GitHub
-ssh -T git@github.com                                # 测试是否成功
-
 git clone --recurse-submodules https://github.com... # 克隆包含子模块的项目
 
 git diff             # 暂存区域 和 已修改   的差异

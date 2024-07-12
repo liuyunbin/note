@@ -51,6 +51,32 @@ function do_lsnet() {
                  print $1, detail }' | column -t
 }
 
+function do_init_git() {
+    log_info "配置 Git"
+    git config --global user.name "Yunbin Liu"
+    git config --global user.email yunbinliu@outlook.com
+    git config --global core.editor vim
+    git config --global log.date iso
+    git config --global alias.lg "log --pretty=format:'%ad %h %s %d %C(bold)%an%Creset' --graph"
+    git config --global core.quotepath false
+    log_info "查看 Git 配置"
+    git config --global --list
+    log_info "生成密钥"
+    [[ -f ~/.ssh/id_rsa.pub ]] || ssh-keygen -t rsa
+    cat ~/.ssh/id_rsa.pub
+    read -p "复制上述公钥到 GitHub, 然后按回车继续"
+    log_info "测试是否成功"
+    ssh -T git@github.com
+}
+
+function do_init_vps() {
+    apt update
+    apt upgrade
+    apt install -y git vim firewalld
+    apt install -y man-db
+    unminimize -y
+}
+
 cmd=$1
 shift
 do_$cmd $@
