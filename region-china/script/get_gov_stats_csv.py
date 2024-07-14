@@ -104,7 +104,7 @@ def handle_url(url, province = "0", city = "0", county = "0", town = "0"):
             if len(response.html.find(v)) > 0:
                 return None
 
-        logging.info("%s 接口调用成功, 但解析失败, 可能被封, 暂停 %ds", url, 10*60)
+        logging.info("%s 接口调用成功, 但解析失败, 可能被封, 暂停 %ds", url, 10 * 60)
         time.sleep(10 * 60)
         return handle_url(url, province, city, county, town)
     except Exception as e:
@@ -118,6 +118,12 @@ start_time = time.time()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S %z")
 session = HTMLSession()
 
+# 新建并切换目录
+path = "gov-stats-csv"
+if not os.path.exists(path):
+    os.mkdir(path)
+os.chdir(path)
+
 # 获取年数据
 url   = "https://www.stats.gov.cn/sj/tjbz/qhdm/"
 years = {}
@@ -126,7 +132,7 @@ handle_url(url)
 for year, url in years.items():
     logging.info(f"获取 {year} 年的数据...")
 
-    file_name = "gov-stats-" + year + ".csv"
+    file_name = year + ".csv"
     if os.path.exists(file_name):
         logging.info(f"{year} 年数据已存在, 跳过")
         continue
