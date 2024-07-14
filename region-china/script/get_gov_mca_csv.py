@@ -61,6 +61,12 @@ text_maker = html2text.HTML2Text()
 
 text_maker.ignore_tables = True
 
+# 新建并切换目录
+path = "gov-mca-csv"
+if not os.path.exists(path):
+    os.mkdir(path)
+os.chdir(path)
+
 # 获取年数据
 logging.info("获取年 url...")
 years = {}
@@ -99,7 +105,7 @@ for year, url in years.items():
 for year in sorted(years):
     logging.info(f"获取 {year} 年的数据...")
 
-    file_name = "gov-mca-" + year + ".csv"
+    file_name = year + ".csv"
     if os.path.exists(file_name):
         logging.info(f"{year} 年的数据已存在, 跳过")
         continue
