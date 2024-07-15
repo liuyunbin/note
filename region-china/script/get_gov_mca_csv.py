@@ -25,7 +25,7 @@ def handle_url(url):
 
 def handle_2021(response):
     # 获取 2020 年的数据
-    file_name = "gov-mca-" + "2020" + ".csv"
+    file_name = "2020" + ".csv"
     with open(file_name, 'r', encoding='utf-8', newline='') as f:
         reader  = csv.reader(f)
         results = list(reader)
@@ -122,6 +122,7 @@ for year in sorted(years):
         logging.info(url)
         logging.info(f"{year} 年的数据获取失败, 暂停 10 秒后重试...")
         time.sleep(10)
+        logging.info(f"获取 {year} 年的数据...")
 
     results.sort(key=lambda v : v[0])
     #logging.info(f"存储 {year} 年的数据...")
