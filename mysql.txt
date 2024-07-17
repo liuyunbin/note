@@ -1,4 +1,23 @@
 
+## 安装
+1. apt -y install mysql-client mysql-server
+2. mysql -e "show variables like 'character%';" -- 查看字符集
+3. 修改字符集为 utf8mb4 --- 最新版本不需要修改了
+   * 查找配置文件: mysqld --help --verbose 2> /dev/null | grep -A1 'Default options'
+   * 在相关文件内添加以下内容:
+       [client]
+       default-character-set = utf8mb4
+
+       [mysql]
+       default-character-set = utf8mb4
+
+       [mysqld]
+       character-set-server = utf8mb4
+       collation-server = utf8mb4_unicode_ci
+    * 停止 mysql 服务: pkill mysql
+    * 启动: mysqld --user=root &
+
+
 mysql -D <库名> -h <域名> -u <用户名> -p<密码>  # 登录
 myqsl -D testdb < 1.sql                         # 从文件导入
 mysqldump database_name table_name > 1.sql      # 导出到文件
@@ -87,34 +106,4 @@ trigger 触发器
 create index 索引名称  表名(字段名称)            # 创建索引
 alter table 表名称 add  index 索引名称(字段名称) # 创建索引
 drop index 索引名称 on 表名                      # 删除索引
-
-## 修改字符集为 utf8mb4
-原因
-    mysql 中 utf8 最多使用三个字节 utf8mb4 最多使用四个字节
-    标准的 UTF-8 最多使用四个字节, 所以 mysql 中应该使用 utf8mb4
-
-查看数据库编码: show variables like 'character%';
-    character_set_client      # 客户端发送请求使用的字符集
-    character_set_connection  # 将客户端的请求转化成的字符集
-    character_set_results     # 返回客户端数据的字符集
-
-    character_set_database    # 数据库默认使用的字符集
-    character_set_filesystem  # 存储为文件时使用
-    character_set_server      # 服务器内部使用的字符集
-    character_set_system      # 内部用, 无法更改
-
-修改:
-1. 查找配置文件: mysqld --help --verbose 2> /dev/null | grep -A1 'Default options'
-2. 在相关文件内添加以下内容:
-    [client]
-    default-character-set = utf8mb4
-
-    [mysql]
-    default-character-set = utf8mb4
-
-    [mysqld]
-    character-set-server = utf8mb4
-    collation-server = utf8mb4_unicode_ci
-3. 停止 mysql 服务: pkill mysql
-4. 启动: mysqld --user=root &
 
