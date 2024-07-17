@@ -22,6 +22,20 @@ cat ~/.ssh/id_rsa.pub
 read -p "复制上述公钥到 GitHub, 然后按回车继续"
 ssh -T git@github.com
 
+# https 协议代理
+# git config --global http.proxy socks5://192.168.68.1:7890
+# git config --global --unset http.proxy # 取消代理
+
+# ssh 协议代理 windows
+# 在 ~/.ssh/config 里添加如下配置
+# Host github.com
+# ProxyCommand connect -H 127.0.0.1:7890 %h %p
+
+# ssh 协议代理 Linux
+# 在 ~/.ssh/config 里添加如下配置
+# Host github.com
+# ProxyCommand nc -x 192.168.68.1:7890 %h %p
+
 # git clone --recurse-submodules https://github.com... # 克隆包含子模块的项目
 #
 # git diff             # 暂存区域 和 已修改   的差异
