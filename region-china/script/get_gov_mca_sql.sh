@@ -5,10 +5,18 @@ set -ueo pipefail
 function log_info() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@";          }
 function log_erro() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@"; exit -1; }
 
-for file_name_csv in ./gov-mca-*.csv; do
+sql_path=$(pwd)/gov-mca-sql
+csv_path=$(pwd)/gov-mca-csv
+
+database_name=testdb # 需要在数据库中添加库 testdb
+
+mkdir -p $sql_path &> /dev/null
+
+cd $csv_path
+for file_name_csv in *.csv; do
     log_info "handle $file_name_csv..."
-    year=${file_name_csv:10:4}
-    file_name_sql=${file_name_csv/csv/sql}
+    year=${file_name_csv/.*}
+    file_name_sql=$sql_path/${file_name_csv/csv/sql}
 
     cat > $file_name_sql <<'EOF'
 drop table if exists `gov_mca`;
@@ -17,7 +25,7 @@ create table `gov_mca` (
   `name` varchar(40) not null comment '名称',
    primary key (`code`),
    index `name` (`name`)
-) engine=innodb default charset=utf8mb4 collate=utf8mb4_unicode_ci;
+);
 
 lock tables `gov_mca` write;
 EOF
@@ -41,7 +49,9 @@ EOF
         ' $file_name_csv | sed 's/,$/;/' >> $file_name_sql
     sed -i "s/gov_mca/gov_mca_$year/g" $file_name_sql
 
-    mysql -D testdb < $file_name_sql
-    mysqldump testdb gov_mca_$year > $file_name_sql
+    mysql -D $database_name < $file_name_sql
+    mysqldump $database_name gov_mca_$year > $file_name_sql
 done
+
+log_info "完成"
 
