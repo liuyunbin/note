@@ -1,5 +1,15 @@
 
-## 使用说明
+## 目录说明
+```
+gov-desc ----------- 政府网县级及以上行政区划变更情况
+gov-mca-desc ------- 民政部县级及以上行政区划变更情况
+gov-mca-csv -------- 民政部数据
+gov-mca-sql -------- 民政部数据对应的数据库文件, 数据源为 gov-mca-csv
+gov-stats-csv ------ 统计局数据
+gov-stats-sql ------ 统计局数据对应的数据库文件, 数据源为 gov-stats-csv
+```
+
+## 脚本说明
 ```
 pip install -r ./script/requirements.txt # 安装依赖
 ./script/get_gov_desc.py # 获取和更新中国政府网县级及以上行政区划变更情况
