@@ -132,19 +132,24 @@ handle_url(url)
 for year, url in years.items():
     logging.info(f"获取 {year} 年的数据...")
 
-    file_name = year + ".csv"
-    if os.path.exists(file_name):
-        logging.info(f"{year} 年数据已存在, 跳过")
+    file_name_csv_tgz = year + ".csv" + ".tgz"
+    if os.path.exists(file_name_csv_tgz):
+        logging.info(f"{file_name_csv_tgz} 年数据已存在, 跳过")
         continue
+    file_name_csv     = year + ".csv"
+    if os.path.exists(file_name_csv):
+        logging.info(f"{file_name_csv} 年数据已存在, 跳过获取")
+    else:
+        results = []
+        handle_url(url)
+        results.sort(key=lambda v : v[0])
 
-    results = []
-    handle_url(url)
-    results.sort(key=lambda v : v[0])
-
-    logging.info(f"存储 {year} 年的数据...")
-    with open(file_name, 'w', encoding='utf-8', newline='') as f:
-        writer = csv.writer(f, lineterminator='\n')
-        writer.writerows(results)
+        logging.info(f"存储 {file_name_csv} 数据...")
+        with open(file_name_csv, 'w', encoding='utf-8', newline='') as f:
+            writer = csv.writer(f, lineterminator='\n')
+            writer.writerows(results)
+    logging.info(f"{file_name_csv_tgz} 压缩中...")
+    os.system("tar acf " + file_name_csv_tgz + " " + file_name_csv)
 
 end_time = time.time()
 logging.info("took: %ds", end_time - start_time)
