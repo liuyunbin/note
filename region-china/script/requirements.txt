@@ -2,4 +2,5 @@
 requests_html
 lxml_html_clean
 html2text
+mysql-connector-python
 
