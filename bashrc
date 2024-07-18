@@ -22,4 +22,3 @@ alias t="./a.out"
 alias v='vim'
 alias x='tar xvf'
 alias z='tar acf'
-alias init_vps='tool.sh init_vps'
