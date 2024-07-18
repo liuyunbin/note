@@ -47,8 +47,8 @@ function handle_gost() {
         docker run -d \
             --name gost \
             -v ${CERT_DIR}:${CERT_DIR}:ro \
-            --net=host ginuerzh/gost \
-            -L "http2://${USER}:${PASS}@${BIND_IP}:${PORT}?cert=${CERT}&key=${KEY}&probe_resist=code:400&knock=www.google.com"
+            --net=host \
+            ginuerzh/gost -L "http2://${USER}:${PASS}@${BIND_IP}:${PORT}?cert=${CERT}&key=${KEY}&probe_resist=code:400&knock=www.google.com"
     fi
 
     log_info "启动 gost..."
