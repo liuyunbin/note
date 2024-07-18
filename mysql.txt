@@ -16,6 +16,9 @@
        collation-server = utf8mb4_unicode_ci
     * 停止 mysql 服务: pkill mysql
     * 启动: mysqld --user=root &
+4. 设置 root 密码
+    ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
+    FLUSH PRIVILEGES;
 
 
 mysql -D <库名> -h <域名> -u <用户名> -p<密码>  # 登录
@@ -25,7 +28,6 @@ select .. into outfile .. fields terminated by ',' optionally enclosed by '"' li
                                                 # 保存数据到文件
 
 mysql_install_db --user=mysql --ldata=/var/lib/mysql # 添加用户 mysql 使mysqld 可以使用 systemctl 启动
-SET PASSWORD FOR 'root'@'localhost' = PASSWORD('root'); # 设置 root 密码
 
 set global max_allowed_packet=64*1024*1024 # 设置插入的上限
 
