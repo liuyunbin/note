@@ -85,3 +85,7 @@ ssh -T git@github.com
 # git submodule update --remote --rebase       # 变基远程修改到本地
 #
 # git reflog show --date=iso                   # 记录每一次提交, 用于找回删除的提交
+#
+# git apply --check ...                        # 检查补丁是否能成功应用
+# git apply         ...                        # 应用补丁
+
