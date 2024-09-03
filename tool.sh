@@ -50,6 +50,10 @@ function do_lsnet() {
                  print $1, detail }' | column -t
 }
 
+function do_test() {
+    g++ -std=c++14 $@ && ./a.out
+}
+
 begin_time=$(date +%s)
 
 cmd=$1
