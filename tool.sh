@@ -50,7 +50,12 @@ function do_lsnet() {
                  print $1, detail }' | column -t
 }
 
+begin_time=$(date +%s)
+
 cmd=$1
 shift
 do_$cmd $@
+
+end_time=$(date +%s)
+echo "took: $(( end_time - begin_time ))"
 
