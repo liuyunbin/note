@@ -12,7 +12,7 @@ alias lssize="     ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrS"  # 以 文件�
 alias lsversion="  ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrv"  # 以 文件名为版本号   排序
 
 alias c="cd $note; pwd"
-alias g="g++ -g -std=c++11"
+alias g="g++ -g -std=c++14"
 alias lastlog="tool.sh lastlog"
 alias lsnet="tool.sh lsnet"
 alias l=lsmtime
