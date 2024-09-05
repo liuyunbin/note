@@ -4,7 +4,7 @@ SRC1=test_reader_writer_and_reader_first.cc
 OBJ2=test_reader_writer_and_writer_first
 SRC2=test_reader_writer_and_writer_first.cc
 
-CC       = clang++
+CC       = g++
 CC_FLAGS = -Wall -Werror
 LIBS     = -lpthread
 

@@ -15,7 +15,7 @@ int main() {
 }
 
 static ReaderWriterAndWriterFirst<int> reader_writer;
-static int data = 0;
+static int                             data = 0;
 
 static void input() {
     std::cout << "reader writer, writer first" << std::endl << std::endl;
@@ -34,23 +34,25 @@ static void input() {
         return;
     }
     switch (std::cin.get()) {
-        case '1':
-            reader_writer.ReaderBlocking();
-            break;
-        case '2':
-            reader_writer.ReaderNonBlocking();
-            break;
-        case '3':
-            reader_writer.WriterBlocking(++data);
-            break;
-        case '4':
-            reader_writer.WriterNonBlocking(++data);
-            break;
-        default:
-            std::cout << "input error" << std::endl;
-            break;
+    case '1':
+        reader_writer.ReaderBlocking();
+        break;
+    case '2':
+        reader_writer.ReaderNonBlocking();
+        break;
+    case '3':
+        reader_writer.WriterBlocking(++data);
+        break;
+    case '4':
+        reader_writer.WriterNonBlocking(++data);
+        break;
+    default:
+        std::cout << "input error" << std::endl;
+        break;
     }
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-static void output() { reader_writer.output_log(std::cout); }
+static void output() {
+    reader_writer.output_log(std::cout);
+}
