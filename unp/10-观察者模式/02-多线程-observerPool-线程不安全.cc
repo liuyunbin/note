@@ -48,12 +48,12 @@ Observer::~Observer() {
 }
 
 void Observer::add_observer_pool() {
-    std::cout << "observer add" << std::endl;
+    std::cout << "observer add..." << std::endl;
     observer_pool_->add_observer(this);
 }
 
 void Observer::del_observer_pool() {
-    std::cout << "observer del" << std::endl;
+    std::cout << "observer del..." << std::endl;
     observer_pool_->del_observer(this);
 }
 
@@ -88,7 +88,6 @@ void ObserverPool::notifyObservers() {
     for (auto val : pool_) {
         std::this_thread::sleep_for(1s);  // 模拟耗时
         val->update();
-        std::cout << "observerPool size: " << pool_.size() << std::endl;
     }
 }
 
