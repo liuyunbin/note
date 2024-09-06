@@ -7,6 +7,8 @@
 #include <utility>
 #include <vector>
 
+using namespace std::chrono_literals;
+
 class ObserverPool;
 
 class Observer {
@@ -42,7 +44,7 @@ Observer::Observer(ObserverPool* s) {
 }
 
 Observer::~Observer() {
-    std::cout << "observer erase" << std::endl;
+    std::cout << "observer erase: " << this << std::endl;
 }
 
 void Observer::add_observer_pool() {
@@ -56,7 +58,7 @@ void Observer::del_observer_pool() {
 }
 
 void Observer::update() {
-    std::cout << "observer update" << std::endl;
+    std::cout << "observer update, addr: " << this << std::endl;
 }
 
 ObserverPool::ObserverPool() {
@@ -82,24 +84,53 @@ void ObserverPool::del_observer(Observer* x) {
 }
 
 void ObserverPool::notifyObservers() {
-    std::cout << "observerPool notifyObservers" << std::endl;
+    std::cout << "observerPool notifyObservers..." << std::endl;
     for (auto val : pool_) {
+        std::this_thread::sleep_for(1s);  // 模拟耗时
         val->update();
+        std::cout << "observerPool size: " << pool_.size() << std::endl;
     }
 }
 
+ObserverPool* observer_pool;
+
 int main() {
-    ObserverPool* observer_pool = new ObserverPool;
-    std::thread   t1([observer_pool]() {
-        Observer* observer = new Observer(observer_pool);
-        if (observer != NULL) {
-            std::cout << "cdcdcd" << std::endl;
-            observer->add_observer_pool();
-            observer_pool->notifyObservers();
-        }
-        //        delete observer;
+    observer_pool = new ObserverPool;
+
+    std::thread t1([]() {
+        std::this_thread::sleep_for(1s);
+        observer_pool->notifyObservers();
     });
+
+    std::thread t2([]() {
+        Observer* observer1 = new Observer(observer_pool);
+        Observer* observer2 = new Observer(observer_pool);
+        Observer* observer3 = new Observer(observer_pool);
+        Observer* observer4 = new Observer(observer_pool);
+        Observer* observer5 = new Observer(observer_pool);
+
+        observer1->add_observer_pool();
+        observer2->add_observer_pool();
+        observer3->add_observer_pool();
+        observer4->add_observer_pool();
+        observer5->add_observer_pool();
+
+        std::this_thread::sleep_for(2s);
+
+        observer1->del_observer_pool();
+        observer2->del_observer_pool();
+        observer3->del_observer_pool();
+        observer4->del_observer_pool();
+        observer5->del_observer_pool();
+
+        delete observer1;
+        delete observer2;
+        delete observer3;
+        delete observer4;
+        delete observer5;
+    });
+
     t1.join();
-    //    observer_pool->notifyObservers();
+    t2.join();
     return 0;
 }
