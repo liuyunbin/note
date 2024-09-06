@@ -1,8 +1,12 @@
 
 ## 安装
-1. apt -y install mysql-client mysql-server
-2. mysql -e "show variables like 'character%';" -- 查看字符集
-3. 修改字符集为 utf8mb4 --- 最新版本不需要修改了
+apt install mariadb-server
+apt install mariadb-client
+
+## 配置 utf8mb4 -- 最新版本不需要修改了
+1. 查看字符集
+    mysql -e "show variables like 'character%';"
+2. 修改字符集为 utf8mb4
    * 查找配置文件: mysqld --help --verbose 2> /dev/null | grep -A1 'Default options'
    * 在相关文件内添加以下内容:
        [client]
@@ -16,11 +20,41 @@
        collation-server = utf8mb4_unicode_ci
     * 停止 mysql 服务: pkill mysql
     * 启动: mysqld --user=root &
-4. 设置 root 密码
-    ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
-    FLUSH PRIVILEGES;
 
+## 启动服务
+sudo systemctl enable mariadb.service --- 开机自动启动
+sudo systemctl start  mariadb.service --- 启动服务
 
+## 设置 root 密码, 使用 unix_socket 认证, 禁止远程登录, 删除匿名用户, 删除测试数据库
+mariadb-secure-installation
+
+## 用户管理
+create user 'tom'@'localhost' identified by 'password' --------------------------- 创建用户
+
+grant all privileges on *.* to 'tom'@'localhost' identified with grant option ---- 授权
+grant select         on *.* to 'tom'@'localhost' identified with grant option ---- 授权
+
+flush privileges; ---------------------------------------------------------------- 刷新权限
+
+revoke process on *.* from 'tom'@'localhost'; ------------------------------------ 回收权限
+
+drop user 'tom'@'localhost'; ----------------------------------------------------- 删除用户
+
+show grants; --------------------------------------------------------------------- 查看权限
+
+## 修改密码
+set password for 'tom'@'localhost' = password('123');
+mysqladmin -u root -p password “123456”;
+
+## 忘记密码
+sudo systemctl stop mariadb
+sudo mysqld_safe --skip-grant-tables & ---- 跳过权限判断启动
+mysql -u root
+set password for 'root'@'localhost' = password('123'); --- 修改密码
+flush privileges;
+sudo systemctl start mariadb
+
+## 其他
 mysql -D <库名> -h <域名> -u <用户名> -p<密码>  # 登录
 myqsl -D testdb < 1.sql                         # 从文件导入
 mysqldump database_name table_name > 1.sql      # 导出到文件
@@ -33,12 +67,14 @@ set global max_allowed_packet=64*1024*1024 # 设置插入的上限
 
 select user,host,passwd from mysql.user; # 查看用户 密码
 
+## 库
 show   databases;                                                        # 查看数据库
 use    testdb;                                                           # 使用数据库
 create database testdb character set utf8mb4 collate utf8mb4_unicode_ci; # 创建数据库
 alter  database testdb character set utf8mb4 collate utf8mb4_unicode_ci; # 修改数据库
 drop   database testdb;                                                  # 删除数据库
 
+## 表
 show tables;             # 查看表
 desc ......;             # 查看表结构
 create   table 表名称(); # 创建表
