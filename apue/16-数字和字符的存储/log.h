@@ -40,25 +40,21 @@ double to_double(const std::string& str) {
 }
 
 // 存储浮点数异常
-std::map<int, std::string> dict_except{
-    {FE_DIVBYZERO, "除以0"        },
-    {FE_INEXACT,   "结果不准确"},
-    {FE_INVALID,   "参数非法"   },
-    {FE_OVERFLOW,  "上溢"         },
-    {FE_UNDERFLOW, "下溢"         }
-};
+std::map<int, std::string> dict_except{{FE_DIVBYZERO, "除以0"},
+                                       {FE_INEXACT, "结果不准确"},
+                                       {FE_INVALID, "参数非法"},
+                                       {FE_OVERFLOW, "上溢"},
+                                       {FE_UNDERFLOW, "下溢"}};
 
 //存储舍入模式
-std::map<int, std::string> dict_round{
-    {FE_DOWNWARD,   "向下舍入"},
-    {FE_TONEAREST,  "最近舍入"},
-    {FE_TOWARDZERO, "向零舍入"},
-    {FE_UPWARD,     "向上舍入"}
-};
+std::map<int, std::string> dict_round{{FE_DOWNWARD, "向下舍入"},
+                                      {FE_TONEAREST, "最近舍入"},
+                                      {FE_TOWARDZERO, "向零舍入"},
+                                      {FE_UPWARD, "向上舍入"}};
 
 // 测试 浮点数
 class Double {
-  public:
+public:
     union Node {
         double   x;
         uint64_t y;
@@ -108,7 +104,7 @@ class Double {
         data         = node.x;
     }
 
-  private:
+private:
     // 存储 2 的幂次, 负幂次只存储小数点后的部分
     std::map<int, std::string> dict_pow;
 
@@ -323,4 +319,17 @@ void test_double(const std::string& name, T data) {
     log("          手动值: " + d.double_by_hand);
     log("          存储值: " + d.double_by_cs);
     log("    保留两位小数: " + format("%.2lf", d.data));
+}
+
+void test_round(const std::string& name, double data) {
+    Double d(data);
+
+    log();
+    log("        测试类型: " + name);
+    log("    测试的二进制: " + d.bit_by_test);
+    log("    存储的二进制: " + d.bit_by_cs);
+    log("          手动值: " + d.double_by_hand);
+    log("          存储值: " + d.double_by_cs);
+    log("        保留整数: " + format("%.0lf", d.data));
+    log("    std::round(): " + format("%.0lf", std::round(data)));
 }
