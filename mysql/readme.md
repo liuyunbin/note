@@ -1,10 +1,12 @@
 
 # 库
+```
 show   databases;       # 查看数据库
 use    testdb;          # 使用数据库
 create database testdb; # 创建数据库
 alter  database testdb; # 修改数据库
 drop   database testdb; # 删除数据库
+```
 
 ## 数据类型
 int --------------- 整形
