@@ -1,7 +1,103 @@
 
-## 安装
-apt install mariadb-server
-apt install mariadb-client
+# 库
+show   databases;       # 查看数据库
+use    testdb;          # 使用数据库
+create database testdb; # 创建数据库
+alter  database testdb; # 修改数据库
+drop   database testdb; # 删除数据库
+
+## 数据类型
+int --------------- 整形
+bigint unsigned --- 大整形
+decimal(m,d) ------ 定点数
+datetime ---------- 日期和时间
+timestamp --------- 时间戳
+char(m) ----------- 固定长度
+varchar(m) -------- 可变长度, 5.0 之后 m 为字符数
+
+## 创建表
+
+
+alter table tbl_name add primary key (col_list);
+alter table tbl_name add unique index_name (col_list);
+alter table tbl_name add index index_name (col_list);
+alter table tbl_name add fulltext index_name (col_list);
+
+drop index index_name on tbl_name;
+alter table tbl_name drop index index_name；
+alter table tbl_name drop primary key;
+
+create unique index uniq_idx_firstname on actor (`first_name`);
+create        index idx_lastname on actor (`last_name`);
+
+
+insert into ...
+insert ignore into ...
+replace into ...
+
+show databases;
+show tables;
+show tables from ...;
+
+show create database ...
+show create table ...
+
+create database ...
+create table ...()
+
+drop database ...
+drop table ...
+
+use ...;
+
+source ...
+
+DISTINCT ----- 放在所有列开头
+
+NULL 参与的所有结果都为 NULL
+
+desc ...
+
+round -- 不一定是直观 的四舍五入
+
+
+DB: 数据库 Database
+DBMS: 数据库管理系统 Database Management System
+SQL: 结构化查询语言 Structured Query Language
+
+RDBMS: 关系型数据库
+* 将复杂的关系转化为二元的关系, 表格
+* 表之间通过外键来关联
+
+E-R(entity-relationship 实体-联系)模型中有三个主要概念是 实体集 属性集 联系集
+一个实体集(class)   == 一个表(table)
+一个实体(instance)  == 一行(row), 一条记录(record)
+一个属性(attribute) == 一列(column), 一个字段(field)
+
+
+表之间的关系
+一对一: 用的不多, 可以使用一张表, 但会冗余
+一对多
+多对多
+自引用
+
+外键: 是主键
+主表
+从表
+
+DDL(数据定义语言): CREATE DROP   ALTER
+DML(数据操作语言): INSERT UPDATE SELECT DELETE
+DCL(数据控制语言): GRANT  REVOKE COMMIT ROLLBACK SAVEPOINT
+
+单引号: 字符串 日期
+双引号: 别名
+反引用: 与关键字冲突时, 使用
+
+库名 表名 表别名 字段名 字段别名 小写, 其他建议大写
+
+## 为什么使用数据库
+* 数据持久化
+* 效率
 
 ## 配置 utf8mb4 -- 最新版本不需要修改了
 1. 查看字符集
@@ -20,13 +116,6 @@ apt install mariadb-client
        collation-server = utf8mb4_unicode_ci
     * 停止 mysql 服务: pkill mysql
     * 启动: mysqld --user=root &
-
-## 启动服务
-sudo systemctl enable mariadb.service --- 开机自动启动
-sudo systemctl start  mariadb.service --- 启动服务
-
-## 设置 root 密码, 使用 unix_socket 认证, 禁止远程登录, 删除匿名用户, 删除测试数据库
-mariadb-secure-installation
 
 ## 用户管理
 create user 'tom'@'localhost' identified by 'password' --------------------------- 创建用户
@@ -67,12 +156,6 @@ set global max_allowed_packet=64*1024*1024 # 设置插入的上限
 
 select user,host,passwd from mysql.user; # 查看用户 密码
 
-## 库
-show   databases;                                                        # 查看数据库
-use    testdb;                                                           # 使用数据库
-create database testdb character set utf8mb4 collate utf8mb4_unicode_ci; # 创建数据库
-alter  database testdb character set utf8mb4 collate utf8mb4_unicode_ci; # 修改数据库
-drop   database testdb;                                                  # 删除数据库
 
 ## 表
 show tables;             # 查看表
@@ -87,23 +170,6 @@ drop     table 表名称;   # 删除表
 delete   table 表名称;   # 删除表内数据, 表结构保留
 truncate table 表名称;   # 删除表内数据, 表结构保留
 
-tinyint ----- 一个字节
-smallint ---- 两个字节
-mediumint --- 三个字节
-int --------- 四个字节
-bigint ------ 八个字节
-float ------- 四个字节
-double ------ 八个字节
-
-datetime ---- 八个字节 年月日 时分秒
-date -------- 三个字节 年月日
-timestamp --- 四个字节 时间戳
-time -------- 三个字节 时分秒
-year -------- 一个字节 年
-
-char ---------- 定长字符串(括号里表示字符个数)
-varchar ------- 变长字符串(括号里表示字符个数)
-
 auto_increment
 
 primary key: 主键, 唯一, 不能为空, 只能有一个主键, 加索引
@@ -111,8 +177,27 @@ unique  index: 唯一, 能有多个, 加索引
 foreign index: 外键, 加索引
         index: 普通索引
 
-书写: select -> distinct -> from -> where -> group by -> having -> order by -> limit
-执行: from -> where -> group by(此后可以使用聚合) -> having -> select -> distinct -> order by -> limit
+## SELECT
+书写: SELECT -> DISTINCT -> FROM -> WHERE -> GROUP BY -> HAVING -> ORDER BY -> LIMIT
+执行: FROM -> WHERE -> GROUP BY(此后可以使用聚合) -> HAVING -> SELECT -> DISTINCT -> ORDER BY -> LIMIT
+
+
+LEAST
+GREATEST
+BETWEEN ... AND ... --- [ ]
+ISNULL
+IS NULL
+IS NOT NULL
+IN
+NOT IN
+LIKE
+REGEXP
+RLIKE
+
+
+ORDER BY ... ASC | DESC
+LIMIT 偏移量, 行数
+LIMIT 行数
 
 update table_name set ...=... where ...
 
@@ -129,11 +214,15 @@ regexp, rlike
 
 order by .... DESC
 
-union, union all
+UNION --------- # 合并, 去重
+UNION ALL ----- # 合并, 不去重
 
-inner join
-left  join
-right join
+INNER JOIN ... ON ... # 内连接
+LEFT  JOIN ... ON ... # 左连接
+RIGHT JOIN ... ON ... # 右连接
+
+NATURAL JOIN ... # 所有相同字段等值连接
+JION ... USING(...) ... # 指定字段等值连接
 
 current_timestamp()
 current_date()
