@@ -1,5 +1,5 @@
 
-# 安装及初始化
+## 安装及初始化
 ```
 apt install mariadb-server           # 安装
                                      #
@@ -13,7 +13,7 @@ mariadb-secure-installation          # 禁止 root 远程登录
                                      # 删除测试数据库
 ```
 
-# 库
+## 库
 ```
 show   databases;       # 查看数据库
 use    testdb;          # 使用数据库
