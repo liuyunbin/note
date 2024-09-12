@@ -1,4 +1,18 @@
 
+# 安装及初始化
+```
+apt install mariadb-server           # 安装
+                                     #
+systemctl enable     mariadb.service # 开机自动启动
+systemctl start      mariadb.service # 启动服务
+systemctl is-active  mariadb.service # 查看是否已启动
+systemctl is-enabled mariadb.service # 查看是否开机自动启动
+                                     #
+mariadb-secure-installation          # 禁止 root 远程登录
+                                     # 删除匿名用户
+                                     # 删除测试数据库
+```
+
 # 库
 ```
 show   databases;       # 查看数据库
@@ -235,4 +249,5 @@ trigger 触发器
 create index 索引名称  表名(字段名称)            # 创建索引
 alter table 表名称 add  index 索引名称(字段名称) # 创建索引
 drop index 索引名称 on 表名                      # 删除索引
+
 
