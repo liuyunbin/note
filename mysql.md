@@ -250,4 +250,118 @@ create index 索引名称  表名(字段名称)            # 创建索引
 alter table 表名称 add  index 索引名称(字段名称) # 创建索引
 drop index 索引名称 on 表名                      # 删除索引
 
+## 约束
+* 实体完整性 ---- 两行不能完全相同
+* 域完整性 ------ 性别
+* 引用完整性 ---- 部门, 外键
+* 自定义完整性 -- 用户名唯一, 密码不能为空
+
+## 范围
+单列
+多列
+列级约束
+表级约束 --- CONSTRAINT ... UNIQUE(...)
+
+## 列约束
+NOT NULL ------------ 不允许包含NULL值
+* alter table 表名称 modify 字段名 数据类型 not null;
+* alter table 表名称 modify 字段名 数据类型     null;
+* alter table 表名称 modify 字段名 数据类型         ;
+
+UNIQUE -------------- 整个表中是唯一的
+* NULL可以多个
+* 默认会创建索引
+* 可以对多个列创建
+*                    UNIQUE(字段名) ------------------------ 创建
+* CONSTRAINT  约束名 UNIQUE(字段名) ------------------------ 创建
+* ALTER TABLE 表名称 ADD CONSTRAINT 约束名 UNIQUE(字段名) -- 更改
+* ALTER TABLE 表名称 MODIFY 字段名 字段类型 UNIQUE; -------- 更改
+* ALTER TABLE 表名称 DROP INDEX 约束名或字段名 ------------- 删除
+
+PRIMARY KEY --------- 主键(非空且唯一)
+* 可以针对多个列创建
+* 不要修改或删除主键的值
+*                    PRIMARY KEY(字段名) ------------------------- 创建
+* CONSTRAINT  约束名 PRIMARY KEY(字段名) ------------------------- 创建
+* ALTER TABLE 表名称 ADD PRIMARY KEY(字段列表); ------------------ 更改
+* ALTER TABLE 表名称 DROP PRIMARY KEY; --------------------------- 删除
+
+AUTO_INCREMENT ------ 自动递增
+* 一般在主键或唯一列
+* 整形
+* 只能有一列
+* ALTER TABLE 表名称 MODIFY 字段名 数据类型 AUTO_INCREMENT; ------ 更改
+* ALTER TABLE 表名称 MODIFY 字段名 数据类型; --------------------- 删除
+
+FOREIGN KEY --------- 外键约束 -- 不适合高并发
+* 主表: 部门表
+* 从表: 职工表
+* 从表的外键必须是主表的主键或唯一键
+* 创建外键时, 如果外键约束没命名, 将生成额外的名称
+* 先创建主表, 再创建从表
+* 先删除从表或外键, 再删除主表
+* 外键可以多个
+* 从表的外键类名称和主表的列名称可以不同, 但类型必须相同
+* 外键会自动创建索引
+* 删除外键约束时, 必须手动删除索引
+* [CONSTRAINT 约束名称]
+    FOREIGN KEY(从表的某个字段) references 主表名(被参考字段)
+    ON UPDATE CASCADE ON DELETE RESTRICT -------------- 创建, 同步更新, 删除严格
+* ALTER TABLE 从表名 ADD ... -------------------------- 修改
+* ALTER TABLE 从表名 DROP FOREIGN KEY 外键约束名; ----- 删除
+
+CHECK -- 约束
+
+DEFAULT ------------- 默认值约束
+ALTER TABLE 表名称 MODIFY 字段名 数据类型 DEFAULT 默认值;
+
+
+# SELECT
+## 书写
+SELECT DISTINCT ...
+FROM ...
+WHERE ...
+GROUP BY ...
+HAVING ...
+ORDER BY ...
+LIMIT ...
+
+## 执行
+FROM -> WHERE -> GROUP BY(此后可以使用聚合) -> HAVING -> SELECT -> DISTINCT -> ORDER BY -> LIMIT
+
+## 运算符
+DISTINCT -------------- 后续所有的列都去重
+LEAST ----------------- 最小
+GREATEST -------------- 最大
+BETWEEN ... AND ... --- 范围 [ ]
+ISNULL ---------------- 是 NULL
+IS NULL --------------- 是 NULL
+IS NOT NULL ----------- 不是 NULL
+IN -------------------- 属于集合
+NOT IN ---------------- 不属于集合
+LIKE ------------------ % 任意多个字符, _ 任意一个字符
+REGEXP ---------------- 正则表达式
+RLIKE ----------------- 正则表达式
+
+
+ORDER BY ... ASC | DESC
+LIMIT 偏移量, 行数
+LIMIT 行数
+
+
+update table_name set ...=... where ...
+
+insert into table_name () values ();
+
+delete from table_name where ...
+
+UNION --------- # 合并, 去重
+UNION ALL ----- # 合并, 不去重
+
+INNER JOIN ... ON ... # 内连接
+LEFT  JOIN ... ON ... # 左连接
+RIGHT JOIN ... ON ... # 右连接
+
+NATURAL JOIN ... # 所有相同字段等值连接
+JION ... USING(...) ... # 指定字段等值连接
 
