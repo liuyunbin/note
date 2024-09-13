@@ -14,6 +14,21 @@ mysql-secure-installation          # 配置密码强度要求
                                    # 删除测试数据库
 ```
 
+## 使用 utf8mb4 --- 8.0 的版本不需要修改了
+```
+mysql -e "show variables like 'character%';" # 1. 查看字符集
+mysql --help --verbose 2> /dev/null | grep -A1 'Default options'
+                                             # 2. 查找配置文件
+default-character-set = utf8mb4              # 3. 修改对应的服务端和客户端配置
+systemctl restart mysql                      # 4. 重启
+mysql -e "show variables like 'character%';" # 5. 再次查看字符集
+```
+
+
+select Host,User from user;
+
+
+
 ## 库
 ```
 show   databases;       # 查看数据库
@@ -116,24 +131,6 @@ DCL(数据控制语言): GRANT  REVOKE COMMIT ROLLBACK SAVEPOINT
 * 数据持久化
 * 效率
 
-## 配置 utf8mb4 -- 最新版本不需要修改了
-1. 查看字符集
-    mysql -e "show variables like 'character%';"
-2. 修改字符集为 utf8mb4
-   * 查找配置文件: mysqld --help --verbose 2> /dev/null | grep -A1 'Default options'
-   * 在相关文件内添加以下内容:
-       [client]
-       default-character-set = utf8mb4
-
-       [mysql]
-       default-character-set = utf8mb4
-
-       [mysqld]
-       character-set-server = utf8mb4
-       collation-server = utf8mb4_unicode_ci
-    * 停止 mysql 服务: pkill mysql
-    * 启动: mysqld --user=root &
-
 ## 用户管理
 create user 'tom'@'localhost' identified by 'password' --------------------------- 创建用户
 
@@ -149,6 +146,9 @@ drop user 'tom'@'localhost'; ---------------------------------------------------
 show grants; --------------------------------------------------------------------- 查看权限
 
 ## 修改密码
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
+
+
 set password for 'tom'@'localhost' = password('123');
 mysqladmin -u root -p password “123456”;
 
