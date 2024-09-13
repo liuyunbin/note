@@ -1,16 +1,17 @@
 
 ## 安装及初始化
 ```
-apt install mariadb-server           # 安装
-                                     #
-systemctl enable     mariadb.service # 开机自动启动
-systemctl start      mariadb.service # 启动服务
-systemctl is-active  mariadb.service # 查看是否已启动
-systemctl is-enabled mariadb.service # 查看是否开机自动启动
-                                     #
-mariadb-secure-installation          # 禁止 root 远程登录
-                                     # 删除匿名用户
-                                     # 删除测试数据库
+apt install mysql-server           # 安装
+                                   #
+systemctl enable     mysql.service # 开机自动启动
+systemctl start      mysql.service # 启动服务
+systemctl is-active  mysql.service # 查看是否已启动
+systemctl is-enabled mysql.service # 查看是否开机自动启动
+                                   #
+mysql-secure-installation          # 配置密码强度要求
+                                   # 禁止 root 远程登录
+                                   # 删除匿名用户
+                                   # 删除测试数据库
 ```
 
 ## 库
