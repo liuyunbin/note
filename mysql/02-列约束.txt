@@ -1,0 +1,66 @@
+
+## 约束
+* 实体完整性 ---- 两行不能完全相同
+* 域完整性 ------ 性别
+* 引用完整性 ---- 部门, 外键
+* 自定义完整性 -- 用户名唯一, 密码不能为空
+
+## 范围
+单列
+多列
+列级约束
+表级约束 --- CONSTRAINT ... UNIQUE(...)
+
+## 列约束
+NOT NULL ------------ 不允许包含NULL值
+* alter table 表名称 modify 字段名 数据类型 not null;
+* alter table 表名称 modify 字段名 数据类型     null;
+* alter table 表名称 modify 字段名 数据类型         ;
+
+UNIQUE -------------- 整个表中是唯一的
+* NULL可以多个
+* 默认会创建索引
+* 可以对多个列创建
+*                    UNIQUE(字段名) ------------------------ 创建
+* CONSTRAINT  约束名 UNIQUE(字段名) ------------------------ 创建
+* ALTER TABLE 表名称 ADD CONSTRAINT 约束名 UNIQUE(字段名) -- 更改
+* ALTER TABLE 表名称 MODIFY 字段名 字段类型 UNIQUE; -------- 更改
+* ALTER TABLE 表名称 DROP INDEX 约束名或字段名 ------------- 删除
+
+PRIMARY KEY --------- 主键(非空且唯一)
+* 可以针对多个列创建
+* 不要修改或删除主键的值
+*                    PRIMARY KEY(字段名) ------------------------- 创建
+* CONSTRAINT  约束名 PRIMARY KEY(字段名) ------------------------- 创建
+* ALTER TABLE 表名称 ADD PRIMARY KEY(字段列表); ------------------ 更改
+* ALTER TABLE 表名称 DROP PRIMARY KEY; --------------------------- 删除
+
+AUTO_INCREMENT ------ 自动递增
+* 一般在主键或唯一列
+* 整形
+* 只能有一列
+* ALTER TABLE 表名称 MODIFY 字段名 数据类型 AUTO_INCREMENT; ------ 更改
+* ALTER TABLE 表名称 MODIFY 字段名 数据类型; --------------------- 删除
+
+FOREIGN KEY --------- 外键约束 -- 不适合高并发
+* 主表: 部门表
+* 从表: 职工表
+* 从表的外键必须是主表的主键或唯一键
+* 创建外键时, 如果外键约束没命名, 将生成额外的名称
+* 先创建主表, 再创建从表
+* 先删除从表或外键, 再删除主表
+* 外键可以多个
+* 从表的外键类名称和主表的列名称可以不同, 但类型必须相同
+* 外键会自动创建索引
+* 删除外键约束时, 必须手动删除索引
+* [CONSTRAINT 约束名称]
+    FOREIGN KEY(从表的某个字段) references 主表名(被参考字段)
+    ON UPDATE CASCADE ON DELETE RESTRICT -------------- 创建, 同步更新, 删除严格
+* ALTER TABLE 从表名 ADD ... -------------------------- 修改
+* ALTER TABLE 从表名 DROP FOREIGN KEY 外键约束名; ----- 删除
+
+CHECK -- 约束
+
+DEFAULT ------------- 默认值约束
+ALTER TABLE 表名称 MODIFY 字段名 数据类型 DEFAULT 默认值;
+

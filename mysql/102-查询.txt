@@ -1,0 +1,50 @@
+
+# SELECT
+## 书写
+SELECT DISTINCT ...
+FROM ...
+WHERE ...
+GROUP BY ...
+HAVING ...
+ORDER BY ...
+LIMIT ...
+
+## 执行
+FROM -> WHERE -> GROUP BY(此后可以使用聚合) -> HAVING -> SELECT -> DISTINCT -> ORDER BY -> LIMIT
+
+## 运算符
+DISTINCT -------------- 后续所有的列都去重
+LEAST ----------------- 最小
+GREATEST -------------- 最大
+BETWEEN ... AND ... --- 范围 [ ]
+ISNULL ---------------- 是 NULL
+IS NULL --------------- 是 NULL
+IS NOT NULL ----------- 不是 NULL
+IN -------------------- 属于集合
+NOT IN ---------------- 不属于集合
+LIKE ------------------ % 任意多个字符, _ 任意一个字符
+REGEXP ---------------- 正则表达式
+RLIKE ----------------- 正则表达式
+
+
+ORDER BY ... ASC | DESC
+LIMIT 偏移量, 行数
+LIMIT 行数
+
+
+update table_name set ...=... where ...
+
+insert into table_name () values ();
+
+delete from table_name where ...
+
+UNION --------- # 合并, 去重
+UNION ALL ----- # 合并, 不去重
+
+INNER JOIN ... ON ... # 内连接
+LEFT  JOIN ... ON ... # 左连接
+RIGHT JOIN ... ON ... # 右连接
+
+NATURAL JOIN ... # 所有相同字段等值连接
+JION ... USING(...) ... # 指定字段等值连接
+
