@@ -196,24 +196,6 @@ iperf -c 127.0.0.1 -L 9090 -r # 客户端(TCP), 客户端连服务端结束后, 
 iperf -c 127.0.0.1 -P 30      # 客户端(TCP), 客户端线程数为 30
 iperf -c 127.0.0.1 -u         # 客户端(UDP)
 
-firewall-cmd --list-ports                      # 查看所有打开的端口
-firewall-cmd --list-services                   # 查看所有打开的服务
-firewall-cmd --get-services                    # 查看所有的服务
-firewall-cmd --reload                          # 重新加载配置
-firewall-cmd --complete-reload                 # 重启服务
-firewall-cmd --permanent --add-service=http    # 添加服务, 永久生效, 需要重新加载配置
-firewall-cmd             --remove-service=http # 移除服务
-firewall-cmd --permanent --add-port=80/tcp     # 添加端口, 永久生效, 需要重新加载配置
-firewall-cmd             --remove-port=80/tcp  # 移除端口
-firewall-cmd             --query-masquerade    # 检查是否允许伪装IP
-firewall-cmd --permanent   --add-masquerade    # 允许防火墙伪装IP, 永久生效, 需要重新加载配置
-firewall-cmd            --remove-masquerade    # 禁止防火墙伪装IP
-firewall-cmd --add-forward-port=proto=80:proto=tcp:toaddr=192.168.0.1:toport=8080
-                                               # 端口转发, 0.0.0.0:80 --> 192.168.0.1:8080
-firewall-cmd --add-forward-port=proto=80:proto=tcp:toaddr=192.168.0.1:toport=8080 --permanent
-                                               # 端口转发, 永久生效, 需要重新加载配置
-firewall-cmd --runtime-to-permanent            # 将当前防火墙的规则永久保存
-
 ps -o pmem,rsz,vsz           # 内存百分比,内存,内存(含交换分区)
 ps -o pcpu,c,bsdtime,cputime # cpu: 百分比,百分比整数,user+system,system
 ps -o lstart,etime,etimes    # 启动时间,运行时间,运行时间(秒), 无法对 etimes 进行排序
