@@ -5,9 +5,16 @@
 
 ## 安装及初始化
 #### 1. 安装软件
-    apt install mysql-server           # 安装
 
-#### 测试
+    apt install mysql-server
+
+#### 2. 初始化: 配置密码强度要求, 禁止 root 远程登录, 删除匿名用户,
+
+    mysql_secure_installation      # 配置密码强度要求
+                                   # 禁止 root 远程登录
+                                   # 删除匿名用户
+                                   # 删除测试数据库
+
 
 ```
                                    #
@@ -16,10 +23,6 @@ systemctl start      mysql.service # 启动服务
 systemctl is-active  mysql.service # 查看是否已启动
 systemctl is-enabled mysql.service # 查看是否开机自动启动
                                    #
-mysql-secure-installation          # 配置密码强度要求
-                                   # 禁止 root 远程登录
-                                   # 删除匿名用户
-                                   # 删除测试数据库
 ```
 
 ## 使用 utf8mb4 --- 8.0 的版本不需要修改了
