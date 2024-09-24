@@ -4,8 +4,12 @@
 * 效率
 
 ## 安装及初始化
+#### 1. 安装软件
+    apt install mysql-server           # 安装
+
+#### 测试
+
 ```
-apt install mysql-server           # 安装
                                    #
 systemctl enable     mysql.service # 开机自动启动
 systemctl start      mysql.service # 启动服务
