@@ -3,69 +3,10 @@
 * 数据持久化
 * 效率
 
-## 安装及初始化
-#### 1. 安装软件
-
-    apt install mysql-server
-
-#### 2. 初始化: 配置密码强度要求, 禁止 root 远程登录, 删除匿名用户,
-
-    mysql_secure_installation      # 配置密码强度要求
-                                   # 禁止 root 远程登录
-                                   # 删除匿名用户
-                                   # 删除测试数据库
-
-
-```
-                                   #
-systemctl enable     mysql.service # 开机自动启动
-systemctl start      mysql.service # 启动服务
-systemctl is-active  mysql.service # 查看是否已启动
-systemctl is-enabled mysql.service # 查看是否开机自动启动
-                                   #
-```
-
-## 使用 utf8mb4 --- 8.0 的版本不需要修改了
-```
-mysql -e "show variables like 'character%';" # 1. 查看字符集
-mysql -e "show variables like 'collation_%'" #
-mysql --help --verbose 2> /dev/null | grep -A1 'Default options'
-                                             # 2. 查找配置文件
-default-character-set = utf8mb4              # 3. 修改对应的服务端和客户端配置
-systemctl restart mysql                      # 4. 重启
-mysql -e "show variables like 'character%';" # 5. 再次查看字符集
-```
 
 DDL(数据定义语言): CREATE DROP   ALTER
 DML(数据操作语言): INSERT UPDATE SELECT DELETE
 DCL(数据控制语言): GRANT  REVOKE COMMIT ROLLBACK SAVEPOINT
-
-## 用户管理
-```
-select user,host from mysql.user;                        # 1. 查看用户
-create user 'root'@'localhost' identified by 'password'; # 2. 创建用户
-grant    all on *.* to 'root'@'localhost';               # 3. 赋予所有权限
-grant select on *.* to 'root'@'localhost';               # 3. 赋予查询权限
-show grants for root@'localhost';                        # 4. 查看权限
-revoke select on *.* from 'root'@'localhost';            # 5. 回收查询权限
-drop user 'root'@'localhost';                            # 6. 删除用户
-```
-
-## 修改密码
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
-
-
-set password for 'tom'@'localhost' = password('123');
-mysqladmin -u root -p password “123456”;
-
-## 忘记密码
-sudo systemctl stop mariadb
-sudo mysqld_safe --skip-grant-tables & ---- 跳过权限判断启动
-mysql -u root
-set password for 'root'@'localhost' = password('123'); --- 修改密码
-flush privileges;
-sudo systemctl start mariadb
-
 
 ## 视图
 * 相当于是一张虚拟表
