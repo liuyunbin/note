@@ -16,68 +16,8 @@ DCL(数据控制语言): GRANT  REVOKE COMMIT ROLLBACK SAVEPOINT
 * 简化查询语言
 * 具有隔离性
 
-## 库
-```
-show databases;            # 查看数据库
-show tables;               # 查看所有的表
-show tables from ...;      # 查看某一库中所有的表
-show create database  ...; # 查看数据库的创建信息
-show create table ...;     # 查看表的创建信息
-
-create database  ...;           # 创建数据库
-create table ... (...);         # 创建表
-create table ... as select ...; # 创建表
-
-alter database  ...; # 修改数据库
-
-alter table 表名称 add    [column]   列名称 列属性 [first | after 旧名称]; # 增加列
-alter table 表名称 modify [column]   列名称 列属性 [first | after 旧名称]; # 修改列属性
-alter table 表名称 change [column] 旧列名称 新列名称 列属性;               # 修改列名称
-alter table 表名称 drop   [column]   列名称;                               # 删除列
-
-alter table 表名称 rename [to] 新表名称;                     # 重命名表名
-
-rename table 旧表名 to 新表名称; # 重命名表名
-
-alter table ... add primary key (col_list);
-alter table ... add unique index_name (col_list);
-alter table ... add index index_name (col_list);
-alter table ... add fulltext index_name (col_list);
-
-alter table tbl_name drop index index_name；
-alter table tbl_name drop primary key;
-
-drop database ...; # 删除数据库
-drop table ...;    # 删除表
-
-truncate table ...; # 清空表
-
-use ...; # 使用数据库
-
-SET autocommit = FALSE; # 取消自动提交
-ROLLBACK;               # 回滚
-
-## 创建表
-
-drop index index_name on tbl_name;
-create unique index uniq_idx_firstname on actor (`first_name`);
-create        index idx_lastname on actor (`last_name`);
-
-insert into ...
-insert ignore into ...
-replace into ...
-
-create table ...()
-
-drop table ...
 
 source ...
-
-DISTINCT ----- 放在所有列开头
-
-NULL 参与的所有结果都为 NULL
-
-desc ...
 
 round -- 不一定是直观 的四舍五入
 
@@ -118,104 +58,9 @@ mysql_install_db --user=mysql --ldata=/var/lib/mysql # 添加用户 mysql 使mys
 
 set global max_allowed_packet=64*1024*1024 # 设置插入的上限
 
-desc ......;             # 查看表结构
-delete   table 表名称;   # 删除表内数据, 表结构保留
-truncate table 表名称;   # 删除表内数据, 表结构保留
-
-## SELECT
-书写: SELECT -> DISTINCT -> FROM -> WHERE -> GROUP BY -> HAVING -> ORDER BY -> LIMIT
-执行: FROM -> WHERE -> GROUP BY(此后可以使用聚合) -> HAVING -> SELECT -> DISTINCT -> ORDER BY -> LIMIT
-
-
-LEAST
-GREATEST
-BETWEEN ... AND ... --- [ ]
-ISNULL
-IS NULL
-IS NOT NULL
-IN
-NOT IN
-LIKE
-REGEXP
-RLIKE
-
-ORDER BY ... ASC | DESC
-LIMIT 偏移量, 行数
-LIMIT 行数
-
-update table_name set ...=... where ...
-
-insert into table_name () values ();
-
-delete from table_name where ...
-
-and or not
-in, not in,
-is null, is not null, <=>(相等或都为null)
-between ... and ...,
-like(%表示任意字符),
-regexp, rlike
-
-order by .... DESC
-
-UNION --------- # 合并, 去重 ---- 效率低
-UNION ALL ----- # 合并, 不去重 -- 效率高
-
-INNER JOIN ... ON ... # 内连接
-LEFT  JOIN ... ON ... # 左连接
-RIGHT JOIN ... ON ... # 右连接
-
-NATURAL JOIN ... # 所有相同字段等值连接
-JION ... USING(...) ... # 指定字段等值连接
-
 current_timestamp()
 current_date()
 now()
 
 trigger 触发器
-
-# SELECT
-## 书写
-SELECT DISTINCT ...
-FROM ...
-WHERE ...
-GROUP BY ...
-HAVING ...
-ORDER BY ...
-LIMIT ...
-
-## 执行
-FROM -> WHERE -> GROUP BY(此后可以使用聚合) -> HAVING -> SELECT -> DISTINCT -> ORDER BY -> LIMIT
-
-## 运算符
-DISTINCT -------------- 后续所有的列都去重
-LEAST ----------------- 最小
-GREATEST -------------- 最大
-BETWEEN ... AND ... --- 范围 [ ]
-ISNULL ---------------- 是 NULL
-IS NULL --------------- 是 NULL
-IS NOT NULL ----------- 不是 NULL
-IN -------------------- 属于集合
-NOT IN ---------------- 不属于集合
-LIKE ------------------ % 任意多个字符, _ 任意一个字符
-REGEXP ---------------- 正则表达式
-RLIKE ----------------- 正则表达式
-
-ORDER BY ... ASC | DESC
-LIMIT 偏移量, 行数
-LIMIT 行数
-
-update table_name set ... where ...
-
-insert into table_name (...) values (...);
-insert into table_name (...) select ... ;
-
-delete from table_name where ...
-
-UNION --------- # 合并, 去重
-UNION ALL ----- # 合并, 不去重
-
-INNER JOIN ... ON ... # 内连接
-LEFT  JOIN ... ON ... # 左连接
-RIGHT JOIN ... ON ... # 右连接
 
