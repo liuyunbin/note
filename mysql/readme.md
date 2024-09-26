@@ -8,15 +8,6 @@ DDL(数据定义语言): CREATE DROP   ALTER
 DML(数据操作语言): INSERT UPDATE SELECT DELETE
 DCL(数据控制语言): GRANT  REVOKE COMMIT ROLLBACK SAVEPOINT
 
-## 视图
-* 相当于是一张虚拟表
-* 不存储数据
-* 一般只用于查询
-* 控制访问的内容, 安全
-* 简化查询语言
-* 具有隔离性
-
-
 source ...
 
 round -- 不一定是直观 的四舍五入
