@@ -16,45 +16,6 @@ DCL(数据控制语言): GRANT  REVOKE COMMIT ROLLBACK SAVEPOINT
 * 简化查询语言
 * 具有隔离性
 
-## 约束
-```
-* NOT NULL
-* UNIQUE ------------ 唯一键
-    * 整个表中是唯一的, 但 NULL 可以多个
-    * 可以有多个 unique
-    * 可以对多个列同时创建
-    * 创建索引
-* PRIMARY KEY ------- 主键
-    * 唯一键 + 非空
-* AUTO_INCREMENT ---- 自动递增
-    * 一般在主键或唯一键
-    * 最多有一列
-    * 整形
-* FOREIGN KEY ------- 外键
-    * 从表的外键必须是主表的主键或唯一键
-    * 先创建主表, 再创建从表
-    * 先删除从表或外键, 再删除主表
-    * 外键可以多个
-    * 外键会自动创建索引
-DEFAULT ------------ 默认值
-```
-
-
-
-[CONSTRAINT 约束名] UNIQUE(字段名) ---------------------------- 创建唯一键
-[CONSTRAINT 约束名] PRIMARY KEY(字段名) ----------------------- 创建主键
-[CONSTRAINT 约束名] FOREIGN KEY(从表的某个字段) references 主表名(被参考字段) ON UPDATE CASCADE ON DELETE RESTRICT
-                                            ------------------- 创建外键, 同步更新, 删除严格
-
-ALTER TABLE 表名称 ADD [CONSTRAINT 约束名] UNIQUE(字段名) ----------- 更改唯一键
-ALTER TABLE 表名称 ADD [CONSTRAINT 约束名] PRIMARY KEY(字段列表) ---- 更改主键
-ALTER TABLE 从表名 ADD [CONSTRAINT 约束名] -------------------------- 修改外键
-
-ALTER TABLE 表名称 DROP INDEX 约束名或字段名 ------------------- 删除唯一键
-ALTER TABLE 表名称 DROP PRIMARY KEY; --------------------------- 删除主键
-ALTER TABLE 从表名 DROP FOREIGN KEY 外键约束名; ---------------- 删除外键
-
-
 ## 库
 ```
 show databases;            # 查看数据库
@@ -96,25 +57,11 @@ use ...; # 使用数据库
 SET autocommit = FALSE; # 取消自动提交
 ROLLBACK;               # 回滚
 
-
-
-
-
-## 数据类型
-int --------------- 整形
-bigint unsigned --- 大整形
-decimal(m,d) ------ 定点数
-datetime ---------- 日期和时间
-timestamp --------- 时间戳
-char(m) ----------- 固定长度
-varchar(m) -------- 可变长度, 5.0 之后 m 为字符数
-
 ## 创建表
 
 drop index index_name on tbl_name;
 create unique index uniq_idx_firstname on actor (`first_name`);
 create        index idx_lastname on actor (`last_name`);
-
 
 insert into ...
 insert ignore into ...
@@ -133,7 +80,6 @@ NULL 参与的所有结果都为 NULL
 desc ...
 
 round -- 不一定是直观 的四舍五入
-
 
 DB: 数据库 Database
 DBMS: 数据库管理系统 Database Management System
@@ -155,10 +101,6 @@ E-R(entity-relationship 实体-联系)模型中有三个主要概念是 实体�
 多对多
 自引用
 
-外键: 是主键
-主表
-从表
-
 单引号: 字符串 日期
 双引号: 别名
 反引用: 与关键字冲突时, 使用
@@ -179,13 +121,6 @@ set global max_allowed_packet=64*1024*1024 # 设置插入的上限
 desc ......;             # 查看表结构
 delete   table 表名称;   # 删除表内数据, 表结构保留
 truncate table 表名称;   # 删除表内数据, 表结构保留
-
-auto_increment
-
-primary key: 主键, 唯一, 不能为空, 只能有一个主键, 加索引
-unique  index: 唯一, 能有多个, 加索引
-foreign index: 外键, 加索引
-        index: 普通索引
 
 ## SELECT
 书写: SELECT -> DISTINCT -> FROM -> WHERE -> GROUP BY -> HAVING -> ORDER BY -> LIMIT
@@ -239,11 +174,6 @@ now()
 
 trigger 触发器
 
-create index 索引名称  表名(字段名称)            # 创建索引
-alter table 表名称 add  index 索引名称(字段名称) # 创建索引
-drop index 索引名称 on 表名                      # 删除索引
-
-
 # SELECT
 ## 书写
 SELECT DISTINCT ...
@@ -274,7 +204,6 @@ RLIKE ----------------- 正则表达式
 ORDER BY ... ASC | DESC
 LIMIT 偏移量, 行数
 LIMIT 行数
-
 
 update table_name set ... where ...
 
