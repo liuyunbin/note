@@ -49,39 +49,41 @@ ss -tal | grep mysql                      # 5. 再次查看 MySQL 是否允许�
 ```
 set password                   =password('123456');  # 修改当前用户密码 -- 旧版本 5.7
 set password for user@hostname =password('123456');  # 修改其他用户密码 -- 旧版本 5.7
-set password                   =new_password;        # 修改当前用户的密码 -- 新版本 8.0 -- 不建议使用
-set password for user@hostname=new_password;         # 修改其他用户的密码 -- 新版本 8.0 -- 不建议使用
-alter user user@hostname identified by new_password; # 修改其他用户的密码 -- 新版本 8.0
+set password                   =new_password;        # 修改当前用户密码 -- 新版本 8.0 -- 不建议使用
+set password for user@hostname=new_password;         # 修改其他用户密码 -- 新版本 8.0 -- 不建议使用
+alter user user@hostname identified by new_password; # 修改其他用户密码 -- 新版本 8.0
 alter user user@hostname identified with caching_sha2_password by 'new_password';
-                                                     # 修改其他用户的密码, 客户端为 8.0
+                                                     # 修改其他用户密码, 客户端为 8.0
 alter user user@hostname identified with mysql_native_password by 'new_password';
-                                                     # 修改其他用户的密码, 客户端为 5.7
+                                                     # 修改其他用户密码, 客户端为 5.7
 ```
 
-## 忘记 root 密码 ----- MariaDB 5.5.68
+## 忘记 root 密码 -- MariaDB 5.5.68 --- centos 7
 ```
-sudo systemctl stop mariadb;            # 1. 停止服务器
-sudo mysqld_safe --skip-grant-tables &  # 2. 启动服务器, 跳过密码和权限判断
-mysql -u root;                          # 3. 连接 MySQL, 不需要密码
-flush privileges;                       # 4. 刷新权限, 使得权限管理生效
+sudo systemctl list-unit-files | grep mariadb # 1. 查看 mariadb 服务的名称
+sudo systemctl stop mariadb.service;          # 2. 停止服务器
+sudo mysqld_safe --skip-grant-tables &        # 3. 启动服务器, 跳过密码和权限判断
+mysql -u root;                                # 4. 连接 MySQL, 不需要密码
+flush privileges;                             # 5. 刷新权限, 使得权限管理生效
 set password for 'root'@'localhost' = password('root');
-                                        # 5. 设置新密码
-mysqladmin -u root -p shutdown;         # 6. 使用新密码停止服务
-sudo systemctl start mariadb;           # 7. 启动服务
+                                              # 6. 设置新密码
+mysqladmin -u root -p shutdown;               # 7. 使用新密码停止服务
+sudo systemctl start mariadb.service;         # 8. 启动服务
 ```
 
-## 忘记 root 密码 ----- MySQL 8.0.39
+## 忘记 root 密码 ----- MySQL 8.0.39 --- ubuntu 22.04
 ```
-sudo systemctl stop mysql;              # 1. 停止服务器
-sudo mkdir -p /var/run/mysqld           # 2. 新建目录(非必须)
-sudo chown mysql:mysql /var/run/mysqld  # 3. 改变归属(非必须)
-sudo mysqld_safe --skip-grant-tables &  # 4. 启动服务器, 跳过密码和权限判断
-mysql -u root;                          # 5. 连接 MySQL, 不需要密码
-flush privileges;                       # 6. 刷新权限, 使得权限管理生效
-alter user 'root'@'localhost' identified with caching_sha2_password by 'root';
-                                        # 7. 设置新密码
-mysqladmin -u root -p shutdown;         # 8. 使用新密码停止服务
-sudo systemctl start mysql;             # 9. 启动服务
+sudo systemctl list-unit-files | grep mysql   # 1. 查看 mysql 服务的名称
+sudo systemctl stop   mysql.service;          # 2. 停止服务器
+sudo mkdir -p /var/run/mysqld                 # 3. 新建目录
+sudo chown mysql:mysql /var/run/mysqld        # 4. 改变归属
+sudo mysqld_safe --skip-grant-tables &        # 5. 启动服务器, 跳过密码和权限判断
+mysql -u root;                                # 6. 连接 MySQL, 不需要密码
+flush privileges;                             # 7. 刷新权限, 使得权限管理生效
+alter user 'root'@'localhost' identified by 'root';
+                                              # 8. 设置新密码
+mysqladmin -u root -p shutdown;               # 9. 使用新密码停止服务
+sudo systemctl start   mysql.service;         # 10. 启动服务
 ```
 
 
