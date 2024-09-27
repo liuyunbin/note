@@ -1,50 +1,4 @@
 
-## 安装及初始化
-```
-# 1. 安装软件
-sudo apt install mysql-server
-
-# 2. 基本安全设置
-#   * 配置 root 使用 Linux root 用户认证
-#   * 禁止 root 远程登录
-#   * 删除匿名用户
-#   * 删除测试数据库
-mysql_secure_installation
-
-# 3. 启动 MySQL 并设置为开机自动启动
-sudo systemctl list-unit-files | grep mysql   # 1. 查看 mysql 服务的名称
-sudo systemctl list-unit-files | grep mariadb #
-sudo systemctl is-active  mysql.service       # 2. 查看是否已启动
-sudo systemctl start      mysql.service       # 3. 启动服务
-sudo systemctl is-active  mysql.service       # 4. 再次查看是否已启动
-sudo systemctl is-enabled mysql.service       # 5. 查看是否开机自动启动
-sudo systemctl enable     mysql.service       # 6. 设置开机自动启动
-sudo systemctl is-enabled mysql.service       # 7. 再次查看是否开机自动启动
-
-# 3. 修改编码为 utf8mb4 --- 8.0 及以后的版本不需要修改了
-show variables like 'character%';         # 1. 查看编码和字符集
-show variables like 'collation%';         #
-mysql --help | grep -A1 'Default options' # 2. 查看 MySQL 的配置文件
-default-character-set = utf8mb4           # 3. 修改配置文件中的编码
-sudo systemctl restart mysql              # 4. 重启 MySQL
-show variables like 'character%';         # 5. 再次查看编码和字符集
-show variables like 'collation%';         #
-
-# 4. 开启防火墙
-sudo firewall-cmd --list-services                 # 1. 查看目前开启的服务
-sudo firewall-cmd --permanent --add-service=mysql # 2. 永久开启服务
-sudo firewall-cmd --reload                        # 3. 重新加载防火墙
-sudo firewall-cmd --list-services                 # 4. 再次查看目前开启的服务
-
-# 5. 允许远程访问
-ss -tal | grep mysql                      # 1. 查看 MySQL 是否允许远程访问
-mysql --help | grep -A1 'Default options' # 2. 查看 MySQL 的配置文件
-bind-address           = 127.0.0.1        # 3. 注释掉对应的配置
-mysqlx-bind-address    = 127.0.0.1        #
-sudo systemctl restart mysql              # 4. 重启 MySQL
-ss -tal | grep mysql                      # 5. 再次查看 MySQL 是否允许远程访问
-```
-
 ## 修改密码
 ```
 set password                   =password('123456');  # 修改当前用户密码 -- 旧版本 5.7
@@ -101,6 +55,98 @@ char(m) ----------- 固定长度, m 为字符数 ---
 varchar(m) -------- 可变长度, m 为字符数 ---
 ```
 
+## 列约束
+```
+SELECT * FROM information_schema.table_constraints WHERE table_name = ...; # 查看约束
+
+# NOT NULL
+* 只能作用在单列上
+* create table student(id int not null);       # 创建
+* alter  table student modify id int not null; # 添加
+* alter  table student modify id int;          # 删除
+
+#  UNIQUE --- 唯一键
+* 可以存储 NULL
+* 整个表中的数据是唯一的, 但 NULL 可以多个
+* 可以有多个 unique
+* 一个 unique 可以对多个列创建
+* 会自动创建唯一索引
+* 默认索引名为第一个列名
+* 约束名和索引名相同, 定义或更改约束名没意义
+* 删除唯一键约束只能通过删除唯一索引实现
+* create table student(id int  unique);                      # 创建
+* create table student(id int, unique [index_name_id](id));  # 创建, 指定索引名称
+* alter  table student add     unique [index_name_id](id);   # 添加, 指定索引名称
+* alter  table student modify id int unique;                 # 添加
+* alter  table student drop     index index_name_id;         # 删除
+
+# PRIMARY KEY --- 主键
+* 唯一键 + 非空 + 最多只有一个
+* 删除主键约束时, 主键索引自动删除
+* 索引名和约束名都是 primary
+* 创建或修改 索引名 或 约束名 没意义
+* create table student(id int  primary key);      # 创建
+* create table student(id int, primary key(id));  # 创建
+* alter  table student add     primary key(id);   # 添加
+* alter  table student modify id int primary key; # 添加
+* alter  table student drop   primary key;        # 删除
+
+# FOREIGN KEY --- 外键
+* 从表的外键必须是主表的主键或唯一键
+* 先创建主表, 再创建从表
+* 先删除从表或外键, 再删除主表
+* 外键可以多个
+* 外键会自动创建索引
+* 默认的外键约束名不是列名
+* create table 从表名称(
+字段1 数据类型 primary key,
+字段2 数据类型,
+[CONSTRAINT <外键约束名称>] FOREIGN KEY（从表的某个字段) references 主表名(被参考字段)
+);
+create table tbl (id int, [constraint symbol] foreign key(id) references 主表名(被参考字段)
+                                                  on update cascade on delete restrict
+
+
+
+# AUTO_INCREMENT --- 自动递增
+* 最多有一列
+* 列必须唯一
+* 一般用在主键
+* 作用于整形
+* create table student(id int auto_increment);       # 创建
+* alter  table student modify id int auto_increment; # 添加
+* alter  table student modify id int;                # 删除
+
+
+
+
+
+#### check --- 检查
+#### DEFAULT --- 默认值
+#### INDEX --- 索引
+```
+* 普通索引 ----- 无任何限制
+* 唯一索引 ----- 和 unique 对应
+* 主键索引 ----- 和 primary key 对应
+* 全文索引 ----- 很少使用
+* 空间索引 ----- 很少使用
+* 单列索引 -----
+* 多列索引 ----- 最左前缀原则
+* 聚簇索引 -----
+* 非聚簇索引 ---
+* 降序索引 ----- 如果查找是降序的话, 可以提高效率 --- ASC DESC
+* 隐藏索引 ----- 便于观察删除索引的影响 --- INVISIBLE VISIBLE
+* 适合建索引
+    * where group by order by 中频繁使用
+    * 区分度大的列
+    * DISTINCT 列
+    * 很少变化的列
+* 不适合建索引
+    * 表很小
+    * 列无序
+* 联合索引多余多个单列索引
+* 删除无用或冗余的索引
+```
 
 
 
@@ -131,8 +177,6 @@ create table tbl (...);                  # 创建表
 create table tbl (id int  [constraint]); # 创建表, 包含约束
 create table tbl (id int, [constraint symbol] unique(id));      # 创建表, 包含唯一键
 create table tbl (id int, [constraint symbol] primary key(id)); # 创建表, 包含主键
-create table tbl (id int, [constraint symbol] foreign key(id) references 主表名(被参考字段)
-                                                  on update cascade on delete restrict
                                          # 创建表, 包含外键, 同步更新, 删除严格
 create table tbl(id int, [unique] index index_name(id)); # 创建索引
 
@@ -229,13 +273,7 @@ rename table old_table to new_table; # 重命名表
 
 truncate table table_name; # 清空表 --- 不能回滚
 
-
-
-
-
-
 create user user@hostname identified by 'password'; # 3. 创建用户
-
 
 drop user user@hostname;                     #  删除用户
 
@@ -252,8 +290,6 @@ set autocommit = false; # 取消自动提交
 rollback;               # 回滚
 
 select user,host,plugin from mysql.user;            # 1. 查看用户及其加密插件
-
-
 
 ## 权限使用原则
 * 只赋予满足要求的最小权限
@@ -302,58 +338,6 @@ revoke 权限 on *.* from role@hostname;                     # 回收角色权�
 grant  role to   user;                                      # 1. 将角色赋予用户
 set default role all to user@hostname;                      # 2. 激活权限
 revoke role from user;                                      # 3. 撤销用户角色
-```
-
-####  UNIQUE --- 唯一键
-```
-* 可以存储 NULL
-* 整个表中的数据是唯一的, 但 NULL 可以多个
-* 可以有多个 unique
-* 一个 unique 可以对多个列创建
-* 会自动创建唯一索引
-* 默认约束名为第一个列名
-```
-#### PRIMARY KEY --- 主键
-* 唯一键 + 非空 + 最多只有一个
-
-#### AUTO_INCREMENT --- 自动递增
-* 一般用在主键
-* 最多有一列
-* 作用于整形
-
-#### FOREIGN KEY --- 外键
-* 从表的外键必须是主表的主键或唯一键
-* 先创建主表, 再创建从表
-* 先删除从表或外键, 再删除主表
-* 外键可以多个
-* 外键会自动创建索引
-* 默认的外键约束名不是列名
-
-#### check --- 检查
-#### DEFAULT --- 默认值
-#### INDEX --- 索引
-```
-* 普通索引 ----- 无任何限制
-* 唯一索引 ----- 和 unique 对应
-* 主键索引 ----- 和 primary key 对应
-* 全文索引 ----- 很少使用
-* 空间索引 ----- 很少使用
-* 单列索引 -----
-* 多列索引 ----- 最左前缀原则
-* 聚簇索引 -----
-* 非聚簇索引 ---
-* 降序索引 ----- 如果查找是降序的话, 可以提高效率 --- ASC DESC
-* 隐藏索引 ----- 便于观察删除索引的影响 --- INVISIBLE VISIBLE
-* 适合建索引
-    * where group by order by 中频繁使用
-    * 区分度大的列
-    * DISTINCT 列
-    * 很少变化的列
-* 不适合建索引
-    * 表很小
-    * 列无序
-* 联合索引多余多个单列索引
-* 删除无用或冗余的索引
 ```
 
 ## SELECT
@@ -479,8 +463,3 @@ trigger 触发器
 * https://dev.mysql.com/doc/refman/9.0/en/privilege-changes.html --------------- 权限刷新
 * https://dev.mysql.com/doc/refman/9.0/en/resetting-permissions.html ----------- 重置 root 密码
 
-
-
-## 约束
-####  NOT NULL
-```
