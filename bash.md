@@ -138,17 +138,6 @@ docker exec     容器ID ls  # 对于在后台运行的容器, 执行命令
 redis flushdb # 清空数据
 redis -c ...  # 集群时需要使用 -c 启动, 否则查不到数据
 
-systemctl -a                 # 查看所有启动的服务
-systemctl start      nginx   # 启动 nginx
-systemctl stop       nginx   # 停止 nginx
-systemctl restart    nginx   # 重启 nginx
-systemctl status     nginx   # 查看 nginx 状态
-systemctl enable     nginx   # 开机自动启动 nginx
-systemctl disable    nginx   # 开机禁止启动 nginx
-systemctl is-active  nginx   # 查看 nginx 是否启动成功
-systemctl is-failed  nginx   # 查看 nginx 是否启动失败
-systemctl is-enabled nginx   # 查看 nginx 是否开机启动
-
                                         # 注意, 有不同版本的 nc, 参数不一定相同
 nc -l             8080                  # 服务端(tcp), 接收单个连接
 nc -lk            8080                  # 服务端(tcp), 接收多个连接
