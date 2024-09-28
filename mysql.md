@@ -385,21 +385,97 @@ insert into student values(1,    "tom");
 select * from student;
 insert into student values(1,    "bob"); # 报错
 
-
-
-
-# FOREIGN KEY --- 外键
-* 从表的外键必须是主表的主键或唯一键
+# 4. FOREIGN KEY --- 外键
 * 先创建主表, 再创建从表
 * 先删除从表或外键, 再删除主表
-* 外键可以多个
 * 外键会自动创建索引
+
+* 从表的外键必须是主表的主键或唯一键
+
+* 外键可以多个
+
 * 默认的外键约束名不是列名
-* create table 从表名称(
-字段1 数据类型 primary key,
-字段2 数据类型,
+
+# 4.1 创建
+# 4.1.1 不指定约束名和索引名: 约束名不是列名, 由系统生成, 索引名是列名 (建议)
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  foreign key(teacher_id) references teacher(id)
+);
+desc student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 4.1.2 同时指定约束名和索引名: 索引名没意义, 约束名和索引名都变成指定的约束名
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  constraint constraint_name foreign key index_name(teacher_id) references teacher(id)
+);
+desc student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 4.1.3 只指定约束名: 约束名和索引名都变成指定的约束名
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  constraint constraint_name foreign key(teacher_id) references teacher(id)
+);
+desc student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 4.1.4 只指定索引名: 约束名不是列名, 由系统生成, 索引名是指定名
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  foreign key index_name(teacher_id) references teacher(id)
+);
+desc student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+
+
+
+
+
+
+
+
+
+
+                                         # 创建表, 包含外键, 同步更新, 删除严格
+alter table tbl_name add [constraint symbol] foreign key index_name(id) ...; # 添加外键
+
+alter table tbl_name drop   foreign key key_name;       # 删除外键约束
+
+
 [CONSTRAINT <外键约束名称>] FOREIGN KEY（从表的某个字段) references 主表名(被参考字段)
 );
+
 create table tbl (id int, [constraint symbol] foreign key(id) references 主表名(被参考字段)
                                                   on update cascade on delete restrict
 
@@ -413,10 +489,6 @@ create table tbl (id int, [constraint symbol] foreign key(id) references 主表�
 * create table student(id int auto_increment);       # 创建
 * alter  table student modify id int auto_increment; # 添加
 * alter  table student modify id int;                # 删除
-
-
-
-
 
 #### check --- 检查
 #### DEFAULT --- 默认值
@@ -443,21 +515,8 @@ create table tbl (id int, [constraint symbol] foreign key(id) references 主表�
     * 列无序
 * 联合索引多余多个单列索引
 * 删除无用或冗余的索引
-```
-
-
-
-
-
-
-
 
 DDL: create drop alter rename truncate
-
-
-## SQL
-```
-use   database_name;                 # 使用数据库
 
 show  databases;                     # 查看所有的数据库
 show  tables;                        # 查看所有的表
@@ -465,15 +524,11 @@ show  tables from     database_name; # 查看某一库中所有的表
 show  index  from        table_name; # 查看索引
 show  create database database_name; # 查看数据库的创建信息, 比如编码
 show  create table       table_name; # 查看表的创建信息
-show variables like 'character%';         # 查看编码
-show variables like 'collation%';         # 查看字符集
 
 create database database_name;           # 创建数据库
 create table tbl (...);                  # 创建表
 create table tbl (id int  [constraint]); # 创建表, 包含约束
-create table tbl (id int, [constraint symbol] unique(id));      # 创建表, 包含唯一键
-create table tbl (id int, [constraint symbol] primary key(id)); # 创建表, 包含主键
-                                         # 创建表, 包含外键, 同步更新, 删除严格
+
 create table tbl(id int, [unique] index index_name(id)); # 创建索引
 
 create          table table_name as select ...;      # 创建表
@@ -521,17 +576,14 @@ desc table_name;                       # 查看表结构
 
 alter table tbl_name add col_name col_def [first | after col_name];          # 增加列
 alter table tbl_name add index index_name(id);                               # 添加普通索引
-alter table tbl_name add [constraint symbol] primary key(id);                # 添加主键
-alter table tbl_name add [constraint symbol] unique      index_name(id);     # 添加唯一键 或 唯一索引
-alter table tbl_name add [constraint symbol] foreign key index_name(id) ...; # 添加外键
+
 alter table tbl_name add [constraint symbol] check(id > 0) [[NOT] ENFORCED]; # 添加 check
 
 alter table tbl_name drop   check      symbol;          # 删除 check 约束
 alter table tbl_name drop   constraint symbol;          # 删除 主键 外键 唯一键 约束
 alter table tbl_name drop   col_name;                   # 删除列
 alter table tbl_name drop   index index_name;           # 删除索引
-alter table tbl_name drop   primary key;                # 删除主键约束
-alter table tbl_name drop   foreign key key_name;       # 删除外键约束
+
 alter table tbl_name drop   check       check_name;     # 删除 check
 alter table tbl_name drop   index index_name;           # 删除索引
 
