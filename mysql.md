@@ -107,6 +107,7 @@ sudo systemctl start   mysql.service;         # 11. 启动服务
     * 库的权限, 客户端使用 use ... 的时候才生效, 但客户端可能缓存库名称
     * 密码那些不会影响到已连接的客户端
 * 修改权限后, 客户端最好重连
+* 见 https://dev.mysql.com/doc/refman/9.0/en/privilege-changes.html
 
 # 3. 使用
 select user,host,plugin from mysql.user;           # 1. 查看用户及其加密插件
