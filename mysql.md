@@ -134,21 +134,22 @@ char(m) ----------- 固定长度, m 为字符数 ---
 varchar(m) -------- 可变长度, m 为字符数 ---
 ```
 
-## 列约束
+## 约束
 ```
 show databases;
 create database if not exists test;
-use test;
 
 # 1. NOT NULL
 * 只能作用在单列上
 
 # 1.1 创建
+use    test;
 drop   table if exists student;
 create table student(id int not null);
 desc   student; 
  
 # 1.2 添加
+use    test;
 drop   table if exists student;
 create table student(id int);
 desc   student;
@@ -156,6 +157,7 @@ alter  table student modify id int not null;
 desc   student;
 
 # 1.3 删除
+use    test;
 drop   table if exists student;
 create table student(id int not null);
 desc   student;
@@ -166,14 +168,15 @@ desc   student;
 * 默认会创建唯一索引
 * 默认约束名和唯一索引名和第一列的列名相同
 * 约束名和索引名同时指定时, 约束名没意义, 会变成索引名
-* 可以有多个 unique
-* 一个 unique 可以对多个列创建
+* 可以有多个 唯一键
+* 一个 唯一键 可以对多个列创建
 * 可以存储 NULL
 * 整个表中的数据是唯一的, 但 NULL 可以多个
 * 删除唯一键约束只能通过删除唯一索引实现
 
 # 2.1 创建
 # 2.1.1 列级约束(单列): 约束名和索引名默认和列名相同 (推荐)
+use    test;
 drop   table if exists student;
 create table student(id int unique, name varchar(20));
 desc   student;
@@ -181,6 +184,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 2.1.2 列级约束(多列): 约束名和索引名默认和列名相同 (推荐)
+use    test;
 drop   table if exists student;
 create table student(id int unique, name varchar(20) unique);
 desc   student;
@@ -188,6 +192,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 2.1.3 表级约束: 指定约束名(索引名也是约束名)
+use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20), constraint constraint_name unique(id));
 desc   student;
@@ -195,6 +200,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 2.1.4 表级约束: 指定约束名, 索引名(约束名没意义, 约束名会变成索引名)
+use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20), constraint constraint_name unique unique_name(id));
 desc   student;
@@ -202,6 +208,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 2.1.5 表级约束: 指定索引名(约束名也是索引名)
+use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20), unique unique_name(id));
 desc   student;
@@ -209,6 +216,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 2.1.6 表级约束(同时在多列指定): 约束名和索引名默认和第一列的列名相同 (推荐)
+use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20), unique(id, name));
 desc   student;
@@ -216,7 +224,8 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 2.2 添加
-# 2.2.1 可以添加表级或列级唯一约束(推荐)
+# 2.2.1 可以添加表级或列级唯一约束 (推荐)
+use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20));
 desc   student;
@@ -227,6 +236,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 2.2.2 只能添加列级唯一约束
+use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20));
 desc   student;
@@ -237,6 +247,8 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 2.3 删除: 只能删除索引
+# 2.3.1 使用 ALTER
+use    test;
 drop   table if exists student;
 create table student(id int unique, name varchar(20));
 desc   student;
@@ -246,7 +258,19 @@ alter  table student drop index id;
 select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
+# 2.3.2 使用 DROP
+use    test;
+drop   table if exists student;
+create table student(id int unique, name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+drop index id on student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
 # 2.4 可以存储 NULL, NULL 可以重复, 其他不行
+use    test;
 drop   table if exists student;
 create table student(id int unique, name varchar(20) unique);
 desc   student;
@@ -270,6 +294,7 @@ select * from student;
 
 # 3.1 创建
 # 3.1.1 列级约束(单列): 约束名和索引名为 PRIMARY (推荐)
+use    test;
 drop   table if exists student;
 create table student(id int primary key, name varchar(20));
 desc   student;
@@ -277,10 +302,12 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 3.1.2 列级约束(多列): 报错
+use    test;
 drop   table if exists student;
 create table student(id int primary key, name varchar(20) primary key);
 
 # 3.1.3 表级约束: 指定约束名, 但约束名和索引名都是 primary
+use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20), constraint constraint_name primary key(id));
 desc   student;
@@ -288,6 +315,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 3.1.4 表级约束: 指定约束名, 索引名, 但约束名和索引名都是 primary
+use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20), constraint constraint_name primary key index_name(id));
 desc   student;
@@ -295,6 +323,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 3.1.5 表级约束: 指定索引名, 但约束名和索引名都是 primary
+use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20), primary key index_name(id));
 desc   student;
@@ -302,6 +331,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 3.1.6 表级约束(同时在多列指定): 约束名和索引名都是 primary (推荐)
+use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20), primary key(id, name));
 desc   student;
@@ -310,6 +340,7 @@ show index from student;
 
 # 3.2 添加
 # 3.2.1 可以添加表级或列级主键约束 (推荐)
+use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20));
 desc   student;
@@ -320,6 +351,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 3.2.2 只能添加列级主键约束
+use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20));
 desc   student;
@@ -330,6 +362,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 3.3 删除: 删除主键会删除对应的索引, 但非空约束还在
+use    test;
 drop   table if exists student;
 create table student(id int primary key, name varchar(20));
 desc   student;
@@ -341,6 +374,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 3.4 不可以存储 NULL, 不可以重复
+use    test;
 drop   table if exists student;
 create table student(id int primary key, name varchar(20));
 desc   student;
