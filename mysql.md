@@ -23,7 +23,8 @@ $ sudo systemctl is-enabled mysql.service       # 7. 再次查看是否开机自
 $ mysql> show variables like 'character%';      # 1. 查看编码和字符集
 $ mysql> show variables like 'collation%';      #
 $ mysql --help | grep -A1 'Default options'     # 2. 查看 MySQL 的配置文件
-$                                               # 3. 修改配置文件中的编码 --- default-character-set = utf8mb4
+$                                               # 3. 修改配置文件中的编码
+#                                               #   * default-character-set = utf8mb4
 $ sudo systemctl restart mysql.service          # 4. 重启 MySQL
 $ mysql> show variables like 'character%';      # 5. 再次查看编码和字符集
 $ mysql> show variables like 'collation%';      #
