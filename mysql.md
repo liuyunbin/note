@@ -161,24 +161,105 @@ desc   student;
 alter  table student modify id int;
 desc   student;
 
-
-SELECT * FROM information_schema.table_constraints WHERE table_name = ...; # 查看约束
-
-
-#  UNIQUE --- 唯一键
-* 可以存储 NULL
-* 整个表中的数据是唯一的, 但 NULL 可以多个
+# 2. UNIQUE --- 唯一键
+* 默认会创建唯一索引
+* 默认约束名和唯一索引名和第一列的列名相同
+* 约束名和索引名同时指定时, 约束名没意义, 会变成索引名
 * 可以有多个 unique
 * 一个 unique 可以对多个列创建
-* 会自动创建唯一索引
-* 默认索引名为第一个列名
-* 约束名和索引名相同, 定义或更改约束名没意义
+* 可以存储 NULL
+* 整个表中的数据是唯一的, 但 NULL 可以多个
 * 删除唯一键约束只能通过删除唯一索引实现
-* create table student(id int  unique);                      # 创建
-* create table student(id int, unique [index_name_id](id));  # 创建, 指定索引名称
-* alter  table student add     unique [index_name_id](id);   # 添加, 指定索引名称
-* alter  table student modify id int unique;                 # 添加
-* alter  table student drop     index index_name_id;         # 删除
+
+# 2.1 创建
+# 2.1.1 列级约束(单列): 约束名和索引名默认和列名相同
+drop   table if exists student;
+create table student(id int unique, name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 2.1.2 列级约束(多列): 约束名和索引名默认和列名相同
+drop   table if exists student;
+create table student(id int unique, name varchar(20) unique);
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 2.1.3 表级约束: 指定约束名(索引名也是约束名)
+drop   table if exists student;
+create table student(id int, name varchar(20), constraint constraint_name unique(id));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 2.1.4 表级约束: 指定约束名, 索引名(约束名没意义, 约束名会变成索引名)
+drop   table if exists student;
+create table student(id int, name varchar(20), constraint constraint_name unique unique_name(id));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 2.1.5 表级约束: 指定索引名(约束名也是索引名)
+drop   table if exists student;
+create table student(id int, name varchar(20), unique unique_name(id));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 2.1.6 表级约束(同时在多列指定): 约束名和索引名默认和第一列的列名相同
+drop   table if exists student;
+create table student(id int, name varchar(20), unique(id, name));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 2.2 添加
+# 2.2.1 可以添加表级或列级唯一约束(推荐)
+drop   table if exists student;
+create table student(id int, name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+alter  table student add unique (id);
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 2.2.2 只能添加列级唯一约束
+drop   table if exists student;
+create table student(id int, name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+alter  table student modify id int unique;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 2.3 删除: 只能删除索引
+drop   table if exists student;
+create table student(id int unique, name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+alter  table student drop index id;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 2.4 可以存储 NULL, NULL 可以重复, 其他不行
+drop   table if exists student;
+create table student(id int unique, name varchar(20) unique);
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+insert into student values(NULL, "bob");
+select * from student;
+insert into student values(NULL, "tom");
+select * from student;
+insert into student values(NULL, "bob"); # 报错
+select * from student;
+
+
+
 
 # PRIMARY KEY --- 主键
 * 唯一键 + 非空 + 最多只有一个
