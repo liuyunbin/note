@@ -135,13 +135,35 @@ varchar(m) -------- 可变长度, m 为字符数 ---
 
 ## 列约束
 ```
+show databases;
+create database if not exists test;
+use test;
+
+# 1. NOT NULL
+* 只能作用在单列上
+
+# 1.1 创建
+drop   table if exists student;
+create table student(id int not null);
+desc   student; 
+ 
+# 1.2 添加
+drop   table if exists student;
+create table student(id int);
+desc   student;
+alter  table student modify id int not null;
+desc   student;
+
+# 1.3 删除
+drop   table if exists student;
+create table student(id int not null);
+desc   student;
+alter  table student modify id int;
+desc   student;
+
+
 SELECT * FROM information_schema.table_constraints WHERE table_name = ...; # 查看约束
 
-# NOT NULL
-* 只能作用在单列上
-* create table student(id int not null);       # 创建
-* alter  table student modify id int not null; # 添加
-* alter  table student modify id int;          # 删除
 
 #  UNIQUE --- 唯一键
 * 可以存储 NULL
