@@ -173,14 +173,14 @@ desc   student;
 * 删除唯一键约束只能通过删除唯一索引实现
 
 # 2.1 创建
-# 2.1.1 列级约束(单列): 约束名和索引名默认和列名相同
+# 2.1.1 列级约束(单列): 约束名和索引名默认和列名相同 (推荐)
 drop   table if exists student;
 create table student(id int unique, name varchar(20));
 desc   student;
 select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
-# 2.1.2 列级约束(多列): 约束名和索引名默认和列名相同
+# 2.1.2 列级约束(多列): 约束名和索引名默认和列名相同 (推荐)
 drop   table if exists student;
 create table student(id int unique, name varchar(20) unique);
 desc   student;
@@ -208,7 +208,7 @@ desc   student;
 select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
-# 2.1.6 表级约束(同时在多列指定): 约束名和索引名默认和第一列的列名相同
+# 2.1.6 表级约束(同时在多列指定): 约束名和索引名默认和第一列的列名相同 (推荐)
 drop   table if exists student;
 create table student(id int, name varchar(20), unique(id, name));
 desc   student;
@@ -309,7 +309,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
 # 3.2 添加
-# 3.2.1 可以添加表级或列级主键约束(推荐)
+# 3.2.1 可以添加表级或列级主键约束 (推荐)
 drop   table if exists student;
 create table student(id int, name varchar(20));
 desc   student;
