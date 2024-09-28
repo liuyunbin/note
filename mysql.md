@@ -259,19 +259,100 @@ select * from student;
 insert into student values(NULL, "bob"); # 报错
 select * from student;
 
-
-
-
-# PRIMARY KEY --- 主键
-* 唯一键 + 非空 + 最多只有一个
-* 删除主键约束时, 主键索引自动删除
+# 3 PRIMARY KEY --- 主键
+* 和唯一键的区别: 非空 + 最多只有一个
+* 主键最多只有一个
+* 主键可以针对多个列设置
+* 建立主键约束会自动创建主键索引
 * 索引名和约束名都是 primary
 * 创建或修改 索引名 或 约束名 没意义
-* create table student(id int  primary key);      # 创建
-* create table student(id int, primary key(id));  # 创建
-* alter  table student add     primary key(id);   # 添加
-* alter  table student modify id int primary key; # 添加
-* alter  table student drop   primary key;        # 删除
+* 删除主键约束时, 主键索引自动删除, 但非空约束还在
+
+# 3.1 创建
+# 3.1.1 列级约束(单列): 约束名和索引名为 PRIMARY (推荐)
+drop   table if exists student;
+create table student(id int primary key, name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 3.1.2 列级约束(多列): 报错
+drop   table if exists student;
+create table student(id int primary key, name varchar(20) primary key);
+
+# 3.1.3 表级约束: 指定约束名, 但约束名和索引名都是 primary
+drop   table if exists student;
+create table student(id int, name varchar(20), constraint constraint_name primary key(id));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 3.1.4 表级约束: 指定约束名, 索引名, 但约束名和索引名都是 primary
+drop   table if exists student;
+create table student(id int, name varchar(20), constraint constraint_name primary key index_name(id));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 3.1.5 表级约束: 指定索引名, 但约束名和索引名都是 primary
+drop   table if exists student;
+create table student(id int, name varchar(20), primary key index_name(id));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 3.1.6 表级约束(同时在多列指定): 约束名和索引名都是 primary (推荐)
+drop   table if exists student;
+create table student(id int, name varchar(20), primary key(id, name));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 3.2 添加
+# 3.2.1 可以添加表级或列级主键约束(推荐)
+drop   table if exists student;
+create table student(id int, name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+alter  table student add primary key(id);
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 3.2.2 只能添加列级主键约束
+drop   table if exists student;
+create table student(id int, name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+alter  table student modify id int primary key;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 3.3 删除: 删除主键会删除对应的索引, 但非空约束还在
+drop   table if exists student;
+create table student(id int primary key, name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+alter  table student drop primary key;
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 3.4 不可以存储 NULL, 不可以重复
+drop   table if exists student;
+create table student(id int primary key, name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+insert into student values(NULL, "bob"); # 报错
+insert into student values(1,    "tom");
+select * from student;
+insert into student values(1,    "bob"); # 报错
+
+
+
 
 # FOREIGN KEY --- 外键
 * 从表的外键必须是主表的主键或唯一键
