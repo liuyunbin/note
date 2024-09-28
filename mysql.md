@@ -90,6 +90,38 @@ mysqladmin -u root -p shutdown;               # 10. 使用新密码停止服务
 sudo systemctl start   mysql.service;         # 11. 启动服务
 ```
 
+## 用户和权限
+```
+# 1. 权限使用原则
+* 只赋予满足要求的最小权限
+* 限制用户登录的主机, root 只允许本机登录
+* 定期删除不用的用户
+* 权限可以叠加
+
+# 2. 权限刷新
+* 服务端
+    * GRANT, REVOKE, SET PASSWORD, RENAME USER --- 不需要刷新权限
+    * INSERT, UPDATE, or DELETE -------------------- 需要刷新权限 FLUSH PRIVILEGES --- 不推荐
+* 客户端
+    * 表和列的权限, 下一次请求的时候就会生效
+    * 库的权限, 客户端使用 use ... 的时候才生效, 但客户端可能缓存库名称
+    * 密码那些不会影响到已连接的客户端
+* 修改权限后, 客户端最好重连
+
+# 3. 使用
+select user,host,plugin from mysql.user;           # 1. 查看用户及其加密插件
+show variables like 'validate_password%';          # 2. 查看密码要求:
+                                                   #    * 大小写字母 数字 特殊字符
+                                                   #    * 至少 8 个字符
+create user 'dba1'@'%' identified by 'Dba123456@'; # 3. 创建用户
+                                                   # 4. 授予权限
+grant  select         on test.* to   'dba1'@'%';   #    * 库的查询权限
+grant  all privileges on test.* to   'dba1'@'%';   #    * 库的全部权限
+show grants for 'dba1'@'%';                        # 5. 查看用户权限
+revoke all privileges on test.* from 'dba1'@'%';   # 6. 回收用户权限
+drop user 'dba1'@'%';                              # 7. 删除用户
+```
+
 ## 常用数据类型
 ```
 int --------------- 整形 ------------------- 4     个字节
@@ -216,7 +248,6 @@ show  create database database_name; # 查看数据库的创建信息, 比如编
 show  create table       table_name; # 查看表的创建信息
 show variables like 'character%';         # 查看编码
 show variables like 'collation%';         # 查看字符集
-show variables like 'validate_password%'; # 查看密码要求
 
 create database database_name;           # 创建数据库
 create table tbl (...);                  # 创建表
@@ -319,12 +350,6 @@ rename table old_table to new_table; # 重命名表
 
 truncate table table_name; # 清空表 --- 不能回滚
 
-create user user@hostname identified by 'password'; # 3. 创建用户
-
-drop user user@hostname;                     #  删除用户
-
-drop role role@hostname;                     # 删除角色
-
 insert into table_name(...) values(...); # 插入数据
 insert into table_name(...) select ...;  # 插入数据
 insert ignore into ...                   # 插入数据 忽略重复的
@@ -335,56 +360,6 @@ delete from table_name where ...         # 删除
 set autocommit = false; # 取消自动提交
 rollback;               # 回滚
 
-select user,host,plugin from mysql.user;            # 1. 查看用户及其加密插件
-
-## 权限使用原则
-* 只赋予满足要求的最小权限
-* 限制用户登录的主机, root 只允许本机登录
-* 定期删除不用的用户
-* 权限可以叠加
-
-## 权限刷新
-* 服务端
-    * GRANT, REVOKE, SET PASSWORD, RENAME USER --- 不需要刷新权限
-    * INSERT, UPDATE, or DELETE -------------------- 需要刷新权限 FLUSH PRIVILEGES --- 不推荐
-* 客户端
-    * 表和列的权限, 下一次请求的时候就会生效
-    * 库的权限, 客户端使用 use ... 的时候才生效, 但客户端可能缓存库名称
-    * 密码那些不会影响到已连接的客户端
-* 修改权限后, 客户端最好重连
-
-## 直接授予和回收用户权限
-```
-show privileges;                                           # 查看所有权限
-grant select,insert,delete,update on *.* to user@hostname; # 授予用户 增删改查 权限
-grant all privileges              on *.* to user@hostname; # 授予用户全部权限, 除 grant
-grant all privileges              on *.* to user@hostname with grant option;
-                                                           # 授予用全部权限
-show grants;                                               # 查看当前用户权限
-show grants for user@hostname;                             # 查看其他用户权限
-revoke 权限 on *.* from user@hostname;                     # 回收用户权限
-```
-
-## 创建和删除角色
-create role role@hostname;                                  # 创建角色
-
-## 授予和回收角色权限
-```
-show privileges;                                           # 查看所有权限
-grant select,insert,delete,update on *.* to role@hostname; # 授予角色 增删改查 权限
-grant all privileges              on *.* to role@hostname; # 授予角色全部权限, 除 grant
-grant all privileges              on *.* to role@hostname with grant option;
-                                                           # 授予角色全部权限
-show grants for role@hostname;                             # 查看角色权限
-revoke 权限 on *.* from role@hostname;                     # 回收角色权限
-```
-
-## 通过角色赋予和删除用户权限
-```
-grant  role to   user;                                      # 1. 将角色赋予用户
-set default role all to user@hostname;                      # 2. 激活权限
-revoke role from user;                                      # 3. 撤销用户角色
-```
 
 ## SELECT
 ```
