@@ -291,6 +291,12 @@ insert into student values(NULL, "bob"); # 报错
 
 # 3 PRIMARY KEY --- 主键
 * 会自动创建主键索引
+* 不可以存储 NULL
+* 存储的值不能相同
+* 默认的索引名和约束名是第一列的列名
+* 最多只存在一个主键
+* 可以对多列定义一个主键
+* 删除主键后, 主键索引也会删除, 但非空约束还在
 * 和唯一键的区别: 非空 + 最多只有一个
 
 # 3.1 创建
@@ -356,6 +362,7 @@ desc   student;
 select * from information_schema.table_constraints where table_name = 'student';
 show   index from student;
 alter  table student add primary key(id);
+desc   student;
 select * from information_schema.table_constraints where table_name = 'student';
 show   index from student;
 
@@ -367,6 +374,7 @@ desc   student;
 select * from information_schema.table_constraints where table_name = 'student';
 show   index from student;
 alter  table student modify id int primary key;
+desc   student;
 select * from information_schema.table_constraints where table_name = 'student';
 show   index from student;
 
