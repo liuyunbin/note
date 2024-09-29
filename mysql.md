@@ -911,6 +911,7 @@ create table student(id int, name varchar(20) default 'tom');
 desc   student;
 
 # 7.2 添加
+# 7.2.1 方式一
 use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20));
@@ -918,12 +919,29 @@ desc   student;
 alter  table student alter name set default 'tom';
 desc   student;
 
+# 7.2.2 方式二 (推荐)
+use    test;
+drop   table if exists student;
+create table student(id int, name varchar(20));
+desc   student;
+alter  table student modify name varchar(20) default 'tom';
+desc   student;
+
 # 7.3 删除
+# 7.3.1 方式一
 use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20) default 'tom');
 desc   student;
 alter  table student alter name drop default;
+desc   student;
+
+# 7.3.2 方式二 (推荐)
+use    test;
+drop   table if exists student;
+create table student(id int, name varchar(20) default 'tom');
+desc   student;
+alter  table student modify name varchar(20);
 desc   student;
 
 # 8. INDEX --- 索引
