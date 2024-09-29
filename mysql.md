@@ -307,7 +307,7 @@ insert into student values(NULL, "bob"); # 报错
 * 设置或修改索引名和约束名没意义
 * 最多只存在一个主键
 * 可以对多列定义一个主键
-* 删除主键约束只能通过删除主键来实现, 删除主键索引或主键约束报错
+* 删除主键约束只能通过删除主键来实现, 删除主键索引或主键约束名报错
 * 删除主键约束后, 主键索引也会删除, 但非空约束还在
 * 和唯一键的区别: 非空 + 最多只有一个
 
@@ -403,7 +403,7 @@ desc   student;
 select * from information_schema.table_constraints where table_name = 'student';
 show   index from student;
 
-# 3.3.2 删除主键约束: 报错
+# 3.3.2 删除主键约束名: 报错
 use    test;
 drop   table if exists student;
 create table student(id int primary key, name varchar(20));
