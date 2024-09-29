@@ -440,6 +440,8 @@ insert into student values(1,    "bob"); # 报错
 * 先删除从表或外键, 再删除主表
 * 默认外键的外键名不是列名, 默认的索引名是列名
 * 建议: ON UPDATE CASCADE ON DELETE RESTRICT -- 同步更新, 删除严格
+* 通过删除外键约束名或外键可以删除外键, 不能通过删除外键索引来删除外键
+* 删除外键后, 外键索引还存在
 
 # 4.1 创建
 # 4.1.1 不指定约束名和索引名: 约束名不是列名, 由系统生成, 索引名是列名 (建议)
@@ -538,7 +540,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show   index from student;
 
 # 4.3 删除
-# 4.3.1 删除外键, 索引不会自动删除
+# 4.3.1 删除外键, 索引不会自动删除 (建议)
 use    test;
 drop   table if exists student;
 drop   table if exists teacher;
@@ -577,7 +579,7 @@ select * from information_schema.table_constraints where table_name = 'student';
 show   index from student;
 alter  table student drop index constraint_name;
 
-# 4.3.3 删除约束, 和删除外键相同, 索引不会自动删除
+# 4.3.3 删除约束名, 和删除外键相同, 索引不会自动删除
 use    test;
 drop   table if exists student;
 drop   table if exists teacher;
