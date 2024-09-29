@@ -389,15 +389,13 @@ select * from student;
 insert into student values(1,    "bob"); # 报错
 
 # 4. FOREIGN KEY --- 外键
+* 会自动创建索引
+* 从表的外键必须是主表的主键或唯一键
 * 先创建主表, 再创建从表
 * 先删除从表或外键, 再删除主表
-* 会自动创建索引
 
-* 从表的外键必须是主表的主键或唯一键
 
-* 外键可以多个
 
-* 默认的外键约束名不是列名
 
 # 4.1 创建
 # 4.1.1 不指定约束名和索引名: 约束名不是列名, 由系统生成, 索引名是列名 (建议)
@@ -460,27 +458,250 @@ desc student;
 select * from information_schema.table_constraints where table_name = 'student';
 show index from student;
 
-
-
-
-
-
-
-
-
-
-
-                                         # 创建表, 包含外键, 同步更新, 删除严格
-alter table tbl_name add [constraint symbol] foreign key index_name(id) ...; # 添加外键
-
-alter table tbl_name drop   foreign key key_name;       # 删除外键约束
-
-
-[CONSTRAINT <外键约束名称>] FOREIGN KEY（从表的某个字段) references 主表名(被参考字段)
+# 4.1.5 不指定约束名和索引名(多列) (建议)
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20) unique);
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  teacher_name varchar(20),
+  foreign key(teacher_id) references teacher(id),
+  foreign key(teacher_name) references teacher(name)
 );
+desc student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
 
-create table tbl (id int, [constraint symbol] foreign key(id) references 主表名(被参考字段)
-                                                  on update cascade on delete restrict
+# 4.2 添加
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int
+);
+desc student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+alter  table student add foreign key(teacher_id) references teacher(id);
+desc student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 4.3 删除
+# 4.3.1 删除外键, 索引不会自动删除
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  constraint constraint_name foreign key(teacher_id) references teacher(id)
+);
+desc student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+alter  table student drop foreign key constraint_name;
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+alter  table student drop index constraint_name;
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 4.3.2 删除索引, 报错
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  constraint constraint_name foreign key(teacher_id) references teacher(id)
+);
+desc student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+alter  table student drop index constraint_name;
+
+# 4.3.3 删除约束, 和删除外键相同, 索引不会自动删除
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  constraint constraint_name foreign key(teacher_id) references teacher(id)
+);
+desc student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+alter  table student drop constraint constraint_name;
+desc student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+alter  table student drop index constraint_name;
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show index from student;
+
+# 4.4 约束等级
+# 4.4.1 cascade --- 父表更新时, 同步更新子表
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  foreign key(teacher_id) references teacher(id) on update cascade
+);
+insert into teacher values(1, "马钰");
+insert into student values(1, "郭靖", 1);
+select * from teacher;
+select * from student;
+update teacher set id = 2 where id = 1;
+select * from teacher;
+select * from student;
+
+# 4.4.2 cascade --- 父表删除时, 同步删除子表对应的行
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  foreign key(teacher_id) references teacher(id) on delete cascade 
+);
+insert into teacher values(1, "马钰");
+insert into student values(1, "郭靖", 1);
+select * from teacher;
+select * from student;
+delete from teacher where id = 1;
+select * from teacher;
+select * from student;
+
+# 4.4.3 SET NULL --- 父表更新时, 同步更新子表对应字段为 NULL (该列不能为 NOT NULL)
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  foreign key(teacher_id) references teacher(id) on update set null 
+);
+insert into teacher values(1, "马钰");
+insert into student values(1, "郭靖", 1);
+select * from teacher;
+select * from student;
+update teacher set id = 2 where id = 1;
+select * from teacher;
+select * from student;
+
+# 4.4.4 SET NULL --- 父表删除时, 同步更新子表对应字段为 NULL (该列不能为 NOT NULL)
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  foreign key(teacher_id) references teacher(id) on delete set null 
+);
+insert into teacher values(1, "马钰");
+insert into student values(1, "郭靖", 1);
+select * from teacher;
+select * from student;
+delete from teacher where id = 1;
+select * from teacher;
+select * from student;
+
+# 4.4.5 NO ACTION (同 RESTRICT) --- 父表更新时, 如果子表对应字段已使用, 报错, 未使用时, 更新成功 (默认)
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  foreign key(teacher_id) references teacher(id) on update no action 
+);
+insert into teacher values(1, "马钰");
+insert into teacher values(2, "丘处机");
+insert into student values(1, "郭靖", 1);
+select * from teacher;
+select * from student;
+update teacher set id = 11 where id = 1; # 报错
+update teacher set id = 22 where id = 2;
+select * from teacher;
+select * from student;
+
+# 4.4.6 NO ACTION (同 RESTRICT) --- 父表删除时, 如果子表对应字段已使用, 报错, 未使用时, 删除成功 (默认)
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  foreign key(teacher_id) references teacher(id) on delete no action 
+);
+insert into teacher values(1, "马钰");
+insert into teacher values(2, "丘处机");
+insert into student values(1, "郭靖", 1);
+select * from teacher;
+select * from student;
+delete from teacher where id = 1; # 报错
+delete from teacher where id = 2;
+select * from teacher;
+select * from student;
+
+# 4.4.7 ON UPDATE CASCADE ON DELETE RESTRICT -- 同步更新, 删除严格
+use    test;
+drop   table if exists student;
+drop   table if exists teacher;
+create table teacher(id int primary key, name varchar(20));
+create table student(
+  id int primary key,
+  name varchar(20) unique,
+  teacher_id int,
+  foreign key(teacher_id) references teacher(id) on update cascade on delete restrict
+);
+insert into teacher values(1, "马钰");
+insert into teacher values(2, "丘处机");
+insert into student values(1, "郭靖", 1);
+select * from teacher;
+select * from student;
+update teacher set id = 11 where id = 1;
+select * from teacher;
+select * from student;
+delete from teacher where id = 11; # 报错
+delete from teacher where id = 2;
+select * from teacher;
+select * from student;
+
+
+
+                                                  
 
 
 
