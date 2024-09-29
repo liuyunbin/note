@@ -769,9 +769,74 @@ desc   student;
 alter  table student modify id int;
 desc   student;
 
+# 6. check --- 检查
+# 6.1 创建
+# 6.1.1 列级约束: 约束名由系统生成 (推荐)
+use    test;
+drop   table if exists student;
+create table student(id int check(id > 0), name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
 
+# 6.1.2 表级约束(单列): 未指定约束名, 约束名由系统生成 (推荐)
+use    test;
+drop   table if exists student;
+create table student(id int, name varchar(20), check(id > 0));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
 
-#### check --- 检查
+# 6.1.2 表级约束(单列): 指定约束名
+use    test;
+drop   table if exists student;
+create table student(
+  id int,
+  name varchar(20), 
+  constraint constraint_name check(id > 0)
+);
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+
+# 6.1.3 表级约束(多列): (推荐)
+use    test;
+drop   table if exists student;
+create table student(
+  id int,
+  name varchar(20), 
+  check(id > 0 and length(name) > 1)
+);
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+
+# 6.2 添加
+# 6.2.1 可以添加列级和表级约束 (推荐)
+use    test;
+drop   table if exists student;
+create table student(id int);
+select * from information_schema.table_constraints where table_name = 'student';
+alter  table student add check(id > 0);
+select * from information_schema.table_constraints where table_name = 'student';
+
+# 6.2.2 只能添加列级约束
+use    test;
+drop   table if exists student;
+create table student(id int);
+select * from information_schema.table_constraints where table_name = 'student';
+alter  table student MODIFY id int check(id > 0);
+select * from information_schema.table_constraints where table_name = 'student';
+
+# 6.3 删除
+use    test;
+drop   table if exists student;
+create table student(
+  id int,
+  name varchar(20),
+  constraint constraint_name check(id > 0)
+);
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+alter  table student drop check constraint_name;
+select * from information_schema.table_constraints where table_name = 'student';
+
 #### DEFAULT --- 默认值
 #### INDEX --- 索引
 ```
