@@ -746,6 +746,10 @@ select * from teacher;
 select * from student;
 
 # 5. AUTO_INCREMENT --- 自动递增
+* 只能作用于整形
+* 最多只有一列
+* 列必须是主键或唯一键
+
 # 5.1 创建
 # 5.1.1 单列 (整形): 作用于主键
 use    test;
