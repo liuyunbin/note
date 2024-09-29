@@ -980,25 +980,40 @@ create table student(id int, index index_name(id));
 show   index from student;
 alter  table student rename index index_name to new_index_name;
 show   index from student;
+```
+
+## 库 表和视图
+```
 
 
+## 视图
+* 相当于是一张虚拟表
+* 不存储数据
+* 一般只用于查询
+* 简化操作, 便于操作
+* 提高数据安全
+* 底层变化时, 必须更新视图
+
+```
+
+## 存储过程和函数
+```
+## 存储过程
+* 简化操作, 减少网上传输的数据
+* 没返回值
+* 提高复用, 减少操作失误
+* 提前编译, 效率高
+* 不好调试
+* 分表时, 不好维护
 
 
+## 函数
+和存储过程的区别
+* 有返回值
 
+## 变量
 
-DDL: create drop alter rename truncate
-
-show  databases;                     # 查看所有的数据库
-show  tables;                        # 查看所有的表
-show  tables from     database_name; # 查看某一库中所有的表
-show  index  from        table_name; # 查看索引
-show  create database database_name; # 查看数据库的创建信息, 比如编码
-show  create table       table_name; # 查看表的创建信息
-
-create database database_name;           # 创建数据库
-create table tbl (...);                  # 创建表
-
-create          table table_name as select ...;      # 创建表
+## if
 
 # 存储函数和存储过程
 * characteristics
@@ -1033,8 +1048,41 @@ DELIMITER ;
 
 select procedure_name(...)
 
-# 触发器
+
+drop function            function_name;               # 删除函数
+drop procedure          procedure_name;               # 删除存储过程
+```
+
+## 游标
+```
+
+```
+
+## 触发器
+```
 create trigger trigger_name [before|after]  [insert|update|delete]   on table_name for each row ...
+
+
+drop trigger   table_name.trigger_name;               # 删除触发器
+```
+
+
+
+
+DDL: create drop alter rename truncate
+
+show  databases;                     # 查看所有的数据库
+show  tables;                        # 查看所有的表
+show  tables from     database_name; # 查看某一库中所有的表
+show  create database database_name; # 查看数据库的创建信息, 比如编码
+show  create table       table_name; # 查看表的创建信息
+
+create database database_name;           # 创建数据库
+create table tbl (...);                  # 创建表
+
+create          table table_name as select ...;      # 创建表
+
+
 
 create [or replace] view view_name as select ... # 创建或更新视图
 
@@ -1052,7 +1100,6 @@ alter table tbl_name alter constraint symbol [[NOT] ENFORCED];   # 设置 主键
 alter table tbl_name alter col_name set {visible | invisible}; # 设置列是否可见
 
 
-
 alter table tbl_name modify                  col_name col_def [first | after col_name]; # 修改列属性
 alter table tbl_name change old_col_name new_col_name col_def [first | after col_name]; # 修改列名称
 
@@ -1068,10 +1115,9 @@ alter database database_name ...;   # 修改数据库
 
 drop database            database_name;               # 删除数据库
 drop table                  table_name;               # 删除表
+
 drop view                    view_name;               # 删除视图
-drop function            function_name;               # 删除函数
-drop procedure          procedure_name;               # 删除存储过程
-drop trigger   table_name.trigger_name;               # 删除触发器
+
 
 rename table old_table to new_table; # 重命名表
 
@@ -1116,37 +1162,6 @@ limit 行数
 union --------- # 合并, 去重 ---- 效率低
 union all ----- # 合并, 不去重 -- 效率高
 ```
-
-## 视图
-```
-* 相当于是一张虚拟表
-* 不存储数据
-* 一般只用于查询
-* 简化操作, 便于操作
-* 提高数据安全
-* 底层变化时, 必须更新视图
-```
-
-
-## 存储过程
-```
-* 简化操作, 减少网上传输的数据
-* 没返回值
-* 提高复用, 减少操作失误
-* 提前编译, 效率高
-* 不好调试
-* 分表时, 不好维护
-```
-
-## 函数
-```
-和存储过程的区别
-* 有返回值
-```
-
-## 变量
-
-## if
 
 ## 为什么使用数据库
 * 数据持久化
@@ -1200,7 +1215,6 @@ current_timestamp()
 current_date()
 now()
 
-trigger 触发器
 
 ## 参考资源
 * https://dev.mysql.com/doc/refman/9.0/en/account-management-statements.html --- 用户和角色
