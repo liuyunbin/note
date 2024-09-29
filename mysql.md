@@ -408,6 +408,8 @@ insert into student values(1,    "bob"); # 报错
 * 从表的外键必须是主表的主键或唯一键
 * 先创建主表, 再创建从表
 * 先删除从表或外键, 再删除主表
+* 默认外键的外键名不是列名, 默认的索引名是列名
+* 建议: ON UPDATE CASCADE ON DELETE RESTRICT -- 同步更新, 删除严格
 
 # 4.1 创建
 # 4.1.1 不指定约束名和索引名: 约束名不是列名, 由系统生成, 索引名是列名 (建议)
@@ -687,7 +689,7 @@ delete from teacher where id = 2;
 select * from teacher;
 select * from student;
 
-# 4.4.7 ON UPDATE CASCADE ON DELETE RESTRICT -- 同步更新, 删除严格
+# 4.4.7 建议: ON UPDATE CASCADE ON DELETE RESTRICT -- 同步更新, 删除严格
 use    test;
 drop   table if exists student;
 drop   table if exists teacher;
