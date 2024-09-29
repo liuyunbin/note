@@ -1085,7 +1085,153 @@ drop   database test;        # 删除数据库
 use    test;                 # 选择数据库
 ```
 
+## 表
+```
+show databases;
+create database if not exists test;
 
+# 1. 创建和删除表
+use    test;
+drop   table if exists student;
+drop   table if exists student_test;
+create table student (id int);
+create table student_test as select * from student;
+show   tables;
+show   create table student;
+show   create table student_test;
+desc   student;
+desc   student_test;
+
+# 2. 增加列
+use    test;
+drop   table if exists student;
+create table student (id int);
+desc   student;
+alter  table student add before_id varchar(20) first;
+alter  table student add  after_id varchar(20) after id;
+alter  table student add      name varchar(20);
+desc   student;
+
+# 3. 删除列
+use    test;
+drop   table if exists student;
+create table student (id int, name varchar(20));
+desc   student;
+alter  table student drop name;
+desc   student;
+
+# 4. 修改列属性
+use    test;
+drop   table if exists student;
+create table student (id int, name varchar(20));
+desc   student;
+alter  table student modify id bigint;
+desc   student;
+alter  table student modify name varchar(20) first;
+desc   student;
+alter  table student modify name varchar(20) after id;
+desc   student;
+
+# 5. 重命名列名
+use    test;
+drop   table if exists student;
+create table student (id int, name varchar(20));
+desc   student;
+alter  table student rename column name to new_name;
+desc   student;
+alter  table student change id new_id bigint;
+desc   student;
+
+# 6. 设置列不可见
+use    test;
+drop   table if exists student;
+create table student (id int, name varchar(20));
+desc   student;
+alter  table student alter name set invisible;
+desc   student;
+alter  table student alter name set visible;
+desc   student;
+
+# 7. 重命名表
+use    test;
+drop   table if exists student;
+drop   table if exists student_test;
+create table student (id int, name varchar(20));
+show   tables;
+alter  table student rename to student_test;
+show   tables;
+rename table student_test to student;
+show   tables;
+
+# 8. 删除表内数据(清空表)
+use    test;
+drop   table if exists student;
+set    autocommit = false;      # 取消自动提交
+create table student (id int, name varchar(20));
+insert into  student values(1, "马钰");
+insert into  student values(2, "丘处机");
+insert into  student values(3, "王处一");
+commit;                  # 提交
+select * from student;
+delete from   student;
+select * from student;
+rollback;                # 回滚
+select * from  student;
+truncate table student;  # 清空表 --- 不能回滚
+rollback;                # 回滚
+select * from  student;
+
+# 9. 插入数据(单个)
+use    test;
+drop   table if exists student;
+create table student (id int, name varchar(20));
+insert into  student values(1, "马钰");
+insert into  student values(2, "丘处机");
+insert into  student values(3, "王处一");
+select * from student;
+
+
+
+insert into table_name(...) select ...;  # 插入数据
+insert ignore into ...                   # 插入数据 忽略重复的
+
+replace into ...                         # 插入数据 如果重复, 删旧的, 加新的
+update table_name set ... where ...      # 更新
+
+
+
+
+## SELECT
+```
+书写: SELECT -> DISTINCT -> FROM -> WHERE -> GROUP BY -> HAVING -> ORDER BY -> LIMIT
+执行: FROM -> WHERE -> GROUP BY(此后可以使用聚合) -> HAVING -> SELECT -> DISTINCT -> ORDER BY -> LIMIT
+
+distinct -------------- 放在所有列开头
+between ... and ... --- 范围 [ ]
+isnull ---------------- 是 null
+is null --------------- 是 null
+is not null ----------- 不是 null
+in -------------------- 属于集合
+not in ---------------- 不属于集合
+like ------------------ % 任意多个字符, _ 任意一个字符
+regexp ---------------- 正则表达式
+rlike ----------------- 正则表达式
+
+order by ... asc | desc
+
+inner join ... on ... # 内连接
+left  join ... on ... # 左连接
+right join ... on ... # 右连接
+
+limit 偏移量, 行数
+limit 行数
+
+union --------- # 合并, 去重 ---- 效率低
+union all ----- # 合并, 不去重 -- 效率高
+```
+
+
+```
 
 
 表和视图
@@ -1099,6 +1245,10 @@ use    test;                 # 选择数据库
 * 简化操作, 便于操作
 * 提高数据安全
 * 底层变化时, 必须更新视图
+
+create [or replace] view view_name as select ... # 创建或更新视图
+alter view view_name as select ...    # 更新视图
+drop view                    view_name;               # 删除视图
 
 ```
 
@@ -1173,94 +1323,7 @@ drop trigger   table_name.trigger_name;               # 删除触发器
 ```
 
 
-
-
 DDL: create drop alter rename truncate
-
-
-show  tables;                        # 查看所有的表
-show  tables from     database_name; # 查看某一库中所有的表
-
-show  create table       table_name; # 查看表的创建信息
-
-create database database_name;           # 创建数据库
-create table tbl (...);                  # 创建表
-
-create          table table_name as select ...;      # 创建表
-
-create [or replace] view view_name as select ... # 创建或更新视图
-
-desc table_name;                       # 查看表结构
-
-alter table tbl_name add col_name col_def [first | after col_name];          # 增加列
-
-alter table tbl_name drop   constraint symbol;          # 删除 主键 外键 唯一键 约束
-alter table tbl_name drop   col_name;                   # 删除列
-
-alter table tbl_name alter check      symbol [[NOT] ENFORCED];   # 设置 check 约束 是否生效
-alter table tbl_name alter constraint symbol [[NOT] ENFORCED];   # 设置 主键 外键 唯一键 约束 是否生效
-
-alter table tbl_name alter col_name set {visible | invisible}; # 设置列是否可见
-
-
-alter table tbl_name modify                  col_name col_def [first | after col_name]; # 修改列属性
-alter table tbl_name change old_col_name new_col_name col_def [first | after col_name]; # 修改列名称
-
-alter table tbl_name order by col_name,...;             # 列排序
-
-alter table tbl_name rename column   old_col_name to   new_col_name;  # 重命名列
-
-alter table tbl_name rename                       to   new_tbl_name;  # 重命名表
-
-alter view view_name as select ...    # 更新视图
-
-
-drop table                  table_name;               # 删除表
-
-drop view                    view_name;               # 删除视图
-
-rename table old_table to new_table; # 重命名表
-
-truncate table table_name; # 清空表 --- 不能回滚
-
-insert into table_name(...) values(...); # 插入数据
-insert into table_name(...) select ...;  # 插入数据
-insert ignore into ...                   # 插入数据 忽略重复的
-
-replace into ...                         # 插入数据 如果重复, 删旧的, 加新的
-update table_name set ... where ...      # 更新
-delete from table_name where ...         # 删除
-set autocommit = false; # 取消自动提交
-rollback;               # 回滚
-
-## SELECT
-```
-书写: SELECT -> DISTINCT -> FROM -> WHERE -> GROUP BY -> HAVING -> ORDER BY -> LIMIT
-执行: FROM -> WHERE -> GROUP BY(此后可以使用聚合) -> HAVING -> SELECT -> DISTINCT -> ORDER BY -> LIMIT
-
-distinct -------------- 放在所有列开头
-between ... and ... --- 范围 [ ]
-isnull ---------------- 是 null
-is null --------------- 是 null
-is not null ----------- 不是 null
-in -------------------- 属于集合
-not in ---------------- 不属于集合
-like ------------------ % 任意多个字符, _ 任意一个字符
-regexp ---------------- 正则表达式
-rlike ----------------- 正则表达式
-
-order by ... asc | desc
-
-inner join ... on ... # 内连接
-left  join ... on ... # 左连接
-right join ... on ... # 右连接
-
-limit 偏移量, 行数
-limit 行数
-
-union --------- # 合并, 去重 ---- 效率低
-union all ----- # 合并, 不去重 -- 效率高
-```
 
 DDL(数据定义语言): CREATE DROP   ALTER
 DML(数据操作语言): INSERT UPDATE SELECT DELETE
@@ -1312,6 +1375,4 @@ now()
 
 
 ## 参考资源
-* https://dev.mysql.com/doc/refman/9.0/en/account-management-statements.html --- 用户和角色
-* https://dev.mysql.com/doc/refman/9.0/en/privilege-changes.html --------------- 权限刷新
 * https://dev.mysql.com/doc/refman/9.0/en/resetting-permissions.html ----------- 重置 root 密码
