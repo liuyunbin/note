@@ -860,20 +860,22 @@ desc   student;
 alter  table student alter name drop default;
 desc   student;
 
-
-#### INDEX --- 索引
-```
-* 普通索引 ----- 无任何限制
-* 唯一索引 ----- 和 unique 对应
-* 主键索引 ----- 和 primary key 对应
-* 全文索引 ----- 很少使用
-* 空间索引 ----- 很少使用
-* 单列索引 -----
-* 多列索引 ----- 最左前缀原则
-* 聚簇索引 -----
-* 非聚簇索引 ---
-* 降序索引 ----- 如果查找是降序的话, 可以提高效率 --- ASC DESC
-* 隐藏索引 ----- 便于观察删除索引的影响 --- INVISIBLE VISIBLE
+# 8. INDEX --- 索引
+* 类型
+  * 普通索引 ----- 无任何限制
+  * 唯一索引 ----- 和 unique 对应
+  * 主键索引 ----- 和 primary key 对应
+  * 全文索引 ----- 很少使用
+  * 空间索引 ----- 很少使用
+* 范围
+  * 单列索引 -----
+  * 多列索引 ----- 最左前缀原则 -- 最常用的放最左边
+* 实现
+  * 聚簇索引 -----
+  * 非聚簇索引 ---
+* 新特性
+  * 降序索引 ----- 如果查找是降序的话, 可以提高效率 --- ASC DESC
+  * 隐藏索引 ----- 便于观察删除索引的影响 --- INVISIBLE VISIBLE
 * 适合建索引
     * where group by order by 中频繁使用
     * 区分度大的列
@@ -881,9 +883,108 @@ desc   student;
     * 很少变化的列
 * 不适合建索引
     * 表很小
-    * 列无序
-* 联合索引多余多个单列索引
+* 联合索引好于多个单列索引
 * 删除无用或冗余的索引
+
+# 8.1 创建
+# 8.1.1 单列: 不指定索引名称: 索引名称默认是列名
+use    test;
+drop   table if exists student;
+create table student(id int, index(id));
+show   index from student;
+
+# 8.1.2 单列: 指定索引名称
+use    test;
+drop   table if exists student;
+create table student(id int, index index_name(id));
+show   index from student;
+
+# 8.1.3 多列: 不指定索引名称: 索引名称默认是第一个列名
+use    test;
+drop   table if exists student;
+create table student(id int, name varchar(20), index(id, name));
+show   index from student;
+
+# 8.1.4 多列: 指定索引名称
+use    test;
+drop   table if exists student;
+create table student(id int, name varchar(20), index index_name(id, name));
+show   index from student;
+
+# 8.1.5 降序索引
+use    test;
+drop   table if exists student;
+create table student(id int, index(id));
+show   index from student;
+drop   table if exists student;
+create table student(id int, index(id desc));
+show   index from student;
+
+# 8.1.6 不可见索引
+use    test;
+drop   table if exists student;
+create table student(id int, index(id) visible);
+show   index from student;
+drop   table if exists student;
+create table student(id int, index(id) invisible);
+show   index from student;
+
+# 8.2 添加 或 修改
+# 8.2.1 使用 create index 添加
+use    test;
+drop   table if exists student;
+create table student(id int);
+show   index from student;
+create index index_name on student(id);
+show   index from student;
+
+# 8.2.2 使用 alter 添加
+use    test;
+drop   table if exists student;
+create table student(id int);
+show   index from student;
+alter  table student add index index_name(id);
+show   index from student;
+
+# 8.2.3 设置索引是否可见
+use    test;
+drop   table if exists student;
+create table student(id int, index index_name(id));
+show   index from student;
+alter  table student alter index index_name invisible;
+show   index from student;
+alter  table student alter index index_name visible;
+show   index from student;
+
+# 8.3 删除
+# 8.3.1 使用 drop
+use    test;
+drop   table if exists student;
+create table student(id int, index index_name(id));
+show   index from student;
+drop   index index_name on student;
+show   index from student;
+
+# 8.3.2 使用 alter
+use    test;
+drop   table if exists student;
+create table student(id int, index index_name(id));
+show   index from student;
+alter  table student drop index index_name;
+show   index from student;
+
+# 8.4 重命名索引
+use    test;
+drop   table if exists student;
+create table student(id int, index index_name(id));
+show   index from student;
+alter  table student rename index index_name to new_index_name;
+show   index from student;
+
+
+
+
+
 
 DDL: create drop alter rename truncate
 
@@ -896,12 +997,8 @@ show  create table       table_name; # 查看表的创建信息
 
 create database database_name;           # 创建数据库
 create table tbl (...);                  # 创建表
-create table tbl (id int  [constraint]); # 创建表, 包含约束
-
-create table tbl(id int, [unique] index index_name(id)); # 创建索引
 
 create          table table_name as select ...;      # 创建表
-create [unique] index index_name on table_name(...); # 添加索引
 
 # 存储函数和存储过程
 * characteristics
@@ -944,26 +1041,17 @@ create [or replace] view view_name as select ... # 创建或更新视图
 desc table_name;                       # 查看表结构
 
 alter table tbl_name add col_name col_def [first | after col_name];          # 增加列
-alter table tbl_name add index index_name(id);                               # 添加普通索引
 
-alter table tbl_name add [constraint symbol] check(id > 0) [[NOT] ENFORCED]; # 添加 check
 
-alter table tbl_name drop   check      symbol;          # 删除 check 约束
 alter table tbl_name drop   constraint symbol;          # 删除 主键 外键 唯一键 约束
 alter table tbl_name drop   col_name;                   # 删除列
-alter table tbl_name drop   index index_name;           # 删除索引
-
-alter table tbl_name drop   check       check_name;     # 删除 check
-alter table tbl_name drop   index index_name;           # 删除索引
 
 alter table tbl_name alter check      symbol [[NOT] ENFORCED];   # 设置 check 约束 是否生效
 alter table tbl_name alter constraint symbol [[NOT] ENFORCED];   # 设置 主键 外键 唯一键 约束 是否生效
 
-alter table tbl_name alter col_name drop default;              # 删除默认值
-alter table tbl_name alter col_name set  default ...;          # 设置默认值
 alter table tbl_name alter col_name set {visible | invisible}; # 设置列是否可见
 
-alter table tbl_name alter index index_name {visible | invisible}; # 设置索引是否可见
+
 
 alter table tbl_name modify                  col_name col_def [first | after col_name]; # 修改列属性
 alter table tbl_name change old_col_name new_col_name col_def [first | after col_name]; # 修改列名称
@@ -971,7 +1059,7 @@ alter table tbl_name change old_col_name new_col_name col_def [first | after col
 alter table tbl_name order by col_name,...;             # 列排序
 
 alter table tbl_name rename column   old_col_name to   new_col_name;  # 重命名列
-alter table tbl_name rename index  old_index_name to new_index_name;  # 重命名索引
+
 alter table tbl_name rename                       to   new_tbl_name;  # 重命名表
 
 alter view view_name as select ...    # 更新视图
@@ -984,7 +1072,6 @@ drop view                    view_name;               # 删除视图
 drop function            function_name;               # 删除函数
 drop procedure          procedure_name;               # 删除存储过程
 drop trigger   table_name.trigger_name;               # 删除触发器
-drop index                  index_name on table_name; # 删除索引
 
 rename table old_table to new_table; # 重命名表
 
@@ -1057,8 +1144,6 @@ union all ----- # 合并, 不去重 -- 效率高
 * 有返回值
 ```
 
-
-
 ## 变量
 
 ## if
@@ -1066,7 +1151,6 @@ union all ----- # 合并, 不去重 -- 效率高
 ## 为什么使用数据库
 * 数据持久化
 * 效率
-
 
 DDL(数据定义语言): CREATE DROP   ALTER
 DML(数据操作语言): INSERT UPDATE SELECT DELETE
@@ -1088,7 +1172,6 @@ E-R(entity-relationship 实体-联系)模型中有三个主要概念是 实体�
 一个实体集(class)   == 一个表(table)
 一个实体(instance)  == 一行(row), 一条记录(record)
 一个属性(attribute) == 一列(column), 一个字段(field)
-
 
 表之间的关系
 一对一: 用的不多, 可以使用一张表, 但会冗余
@@ -1123,4 +1206,3 @@ trigger 触发器
 * https://dev.mysql.com/doc/refman/9.0/en/account-management-statements.html --- 用户和角色
 * https://dev.mysql.com/doc/refman/9.0/en/privilege-changes.html --------------- 权限刷新
 * https://dev.mysql.com/doc/refman/9.0/en/resetting-permissions.html ----------- 重置 root 密码
-
