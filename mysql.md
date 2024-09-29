@@ -837,7 +837,30 @@ select * from information_schema.table_constraints where table_name = 'student';
 alter  table student drop check constraint_name;
 select * from information_schema.table_constraints where table_name = 'student';
 
-#### DEFAULT --- 默认值
+# 7. DEFAULT --- 默认值
+# 7.1 创建
+use    test;
+drop   table if exists student;
+create table student(id int, name varchar(20) default 'tom');
+desc   student;
+
+# 7.2 添加
+use    test;
+drop   table if exists student;
+create table student(id int, name varchar(20));
+desc   student;
+alter  table student alter name set default 'tom';
+desc   student;
+
+# 7.3 删除
+use    test;
+drop   table if exists student;
+create table student(id int, name varchar(20) default 'tom');
+desc   student;
+alter  table student alter name drop default;
+desc   student;
+
+
 #### INDEX --- 索引
 ```
 * 普通索引 ----- 无任何限制
