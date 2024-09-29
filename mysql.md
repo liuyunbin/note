@@ -394,9 +394,6 @@ insert into student values(1,    "bob"); # 报错
 * 先创建主表, 再创建从表
 * 先删除从表或外键, 再删除主表
 
-
-
-
 # 4.1 创建
 # 4.1.1 不指定约束名和索引名: 约束名不是列名, 由系统生成, 索引名是列名 (建议)
 use    test;
@@ -699,20 +696,80 @@ delete from teacher where id = 2;
 select * from teacher;
 select * from student;
 
+# 5. AUTO_INCREMENT --- 自动递增
+# 5.1 创建
+# 5.1.1 单列 (整形): 作用于主键
+use    test;
+drop   table if exists student;
+create table student(id int primary key auto_increment);
+desc   student;
+
+# 5.1.2 单列 (整形): 作用于唯一键, 非空, 无主键时, 该列会变成主键
+use    test;
+drop   table if exists student;
+create table student(id int unique auto_increment, idd int);
+desc   student;
+
+# 5.1.3 单列 (整形): 作用于唯一键, 非空, 有其他主键时, 该列还是唯一键
+use    test;
+drop   table if exists student;
+create table student(id int unique auto_increment, idd int primary key );
+desc   student;
+
+# 5.1.4 单列 (非整形) -- 报错
+use    test;
+drop   table if exists student;
+create table student(id int, name varchar(20) unique auto_increment);
+
+# 5.1.5 多列 (整形) -- 报错
+use    test;
+drop   table if exists student;
+create table student(id int unique auto_increment, idd int unique auto_increment);
+
+# 5.1.6 单列 -- 默认初始值为 1
+use    test;
+drop   table if exists student;
+create table student(id int primary key auto_increment, name varchar(20));
+insert into student(name) values('bob');
+select * from student;
+
+# 5.1.7 单列 -- 设置初始值为 10
+use    test;
+drop   table if exists student;
+create table student(id int primary key auto_increment, name varchar(20)) auto_increment = 10;
+insert into student(name) values('bob');
+select * from student;
+
+# 5.2 添加
+# 5.2.1 初始值为 1
+use    test;
+drop   table if exists student;
+create table student(id int primary key, name varchar(20));
+desc   student;
+alter  table student modify id int auto_increment;
+desc   student;
+insert into student(name) values('bob');
+select * from student;
+
+# 5.2.2 设置初始值为 10
+use    test;
+drop   table if exists student;
+create table student(id int primary key auto_increment, name varchar(20));
+desc   student;
+alter  table student auto_increment = 10;
+desc   student;
+insert into student(name) values('bob');
+select * from student;
+
+# 5.3 删除
+use    test;
+drop   table if exists student;
+create table student(id int primary key auto_increment);
+desc   student;
+alter  table student modify id int;
+desc   student;
 
 
-                                                  
-
-
-
-# AUTO_INCREMENT --- 自动递增
-* 最多有一列
-* 列必须唯一
-* 一般用在主键
-* 作用于整形
-* create table student(id int auto_increment);       # 创建
-* alter  table student modify id int auto_increment; # 添加
-* alter  table student modify id int;                # 删除
 
 #### check --- 检查
 #### DEFAULT --- 默认值
