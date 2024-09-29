@@ -297,7 +297,8 @@ insert into student values(NULL, "bob"); # 报错
 * 设置或修改索引名和约束名没意义
 * 最多只存在一个主键
 * 可以对多列定义一个主键
-* 删除主键后, 主键索引也会删除, 但非空约束还在
+* 删除主键约束只能通过删除主键来实现, 删除主键索引或主键约束报错
+* 删除主键约束后, 主键索引也会删除, 但非空约束还在
 * 和唯一键的区别: 非空 + 最多只有一个
 
 # 3.1 创建
@@ -379,7 +380,8 @@ desc   student;
 select * from information_schema.table_constraints where table_name = 'student';
 show   index from student;
 
-# 3.3 删除: 删除主键会删除对应的索引, 但非空约束还在
+# 3.3 删除
+# 3.3.1 删除主键: 会删除对应的索引, 但非空约束还在
 use    test;
 drop   table if exists student;
 create table student(id int primary key, name varchar(20));
@@ -390,6 +392,24 @@ alter  table student drop primary key;
 desc   student;
 select * from information_schema.table_constraints where table_name = 'student';
 show   index from student;
+
+# 3.3.2 删除主键约束: 报错
+use    test;
+drop   table if exists student;
+create table student(id int primary key, name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show   index from student;
+alter  table student drop constraints primary;
+
+# 3.3.3 删除主键索引: 报错
+use    test;
+drop   table if exists student;
+create table student(id int primary key, name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show   index from student;
+alter  table student drop index primary;
 
 # 3.4 不可以存储 NULL, 不可以重复
 use    test;
