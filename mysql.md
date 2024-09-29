@@ -172,6 +172,7 @@ desc   student;
 * 可以存在多个唯一键
 * 可以对多列定义一个唯一键
 * 只能通过删除唯一索引的方式删除唯一键
+* 删除唯一约束名报错
 
 # 2.1 创建
 # 2.1.1 列级约束(单列): 约束名和索引名默认和列名相同 (推荐)
@@ -253,8 +254,8 @@ alter  table student modify id int unique;
 select * from information_schema.table_constraints where table_name = 'student';
 show   index from student;
 
-# 2.3 删除: 只能通过删除唯一索引实现
-# 2.3.1 使用 ALTER
+# 2.3 删除
+# 2.3.1 删除唯一索引: 使用 ALTER
 use    test;
 drop   table if exists student;
 create table student(id int unique, name varchar(20));
@@ -265,7 +266,7 @@ alter  table student drop index id;
 select * from information_schema.table_constraints where table_name = 'student';
 show   index from student;
 
-# 2.3.2 使用 DROP
+# 2.3.2 删除唯一索引: 使用 DROP
 use    test;
 drop   table if exists student;
 create table student(id int unique, name varchar(20));
@@ -275,6 +276,15 @@ show   index from student;
 drop   index id on student;
 select * from information_schema.table_constraints where table_name = 'student';
 show   index from student;
+
+# 2.3.3 删除唯一约束名: 报错
+use    test;
+drop   table if exists student;
+create table student(id int unique, name varchar(20));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+show   index from student;
+alter  table student drop constraints id;
 
 # 2.4 可以存储 NULL, NULL 可以重复, 其他不行
 use    test;
