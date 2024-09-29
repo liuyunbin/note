@@ -1070,7 +1070,25 @@ alter  table student rename index index_name to new_index_name;
 show   index from student;
 ```
 
-## 库 表和视图
+## 库
+```
+# 1. 为什么使用数据库
+* 数据持久化
+* 效率
+
+# 2. 常用命令
+show   databases;            # 查看所有的数据库
+show   create database test; # 查看数据库的创建信息, 比如编码
+create database test;        # 创建数据库
+alter  database test ...;    # 修改数据库
+drop   database test;        # 删除数据库
+use    test;                 # 选择数据库
+```
+
+
+
+
+表和视图
 ```
 
 
@@ -1159,10 +1177,10 @@ drop trigger   table_name.trigger_name;               # 删除触发器
 
 DDL: create drop alter rename truncate
 
-show  databases;                     # 查看所有的数据库
+
 show  tables;                        # 查看所有的表
 show  tables from     database_name; # 查看某一库中所有的表
-show  create database database_name; # 查看数据库的创建信息, 比如编码
+
 show  create table       table_name; # 查看表的创建信息
 
 create database database_name;           # 创建数据库
@@ -1170,14 +1188,11 @@ create table tbl (...);                  # 创建表
 
 create          table table_name as select ...;      # 创建表
 
-
-
 create [or replace] view view_name as select ... # 创建或更新视图
 
 desc table_name;                       # 查看表结构
 
 alter table tbl_name add col_name col_def [first | after col_name];          # 增加列
-
 
 alter table tbl_name drop   constraint symbol;          # 删除 主键 外键 唯一键 约束
 alter table tbl_name drop   col_name;                   # 删除列
@@ -1199,13 +1214,10 @@ alter table tbl_name rename                       to   new_tbl_name;  # 重命�
 
 alter view view_name as select ...    # 更新视图
 
-alter database database_name ...;   # 修改数据库
 
-drop database            database_name;               # 删除数据库
 drop table                  table_name;               # 删除表
 
 drop view                    view_name;               # 删除视图
-
 
 rename table old_table to new_table; # 重命名表
 
@@ -1220,7 +1232,6 @@ update table_name set ... where ...      # 更新
 delete from table_name where ...         # 删除
 set autocommit = false; # 取消自动提交
 rollback;               # 回滚
-
 
 ## SELECT
 ```
@@ -1250,10 +1261,6 @@ limit 行数
 union --------- # 合并, 去重 ---- 效率低
 union all ----- # 合并, 不去重 -- 效率高
 ```
-
-## 为什么使用数据库
-* 数据持久化
-* 效率
 
 DDL(数据定义语言): CREATE DROP   ALTER
 DML(数据操作语言): INSERT UPDATE SELECT DELETE
