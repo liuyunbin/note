@@ -819,6 +819,9 @@ alter  table student modify id int;
 desc   student;
 
 # 6. check --- 检查
+* 只能通过删除 check 约束名来删除 check 约束
+* 可以使 check 不生效
+
 # 6.1 创建
 # 6.1.1 列级约束: 约束名由系统生成 (推荐)
 use    test;
@@ -866,10 +869,11 @@ use    test;
 drop   table if exists student;
 create table student(id int);
 select * from information_schema.table_constraints where table_name = 'student';
-alter  table student MODIFY id int check(id > 0);
+alter  table student modify id int check(id > 0);
 select * from information_schema.table_constraints where table_name = 'student';
 
 # 6.3 删除
+# 6.3.1 删除 check 约束名
 use    test;
 drop   table if exists student;
 create table student(id int, name varchar(20), constraint constraint_name check(id > 0));
@@ -877,6 +881,27 @@ desc   student;
 select * from information_schema.table_constraints where table_name = 'student';
 alter  table student drop check constraint_name;
 select * from information_schema.table_constraints where table_name = 'student';
+
+# 6.3.2 通过 alter ... modify ... ------ 没用
+use    test;
+drop   table if exists student;
+create table student(id int, name varchar(20), constraint constraint_name check(id > 0));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+alter  table student modify id int;
+select * from information_schema.table_constraints where table_name = 'student';
+
+# 6.4 使 check 不生效
+use    test;
+drop   table if exists student;
+create table student(id int, name varchar(20), constraint constraint_name check(id > 0));
+desc   student;
+select * from information_schema.table_constraints where table_name = 'student';
+insert into student values(-1, 'bob'); # 报错
+alter  table student alter check constraint_name not enforced;
+select * from information_schema.table_constraints where table_name = 'student';
+insert into student values(-1, 'bob');
+select * from student;
 
 # 7. DEFAULT --- 默认值
 # 7.1 创建
