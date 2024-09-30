@@ -8,63 +8,6 @@
 * 数据持久化
 * 效率
 
-## 存储过程和函数
-```
-## 存储过程
-* 简化操作, 减少网上传输的数据
-* 没返回值
-* 提高复用, 减少操作失误
-* 提前编译, 效率高
-* 不好调试
-* 分表时, 不好维护
-
-
-## 函数
-和存储过程的区别
-* 有返回值
-
-## 变量
-
-## if
-
-# 存储函数和存储过程
-* characteristics
-    * LANGUAGE SQL ----------- 语言 SQL
-    * DETERMINISTIC ---------- 相同的输入会得到相同的输出
-    * NOT DETERMINISTIC ------ 相同的输入不一定会得到相同的输出 ---- 默认值
-    * NO SQL ----------------- 不包含任何 SQL 语句
-    * CONTAINS SQL ----------- 不包含任何 SQL 语句, 但是并不包含读写数据的SQL语句 ---- 默认
-    * READS SQL DATA --------- 包含读数据的 SQL 语句
-    * MODIFIES SQL DATA ------ 包含写数据的 SQL 语句
-    * SQL SECURITY DEFINER --- 只允许创建者或定义者使用 --- 默认
-    * SQL SECURITY INVOKER --- 允许所有人使用
-
-DELIMITER $
-create procedure procedure_name(...) ------- IN, OUT, INOUT
-    [characteristics ...]
-    begin
-        ...
-    end $
-DELIMITER ;
-
-call procedure_name(...)
-
-DELIMITER $
-create function function_name(...) --- 只能是 IN
-    [characteristics ...]
-    return ...
-    begin
-        ...
-    end $
-DELIMITER ;
-
-select procedure_name(...)
-
-
-drop function            function_name;               # 删除函数
-drop procedure          procedure_name;               # 删除存储过程
-```
-
 ## 游标
 ```
 
