@@ -1,128 +1,4 @@
 
-## 安装和初始化
-```
-# 1. 安装软件和基本安全设置
-$ sudo apt install mysql-server # 1. 安装软件
-$ mysql_secure_installation     # 2. 基本安全设置
-                                #   * 配置 root 使用 Linux root 用户认证
-                                #   * 禁止 root 远程登录
-                                #   * 删除匿名用户
-                                #   * 删除测试数据库
-
-# 2. 启动 MySQL 并设置为开机自动启动
-$ sudo systemctl list-unit-files | grep mysql   # 1. 查看 mysql 服务的名称
-$ sudo systemctl list-unit-files | grep mariadb #
-$ sudo systemctl is-active  mysql.service       # 2. 查看是否已启动
-$ sudo systemctl start      mysql.service       # 3. 启动服务
-$ sudo systemctl is-active  mysql.service       # 4. 再次查看是否已启动
-$ sudo systemctl is-enabled mysql.service       # 5. 查看是否开机自动启动
-$ sudo systemctl enable     mysql.service       # 6. 设置开机自动启动
-$ sudo systemctl is-enabled mysql.service       # 7. 再次查看是否开机自动启动
-
-# 3. 修改编码为 utf8mb4 --- 8.0 及以后的版本不需要修改了
-$ mysql> show variables like 'character%';      # 1. 查看编码和字符集
-$ mysql> show variables like 'collation%';      #
-$ mysql --help | grep -A1 'Default options'     # 2. 查看 MySQL 的配置文件
-$                                               # 3. 修改配置文件中的编码
-#                                               #   * default-character-set = utf8mb4
-$ sudo systemctl restart mysql.service          # 4. 重启 MySQL
-$ mysql> show variables like 'character%';      # 5. 再次查看编码和字符集
-$ mysql> show variables like 'collation%';      #
-
-# 4. 开启防火墙
-$ sudo firewall-cmd --list-services                 # 1. 查看目前开启的服务
-$ sudo firewall-cmd --permanent --add-service=mysql # 2. 永久开启服务
-$ sudo firewall-cmd --reload                        # 3. 重新加载防火墙
-$ sudo firewall-cmd --list-services                 # 4. 再次查看目前开启的服务
-
-# 5. 允许远程访问
-$ ss -tal | grep mysql                      # 1. 查看 MySQL 是否允许远程访问
-$ mysql --help | grep -A1 'Default options' # 2. 查看 MySQL 的配置文件
-$                                           # 3. 注释掉对应的配置
-$                                           #   * bind-address        = 127.0.0.1
-$                                           #   * mysqlx-bind-address = 127.0.0.1
-$ sudo systemctl restart mysql              # 4. 重启 MySQL
-$ ss -tal | grep mysql                      # 5. 再次查看 MySQL 是否允许远程访问
-```
-
-## 修改密码
-```
-set password                   =password('123456');  # 修改当前用户密码 -- 旧版本 5.7
-set password for user@hostname =password('123456');  # 修改其他用户密码 -- 旧版本 5.7
-set password                   =new_password;        # 修改当前用户密码 -- 新版本 8.0 -- 不建议使用
-set password for user@hostname=new_password;         # 修改其他用户密码 -- 新版本 8.0 -- 不建议使用
-alter user user@hostname identified by new_password; # 修改其他用户密码 -- 新版本 8.0
-alter user user@hostname identified with caching_sha2_password by 'new_password';
-                                                     # 修改其他用户密码, 客户端为 8.0
-alter user user@hostname identified with mysql_native_password by 'new_password';
-                                                     # 修改其他用户密码, 客户端为 5.7
-```
-
-## 忘记 root 密码 或 恢复 root 权限-- MariaDB 5.5.68 --- centos 7
-```
-sudo systemctl list-unit-files | grep mariadb # 1. 查看 mariadb 服务的名称
-sudo systemctl stop mariadb.service;          # 2. 停止服务器
-sudo mysqld_safe --skip-grant-tables &        # 3. 启动服务器, 跳过密码和权限判断
-mysql -u root;                                # 4. 连接 MySQL, 不需要密码
-flush privileges;                             # 5. 刷新权限, 使得权限管理生效
-set password for 'root'@'localhost' = password('root');
-                                              # 6. 设置新密码(可选)
-grant all privileges on *.* to 'root'@'localhost' with grant option;
-                                              # 7. 赋予权限(可选)
-mysqladmin -u root -p shutdown;               # 8. 使用新密码停止服务
-sudo systemctl start mariadb.service;         # 9. 启动服务
-```
-
-## 忘记 root 密码 或 恢复 root 权限----- MySQL 8.0.39 --- ubuntu 22.04
-```
-sudo systemctl list-unit-files | grep mysql   # 1. 查看 mysql 服务的名称
-sudo systemctl stop   mysql.service;          # 2. 停止服务器
-sudo mkdir -p /var/run/mysqld                 # 3. 新建目录
-sudo chown mysql:mysql /var/run/mysqld        # 4. 改变归属
-sudo mysqld_safe --skip-grant-tables &        # 5. 启动服务器, 跳过密码和权限判断
-mysql -u root;                                # 6. 连接 MySQL, 不需要密码
-flush privileges;                             # 7. 刷新权限, 使得权限管理生效
-alter user 'root'@'localhost' identified by 'root';
-                                              # 8. 设置新密码(可选)
-grant all privileges on *.* to 'root'@'localhost' with grant option;
-                                              # 9. 赋予权限(可选)
-mysqladmin -u root -p shutdown;               # 10. 使用新密码停止服务
-sudo systemctl start   mysql.service;         # 11. 启动服务
-```
-
-## 用户和权限
-```
-# 1. 权限使用原则
-* 只赋予满足要求的最小权限
-* 限制用户登录的主机, root 只允许本机登录
-* 定期删除不用的用户
-* 权限可以叠加
-
-# 2. 权限刷新
-* 服务端
-    * GRANT, REVOKE, SET PASSWORD, RENAME USER --- 不需要刷新权限
-    * INSERT, UPDATE, or DELETE -------------------- 需要刷新权限 FLUSH PRIVILEGES --- 不推荐
-* 客户端
-    * 表和列的权限, 下一次请求的时候就会生效
-    * 库的权限, 客户端使用 use ... 的时候才生效, 但客户端可能缓存库名称
-    * 密码那些不会影响到已连接的客户端
-* 修改权限后, 客户端最好重连
-* 见 https://dev.mysql.com/doc/refman/9.0/en/privilege-changes.html
-
-# 3. 使用
-select user,host,plugin from mysql.user;           # 1. 查看用户及其加密插件
-show variables like 'validate_password%';          # 2. 查看密码要求:
-                                                   #    * 大小写字母 数字 特殊字符
-                                                   #    * 至少 8 个字符
-create user 'dba1'@'%' identified by 'Dba123456@'; # 3. 创建用户
-                                                   # 4. 授予权限
-grant  select         on test.* to   'dba1'@'%';   #    * 库的查询权限
-grant  all privileges on test.* to   'dba1'@'%';   #    * 库的全部权限
-show grants for 'dba1'@'%';                        # 5. 查看用户权限
-revoke all privileges on test.* from 'dba1'@'%';   # 6. 回收用户权限
-drop user 'dba1'@'%';                              # 7. 删除用户
-```
-
 ## 常用数据类型
 ```
 int --------------- 整形 ------------------- 4     个字节
@@ -146,8 +22,8 @@ create database if not exists test;
 use    test;
 drop   table if exists student;
 create table student(id int not null);
-desc   student; 
- 
+desc   student;
+
 # 1.2 添加
 use    test;
 drop   table if exists student;
@@ -631,7 +507,7 @@ create table student(
   id int primary key,
   name varchar(20) unique,
   teacher_id int,
-  foreign key(teacher_id) references teacher(id) on delete cascade 
+  foreign key(teacher_id) references teacher(id) on delete cascade
 );
 insert into teacher values(1, "马钰");
 insert into student values(1, "郭靖", 1);
@@ -650,7 +526,7 @@ create table student(
   id int primary key,
   name varchar(20) unique,
   teacher_id int,
-  foreign key(teacher_id) references teacher(id) on update set null 
+  foreign key(teacher_id) references teacher(id) on update set null
 );
 insert into teacher values(1, "马钰");
 insert into student values(1, "郭靖", 1);
@@ -669,7 +545,7 @@ create table student(
   id int primary key,
   name varchar(20) unique,
   teacher_id int,
-  foreign key(teacher_id) references teacher(id) on delete set null 
+  foreign key(teacher_id) references teacher(id) on delete set null
 );
 insert into teacher values(1, "马钰");
 insert into student values(1, "郭靖", 1);
@@ -688,7 +564,7 @@ create table student(
   id int primary key,
   name varchar(20) unique,
   teacher_id int,
-  foreign key(teacher_id) references teacher(id) on update no action 
+  foreign key(teacher_id) references teacher(id) on update no action
 );
 insert into teacher values(1, "马钰");
 insert into teacher values(2, "丘处机");
@@ -709,7 +585,7 @@ create table student(
   id int primary key,
   name varchar(20) unique,
   teacher_id int,
-  foreign key(teacher_id) references teacher(id) on delete no action 
+  foreign key(teacher_id) references teacher(id) on delete no action
 );
 insert into teacher values(1, "马钰");
 insert into teacher values(2, "丘处机");
@@ -846,7 +722,7 @@ use    test;
 drop   table if exists student;
 create table student(
   id int,
-  name varchar(20), 
+  name varchar(20),
   constraint constraint_name check(id > 0)
 );
 desc   student;
