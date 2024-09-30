@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cstdint>
 
 #include <algorithm>
 #include <bitset>
