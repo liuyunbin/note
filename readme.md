@@ -22,5 +22,12 @@
 * 熟悉 设计模式
 * 熟悉 redis
 * 熟悉 mysql
-* 熟悉 workflow
+* 熟悉 jq
+* 熟悉 wrk
+* 熟悉 lua
+* 熟悉 cpp
+* 熟悉 perl
+* 熟悉 python
+* 熟悉 thread
+* 熟悉 nginx
 
