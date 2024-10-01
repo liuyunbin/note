@@ -1,26 +1,17 @@
 
+round -- 不一定是直观 的四舍五入
 
-## 联系子查询
+current_timestamp()
+current_date()
+now()
+
+## 练习子查询
 
 ## 库
 ```
 # 1. 为什么使用数据库
 * 数据持久化
 * 效率
-
-## 游标
-```
-
-```
-
-## 触发器
-```
-create trigger trigger_name [before|after]  [insert|update|delete]   on table_name for each row ...
-
-
-drop trigger   table_name.trigger_name;               # 删除触发器
-```
-
 
 DDL: create drop alter rename truncate
 
