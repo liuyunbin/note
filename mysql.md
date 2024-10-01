@@ -1,4 +1,140 @@
 
+## 安装和初始化
+#### 1. 安装软件和基本安全设置
+```
+sudo apt install mysql-server # 1. 安装软件
+mysql_secure_installation     # 2. 基本安全设置
+                              #   * 配置 root 使用 Linux root 用户认证
+                              #   * 禁止 root 远程登录
+                              #   * 删除匿名用户
+                              #   * 删除测试数据库
+```
+
+#### 2. 启动 MySQL 并设置为开机自动启动
+```
+sudo systemctl list-unit-files | grep mysql   # 1. 查看 mysql 服务的名称
+sudo systemctl list-unit-files | grep mariadb #
+sudo systemctl is-active  mysql.service       # 2. 查看是否已启动
+sudo systemctl start      mysql.service       # 3. 启动服务
+sudo systemctl is-active  mysql.service       # 4. 再次查看是否已启动
+sudo systemctl is-enabled mysql.service       # 5. 查看是否开机自动启动
+sudo systemctl enable     mysql.service       # 6. 设置开机自动启动
+sudo systemctl is-enabled mysql.service       # 7. 再次查看是否开机自动启动
+```
+
+#### 3. 修改编码为 utf8mb4 --- 8.0 及以后的版本不需要修改了
+```
+SHOW VARIABLES LIKE 'character%';         # 1. 查看编码和字符集
+SHOW VARIABLES LIKE 'collation%';         #
+mysql --help | grep -A1 'Default options' # 2. 查看 MySQL 的配置文件
+                                          # 3. 修改配置文件中的编码
+                                          #   * default-character-set = utf8mb4
+sudo systemctl restart mysql.service      # 4. 重启 MySQL
+SHOW VARIABLES LIKE 'character%';         # 5. 再次查看编码和字符集
+SHOW VARIABLES LIKE 'collation%';         #
+```
+
+##### 4. 开启防火墙
+```
+sudo firewall-cmd --list-services                 # 1. 查看目前开启的服务
+sudo firewall-cmd --permanent --add-service=mysql # 2. 永久开启服务
+sudo firewall-cmd --reload                        # 3. 重新加载防火墙
+sudo firewall-cmd --list-services                 # 4. 再次查看目前开启的服务
+```
+
+#### 5. 允许远程访问
+```
+ss -tal | grep mysql                      # 1. 查看 MySQL 是否允许远程访问
+mysql --help | grep -A1 'Default options' # 2. 查看 MySQL 的配置文件
+                                          # 3. 注释掉对应的配置
+                                          #   * bind-address        = 127.0.0.1
+                                          #   * mysqlx-bind-address = 127.0.0.1
+sudo systemctl restart mysql              # 4. 重启 MySQL
+ss -tal | grep mysql                      # 5. 再次查看 MySQL 是否允许远程访问
+```
+
+
+## 1. 修改密码
+```
+SET PASSWORD                   =PASSWORD('123456');  # 修改当前用户密码 -- 旧版本 5.7
+SET PASSWORD FOR user@hostname =PASSWORD('123456');  # 修改其他用户密码 -- 旧版本 5.7
+SET PASSWORD                   =new_password;        # 修改当前用户密码 -- 新版本 8.0 -- 不建议使用
+SET PASSWORD FOR user@hostname=new_password;         # 修改其他用户密码 -- 新版本 8.0 -- 不建议使用
+ALTER USER user@hostname IDENTIFIED BY new_password; # 修改其他用户密码 -- 新版本 8.0
+ALTER USER user@hostname IDENTIFIED WITH caching_sha2_password BY 'new_password';
+                                                     # 修改其他用户密码, 客户端为 8.0
+ALTER USER user@hostname IDENTIFIED WITH mysql_native_password BY 'new_password';
+                                                     # 修改其他用户密码, 客户端为 5.7
+```
+
+## 2. 忘记 root 密码 或 恢复 root 权限-- MariaDB 5.5.68 --- centos 7
+```
+sudo systemctl list-unit-files | grep mariadb # 1. 查看 mariadb 服务的名称
+sudo systemctl stop mariadb.service;          # 2. 停止服务器
+sudo mysqld_safe --skip-grant-tables &        # 3. 启动服务器, 跳过密码和权限判断
+mysql -u root;                                # 4. 连接 MySQL, 不需要密码
+FLUSH PRIVILEGES;                             # 5. 刷新权限, 使得权限管理生效
+SET PASSWORD FOR 'root'@'localhost' = PASSWORD('root');
+                                              # 6. 设置新密码(可选)
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
+                                              # 7. 赋予权限(可选)
+mysqladmin -u root -p shutdown;               # 8. 使用新密码停止服务
+sudo systemctl start mariadb.service;         # 9. 启动服务
+```
+
+## 3. 忘记 root 密码 或 恢复 root 权限----- MySQL 8.0.39 --- ubuntu 22.04
+```
+sudo systemctl list-unit-files | grep mysql   # 1. 查看 mysql 服务的名称
+sudo systemctl stop   mysql.service;          # 2. 停止服务器
+sudo mkdir -p /var/run/mysqld                 # 3. 新建目录
+sudo chown mysql:mysql /var/run/mysqld        # 4. 改变归属
+sudo mysqld_safe --skip-grant-tables &        # 5. 启动服务器, 跳过密码和权限判断
+mysql -u root;                                # 6. 连接 MySQL, 不需要密码
+FLUSH PRIVILEGES;                             # 7. 刷新权限, 使得权限管理生效
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
+                                              # 8. 设置新密码(可选)
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
+                                              # 9. 赋予权限(可选)
+mysqladmin -u root -p shutdown;               # 10. 使用新密码停止服务
+sudo systemctl start   mysql.service;         # 11. 启动服务
+```
+
+## 4. 用户和权限
+#### 4.1 权限使用原则
+* 只赋予满足要求的最小权限
+* 限制用户登录的主机, root 只允许本机登录
+* 定期删除不用的用户
+* 权限可以叠加
+
+#### 4.2 权限刷新
+* 服务端
+    * GRANT, REVOKE, SET PASSWORD, RENAME USER --- 不需要刷新权限
+    * INSERT, UPDATE, or DELETE -------------------- 需要刷新权限 FLUSH PRIVILEGES --- 不推荐
+* 客户端
+    * 表和列的权限, 下一次请求的时候就会生效
+    * 库的权限, 客户端使用 use ... 的时候才生效, 但客户端可能缓存库名称
+    * 密码那些不会影响到已连接的客户端
+* 修改权限后, 客户端最好重连
+* 见 https://dev.mysql.com/doc/refman/9.0/en/privilege-changes.html
+
+#### 4.3 使用
+```
+SELECT user,host,plugin FROM mysql.user;           # 1. 查看用户及其加密插件
+SHOW VARIABLES LIKE 'validate_password%';          # 2. 查看密码要求:
+                                                   #    * 大小写字母 数字 特殊字符
+                                                   #    * 至少 8 个字符
+CREATE USER 'dba1'@'%' IDENTIFIED BY 'Dba123456@'; # 3. 创建用户
+                                                   # 4. 授予权限
+GRANT  SELECT         ON test.* TO   'dba1'@'%';   #    * 库的查询权限
+GRANT  ALL PRIVILEGES ON test.* TO   'dba1'@'%';   #    * 库的全部权限
+SHOW GRANTS FOR 'dba1'@'%';                        # 5. 查看用户权限
+REVOKE ALL PRIVILEGES ON test.* FROM 'dba1'@'%';   # 6. 回收用户权限
+DROP USER 'dba1'@'%';                              # 7. 删除用户
+```
+
+## 参考
+* https://dev.mysql.com/doc/refman/9.0/en/resetting-permissions.html ----------- 重置 root 密码
+
 # 常用数据类型
 ```
 INT --------------- 整形 ------------------- 4     个字节
@@ -1113,3 +1249,918 @@ SHOW   INDEX FROM student;
 ALTER  TABLE student REname INDEX index_name TO NEW_index_name;
 SHOW   INDEX FROM student;
 ```
+
+## 库
+```
+SHOW   DATABASES;                   # 查看所有的数据库
+CREATE DATABASE IF NOT EXISTS test; # 创建数据库
+SHOW   CREATE DATABASE test;        # 查看数据库的创建信息, 比如编码
+USE    test;                        # 选择数据库
+DROP   DATABASE test;               # 删除数据库
+```
+
+## 表
+### 0. 准备库
+```
+SHOW   DATABASES;
+CREATE DATABASE IF NOT EXISTS test;
+SHOW   DATABASES;
+```
+
+### 1. 创建和删除表
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+DROP   TABLE IF EXISTS student_test;
+CREATE TABLE student (id INT);
+CREATE TABLE student_test AS SELECT * FROM student; # 通过已存在的表新建
+SHOW   TABLES;
+SHOW   CREATE TABLE student;
+SHOW   CREATE TABLE student_test;
+DESC   student;
+DESC   student_test;
+```
+
+### 2. 增加列
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student (id INT);
+DESC   student;
+ALTER  TABLE student ADD before_id VARCHAR(20) FIRST;
+ALTER  TABLE student ADD  after_id VARCHAR(20) AFTER id;
+ALTER  TABLE student ADD      name VARCHAR(20);
+DESC   student;
+```
+
+### 3. 删除列
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student (id INT, name VARCHAR(20));
+DESC   student;
+ALTER  TABLE student DROP name;
+DESC   student;
+```
+
+### 4. 修改列属性
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student (id INT, name VARCHAR(20));
+DESC   student;
+ALTER  TABLE student MODIFY id BIGINT;
+DESC   student;
+ALTER  TABLE student MODIFY name VARCHAR(20) FIRST;
+DESC   student;
+ALTER  TABLE student MODIFY name VARCHAR(20) AFTER id;
+DESC   student;
+```
+
+### 5. 重命名列名
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student (id INT, name VARCHAR(20));
+DESC   student;
+ALTER  TABLE student RENAME COLUMN name TO new_name;
+DESC   student;
+ALTER  TABLE student CHANGE id new_id BIGINT;
+DESC   student;
+```
+
+### 6. 设置列不可见
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student (id INT, name VARCHAR(20));
+DESC   student;
+ALTER  TABLE student ALTER name SET INVISIBLE;
+DESC   student;
+ALTER  TABLE student ALTER name SET VISIBLE;
+DESC   student;
+```
+
+### 7. 重命名表
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+DROP   TABLE IF EXISTS student_test;
+CREATE TABLE student (id INT, name VARCHAR(20));
+SHOW   TABLES;
+ALTER  TABLE student RENAME TO student_test;
+SHOW   TABLES;
+RENAME TABLE student_test TO student;
+SHOW   TABLES;
+```
+
+### 8. 删除表内数据(清空表)
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+SET    AUTOCOMMIT = FALSE;      # 取消自动提交
+CREATE TABLE student (id INT, name VARCHAR(20));
+INSERT INTO  student VALUES(1, "马钰");
+INSERT INTO  student VALUES(2, "丘处机");
+INSERT INTO  student VALUES(3, "王处一");
+COMMIT;                  # 提交
+SELECT * FROM student;
+DELETE   FROM student;
+SELECT * FROM student;
+ROLLBACK;                # 回滚
+SELECT * FROM  student;
+TRUNCATE TABLE student;  # 清空表 --- 不能回滚 --- 会自动提交
+ROLLBACK;                # 回滚
+SELECT * FROM  student;
+```
+
+### 9. 插入数据(一个一个插入)
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student (id INT, name VARCHAR(20));
+INSERT INTO  student VALUES(1, "马钰");
+INSERT INTO  student VALUES(2, "丘处机");
+INSERT INTO  student VALUES(3, "王处一");
+SELECT * FROM student;
+```
+
+### 10. 插入数据(多个插入)
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student (id INT, name VARCHAR(20));
+INSERT INTO  student VALUES(1, "马钰"), (2, "丘处机"), (3, "王处一");
+SELECT * FROM student;
+```
+
+### 11. 插入数据(使用现有表)
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+DROP   TABLE IF EXISTS student_test;
+CREATE TABLE student (id INT, name VARCHAR(20));
+CREATE TABLE student_test (id INT, name VARCHAR(20));
+INSERT INTO  student VALUES(1, "马钰"), (2, "丘处机"), (3, "王处一");
+SELECT * FROM student;
+SELECT * FROM student_test;
+INSERT   INTO student_test SELECT * FROM student;
+SELECT * FROM student;
+SELECT * FROM student_test;
+```
+
+### 12. 插入数据(忽略重复的数据, 列唯一)
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20));
+INSERT INTO  student VALUES(1, "马钰");
+SELECT * FROM student;
+INSERT INTO  student VALUES(2, "马钰");
+SELECT * FROM student;
+INSERT INTO  student VALUES(1, "丘处机");        # 报错
+INSERT IGNORE INTO  student VALUES(1, "丘处机"); # 忽略重复的数据
+SELECT * FROM student;
+```
+
+### 13. 插入数据(遇到重复的数据, 先删除再添加)
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20));
+INSERT INTO  student VALUES(1, "丘处机");
+SELECT * FROM student;
+REPLACE INTO  student VALUES(1, "马钰");
+SELECT * FROM student;
+REPLACE INTO  student VALUES(2, "丘处机");
+SELECT * FROM student;
+```
+
+### 14. 更新数据
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student (id INT, name VARCHAR(20));
+INSERT INTO  student VALUES(1, "马玉");
+INSERT INTO  student VALUES(2, "丘处机");
+INSERT INTO  student VALUES(3, "王处一");
+SELECT * FROM student;
+UPDATE student SET name = "马钰" WHERE id = 1;
+SELECT * FROM student;
+```
+
+### 15. SELECT(书写和执行顺序)
+```
+书写: SELECT -> DISTINCT -> FROM -> WHERE -> GROUP BY -> HAVING -> ORDER BY -> LIMIT
+执行: FROM -> WHERE -> GROUP BY(此后可以使用聚合) -> HAVING -> SELECT -> DISTINCT -> ORDER BY -> LIMIT
+```
+
+### 16. SELECT()
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+DROP   TABLE IF EXISTS teacher;
+CREATE TABLE teacher (id INT PRIMARY KEY, name VARCHAR(20), addr VARCHAR(20));
+INSERT INTO  teacher VALUES(1, "中神通", "全真教");
+INSERT INTO  teacher VALUES(2, "东邪",   "桃花岛");
+INSERT INTO  teacher VALUES(3, "西毒",   "西域");
+INSERT INTO  teacher VALUES(4, "南帝",   "大理");
+INSERT INTO  teacher VALUES(5, "北丐",   "宋");
+INSERT INTO  teacher VALUES(6, "中顽童", "全真教");
+INSERT INTO  teacher VALUES(7, "北侠",   "大元");
+INSERT INTO  teacher VALUES(8, "西狂",   NULL);
+
+CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), addr VARCHAR(20), teacher_id int,
+  FOREIGN KEY (teacher_id) REFERENCES teacher(id)
+);
+INSERT INTO  student VALUES(1, "马钰",   "全真教", 1);
+INSERT INTO  student VALUES(2, "丘处机", "全真教", 1);
+INSERT INTO  student VALUES(3, "王处一", "全真教", 1);
+INSERT INTO  student VALUES(4, "黄蓉",   "桃花岛", 2);
+INSERT INTO  student VALUES(5, "欧阳克",   "西域", 3);
+INSERT INTO  student VALUES(6, "朱子柳",   "大理", 4);
+
+DROP   TABLE IF EXISTS teacher2;
+CREATE TABLE teacher2 (id INT PRIMARY KEY, name VARCHAR(20), addr VARCHAR(20));
+INSERT INTO  teacher2 VALUES(7, "北侠",      "大元");
+INSERT INTO  teacher2 VALUES(10, "金轮法王", "蒙古");
+INSERT INTO  teacher2 VALUES(11, "潇湘子",   "蒙古");
+INSERT INTO  teacher2 VALUES(12, "尼摩星",   "蒙古");
+INSERT INTO  teacher2 VALUES(13, "尹克西",   "蒙古");
+
+SELECT * FROM teacher;
+SELECT * FROM teacher WHERE addr = NULL;
+SELECT * FROM teacher WHERE addr IS NULL;
+SELECT * FROM teacher WHERE addr IS NOT NULL;
+SELECT * FROM teacher WHERE id BETWEEN 3 AND 5; # []
+SELECT * FROM teacher WHERE id IN (3, 5, 8);
+SELECT * FROM teacher WHERE id NOT IN (3, 5, 8);
+SELECT * FROM teacher WHERE addr   LIKE '大_';    # _ 任意一个字符
+SELECT * FROM teacher WHERE addr   LIKE '__';
+SELECT * FROM teacher WHERE name   LIKE '中%';    # % 任意多个字符
+SELECT * FROM teacher WHERE addr  RLIKE '^.{2}$'; # 正则
+SELECT * FROM teacher WHERE addr REGEXP '^.{3}$'; # 正则
+SELECT DISTINCT addr FROM teacher; # 去重
+SELECT * FROM teacher ORDER BY name;
+SELECT * FROM teacher ORDER BY name DESC;
+SELECT addr, count(*) c FROM teacher                        GROUP BY addr;
+SELECT addr, count(*) c FROM teacher WHERE addr IS NOT NULL GROUP BY addr;
+SELECT addr, count(*) c FROM teacher                        GROUP BY addr having c = 1;
+SELECT addr, count(*) c FROM teacher                        GROUP BY addr limit 1; # LIMIT 偏移量, 行数
+
+SELECT * FROM teacher UNION     SELECT * FROM teacher2; # 合并,   去重
+SELECT * FROM teacher UNION ALL SELECT * FROM teacher2; # 合并, 不去重, 效率高
+
+SELECT * FROM teacher t       JOIN student s ON s.teacher_id = t.id; # 内连接
+SELECT * FROM teacher t LEFT  JOIN student s ON s.teacher_id = t.id; # 左连接
+SELECT * FROM teacher t RIGHT JOIN student s ON s.teacher_id = t.id; # 右连接
+
+# 查看有徒弟的师傅
+SELECT DISTINCT t.id, t.name from teacher t WHERE EXISTS (SELECT * FROM student s WHERE t.id = s.teacher_id);
+SELECT DISTINCT t.id, t.name from teacher t, student s WHERE t.id = s.teacher_id;
+```
+
+## 视图
+```
+* 相当于是一张虚拟表
+* 不存储数据
+* 一般只用于查询
+* 简化操作, 便于操作
+* 提高数据安全, 只展示部分列
+* 底层变化时, 必须更新视图
+
+USE    test;
+DROP   TABLE IF EXISTS student_base;
+DROP   TABLE IF EXISTS student_detail;
+CREATE TABLE student_base   (id INT PRIMARY KEY, name VARCHAR(20));
+CREATE TABLE student_detail (id INT PRIMARY KEY, addr VARCHAR(20));
+
+# 创建或更新视图
+CREATE OR REPLACE VIEW view_name AS
+  SELECT b.id, b.name, d.addr
+  FROM student_base b, student_detail d
+  WHERE b.id = d.id;
+
+# 查看视图
+SHOW TABLE STATUS LIKE 'view_name';
+SHOW CREATE VIEW view_name;
+
+# 更新视图
+ALTER VIEW view_name AS
+  SELECT b.id, b.name, d.addr
+  FROM student_base b, student_detail d
+  WHERE b.id = d.id;
+  
+# 删除视图
+DROP VIEW  view_name;
+```
+
+## 1. 存储过程
+### 1.1 优缺点
+```
+* 提前编译, 效率高
+* 简化操作
+* 提高复用
+* 减少操作失误
+* 减少网上传输的数据
+* 提高了数据安全 
+* 没返回值
+* 不好调试
+* 分表时, 不好维护
+* 跨数据库不好移植
+* 不好做版本管理
+```
+
+### 1.2 说明
+```
+DELIMITER $
+CREATE PROCEDURE procedure_name(...) ------- IN, OUT, INOUT
+[characteristics ...]
+BEGIN
+    ...
+END $
+DELIMITER ;
+
+characteristics:
+* LANGUAGE SQL ----------- 语言 SQL
+* DETERMINISTIC ---------- 相同的输入会得到相同的输出
+* NOT DETERMINISTIC ------ 相同的输入不一定会得到相同的输出 ---- 默认值
+* NO SQL ----------------- 不包含任何 SQL 语句
+* CONTAINS SQL ----------- 不包含任何 SQL 语句, 但是并不包含读写数据的SQL语句 ---- 默认
+* READS SQL DATA --------- 包含读数据的 SQL 语句
+* MODIFIES SQL DATA ------ 包含写数据的 SQL 语句
+* SQL SECURITY DEFINER --- 只允许创建者或定义者使用 --- 默认
+* SQL SECURITY INVOKER --- 允许所有人使用
+* COMMENT string --------- 注释信息
+
+CALL procedure_name(...)
+```
+
+### 1.3 示例
+```
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name()
+BEGIN
+    SELECT 123;
+END $
+DELIMITER ;
+
+CALL  procedure_name();
+SHOW  CREATE PROCEDURE procedure_name;
+```
+
+## 2. 函数
+### 2.1 和存储过程的区别
+```
+* 有返回值
+* 参数只能是 IN
+* 需要设置: SET GLOBAL log_bin_trust_function_creators = 1
+```
+
+### 2.2 说明
+```
+DELIMITER $
+CREATE FUNCTION function_name(...)
+[characteristics ...]
+RETURNS ...
+BEGIN
+   ...
+END $
+DELIMITER ;
+
+SELECT procedure_name(...)
+```
+
+### 2.3 实例
+```
+SET GLOBAL log_bin_trust_function_creators = 1; # 使用 root 用户或有权限的用户设置
+
+DROP FUNCTION  IF EXISTS function_name;
+DELIMITER $
+CREATE FUNCTION function_name()
+RETURNS INT
+BEGIN
+   RETURN 123;
+END $
+DELIMITER ;
+
+SELECT function_name();
+SHOW CREATE FUNCTION function_name;
+```
+
+## 3. 变量
+### 3.1 全局系统变量
+```
+SHOW   GLOBAL  VARIABLES LIKE 'character%';    # 查询全局系统变量
+SELECT @@GLOBAL.character_set_client;          # 查询全局系统变量
+SET    @@global.character_set_client = 变量值;       # 设置全局系统变量 -- 不能跨服务器重启
+SET            GLOBAL character_set_client = 变量值; # 设置全局系统变量 -- 不能跨服务器重启
+SET    PERSIST GLOBAL character_set_client = 变量值; # 设置全局系统变量 -----能跨服务器重启
+```
+
+### 3.2 会话系统变量
+```
+* 初始值可以从全局系统变量拷贝
+
+SHOW   SESSION VARIABLES LIKE 'character%';     # 查询会话系统变量
+SELECT @@SESSION.character_set_client;          # 查询会话系统变量
+SET    @@session.character_set_client = 变量值; # 设置会话系统变量
+SET    SESSION   character_set_client = 变量值; # 设置会话系统变量
+```
+
+### 3.3 会话用户变量
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student (id INT);
+SET    @num = 100;                      # 设置会话用户变量
+SELECT @num;                            # 查看会话用户变量
+SELECT count(*) INTO @num FROM student; # 设置会话用户变量
+SELECT @num;                            # 查看会话用户变量
+```
+
+### 3.4 局部变量
+```
+* 只在BEGIN 和 END 之间使用, 定义只能放在开头
+* 需要指定类型
+* DECLARE 定义
+```
+
+### 3.5 测试
+#### 3.5.1: SET SELECT
+```
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name()
+BEGIN
+    DECLARE num  int;
+    SET     num  = 10;
+    SELECT  num;
+END $
+DELIMITER ;
+
+CALL procedure_name()
+```
+
+#### 3.5.2: SET DEFAULT SELECT
+```
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name()
+BEGIN
+    DECLARE num  int DEFAULT 100;
+    SELECT  num;
+    SET     num  = 10;
+    SELECT  num;
+END $
+DELIMITER ;
+
+CALL procedure_name()
+```
+
+#### 3.5.3: SELECT INTO
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student (id INT);
+    
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name()
+BEGIN
+    DECLARE num int;
+    SELECT count(*) INTO num FROM student;
+    SELECT  num;
+END $
+DELIMITER ;
+
+CALL procedure_name()
+```
+
+#### 3.5.4 : 混用局部变量和用户会话变量
+```
+USE    test;
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student (id INT);
+    
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name(OUT num int)
+BEGIN
+    SELECT count(*) INTO num FROM student;
+END $
+DELIMITER ;
+
+SET    @num = 10;
+SELECT @num;
+CALL   procedure_name(@num);
+SELECT @num;
+```
+
+## 4. 流程控制
+### 4.1 语句: IF
+```
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name()
+BEGIN
+  DECLARE num INT;
+  SET num = 3;
+  IF num = 1 THEN
+    select "num 1", num;
+  ELSEIF num = 2 THEN
+    select "num 2", num;
+  ELSE
+    select "num 3", num;
+  END IF;
+END $
+DELIMITER ;
+
+CALL procedure_name();
+```
+
+### 4.2 语句: CASE (情况一: 类似 switch)
+```
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name()
+BEGIN
+  DECLARE num INT;
+  SET num = 3;
+  CASE num
+	WHEN 1 THEN
+    select "num 1", num;
+  WHEN 2 THEN
+    select "num 2", num; 
+	ELSE
+    select "num 3", num; 
+  END CASE;
+END $
+DELIMITER ;
+
+CALL procedure_name();
+```
+
+### 4.2 语句: CASE (情况二)
+```
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name()
+BEGIN
+  DECLARE num INT;
+  SET num = 3;
+  CASE
+	WHEN num = 1 THEN
+    select "num 1", num;
+  WHEN num = 2 THEN
+    select "num 2", num; 
+	ELSE
+    select "num 3", num; 
+  END CASE;
+END $
+DELIMITER ;
+
+CALL procedure_name();
+```
+  
+### 4.3 语句: LOOP
+```
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name()
+BEGIN
+  DECLARE id INT DEFAULT 0;
+  add_loop: LOOP
+    SET id = id +1;
+    IF id > 3 THEN
+      LEAVE add_loop;
+    ELSE
+      select id;
+    END IF;
+  END LOOP add_loop;
+END $
+DELIMITER ;
+
+CALL procedure_name();
+```
+
+### 4.4 语句: WHILE
+```
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name()
+BEGIN
+  DECLARE i INT DEFAULT 0;
+	
+	add_while: WHILE i < 10 DO
+		SET i = i + 1;
+	END WHILE add_while;
+	
+	SELECT i;
+END $
+DELIMITER ;
+
+CALL procedure_name();
+```
+
+### 4.5 语句: REPEAT (类似 do ... while)
+```
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name()
+BEGIN
+  DECLARE i INT DEFAULT 0;
+    
+  add_repeat: REPEAT 
+		SET i = i + 1;
+	UNTIL i >= 10
+	END REPEAT add_repeat;
+	
+	SELECT i;
+END $
+DELIMITER ;
+
+CALL procedure_name();
+```
+
+### 4.6 语句: ITERATE(与 continue 类似)
+```
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name()
+BEGIN
+  DECLARE id INT DEFAULT 0;
+  add_loop: LOOP
+    SET id = id +1;
+    IF id < 10 THEN
+      ITERATE add_loop;
+    ELSEIF id > 13 THEN
+      LEAVE add_loop;
+    END IF;
+    
+    select id;
+  END LOOP add_loop;
+END $
+DELIMITER ;
+
+CALL procedure_name();
+```
+
+### 4.7 语句: LEAVE(与 break 类似)
+```
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name()
+BEGIN
+  DECLARE id INT DEFAULT 0;
+  add_loop: LOOP
+    SET id = id +1;
+    IF id > 3 THEN
+      LEAVE add_loop;
+    ELSE
+      select id;
+    END IF;
+  END LOOP add_loop;
+END $
+DELIMITER ;
+
+CALL procedure_name();
+```
+
+## 5. 异常处理
+### 5.1 定义条件: 方便后续使用
+```
+DECLARE 错误名称 CONDITION FOR 错误码（或错误条件）
+
+错误码: 整形
+错误条件: 长度为 5 的字符串
+
+DECLARE Field_Not_Be_NULL CONDITION FOR 1048;
+DECLARE Field_Not_Be_NULL CONDITION FOR SQLSTATE '23000';
+```
+
+### 5.2 定义程序: 发生错误执行的代码
+```
+DECLARE 处理方式 HANDLER FOR 错误类型 处理语句
+SIGNAL  错误类型 .....     ------ 抛出错误
+
+处理方式:
+* CONTINUE：表示遇到错误不处理，继续执行。
+* EXIT：表示遇到错误马上退出
+* UNDO：表示遇到错误后撤回之前的操作 -- MySQL中暂时不支持这样的操作
+  
+错误类型:
+* SQLSTATE 字符串错误码: 上述定义的错误条件
+* MySQL_error_code: 上述定义的错误码
+* 错误名称: 见上述定义。
+* SQLWARNING:   匹配所有以01开头的SQLSTATE错误代码
+* NOT FOUND:    匹配所有以02开头的SQLSTATE错误代码
+* SQLEXCEPTION: 匹配所有没有被SQLWARNING或NOT FOUND捕获的SQLSTATE错误代码
+
+处理语句: 简单语句 或 BEGIN ... END 编写的复合语句
+```
+
+## 1. 游标: 用于定位某条记录
+### 1.1 说明
+```
+* 游标使用过程会对数据加锁
+* 耗内存资源
+
+DECLARE cursor_name CURSOR FOR select ....; # 1. 定义游标
+OPEN    cursor_name;                        # 2. 打开游标
+FETCH   cursor_name INTO var_name ...;      # 3. 使用游标
+CLOSE   cursor_name;                        # 4. 关闭游标, 需要及时关闭, 否则消耗系统资源
+```
+
+### 1.2 实例
+#### 1.2.1 数据准备
+```
+USE    test;
+DROP   TABLE IF EXISTS employees;
+CREATE TABLE employees(id INT, name VARCHAR(20), salary INT);
+INSERT INTO  employees values(1, "张三",  7000);
+INSERT INTO  employees values(2, "李四",  8000);
+INSERT INTO  employees values(3, "王五",  9000);
+INSERT INTO  employees values(4, "赵六", 10000);
+INSERT INTO  employees values(4, "田七", 11000);
+```
+
+#### 1.2.2 定义存储过程
+```
+USE  test;
+DROP PROCEDURE IF EXISTS procedure_name;
+DELIMITER $
+CREATE PROCEDURE procedure_name(IN total_salary INT, OUT ret int, INOUT sum_salary INT, INOUT count_salary INT)
+BEGIN
+  DECLARE  curr_salary INT DEFAULT 0;
+  DECLARE v_not_found  INT DEFAULT FALSE; 
+  DECLARE cursor_name CURSOR FOR SELECT salary FROM employees ORDER BY salary DESC;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_not_found = TRUE;  # 游标无数据时 设置变量
+  
+  OPEN    cursor_name;
+  
+  add_loop: LOOP
+      FETCH cursor_name INTO curr_salary;
+      IF v_not_found THEN
+        SET ret = -1;
+        LEAVE add_loop; 
+      END IF;
+      SET sum_salary   = sum_salary + curr_salary;
+      SET count_salary = count_salary + 1;
+      IF sum_salary > total_salary THEN
+        SET ret = 0;
+        LEAVE add_loop; 
+      END IF;
+  END LOOP add_loop;
+
+  CLOSE   cursor_name;
+END $
+DELIMITER ;
+```
+
+#### 1.2.3 测试
+```
+SET @ret          = 0;
+SET @sum_salary   = 0;
+SET @count_salary = 0;
+CALL   procedure_name(20000, @ret, @sum_salary, @count_salary);   # 正常获取
+SELECT @ret, @sum_salary, @count_salary;
+CALL   procedure_name(200000, @ret, @sum_salary, @count_salary);  # 测试报错
+SELECT @ret, @sum_salary, @count_salary;
+```
+
+## 2. 触发器
+### 2.1 说明
+```
+* 可用于自动维护一些信息, 比如 日志
+* 可用于检查入参的错误
+* 底层表变化时, 需要修改触发器
+* 由于操作是自动的, 不容易发现错误
+* OLD 获取旧数据, NEW 获取新数据
+
+CREATE TRIGGER trigger_name
+[BEFORE|AFTER]  [INSERT|UPDATE|DELETE]
+ON table_name FOR EACH ROW ...
+
+DROP TRIGGER   table_name.trigger_name;               # 删除触发器
+```
+
+### 2.2 测试 
+#### 2.2.1 日志记录
+```
+USE test;
+DROP TABLE IF EXISTS student;
+CREATE TABLE student (id INT, name VARCHAR(20));
+DROP TABLE IF EXISTS student_log;
+CREATE TABLE student_log (log_time DATETIME, log_name VARCHAR(20));
+
+DROP   TRIGGER   IF EXISTS trigger_name;
+CREATE TRIGGER trigger_name AFTER INSERT ON student FOR EACH ROW
+INSERT INTO student_log values(now(), "insert");
+SELECT * FROM student; 
+SELECT * FROM student_log;
+INSERT INTO student VALUES(1, "张三");
+SELECT * FROM student; 
+SELECT * FROM student_log;
+```
+
+#### 2.2.2 检查入参 (只是测试, 用唯一键更合适)
+```
+USE test;
+DROP TABLE IF EXISTS student;
+CREATE TABLE student (id INT, name VARCHAR(20));
+DROP TABLE IF EXISTS student_log;
+CREATE TABLE student_log (log_time DATETIME, log_name VARCHAR(20));
+
+DROP   TRIGGER   IF EXISTS trigger_name;
+DELIMITER $
+CREATE TRIGGER trigger_name
+BEFORE INSERT ON student FOR EACH ROW
+BEGIN
+    DECLARE num int DEFAULT(0);
+    
+    SELECT count(*) into num FROM student WHERE name = NEW.name;
+    
+    IF num != 0 THEN
+        SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT = '数据已存在, 不允许插入';
+    END IF;
+    
+    INSERT INTO student_log values(now(), "insert");
+END $
+DELIMITER ;
+
+SELECT * FROM student; 
+SELECT * FROM student_log;
+INSERT INTO student VALUES(1, "张三");
+SELECT * FROM student; 
+SELECT * FROM student_log;
+INSERT INTO student VALUES(1, "张三");
+SELECT * FROM student; 
+SELECT * FROM student_log;
+```
+
+round -- 不一定是直观 的四舍五入
+
+current_timestamp()
+current_date()
+now()
+
+## 练习子查询
+
+## 库
+```
+# 1. 为什么使用数据库
+* 数据持久化
+* 效率
+
+DDL: create drop alter rename truncate
+
+DDL(数据定义语言): CREATE DROP   ALTER
+DML(数据操作语言): INSERT UPDATE SELECT DELETE
+DCL(数据控制语言): GRANT  REVOKE COMMIT ROLLBACK SAVEPOINT
+
+source ...
+
+round -- 不一定是直观 的四舍五入
+
+DB: 数据库 Database
+DBMS: 数据库管理系统 Database Management System
+SQL: 结构化查询语言 Structured Query Language
+
+RDBMS: 关系型数据库
+* 将复杂的关系转化为二元的关系, 表格
+* 表之间通过外键来关联
+
+E-R(entity-relationship 实体-联系)模型中有三个主要概念是 实体集 属性集 联系集
+一个实体集(class)   == 一个表(table)
+一个实体(instance)  == 一行(row), 一条记录(record)
+一个属性(attribute) == 一列(column), 一个字段(field)
+
+表之间的关系
+一对一: 用的不多, 可以使用一张表, 但会冗余
+一对多
+多对多
+自引用
+
+单引号: 字符串 日期
+双引号: 别名
+反引用: 与关键字冲突时, 使用
+
+库名 表名 表别名 字段名 字段别名 小写, 其他建议大写
+
+## 其他
+mysql -D <库名> -h <域名> -u <用户名> -p<密码>  # 登录
+myqsl -D testdb < 1.sql                         # 从文件导入
+mysqldump database_name table_name > 1.sql      # 导出到文件
+select .. into outfile .. fields terminated by ',' optionally enclosed by '"' lines terminated by '\n' from ..
+                                                # 保存数据到文件
+
+mysql_install_db --user=mysql --ldata=/var/lib/mysql # 添加用户 mysql 使mysqld 可以使用 systemctl 启动
+
+set global max_allowed_packet=64*1024*1024 # 设置插入的上限
+
+current_timestamp()
+current_date()
+now()
+
