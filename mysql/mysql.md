@@ -1,4 +1,16 @@
 
+## 汇总
+```
+SET  @@GLOBAL.log_bin_trust_function_creators = 1; # 设置全局系统变量, 服务器重启失效
+SET @@PERSIST.log_bin_trust_function_creators = 1; # 设置全局系统变量, 服务器重启依然保留
+SET @@SESSION.log_bin_trust_function_creators = 1; # 设置会话系统变量, 服务器重启失效
+SET @name = 'Tom'; # 设置会话用户变量
+SET  name = 'Tom'; # 设置局部变量
+
+
+```
+----------------------------------------
+
 ## 安装和初始化
 #### 1. 安装软件和基本安全设置
 ```
@@ -22,8 +34,6 @@ SHOW VARIABLES LIKE 'character%';         # 5. 再次查看编码和字符集
 SHOW VARIABLES LIKE 'collation%';         #
 ```
 
-
-
 #### 5. 允许远程访问
 ```
 ss -tal | grep mysql                      # 1. 查看 MySQL 是否允许远程访问
@@ -34,7 +44,6 @@ mysql --help | grep -A1 'Default options' # 2. 查看 MySQL 的配置文件
 sudo systemctl restart mysql              # 4. 重启 MySQL
 ss -tal | grep mysql                      # 5. 再次查看 MySQL 是否允许远程访问
 ```
-
 
 ## 1. 修改密码
 ```
@@ -1532,7 +1541,7 @@ ALTER VIEW view_name AS
   SELECT b.id, b.name, d.addr
   FROM student_base b, student_detail d
   WHERE b.id = d.id;
-  
+
 # 删除视图
 DROP VIEW  view_name;
 ```
@@ -1545,7 +1554,7 @@ DROP VIEW  view_name;
 * 提高复用
 * 减少操作失误
 * 减少网上传输的数据
-* 提高了数据安全 
+* 提高了数据安全
 * 没返回值
 * 不好调试
 * 分表时, 不好维护
@@ -1706,7 +1715,7 @@ CALL procedure_name()
 USE    test;
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT);
-    
+
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name()
@@ -1725,7 +1734,7 @@ CALL procedure_name()
 USE    test;
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT);
-    
+
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name(OUT num int)
@@ -1774,9 +1783,9 @@ BEGIN
 	WHEN 1 THEN
     select "num 1", num;
   WHEN 2 THEN
-    select "num 2", num; 
+    select "num 2", num;
 	ELSE
-    select "num 3", num; 
+    select "num 3", num;
   END CASE;
 END $
 DELIMITER ;
@@ -1796,16 +1805,16 @@ BEGIN
 	WHEN num = 1 THEN
     select "num 1", num;
   WHEN num = 2 THEN
-    select "num 2", num; 
+    select "num 2", num;
 	ELSE
-    select "num 3", num; 
+    select "num 3", num;
   END CASE;
 END $
 DELIMITER ;
 
 CALL procedure_name();
 ```
-  
+
 ### 4.3 语句: LOOP
 ```
 DROP PROCEDURE IF EXISTS procedure_name;
@@ -1834,11 +1843,11 @@ DELIMITER $
 CREATE PROCEDURE procedure_name()
 BEGIN
   DECLARE i INT DEFAULT 0;
-	
+
 	add_while: WHILE i < 10 DO
 		SET i = i + 1;
 	END WHILE add_while;
-	
+
 	SELECT i;
 END $
 DELIMITER ;
@@ -1853,12 +1862,12 @@ DELIMITER $
 CREATE PROCEDURE procedure_name()
 BEGIN
   DECLARE i INT DEFAULT 0;
-    
-  add_repeat: REPEAT 
+
+  add_repeat: REPEAT
 		SET i = i + 1;
 	UNTIL i >= 10
 	END REPEAT add_repeat;
-	
+
 	SELECT i;
 END $
 DELIMITER ;
@@ -1880,7 +1889,7 @@ BEGIN
     ELSEIF id > 13 THEN
       LEAVE add_loop;
     END IF;
-    
+
     select id;
   END LOOP add_loop;
 END $
@@ -1931,7 +1940,7 @@ SIGNAL  错误类型 .....     ------ 抛出错误
 * CONTINUE：表示遇到错误不处理，继续执行。
 * EXIT：表示遇到错误马上退出
 * UNDO：表示遇到错误后撤回之前的操作 -- MySQL中暂时不支持这样的操作
-  
+
 错误类型:
 * SQLSTATE 字符串错误码: 上述定义的错误条件
 * MySQL_error_code: 上述定义的错误码
@@ -1976,23 +1985,23 @@ DELIMITER $
 CREATE PROCEDURE procedure_name(IN total_salary INT, OUT ret int, INOUT sum_salary INT, INOUT count_salary INT)
 BEGIN
   DECLARE  curr_salary INT DEFAULT 0;
-  DECLARE v_not_found  INT DEFAULT FALSE; 
+  DECLARE v_not_found  INT DEFAULT FALSE;
   DECLARE cursor_name CURSOR FOR SELECT salary FROM employees ORDER BY salary DESC;
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_not_found = TRUE;  # 游标无数据时 设置变量
-  
+
   OPEN    cursor_name;
-  
+
   add_loop: LOOP
       FETCH cursor_name INTO curr_salary;
       IF v_not_found THEN
         SET ret = -1;
-        LEAVE add_loop; 
+        LEAVE add_loop;
       END IF;
       SET sum_salary   = sum_salary + curr_salary;
       SET count_salary = count_salary + 1;
       IF sum_salary > total_salary THEN
         SET ret = 0;
-        LEAVE add_loop; 
+        LEAVE add_loop;
       END IF;
   END LOOP add_loop;
 
@@ -2028,7 +2037,7 @@ ON table_name FOR EACH ROW ...
 DROP TRIGGER   table_name.trigger_name;               # 删除触发器
 ```
 
-### 2.2 测试 
+### 2.2 测试
 #### 2.2.1 日志记录
 ```
 USE test;
@@ -2040,10 +2049,10 @@ CREATE TABLE student_log (log_time DATETIME, log_name VARCHAR(20));
 DROP   TRIGGER   IF EXISTS trigger_name;
 CREATE TRIGGER trigger_name AFTER INSERT ON student FOR EACH ROW
 INSERT INTO student_log values(now(), "insert");
-SELECT * FROM student; 
+SELECT * FROM student;
 SELECT * FROM student_log;
 INSERT INTO student VALUES(1, "张三");
-SELECT * FROM student; 
+SELECT * FROM student;
 SELECT * FROM student_log;
 ```
 
@@ -2061,24 +2070,24 @@ CREATE TRIGGER trigger_name
 BEFORE INSERT ON student FOR EACH ROW
 BEGIN
     DECLARE num int DEFAULT(0);
-    
+
     SELECT count(*) into num FROM student WHERE name = NEW.name;
-    
+
     IF num != 0 THEN
         SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT = '数据已存在, 不允许插入';
     END IF;
-    
+
     INSERT INTO student_log values(now(), "insert");
 END $
 DELIMITER ;
 
-SELECT * FROM student; 
+SELECT * FROM student;
 SELECT * FROM student_log;
 INSERT INTO student VALUES(1, "张三");
-SELECT * FROM student; 
+SELECT * FROM student;
 SELECT * FROM student_log;
 INSERT INTO student VALUES(1, "张三");
-SELECT * FROM student; 
+SELECT * FROM student;
 SELECT * FROM student_log;
 ```
 
@@ -2089,8 +2098,6 @@ current_date()
 now()
 
 ## 练习子查询
-
-## 库
 ```
 # 1. 为什么使用数据库
 * 数据持久化
