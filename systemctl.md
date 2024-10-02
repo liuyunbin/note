@@ -27,7 +27,7 @@ systemctl is-active  mysql.service     # 4. 再次查看是否已启动
 ```
 systemctl list-unit-files | grep mysql # 1. 查看服务的名称 及其 状态
 systemctl is-enabled mysql.service     # 2. 查看是否开机自动启动
-systemctl enable     mysql.service     # 3. 设置开机自动启动
+systemctl    enable  mysql.service     # 3. 设置开机自动启动
 systemctl is-enabled mysql.service     # 4. 再次查看是否开机自动启动
 ```
 
@@ -35,6 +35,7 @@ systemctl is-enabled mysql.service     # 4. 再次查看是否开机自动启动
 ```
 systemctl list-unit-files | grep mysql # 1. 查看服务的名称 及其 状态
 systemctl is-enabled mysql.service     # 2. 查看是否开机自动启动
-systemctl disenable  mysql.service     # 3. 禁止开机自动启动
+systemctl   disable  mysql.service     # 3. 禁止开机自动启动
 systemctl is-enabled mysql.service     # 4. 再次查看是否开机自动启动
 ```
+
