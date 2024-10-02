@@ -11,40 +11,6 @@ SET  name = 'Tom'; # 设置局部变量
 ```
 ----------------------------------------
 
-## 安装和初始化
-#### 1. 安装软件和基本安全设置
-```
-sudo apt install mysql-server # 1. 安装软件
-mysql_secure_installation     # 2. 基本安全设置
-                              #   * 配置 root 使用 Linux root 用户认证
-                              #   * 禁止 root 远程登录
-                              #   * 删除匿名用户
-                              #   * 删除测试数据库
-```
-
-#### 3. 修改编码为 utf8mb4 --- 8.0 及以后的版本不需要修改了
-```
-SHOW VARIABLES LIKE 'character%';         # 1. 查看编码和字符集
-SHOW VARIABLES LIKE 'collation%';         #
-mysql --help | grep -A1 'Default options' # 2. 查看 MySQL 的配置文件
-                                          # 3. 修改配置文件中的编码
-                                          #   * default-character-set = utf8mb4
-sudo systemctl restart mysql.service      # 4. 重启 MySQL
-SHOW VARIABLES LIKE 'character%';         # 5. 再次查看编码和字符集
-SHOW VARIABLES LIKE 'collation%';         #
-```
-
-#### 5. 允许远程访问
-```
-ss -tal | grep mysql                      # 1. 查看 MySQL 是否允许远程访问
-mysql --help | grep -A1 'Default options' # 2. 查看 MySQL 的配置文件
-                                          # 3. 注释掉对应的配置
-                                          #   * bind-address        = 127.0.0.1
-                                          #   * mysqlx-bind-address = 127.0.0.1
-sudo systemctl restart mysql              # 4. 重启 MySQL
-ss -tal | grep mysql                      # 5. 再次查看 MySQL 是否允许远程访问
-```
-
 ## 1. 修改密码
 ```
 SET PASSWORD                   =PASSWORD('123456');  # 修改当前用户密码 -- 旧版本 5.7
