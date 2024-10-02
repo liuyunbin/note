@@ -10,18 +10,6 @@ mysql_secure_installation     # 2. 基本安全设置
                               #   * 删除测试数据库
 ```
 
-#### 2. 启动 MySQL 并设置为开机自动启动
-```
-sudo systemctl list-unit-files | grep mysql   # 1. 查看 mysql 服务的名称
-sudo systemctl list-unit-files | grep mariadb #
-sudo systemctl is-active  mysql.service       # 2. 查看是否已启动
-sudo systemctl start      mysql.service       # 3. 启动服务
-sudo systemctl is-active  mysql.service       # 4. 再次查看是否已启动
-sudo systemctl is-enabled mysql.service       # 5. 查看是否开机自动启动
-sudo systemctl enable     mysql.service       # 6. 设置开机自动启动
-sudo systemctl is-enabled mysql.service       # 7. 再次查看是否开机自动启动
-```
-
 #### 3. 修改编码为 utf8mb4 --- 8.0 及以后的版本不需要修改了
 ```
 SHOW VARIABLES LIKE 'character%';         # 1. 查看编码和字符集
@@ -34,13 +22,7 @@ SHOW VARIABLES LIKE 'character%';         # 5. 再次查看编码和字符集
 SHOW VARIABLES LIKE 'collation%';         #
 ```
 
-##### 4. 开启防火墙
-```
-sudo firewall-cmd --list-services                 # 1. 查看目前开启的服务
-sudo firewall-cmd --permanent --add-service=mysql # 2. 永久开启服务
-sudo firewall-cmd --reload                        # 3. 重新加载防火墙
-sudo firewall-cmd --list-services                 # 4. 再次查看目前开启的服务
-```
+
 
 #### 5. 允许远程访问
 ```
