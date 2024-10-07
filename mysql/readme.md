@@ -1,12 +1,9 @@
 
-## 汇总
-```
-SET  @@GLOBAL.log_bin_trust_function_creators = 1; # 设置全局系统变量, 服务器重启失效
-SET @@PERSIST.log_bin_trust_function_creators = 1; # 设置全局系统变量, 服务器重启依然保留
-SET @@SESSION.log_bin_trust_function_creators = 1; # 设置会话系统变量, 服务器重启失效
-SET @name = 'Tom'; # 设置会话用户变量
-SET  name = 'Tom'; # 设置局部变量
-```
+
+配置文件详述
+
+程序详述
+
 
 round -- 不一定是直观 的四舍五入
 
