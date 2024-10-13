@@ -7,7 +7,7 @@ GROUP BY: 分组并合并
 窗口函数: 分组不合并
 
 聚合窗口函数不能使用 DISTINCT
-窗口函数不能嵌套, 但你不可以使用单行函数
+窗口函数不能嵌套, 但内部可以使用单行函数
 窗口大小不能根据当前行的值动态变化
 
 窗口函数出现在: SELECT, ORDER BY
@@ -270,7 +270,7 @@ FROM student;
 ## 2. 实战
 ### 2.1 查看各个市 GDP 占各自省的比例以及全国的比例以及排名 (体现窗口函数的优势)
 ```
-# 1.1 准备数据
+# 2.1.1 准备数据
 USE    test;
 DROP   TABLE IF EXISTS m_gdp;
 CREATE TABLE m_gdp(
@@ -295,28 +295,28 @@ INSERT INTO m_gdp VALUES('天津', '塘沽', 7);
 
 SELECT * FROM m_gdp;
 
-# 1.2 使用窗口函数 (推荐)
+# 2.1.2 使用窗口函数 (推荐)
 SELECT
     *,
-    RANK() OVER (PARTITION BY province ORDER BY gdp DESC) '省内排名',
-    RANK() OVER (                      ORDER BY gdp DESC) '全国排名',
-            SUM(gdp) OVER (PARTITION BY province) '省内总和',
-      gdp / SUM(gdp) OVER (PARTITION BY province) '省内占比',  
-            SUM(gdp) OVER () '全国总和',
-      gdp / SUM(gdp) OVER () '全国占比'
+    RANK() OVER (PARTITION BY province ORDER BY gdp DESC) AS '省内排名',
+    RANK() OVER (                      ORDER BY gdp DESC) AS '全国排名',
+            SUM(gdp) OVER (PARTITION BY province) AS '省内总和',
+      gdp / SUM(gdp) OVER (PARTITION BY province) AS '省内占比',  
+            SUM(gdp) OVER () AS '全国总和',
+      gdp / SUM(gdp) OVER () AS '全国占比'
 FROM m_gdp
 ORDER BY province, RANK() OVER (ORDER BY gdp DESC);
 
-# 1.3 不使用窗口函数
-# 1.3.1 存储全国 GDP 的总和
+# 2.1.3 不使用窗口函数
+# 2.1.3.1 存储全国 GDP 的总和
 DROP   TABLE IF EXISTS sum_total;
-CREATE TEMPORARY TABLE sum_total AS SELECT sum(gdp) sum_total FROM m_gdp;
+CREATE TEMPORARY TABLE sum_total AS SELECT sum(gdp) AS sum_total FROM m_gdp;
 SELECT * FROM sum_total;
-# 1.3.2 存储全省 GDP 的总和
+# 2.1.3.2 存储全省 GDP 的总和
 DROP   TABLE IF EXISTS sum_province;
-CREATE TEMPORARY TABLE sum_province AS SELECT province, sum(gdp) sum_province FROM m_gdp GROUP BY province;
+CREATE TEMPORARY TABLE sum_province AS SELECT province, sum(gdp) AS sum_province FROM m_gdp GROUP BY province;
 SELECT * FROM sum_province;
-# 1.3.3 存储全国排名
+# 2.1.3.3 存储全国排名
 DROP   TABLE IF EXISTS rank_total;
 CREATE TEMPORARY TABLE rank_total
 AS
@@ -326,7 +326,7 @@ SELECT
     (SELECT count(*) FROM m_gdp m2 WHERE m2.gdp > m1.gdp) + 1 AS t_rank
 FROM m_gdp m1;
 SELECT * FROM rank_total ORDER BY t_rank;
-# 1.3.4 存储省内排名
+# 2.1.3.4 存储省内排名
 DROP   TABLE IF EXISTS rank_province;
 CREATE TEMPORARY TABLE rank_province
 AS
@@ -336,17 +336,17 @@ SELECT
     (SELECT count(*) FROM m_gdp m2 WHERE m2.province = m1.province AND m2.gdp > m1.gdp) + 1 AS t_rank
 FROM m_gdp m1;
 SELECT * FROM rank_province ORDER BY t_rank;
-# 1.3.5 使用五张表求结果
+# 2.1.3.5 使用五张表求结果
 SELECT
     m_gdp.province,
     m_gdp.city,
     m_gdp.gdp,
-    rank_province.t_rank '省内排名',
-    rank_total.t_rank '全国排名',
-    sum_province.sum_province '省内总和',
-    m_gdp.gdp / sum_province.sum_province '省内占比',
-    sum_total.sum_total '全国总和',
-    m_gdp.gdp / sum_total.sum_total '全国占比' 
+    rank_province.t_rank AS '省内排名',
+    rank_total.t_rank AS '全国排名',
+    sum_province.sum_province AS '省内总和',
+    m_gdp.gdp / sum_province.sum_province AS '省内占比',
+    sum_total.sum_total AS '全国总和',
+    m_gdp.gdp / sum_total.sum_total AS '全国占比' 
 FROM m_gdp
 JOIN sum_province ON m_gdp.province = sum_province.province
 JOIN rank_total ON m_gdp.city = rank_total.city
@@ -357,7 +357,7 @@ ORDER BY province, RANK() OVER (ORDER BY gdp DESC);
 
 ### 2.2 查看各个市 GDP 占各自省内排名前二的区域
 ```
-# 2.1 准备数据
+# 2.2.1 准备数据
 USE    test;
 DROP   TABLE IF EXISTS m_gdp;
 CREATE TABLE m_gdp(
@@ -380,26 +380,26 @@ INSERT INTO m_gdp VALUES('天津', '滨海新区', 5);
 INSERT INTO m_gdp VALUES('天津', '武清', 6);
 INSERT INTO m_gdp VALUES('天津', '塘沽', 6);
 
-# 2.2 并列的数据都返回, 每组结果可能超过两个
+# 2.2.2 并列的数据都返回, 每组结果可能超过两个
 SELECT *
 FROM (
     SELECT
         city,
         province,
         gdp,
-        RANK() OVER (PARTITION BY province ORDER BY gdp DESC) m_rank
+        RANK() OVER (PARTITION BY province ORDER BY gdp DESC) AS m_rank
     FROM m_gdp
 ) t
 WHERE t.m_rank <= 2;
 
-# 2.3 每组结果可能最多两个, 并列的数据只取前两个
+# 2.2.3 每组结果可能最多两个, 并列的数据只取前两个
 SELECT *
 FROM (
     SELECT
         city,
         province,
         gdp,
-        ROW_NUMBER() OVER (PARTITION BY province ORDER BY gdp DESC) m_rank
+        ROW_NUMBER() OVER (PARTITION BY province ORDER BY gdp DESC) AS m_rank
     FROM m_gdp
 ) t
 WHERE t.m_rank <= 2;
@@ -407,7 +407,7 @@ WHERE t.m_rank <= 2;
 
 ### 2.3 综合测试
 ```
-# 3.1 准备数据, 内容为 日期和销售额
+# 2.3.1 准备数据, 内容为 日期和销售额
 USE    test;
 DROP   TABLE IF EXISTS m_company;
 CREATE TABLE m_company (
@@ -457,34 +457,34 @@ INSERT INTO m_company VALUES('2025-04-02', 8);
 
 SELECT * FROM m_company ORDER BY order_date;
 
-# 3.2 查看公司各个月的销售
+# 2.3.2 查看公司各个月的销售
 SELECT
-    year(order_date) year,
-    month(order_date) month,
-    SUM(sale) sale
+    year(order_date) AS year,
+    month(order_date) AS month,
+    SUM(sale) AS sale
 FROM m_company
-GROUP BY year(order_date), month(order_date)
+GROUP BY year(order_date), month(order_date);
 
-# 3.3 查看公司各个月的销售和每个月累计销售, 年销售总额
+# 2.3.3 查看公司各个月的销售和每个月累计销售, 年销售总额
 SELECT
-    year '年',
-    month '月',
-    sale '当月销售',
-    SUM(sale) OVER(PARTITION BY year ORDER BY month) '月累计销售', 
-    SUM(sale) OVER(PARTITION BY year               ) '年总销售'
+    year  AS '年',
+    month AS '月',
+    sale  AS '当月销售',
+    SUM(sale) OVER(PARTITION BY year ORDER BY month) AS '月累计销售', 
+    SUM(sale) OVER(PARTITION BY year               ) AS '年总销售'
 FROM (
     SELECT year(order_date) year, month(order_date) month, SUM(sale) sale
     FROM m_company
     GROUP BY year(order_date), month(order_date)
 ) t;
 
-# 3.3 查看公司各个月的销售和年销售总额, 月销售占比
+# 2.3.3 查看公司各个月的销售和年销售总额, 月销售占比
 SELECT
-    year '年',
-    month '月',
-    sale '当月销售',
-           SUM(sale) OVER w1 '年总销售', 
-    sale / SUM(sale) OVER w1 '月销售占比'
+    year  AS '年',
+    month AS '月',
+    sale  AS '当月销售',
+           SUM(sale) OVER w1 AS '年总销售', 
+    sale / SUM(sale) OVER w1 AS '月销售占比'
 FROM (
     SELECT year(order_date) year, month(order_date) month, SUM(sale) sale
     FROM m_company
@@ -492,17 +492,17 @@ FROM (
 ) t
 WINDOW w1 AS (PARTITION BY year);
 
-# 3.4 销售量前二的月份及其占比
+# 2.3.4 销售量前二的月份及其占比
 SELECT *
 FROM
 (
     SELECT
-        year '年',
-        month '月',
-        sale '当月销售',
-               SUM(sale) OVER w1 '年总销售', 
-        sale / SUM(sale) OVER w1 '月销售占比',
-        RANK() OVER (PARTITION BY year ORDER BY sale DESC) row_rank
+        year   AS '年',
+        month  AS '月',
+        sale   AS  '当月销售',
+               SUM(sale) OVER w1 AS '年总销售', 
+        sale / SUM(sale) OVER w1 AS '月销售占比',
+        RANK() OVER (PARTITION BY year ORDER BY sale DESC) AS row_rank
   FROM (
         SELECT year(order_date) year, month(order_date) month, SUM(sale) sale
         FROM m_company
@@ -512,16 +512,16 @@ FROM
 ) t2
 WHERE t2.row_rank <= 2;
 
-# 3.5 销售量的季度和
+# 2.3.5 销售量的季度和
 SELECT *
 FROM
 (
     SELECT
-        year '年',
-        month '月',
-        sale '当月销售',
-        SUM(sale) OVER(PARTITION BY year) '年总销售',
-        SUM(sale) OVER(PARTITION BY year ORDER BY month ROWS BETWEEN 2 preceding AND current row) '三个月的和'
+        year  AS '年',
+        month AS '月',
+        sale  AS '当月销售',
+        SUM(sale) OVER(PARTITION BY year) AS '年总销售',
+        SUM(sale) OVER(PARTITION BY year ORDER BY month ROWS BETWEEN 2 preceding AND current row) AS '三个月的和'
     FROM (
         SELECT year(order_date) year, month(order_date) month, SUM(sale) sale
         FROM m_company
@@ -530,17 +530,17 @@ FROM
 ) t2
 WHERE t2.月 % 3 = 0;
 
-# 3.6 销售量的季度和及其占比
+# 2.3.6 销售量的季度和及其占比
 SELECT *
 FROM
 (
     SELECT
-        year '年',
-        month '月',
-        sale '当月销售',
-        SUM(sale) OVER w2 '年总销售',
+        year   AS '年',
+        month  AS '月',
+        sale   AS '当月销售',
+        SUM(sale) OVER w2 AS '年总销售',
         SUM(sale) OVER w1,
-        SUM(sale) OVER w1 / SUM(sale) OVER w2 '占比'
+        SUM(sale) OVER w1 / SUM(sale) OVER w2 AS '占比'
     FROM (
         SELECT year(order_date) year, month(order_date) month, SUM(sale) sale
         FROM m_company
@@ -551,11 +551,11 @@ FROM
 ) t2
 WHERE t2.月 % 3 = 0;
 
-# 3.7 月销售量排名
+# 2.3.7 月销售量排名
 SELECT
-    year '年',
-    month '月',
-    sale '当月销售',
+    year   AS '年',
+    month  AS '月',
+    sale   AS '当月销售',
     RANK() OVER(PARTITION BY year ORDER BY sale DESC) row_rank
 FROM (
     SELECT year(order_date) year, month(order_date) month, SUM(sale) sale
@@ -564,14 +564,29 @@ FROM (
 ) t1
 ORDER BY year, row_rank;
 
-# 3.8 月销售量排名前 40% 的月份
+# 2.3.8 月销售量比前一个月高的月份
 SELECT *
 FROM (
     SELECT
-        year '年',
-        month '月',
-        sale '当月销售',
-        NTILE(12) OVER(PARTITION BY year ORDER BY sale DESC) row_level
+        month,
+        sale,
+        LAG(sale, 1) OVER(ORDER BY month) AS last_price
+    FROM (
+        SELECT SUBSTRING(order_date,1,7) month, SUM(sale) sale
+        FROM m_company
+        GROUP BY SUBSTRING(order_date,1,7)
+    ) t1
+) t2
+WHERE last_price < sale OR last_price IS NULL;
+
+# 2.3.9 月销售量排名前 40% 的月份 (不好, 月份不完整有问题)
+SELECT *
+FROM (
+    SELECT
+        year   AS '年',
+        month  AS '月',
+        sale   AS '当月销售',
+        NTILE(10) OVER(PARTITION BY year ORDER BY sale DESC) AS row_level
     FROM (
         SELECT year(order_date) year, month(order_date) month, SUM(sale) sale
         FROM m_company
@@ -580,25 +595,42 @@ FROM (
 ) t2
 WHERE row_level <= 4;
 
-# 3.9 月销售量比前一个月高的月份
+# 2.3.10 月销售量排名前 40% 的月份 (好, 月份不完整没有问题) -- 数量超过时, 相同的销量会同时包含
 SELECT *
 FROM (
     SELECT
-        month,
-        sale,
-        LAG(sale, 1) OVER(ORDER BY month) last_price
+        year   AS '年',
+        month  AS '月',
+        sale   AS '当月销售',
+        CUME_DIST() OVER(PARTITION BY year ORDER BY sale) AS row_level
     FROM (
-        SELECT SUBSTRING(order_date,1,7) month, SUM(sale) sale
+        SELECT year(order_date) year, month(order_date) month, SUM(sale) sale
         FROM m_company
-        GROUP BY SUBSTRING(order_date,1,7)
+        GROUP BY year(order_date), month(order_date)
     ) t1
 ) t2
-WHERE last_price < sale OR last_price IS NULL;
+WHERE row_level >= 0.6;
+
+# 2.3.11 月销售量排名前 40% 的月份 (好, 月份不完整没有问题) --  数量超过时, 相同的销量会同时舍弃
+SELECT *
+FROM (
+    SELECT
+        year   AS '年',
+        month  AS '月',
+        sale   AS '当月销售',
+        CUME_DIST() OVER(PARTITION BY year ORDER BY sale DESC) AS row_level
+    FROM (
+        SELECT year(order_date) year, month(order_date) month, SUM(sale) sale
+        FROM m_company
+        GROUP BY year(order_date), month(order_date)
+    ) t1
+) t2
+WHERE row_level <= 0.4;
 ```
 
 ### 2.4 连续登录的最大天数
 ```
-# 4.1 准备数据, 内容为 ID, 用户名, 日期
+# 2.4.1 准备数据, 内容为 ID, 用户名, 日期
 USE    test;
 DROP   TABLE IF EXISTS m_user;
 CREATE TABLE m_user (
@@ -632,16 +664,16 @@ INSERT INTO m_user VALUES(1, '张三', '2023-10-04');
 
 SELECT * FROM m_user ORDER BY id, login_date;
 
-# 4.2 去重
+# 2.4.2 去重
 SELECT DISTINCT * FROM m_user;
 
-# 4.3 用户分组, 日期排名
+# 2.4.3 用户分组, 日期排名
 SELECT
     *,
     rank() OVER (PARTITION BY id ORDER BY login_date) row_rank
 FROM (SELECT DISTINCT * FROM m_user) t1;
 
-# 4.4 求日期和排名的差值
+# 2.4.4 求日期和排名的差值
 SELECT
     *,
     DATE_SUB(login_date, INTERVAL row_rank DAY) AS diffe_date
@@ -652,7 +684,7 @@ FROM (
     FROM (SELECT DISTINCT * FROM m_user) t1
 ) t2
 
-# 4.5 统计连续登录的信息
+# 2.4.5 统计连续登录的信息
 SELECT
     id,
     name,
@@ -674,5 +706,5 @@ GROUP BY id, name, diff_date
 HAVING count(*) > 1;
 ```
 
-## 官网
+## 3. 官网
 * https://dev.mysql.com/doc/refman/9.0/en/window-functions.html
