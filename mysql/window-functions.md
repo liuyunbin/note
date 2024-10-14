@@ -29,7 +29,7 @@ partition_clause:
 order_clause:
 * ORDER BY
 * 可以使用单行函数
- 
+
 frame_clause:
 * ROWS         frame_start         相当于 ROWS BETWEEN frame_start AND current row
 * ROWS BETWEEN frame_start AND frame_end
@@ -88,11 +88,11 @@ SELECT * FROM student;
 # 1.3.1 序号函数 
 SELECT
     *,
-          RANK() OVER (w ORDER BY score DESC) AS       rank_desc, -- 相同的值排名  相同, 排名不连续, 例如 1 2 2 4
+          RANK() OVER (w ORDER BY score DESC) AS       rank_desc, -- 相同的值排名相同, 排名不连续, 例如 1 2 2 4
           RANK() OVER (w ORDER BY score  ASC) AS       rank_asc,
-    DENSE_RANK() OVER (w ORDER BY score DESC) AS dense_rank_desc, -- 相同的值排名  相同, 排名  连续, 例如 1 2 2 3
+    DENSE_RANK() OVER (w ORDER BY score DESC) AS dense_rank_desc, -- 相同的值排名相同, 排名连续, 例如 1 2 2 3
     DENSE_RANK() OVER (w ORDER BY score  ASC) AS dense_rank_asc,
-    ROW_NUMBER() OVER (w ORDER BY score DESC) AS row_number_desc, -- 相同的值排名不相同, 排名  连续, 例如 1 2 3 4
+    ROW_NUMBER() OVER (w ORDER BY score DESC) AS row_number_desc, -- 相同的值排名不相同, 排名连续, 例如 1 2 3 4
     ROW_NUMBER() OVER (w ORDER BY score  ASC) AS row_number_asc
 FROM student
 WINDOW w AS (PARTITION BY class_id);
@@ -101,7 +101,7 @@ WINDOW w AS (PARTITION BY class_id);
 SELECT
     *,
             RANK() OVER (w ORDER BY score DESC) AS         rank_desc,
-    PERCENT_RANK() OVER (w ORDER BY score DESC) AS percent_rank_desc, -- 排名百分比:  (rank - 1) / (rows - 1)
+    PERCENT_RANK() OVER (w ORDER BY score DESC) AS percent_rank_desc, -- 排名百分比: (rank - 1) / (rows - 1)
             RANK() OVER (w ORDER BY score  ASC) AS         rank_asc,
     PERCENT_RANK() OVER (w ORDER BY score  ASC) AS percent_rank_asc
 FROM student
