@@ -1,6 +1,6 @@
 
-## 1. 游标: 用于定位某条记录
-### 1.1 说明
+## 游标: 用于定位某条记录
+### 1. 说明
 ```
 * 游标使用过程会对数据加锁
 * 耗内存资源
@@ -11,10 +11,9 @@ FETCH   cursor_name INTO var_name ...;      # 3. 使用游标
 CLOSE   cursor_name;                        # 4. 关闭游标, 需要及时关闭, 否则消耗系统资源
 ```
 
-### 1.2 实例
-#### 1.2.1 数据准备
+### 2. 实例
 ```
-USE    test;
+# 1. 数据准备
 DROP   TABLE IF EXISTS employees;
 CREATE TABLE employees(id INT, name VARCHAR(20), salary INT);
 INSERT INTO  employees values(1, "张三",  7000);
@@ -22,11 +21,8 @@ INSERT INTO  employees values(2, "李四",  8000);
 INSERT INTO  employees values(3, "王五",  9000);
 INSERT INTO  employees values(4, "赵六", 10000);
 INSERT INTO  employees values(4, "田七", 11000);
-```
 
-#### 1.2.2 定义存储过程
-```
-USE  test;
+# 2. 定义存储过程
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name(IN total_salary INT, OUT ret int, INOUT sum_salary INT, INOUT count_salary INT)
@@ -55,10 +51,8 @@ BEGIN
   CLOSE   cursor_name;
 END $
 DELIMITER ;
-```
 
-#### 1.2.3 测试
-```
+# 3. 测试
 SET @ret          = 0;
 SET @sum_salary   = 0;
 SET @count_salary = 0;
@@ -66,74 +60,4 @@ CALL   procedure_name(20000, @ret, @sum_salary, @count_salary);   # 正常获取
 SELECT @ret, @sum_salary, @count_salary;
 CALL   procedure_name(200000, @ret, @sum_salary, @count_salary);  # 测试报错
 SELECT @ret, @sum_salary, @count_salary;
-```
-
-## 2. 触发器
-### 2.1 说明
-```
-* 可用于自动维护一些信息, 比如 日志
-* 可用于检查入参的错误
-* 底层表变化时, 需要修改触发器
-* 由于操作是自动的, 不容易发现错误
-* OLD 获取旧数据, NEW 获取新数据
-
-CREATE TRIGGER trigger_name
-[BEFORE|AFTER]  [INSERT|UPDATE|DELETE]
-ON table_name FOR EACH ROW ...
-
-DROP TRIGGER   table_name.trigger_name; # 删除触发器
-```
-
-### 2.2 测试 
-#### 2.2.1 日志记录
-```
-USE    test;
-DROP   TABLE IF EXISTS student;
-CREATE TABLE student (id INT, name VARCHAR(20));
-DROP   TABLE IF EXISTS student_log;
-CREATE TABLE student_log (log_time DATETIME, log_name VARCHAR(20));
-
-DROP   TRIGGER   IF EXISTS trigger_name;
-CREATE TRIGGER trigger_name AFTER INSERT ON student FOR EACH ROW
-INSERT INTO student_log values(now(), "insert");
-SELECT * FROM student; 
-SELECT * FROM student_log;
-INSERT INTO student VALUES(1, "张三");
-SELECT * FROM student; 
-SELECT * FROM student_log;
-```
-
-#### 2.2.2 检查入参 (只是测试, 用唯一键更合适)
-```
-USE    test;
-DROP   TABLE IF EXISTS student;
-CREATE TABLE student (id INT, name VARCHAR(20));
-DROP   TABLE IF EXISTS student_log;
-CREATE TABLE student_log (log_time DATETIME, log_name VARCHAR(20));
-
-DROP   TRIGGER   IF EXISTS trigger_name;
-DELIMITER $
-CREATE TRIGGER trigger_name
-BEFORE INSERT ON student FOR EACH ROW
-BEGIN
-    DECLARE num int DEFAULT(0);
-    
-    SELECT count(*) into num FROM student WHERE name = NEW.name;
-    
-    IF num != 0 THEN
-        SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT = '数据已存在, 不允许插入';
-    END IF;
-    
-    INSERT INTO student_log values(now(), "insert");
-END $
-DELIMITER ;
-
-SELECT * FROM student; 
-SELECT * FROM student_log;
-INSERT INTO student VALUES(1, "张三");
-SELECT * FROM student; 
-SELECT * FROM student_log;
-INSERT INTO student VALUES(1, "张三");
-SELECT * FROM student;
-SELECT * FROM student_log;
 ```
