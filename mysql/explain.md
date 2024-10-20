@@ -1,7 +1,6 @@
 
 ## 1. 造数据
 ```
-USE    test;
 DROP   TABLE IF EXISTS teacher1;
 CREATE TABLE teacher1 (id INT PRIMARY KEY, name VARCHAR(20) unique, addr VARCHAR(20), extra varchar(20));
 INSERT INTO  teacher1 VALUES(1, "中神通", "全真教", "111");
@@ -60,113 +59,84 @@ EXPLAIN SELECT * FROM teacher1 WHERE id = (SELECT teacher_id FROM student WHERE 
 ```
 
 ### 2.3 select_type -- 查询的类型
-#### 2.3.1 SIMPLE --------- 不包含 UNION 或者子查询
 ```
+# 1. SIMPLE --------- 不包含 UNION 或者子查询
 EXPLAIN SELECT * FROM teacher1;
 EXPLAIN SELECT * FROM teacher1, teacher2;
-```
 
-#### 2.3.2 PRIMARY -------- UNION 和 UNION ALL 的左边, 子查询的大查询
-```
+# 2. PRIMARY -------- UNION 和 UNION ALL 的左边, 子查询的大查询
 EXPLAIN SELECT * FROM teacher1 UNION     SELECT * FROM teacher2;
 EXPLAIN SELECT * FROM teacher1 UNION ALL SELECT * FROM teacher2;
 EXPLAIN SELECT * FROM teacher1 WHERE id = (SELECT teacher_id FROM student WHERE name = '马钰');
-```
 
-#### 2.3.4 UNION  --------- UNION 和 UNION ALL 的右边 (不相关)
-```
+# 3. UNION  --------- UNION 和 UNION ALL 的右边 (不相关)
 EXPLAIN SELECT * FROM teacher1 UNION     SELECT * FROM teacher2;
 EXPLAIN SELECT * FROM teacher1 UNION ALL SELECT * FROM teacher2;
-```
    
-#### 2.3.5 UNION RESULT --- UNION 去重的临时表
-```
+# 4. UNION RESULT --- UNION 去重的临时表
 EXPLAIN SELECT * FROM teacher1 UNION     SELECT * FROM teacher2;
-```
 
-#### 2.3.6 SUBQUERY ------------ 不相关子查询中的小查询
-```
+# 5. SUBQUERY ------------ 不相关子查询中的小查询
 EXPLAIN SELECT * FROM teacher1 WHERE id = (SELECT teacher_id FROM student WHERE name = '马钰');
-```
 
-#### 2.3.7 DEPENDENT SUBQUERY ---- 相关子查询中的小查询
-```
+# 6. DEPENDENT SUBQUERY ---- 相关子查询中的小查询
 EXPLAIN SELECT *, (SELECT name FROM teacher1 WHERE teacher1.id = student.teacher_id)
 FROM student;
-```
 
-#### 2.3.8 DEPENDENT UNION ------- UNION 和 UNION ALL 的右边 (相关)
-```
+# 7. DEPENDENT UNION ------- UNION 和 UNION ALL 的右边 (相关)
 EXPLAIN
 SELECT * FROM student WHERE teacher_id IN (
     SELECT id FROM teacher1 WHERE teacher1.id = student.teacher_id
     UNION ALL
     SELECT id FROM teacher2 WHERE teacher2.id = student.teacher_id
-)
-```
+);
 
-#### 2.3.9 DERIVED ---------------- 派生表
-```
+# 8. DERIVED ---------------- 派生表
 EXPLAIN SELECT * FROM (SELECT * FROM teacher1 UNION ALL SELECT * FROM teacher2) t1;
-```
 
-#### 2.3.10 MATERIALIZED ----------- 把子查询优化成连接查询
-```
-EXPLAIN SELECT * FROM teacher1 WHERE id IN (SELECT teacher_id FROM student);    
-```
+# 9. MATERIALIZED ----------- 把子查询优化成连接查询
+EXPLAIN SELECT * FROM teacher1 WHERE id IN (SELECT teacher_id FROM student);
    
-#### 2.3.11 UNCACHEABLE SUBQUERY --- 不常用
+# 10. UNCACHEABLE SUBQUERY --- 不常用
 
-#### 2.3.12 UNCACHEABLE UNION ------ 不常用
+# 11. UNCACHEABLE UNION ------ 不常用
+```
 
 ### 2.4 partitions --- 分区表中的命中情况
 
 ### 2.5 type -- 针对单表的访问方法
-#### 2.5.1 system --- 只有一条记录, 精确
-#### 2.5.2 const ---- 常数与主键或唯一键等值匹配
 ```
+# 1. system --- 只有一条记录, 精确
+
+# 2. const ---- 常数与主键或唯一键等值匹配
 EXPLAIN SELECT * FROM teacher1 WHERE id = 1;
 EXPLAIN SELECT * FROM teacher1 WHERE name = '中神通';
-```
 
-#### 2.5.3 eq_ref --- 连接查询 或 子查询时，被驱动表 使用主键或唯一键 常量等值匹配
-```
+# 3. eq_ref --- 连接查询 或 子查询时，被驱动表 使用主键或唯一键 常量等值匹配
 EXPLAIN SELECT *, (SELECT name FROM teacher1 WHERE id = student.teacher_id) FROM student;
-```
 
-#### 2.5.4 ref ------ 常数与普通索引等值匹配
-```
+# 4. ref ------ 常数与普通索引等值匹配
 EXPLAIN SELECT * FROM teacher1 WHERE addr = '大元';
-```
 
-#### 2.5.5 fulltext ----- 全文索引
+# 5. fulltext ----- 全文索引
 
-#### 2.5.6 ref_or_null -- 常数与普通索引等值匹配 或 NULL
-```
+# 6. ref_or_null -- 常数与普通索引等值匹配 或 NULL
 EXPLAIN SELECT * FROM teacher1 WHERE addr = '大元' OR addr IS NULL;
-```
 
-#### 2.5.7 index_merge -- 单表多字段查询, 查询之间使用 OR, 可能索引合并
-```
+# 7. index_merge -- 单表多字段查询, 查询之间使用 OR, 可能索引合并
 EXPLAIN SELECT * FROM teacher1 WHERE name = '北侠' OR  addr = '蒙古';
 EXPLAIN SELECT * FROM teacher1 WHERE name = '北侠' AND addr = '蒙古'; # const
-```
 
-#### 2.5.8 unique_subquery --- 子查询 IN 转化成 EXISTS, 并且子查询使用 主键进行等值匹配 --- 没复现
-```
+# 8. unique_subquery --- 子查询 IN 转化成 EXISTS, 并且子查询使用 主键进行等值匹配 --- 没复现
 EXPLAIN SELECT * FROM student WHERE id IN (SELECT id FROM teacher1 WHERE teacher1.id = student.teacher_id);
-```
 
-#### 2.5.9 index_subquery ---- 与 unique_subquery 类似，只不过子查询中的表时使用的是普通的索引 --- 没复现
+# 9. index_subquery ---- 与 unique_subquery 类似，只不过子查询中的表时使用的是普通的索引 --- 没复现
 
-#### 2.5.10 range --- 范围查找
-```
+# 10. range --- 范围查找
 EXPLAIN SELECT * FROM teacher1 WHERE id IN (1, 2, 3);
 EXPLAIN SELECT * FROM teacher1 WHERE id > 1 AND id < 3;
-```
 
-#### 2.5.10 index
-```
+# 11. index
 * 复合索引
 * 查找时索引不是第一个字段
 * 不需要回表, 只用索引就能满足要求
@@ -176,15 +146,11 @@ CREATE TABLE tb1(t1 INT, t2 INT,  t3 int, t4 int);
 CREATE INDEX index_123 ON tb1(t1, t2, t3);
 
 EXPLAIN SELECT t2 FROM tb1 WHERE t3 = 123;
-```
 
-#### 2.5.11 ALL: 全表扫描
-```
+# 12. ALL: 全表扫描
 EXPLAIN SELECT * FROM teacher1;
-```
 
-#### 2.5.12 结果值从最好到最坏依次是
-```
+# 13. 结果值从最好到最坏依次是
 system > const > eq_ref > ref** > ref_or_null > index_merge > unique_subquery > index_subquery > range > index > ALL 
 
 至少要达到 range 级别，要求是 ref 级别，最好是 consts级别
@@ -207,65 +173,43 @@ EXPLAIN SELECT *, (SELECT name FROM teacher1 WHERE id = student.teacher_id) FROM
 ### 2.11 filtered ----------- 某个表经过搜索条件过滤后剩余记录条数的百分比
 
 ### 2.12 Extra -------------- 一些额外的信息
-#### 2.12.1 No tables used --- 没有 FROM 子句
 ```
+# 1. No tables used --- 没有 FROM 子句
 EXPLAIN SELECT 1;
-```
 
-#### 2.12.2 Impossible WHERE ---- WHERE 子句永远为 FALSE
-```
+# 2. Impossible WHERE ---- WHERE 子句永远为 FALSE
 EXPLAIN SELECT * FROM teacher1 WHERE 1 = 2;
-```
 
-#### 2.12.3 Using where ----- WHERE 使用非索引列
-```
+# 3. Using where ----- WHERE 使用非索引列
 EXPLAIN SELECT * FROM teacher1 WHERE extra = '111';
-```
 
-#### 2.12.4 No matching min/max row -- 有 MIN 或者 MAX 聚合函数，但是没有符合 WHERE的搜索条件的记录
-```
+# 4. No matching min/max row -- 有 MIN 或者 MAX 聚合函数，但是没有符合 WHERE的搜索条件的记录
 EXPLAIN SELECT max(id) FROM teacher1 WHERE id > 1000;
-```
 
-#### 2.12.5 Select tables optimized away -- 有 MIN 或者 MAX 聚合函数, 有符合 WHERE的搜索条件的记录
-```
+# 5. Select tables optimized away -- 有 MIN 或者 MAX 聚合函数, 有符合 WHERE的搜索条件的记录
 EXPLAIN SELECT max(id) FROM teacher1;
-```
 
-#### 2.12.6 Using index ----- 不需要回表
-```
+# 6. Using index ----- 不需要回表
 EXPLAIN SELECT id FROM teacher1 WHERE name = '北侠';
-```
 
-#### 2.12.6 Using index condition -- 搜索条件中虽然出现了索引列，但却有不能使用索引的情况
-```
+# 7. Using index condition -- 搜索条件中虽然出现了索引列，但却有不能使用索引的情况
 EXPLAIN SELECT * FROM teacher1 WHERE name >= '北侠' AND name LIKE '%北侠%';
-```
 
-#### 2.12.7 Using join buffer (Block Nested Loop) -- 连接查询执行过程中, 可能分配新内存提高效率
+# 8. Using join buffer (Block Nested Loop) -- 连接查询执行过程中, 可能分配新内存提高效率
 
-#### 2.12.8 Not exists --- 左连接要求被驱动表的字段为 NULL, 但该字段不可能为 NULL
-```
+# 9. Not exists --- 左连接要求被驱动表的字段为 NULL, 但该字段不可能为 NULL
 EXPLAIN SELECT * FROM teacher1 LEFT JOIN teacher2 ON teacher1.name = teacher2.name WHERE teacher2.id IS NULL;
-```
 
-#### 2.12.9 Using intersect(...) 、 Using union(...) 和 Using sort_union(...) --- 多个索引同时使用
-```
+# 10. Using intersect(...) 、 Using union(...) 和 Using sort_union(...) --- 多个索引同时使用
 EXPLAIN SELECT id FROM teacher1 WHERE name = '北侠' OR addr = '大宋';
-```
 
-#### 2.12.10 Zero limit -- 压根不读表
-```
+# 11. Zero limit -- 压根不读表
 EXPLAIN SELECT * FROM teacher1 LIMIT 0;
-```
 
-#### 2.12.11 Using filesort -- 排序无法使用索引, 使用内存或磁盘排序
-```
+# 12. Using filesort -- 排序无法使用索引, 使用内存或磁盘排序
 EXPLAIN SELECT * FROM teacher1 ORDER BY addr;
-```
 
-#### 2.12.12 Using temporary -- 使用临时表
-```
+# 13. Using temporary -- 使用临时表
 EXPLAIN
 SELECT * FROM teacher1
 UNION
@@ -283,7 +227,7 @@ EXPLAIN FORMAT=tree SELECT * FROM teacher1; # TREE
 ```
 EXPLAIN
 SELECT * FROM teacher1 WHERE id in (SELECT teacher_id FROM student);
-SHOW WARNINGS
+SHOW WARNINGS;
 
 select `test`.`teacher1`.`id` AS `id`,
        `test`.`teacher1`.`name` AS `name`,
