@@ -4,19 +4,6 @@
 * 效率
 
 
-
-配置文件详述
-
-程序详述
-
-
-round -- 不一定是直观 的四舍五入
-
-current_timestamp()
-current_date()
-now()
-
-## 练习子查询
 ```
 
 DDL: create drop alter rename truncate
@@ -26,8 +13,6 @@ DML(数据操作语言): INSERT UPDATE SELECT DELETE
 DCL(数据控制语言): GRANT  REVOKE COMMIT ROLLBACK SAVEPOINT
 
 source ...
-
-round -- 不一定是直观 的四舍五入
 
 DB: 数据库 Database
 DBMS: 数据库管理系统 Database Management System
@@ -64,8 +49,4 @@ select .. into outfile .. fields terminated by ',' optionally enclosed by '"' li
 mysql_install_db --user=mysql --ldata=/var/lib/mysql # 添加用户 mysql 使mysqld 可以使用 systemctl 启动
 
 set global max_allowed_packet=64*1024*1024 # 设置插入的上限
-
-current_timestamp()
-current_date()
-now()
 
