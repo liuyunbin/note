@@ -9,15 +9,12 @@ DROP   DATABASE test;               # 删除数据库
 ```
 
 ## 表
-### 0. 准备库
 ```
+# 0. 准备库
 SHOW   DATABASES;
 CREATE DATABASE IF NOT EXISTS test;
-```
 
-### 1. 创建和删除表
-```
-USE    test;
+# 1. 创建和删除表
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS student_test;
 CREATE TABLE student (id INT);
@@ -27,11 +24,8 @@ SHOW   CREATE TABLE student;
 SHOW   CREATE TABLE student_test;
 DESC   student;
 DESC   student_test;
-```
 
-### 2. 增加列
-```
-USE    test;
+# 2. 增加列
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT);
 DESC   student;
@@ -39,21 +33,15 @@ ALTER  TABLE student ADD before_id VARCHAR(20) FIRST;
 ALTER  TABLE student ADD  after_id VARCHAR(20) AFTER id;
 ALTER  TABLE student ADD      name VARCHAR(20);
 DESC   student;
-```
 
-### 3. 删除列
-```
-USE    test;
+# 3. 删除列
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT, name VARCHAR(20));
 DESC   student;
 ALTER  TABLE student DROP name;
 DESC   student;
-```
 
-### 4. 修改列属性
-```
-USE    test;
+# 4. 修改列属性
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT, name VARCHAR(20));
 DESC   student;
@@ -63,11 +51,8 @@ ALTER  TABLE student MODIFY name VARCHAR(20) FIRST;
 DESC   student;
 ALTER  TABLE student MODIFY name VARCHAR(20) AFTER id;
 DESC   student;
-```
 
-### 5. 重命名列名
-```
-USE    test;
+# 5. 重命名列名
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT, name VARCHAR(20));
 DESC   student;
@@ -75,11 +60,8 @@ ALTER  TABLE student RENAME COLUMN name TO new_name;
 DESC   student;
 ALTER  TABLE student CHANGE id new_id BIGINT;
 DESC   student;
-```
 
-### 6. 设置列不可见
-```
-USE    test;
+# 6. 设置列不可见
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT, name VARCHAR(20));
 DESC   student;
@@ -87,11 +69,8 @@ ALTER  TABLE student ALTER name SET INVISIBLE;
 DESC   student;
 ALTER  TABLE student ALTER name SET VISIBLE;
 DESC   student;
-```
 
-### 7. 重命名表
-```
-USE    test;
+# 7. 重命名表
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS student_test;
 CREATE TABLE student (id INT, name VARCHAR(20));
@@ -100,11 +79,8 @@ ALTER  TABLE student RENAME TO student_test;
 SHOW   TABLES;
 RENAME TABLE student_test TO student;
 SHOW   TABLES;
-```
 
-### 8. 删除表内数据(清空表)
-```
-USE    test;
+# 8. 删除表内数据(清空表)
 DROP   TABLE IF EXISTS student;
 SET    AUTOCOMMIT = FALSE;      # 取消自动提交
 CREATE TABLE student (id INT, name VARCHAR(20));
@@ -120,31 +96,22 @@ SELECT * FROM  student;
 TRUNCATE TABLE student;  # 清空表 --- 不能回滚 --- 会自动提交
 ROLLBACK;                # 回滚
 SELECT * FROM  student;
-```
 
-### 9. 插入数据(一个一个插入)
-```
-USE    test;
+# 9. 插入数据(一个一个插入)
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT, name VARCHAR(20));
 INSERT INTO  student VALUES(1, "马钰");
 INSERT INTO  student VALUES(2, "丘处机");
 INSERT INTO  student VALUES(3, "王处一");
 SELECT * FROM student;
-```
 
-### 10. 插入数据(多个插入)
-```
-USE    test;
+# 10. 插入数据(多个插入)
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT, name VARCHAR(20));
 INSERT INTO  student VALUES(1, "马钰"), (2, "丘处机"), (3, "王处一");
 SELECT * FROM student;
-```
 
-### 11. 插入数据(使用现有表)
-```
-USE    test;
+# 11. 插入数据(使用现有表)
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS student_test;
 CREATE TABLE student (id INT, name VARCHAR(20));
@@ -155,11 +122,8 @@ SELECT * FROM student_test;
 INSERT   INTO student_test SELECT * FROM student;
 SELECT * FROM student;
 SELECT * FROM student_test;
-```
 
-### 12. 插入数据(忽略重复的数据, 列唯一)
-```
-USE    test;
+# 12. 插入数据(忽略重复的数据, 列唯一)
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20));
 INSERT INTO  student VALUES(1, "马钰");
@@ -169,11 +133,8 @@ SELECT * FROM student;
 INSERT INTO  student VALUES(1, "丘处机");        # 报错
 INSERT IGNORE INTO  student VALUES(1, "丘处机"); # 忽略重复的数据
 SELECT * FROM student;
-```
 
-### 13. 插入数据(遇到重复的数据, 先删除再添加)
-```
-USE     test;
+# 13. 插入数据(遇到重复的数据, 先删除再添加)
 DROP    TABLE IF EXISTS student;
 CREATE  TABLE student (id INT PRIMARY KEY, name VARCHAR(20));
 INSERT  INTO  student VALUES(1, "丘处机");
@@ -182,11 +143,8 @@ REPLACE INTO  student VALUES(1, "马钰");
 SELECT  * FROM student;
 REPLACE INTO  student VALUES(2, "丘处机");
 SELECT  * FROM student;
-```
 
-### 14. 更新数据
-```
-USE    test;
+# 14. 更新数据
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT, name VARCHAR(20));
 INSERT INTO  student VALUES(1, "马玉");
@@ -195,17 +153,12 @@ INSERT INTO  student VALUES(3, "王处一");
 SELECT * FROM student;
 UPDATE student SET name = "马钰" WHERE id = 1;
 SELECT * FROM student;
-```
 
-### 15. SELECT(书写和执行顺序)
-```
+# 15. SELECT(书写和执行顺序)
 书写: SELECT -> DISTINCT -> FROM -> WHERE -> GROUP BY -> HAVING -> ORDER BY -> LIMIT
 执行: FROM -> WHERE -> GROUP BY(此后可以使用聚合) -> HAVING -> SELECT -> DISTINCT -> ORDER BY -> LIMIT
-```
 
-### 16. SELECT()
-```
-USE    test;
+# 16. SELECT()
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher (id INT PRIMARY KEY, name VARCHAR(20), addr VARCHAR(20));
@@ -277,7 +230,6 @@ SELECT DISTINCT t.id, t.name from teacher t, student s WHERE t.id = s.teacher_id
 * 提高数据安全, 只展示部分列
 * 底层变化时, 必须更新视图
 
-USE    test;
 DROP   TABLE IF EXISTS student_base;
 DROP   TABLE IF EXISTS student_detail;
 CREATE TABLE student_base   (id INT PRIMARY KEY, name VARCHAR(20));
