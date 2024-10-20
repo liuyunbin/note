@@ -121,7 +121,7 @@ CREATE TABLE tb1 (
     t3 INT NOT NULL,
     t4 INT);
 
-CREATE INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
+CREATE  INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1;                       # 使用部分索引, t1 的索引 (key_len = 4)
 EXPLAIN SELECT * FROM tb1 WHERE t2 = 1;                       # 不使用索引
 EXPLAIN SELECT * FROM tb1 WHERE t3 = 1;                       # 不使用索引
@@ -140,12 +140,12 @@ CREATE TABLE tb1 (
     t2 INT NOT NULL
     );
 
-CREATE INDEX index_t1 ON tb1(t1);
+CREATE  INDEX index_t1 ON tb1(t1);
 EXPLAIN SELECT * FROM tb1 WHERE t1 = '1';
 EXPLAIN SELECT * FROM tb1 WHERE t1 =  1;           # 类型转换导致索引失效
 EXPLAIN SELECT * FROM tb1 WHERE UPPER(t1) = '1';   # 函数导致索引失效
 
-CREATE INDEX index_t2 ON tb1(t2);
+CREATE  INDEX index_t2 ON tb1(t2);
 EXPLAIN SELECT * FROM tb1 WHERE t2 = 1;
 EXPLAIN SELECT * FROM tb1 WHERE t2 + 1 = 1; # 计算导致索引失效
 ```
@@ -160,13 +160,13 @@ CREATE TABLE tb1 (
     t3 INT NOT NULL,
     t4 INT);
 
-CREATE INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
+CREATE  INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 = 1 AND t3 = 1; # 使用全部索引 (key_len = 12)
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 > 1 AND t3 = 1; # 使用部分索引, 范围查找 t3 上的索引失效 (key_len = 8)
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t3 = 1 AND t2 > 1; # 系统会按照联合索引声明的方式使用, 所以还是失效
 
-DROP   INDEX index_t1_t2_t3 ON tb1;                                       
-CREATE INDEX index_t1_t2_t3 ON tb1(t1, t3, t2);               # 修改联合索引声明的顺序
+DROP    INDEX index_t1_t2_t3 ON tb1;                                       
+CREATE  INDEX index_t1_t2_t3 ON tb1(t1, t3, t2);              # 修改联合索引声明的顺序
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 = 1 AND t3 = 1; # 使用全部索引 (key_len = 12)
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 > 1 AND t3 = 1; # 使用全部索引 (key_len = 12)
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t3 = 1 AND t2 > 1; # 使用全部索引 (key_len = 12)
@@ -180,7 +180,7 @@ CREATE TABLE tb1 (
     id INT PRIMARY KEY AUTO_INCREMENT,
     t1 INT);
     
-CREATE INDEX index_t1 ON tb1(t1);
+CREATE  INDEX index_t1 ON tb1(t1);
 EXPLAIN SELECT * FROM tb1 WHERE t1 != 2; 
 EXPLAIN SELECT * FROM tb1 WHERE t1 IS NULL;
 EXPLAIN SELECT * FROM tb1 WHERE t1 IS NOT NULL;
@@ -193,7 +193,7 @@ CREATE TABLE tb1 (
     id INT PRIMARY KEY AUTO_INCREMENT,
     t1 VARCHAR(20));
     
-CREATE INDEX index_t1 ON tb1(t1);
+CREATE  INDEX index_t1 ON tb1(t1);
 EXPLAIN SELECT * FROM tb1 WHERE t1 LIKE 'abc%';
 EXPLAIN SELECT * FROM tb1 WHERE t1 LIKE '%bc'; 
 EXPLAIN SELECT * FROM tb1 WHERE t1 LIKE 'abc_'; 
@@ -215,36 +215,36 @@ EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 OR t2 = 1;
 
 ## 8. 测试多表查询 (左连接 或 右连接)
 ```
-DROP TABLE IF EXISTS tb1;
+DROP   TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (t1 INT);
     
-DROP TABLE IF EXISTS tb2;
+DROP   TABLE IF EXISTS tb2;
 CREATE TABLE tb2 (t1 INT);
 
 EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.t1 = tb2.t1; # 1. 查看左连接
-CREATE INDEX index_t1 ON tb1(t1);                           # 2. 在驱动表上建立索引, 意义不大 (可能被优化成内连接)
+CREATE  INDEX index_t1 ON tb1(t1);                          # 2. 在驱动表上建立索引, 意义不大 (可能被优化成内连接)
 EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.t1 = tb2.t1; # 3. 查看左连接
-DROP INDEX index_t1 ON tb1;                                 # 4. 删除驱动表上的索引
-CREATE INDEX index_t1 ON tb2(t1);                           # 5. 在被驱动表上建立索引, 有用
+DROP    INDEX index_t1 ON tb1;                              # 4. 删除驱动表上的索引
+CREATE  INDEX index_t1 ON tb2(t1);                          # 5. 在被驱动表上建立索引, 有用
 EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.t1 = tb2.t1; # 6. 查看左连接
 ```
 
 ## 9. 测试多表查询 (内连接)
 ```
-DROP TABLE IF EXISTS tb1;
+DROP   TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (t1 INT);
 
-DROP TABLE IF EXISTS tb2;
+DROP   TABLE IF EXISTS tb2;
 CREATE TABLE tb2 (t1 INT);
 
 EXPLAIN SELECT * FROM tb1 JOIN tb2 ON tb1.t1 = tb2.t1; # 1. 查看内连接
-CREATE INDEX index_t1 ON tb1(t1);                      # 2. 表 t1 建立索引
+CREATE  INDEX index_t1 ON tb1(t1);                     # 2. 表 t1 建立索引
 EXPLAIN SELECT * FROM tb1 JOIN tb2 ON tb1.t1 = tb2.t1; # 3. 查看内连接, 有索引的表可以做被驱动表
-CREATE INDEX index_t1 ON tb2(t1);                      # 4. 表 t2 建立索引
+CREATE  INDEX index_t1 ON tb2(t1);                     # 4. 表 t2 建立索引
 EXPLAIN SELECT * FROM tb1 JOIN tb2 ON tb1.t1 = tb2.t1; # 5. 查看内连接, 有索引的表可以做被驱动表
-INSERT INTO tb1 VALUES(1);                             # 6. t1 插入数据
-INSERT INTO tb1 VALUES(2);
-INSERT INTO tb1 VALUES(3);
+INSERT  INTO tb1 VALUES(1);                            # 6. t1 插入数据
+INSERT  INTO tb1 VALUES(2);
+INSERT  INTO tb1 VALUES(3);
 EXPLAIN SELECT * FROM tb1 JOIN tb2 ON tb1.t1 = tb2.t1; # 7. t1 和 t2 都有索引
                                                        #    t1 比 t2 大
                                                        #    小表驱动大表, 所以使用 t1 的索引
