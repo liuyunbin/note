@@ -1,6 +1,6 @@
 
-## 1. 窗口函数基础及测试
-### 1.1 总结
+# 窗口函数
+## 0. 总结
 ```
 在不改变原表行数的情况下进行分组和排序计算
 GROUP BY: 分组并合并
@@ -57,9 +57,9 @@ frame_clause:
 * 连续登录
 ```
 
-### 1.2 准备数据
+## 1. 基础及测试
 ```
-USE    test;
+# 1. 准备数据
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(
     login_date DATE,
@@ -85,11 +85,9 @@ INSERT INTO student VALUES('2021-02-01', '李六', 2, NULL);
 INSERT INTO student VALUES('2022-01-01', '李七', 2, 80);
 
 SELECT * FROM student;
-```
 
-### 1.3 静态窗口函数
-#### 1.3.1 序号函数 
-```
+# 2. 静态窗口函数
+# 2.1 序号函数 
 SELECT
     *,
           RANK() OVER (w ORDER BY score DESC) AS       rank_desc, -- 相同的值排名相同, 排名不连续, 例如 1 2 2 4
@@ -100,10 +98,8 @@ SELECT
     ROW_NUMBER() OVER (w ORDER BY score  ASC) AS row_number_asc
 FROM student
 WINDOW w AS (PARTITION BY class_id);
-```
 
-#### 1.3.2 分布函数
-```
+# 2.2 分布函数
 SELECT
     *,
             RANK() OVER (w ORDER BY score DESC) AS         rank_desc,
@@ -119,36 +115,28 @@ SELECT
     CUME_DIST() OVER (w ORDER BY score  ASC) AS cume_dist_asc    -- 小于等于某一值的比例
 FROM student
 WINDOW w AS (PARTITION BY class_id);
-```
 
-#### 1.3.3 前后函数
-```
+# 2.3 前后函数
 SELECT
     *,
      LAG(score, 2, -1) OVER w AS 'lag', -- 当前行的前n行的expr的值
     LEAD(score, 2, -1) OVER w AS 'ead'  -- 当前行的后n行的expr的值
 FROM student
 WINDOW w AS (PARTITION BY class_id ORDER BY score DESC);
-```
 
-#### 1.3.4 NTILE(n) 函数
-```
+# 2.4 NTILE(n) 函数
 SELECT
     *,
     NTILE(5) OVER w AS 'ntile' -- 将数据分成 n 组, 返回组编号
 FROM student
 WINDOW w AS (PARTITION BY class_id ORDER BY score DESC);
-```
 
-### 1.4 动态窗口函数
-```
+# 3. 动态窗口函数
 FIRST_VALUE(expr) ---- 第一个expr的值
  LAST_VALUE(expr) ---- 最后一个expr的值
   NTH_VALUE(expr,n) -- 第n个expr的值 
-```
   
-#### 1.4.1 无 ORDER BY: 默认窗口是分组下所有行
-```
+# 3.1 无 ORDER BY: 默认窗口是分组下所有行
 SELECT
     *,
     FIRST_VALUE(score)   OVER w AS 'first',
@@ -156,10 +144,8 @@ SELECT
       NTH_VALUE(score,2) OVER w AS 'nth'
 FROM student
 WINDOW w AS (PARTITION BY class_id);
-```
 
-#### 1.4.2 有 ORDER BY: 默认窗口是 [第一行, 当前行]
-```
+# 3.2 有 ORDER BY: 默认窗口是 [第一行, 当前行]
 SELECT
     *,
     FIRST_VALUE(score)   OVER w AS 'first',
@@ -167,10 +153,8 @@ SELECT
       NTH_VALUE(score,2) OVER w AS 'nth'
 FROM student
 WINDOW w AS (PARTITION BY class_id ORDER BY score DESC);
-```
 
-#### 1.4.3 指定窗口: [第一行, 当前行]
-```
+# 3.3 指定窗口: [第一行, 当前行]
 SELECT
     *,
     FIRST_VALUE(score)   OVER w AS 'first',
@@ -179,10 +163,8 @@ SELECT
 FROM student
 WINDOW w AS (PARTITION BY class_id ORDER BY score DESC
             ROWS BETWEEN unbounded preceding AND current row);
-```
 
-#### 1.4.4 指定窗口: [当前行的前两行, 当前行]
-```
+# 3.4 指定窗口: [当前行的前两行, 当前行]
 SELECT
     *,
     FIRST_VALUE(score)   OVER w AS 'first',
@@ -191,10 +173,8 @@ SELECT
 FROM student
 WINDOW w AS (PARTITION BY class_id ORDER BY score DESC
             ROWS BETWEEN 2 preceding AND current row);
-```
 
-#### 1.4.5 指定窗口: [当前行, 最后一行]
-```
+# 3.5 指定窗口: [当前行, 最后一行]
 SELECT
     *,
     FIRST_VALUE(score)   OVER w AS 'first',
@@ -203,10 +183,8 @@ SELECT
 FROM student
 WINDOW w AS (PARTITION BY class_id ORDER BY score DESC
             ROWS BETWEEN current row AND unbounded following);
-```
 
-#### 1.4.6 指定窗口: [当前行, 当前行的后两行]
-```
+# 3.6 指定窗口: [当前行, 当前行的后两行]
 SELECT
     *,
     FIRST_VALUE(score)   OVER w AS 'first',
@@ -215,10 +193,8 @@ SELECT
 FROM student
 WINDOW w AS (PARTITION BY class_id ORDER BY score DESC
               ROWS BETWEEN current row AND 2 following);
-```
 
-#### 1.4.7 指定窗口: [当前行的前一行, 当前行的后一行]
-```
+# 3.7 指定窗口: [当前行的前一行, 当前行的后一行]
 SELECT
     *,
     FIRST_VALUE(score)   OVER w AS 'first',
@@ -227,10 +203,8 @@ SELECT
 FROM student
 WINDOW w AS (PARTITION BY class_id ORDER BY score DESC
               ROWS BETWEEN 1 preceding AND 1 following);
-```
 
-#### 1.4.8 指定窗口: [第一行, 最后一行]
-```
+# 3.8 指定窗口: [第一行, 最后一行]
 SELECT
     *,
     FIRST_VALUE(score)   OVER w AS 'first',
@@ -239,10 +213,8 @@ SELECT
 FROM student
 WINDOW w AS (PARTITION BY class_id ORDER BY score DESC
              ROWS BETWEEN unbounded preceding AND unbounded following);
-```
           
-#### 1.4.9 不使用 BETWEEN 和 AND 时, 结束行是当前行, 窗口: [第一行, 当前行]
-```
+# 3.9 不使用 BETWEEN 和 AND 时, 结束行是当前行, 窗口: [第一行, 当前行]
 SELECT
     *,
     FIRST_VALUE(score)   OVER w AS 'first',
@@ -250,11 +222,9 @@ SELECT
       NTH_VALUE(score,2) OVER w AS 'nth'
 FROM student
 WINDOW w AS (PARTITION BY class_id ORDER BY score DESC
-             ROWS  unbounded preceding);            
-```
-          
-#### 1.4.10 聚合函数同上
-```
+             ROWS  unbounded preceding);
+
+# 3.10 聚合函数同上
 SELECT
     *,
     SUM(score) OVER w AS 'sum',
@@ -265,10 +235,8 @@ SELECT
 FROM student
 WINDOW w AS (PARTITION BY class_id ORDER BY score DESC
              ROWS BETWEEN 1 preceding AND current row);
-```
           
-#### 1.4.11 使用 RANGE
-```
+# 3.11 使用 RANGE
 * 如果当前行是 NULL, expr PRECEDING 和 expr FOLLOWING 的值都为 NULL
 
 SELECT
@@ -281,37 +249,29 @@ SELECT
 FROM student
 WINDOW w AS (PARTITION BY class_id ORDER BY score DESC
              RANGE BETWEEN 1 preceding AND current row);
-```
 
-### 1.5. 测试在 ORDER BY 中使用窗口函数
-```
+# 4. 测试在 ORDER BY 中使用窗口函数
 SELECT 
     *
 FROM student
 ORDER BY RANK() OVER (ORDER BY login_date);
-```
 
-### 1.6. 测试 PARTITION BY 中使用单行函数
-```
+# 5. 测试 PARTITION BY 中使用单行函数
 SELECT 
     *,
     RANK() OVER (PARTITION BY MONTH(login_date) ORDER BY score DESC) AS 'rank'
 FROM student;
-```
 
-### 1.7. 测试 ORDER BY 中使用单行函数
-```
+# 6. 测试 ORDER BY 中使用单行函数
 SELECT 
     *,
     RANK() OVER (PARTITION BY class_id ORDER BY MONTH(login_date)) AS 'rank'
 FROM student;
 ```
 
-## 2. 实战
-### 2.1 查看各个市 GDP 占各自省的比例以及全国的比例以及排名 (体现窗口函数的优势)
-#### 2.1.1 准备数据
+## 2. 查看各个市 GDP 占各自省的比例以及全国的比例以及排名 (体现窗口函数的优势)
 ```
-USE    test;
+# 1. 准备数据
 DROP   TABLE IF EXISTS m_gdp;
 CREATE TABLE m_gdp(
     province VARCHAR(20),
@@ -334,10 +294,8 @@ INSERT INTO m_gdp VALUES('天津', '武清', 6);
 INSERT INTO m_gdp VALUES('天津', '塘沽', 7);
 
 SELECT * FROM m_gdp;
-```
 
-#### 2.1.2 使用窗口函数 (推荐)
-```
+# 2. 使用窗口函数 (推荐)
 SELECT
     *,
     RANK() OVER (PARTITION BY province ORDER BY gdp DESC) AS '省内排名',
@@ -348,25 +306,19 @@ SELECT
       gdp / SUM(gdp) OVER () AS '全国占比'
 FROM m_gdp
 ORDER BY province, RANK() OVER (ORDER BY gdp DESC);
-```
 
-#### 2.1.3 不使用窗口函数
-##### 2.1.3.1 存储全国 GDP 的总和
-```
+# 3. 不使用窗口函数
+# 3.1 存储全国 GDP 的总和
 DROP   TABLE IF EXISTS sum_total;
 CREATE TEMPORARY TABLE sum_total AS SELECT sum(gdp) AS sum_total FROM m_gdp;
 SELECT * FROM sum_total;
-```
 
-##### 2.1.3.2 存储全省 GDP 的总和
-```
+# 3.2 存储全省 GDP 的总和
 DROP   TABLE IF EXISTS sum_province;
 CREATE TEMPORARY TABLE sum_province AS SELECT province, sum(gdp) AS sum_province FROM m_gdp GROUP BY province;
 SELECT * FROM sum_province;
-```
 
-##### 2.1.3.3 存储全国排名
-```
+# 3.3 存储全国排名
 DROP   TABLE IF EXISTS rank_total;
 CREATE TEMPORARY TABLE rank_total
 AS
@@ -376,10 +328,8 @@ SELECT
     (SELECT count(*) FROM m_gdp m2 WHERE m2.gdp > m1.gdp) + 1 AS t_rank
 FROM m_gdp m1;
 SELECT * FROM rank_total ORDER BY t_rank;
-```
 
-##### 2.1.3.4 存储省内排名
-```
+# 3.4 存储省内排名
 DROP   TABLE IF EXISTS rank_province;
 CREATE TEMPORARY TABLE rank_province
 AS
@@ -389,10 +339,8 @@ SELECT
     (SELECT count(*) FROM m_gdp m2 WHERE m2.province = m1.province AND m2.gdp > m1.gdp) + 1 AS t_rank
 FROM m_gdp m1;
 SELECT * FROM rank_province ORDER BY t_rank;
-```
 
-##### 2.1.3.5 使用五张表求结果
-```
+# 3.5 使用五张表求结果
 SELECT
     m_gdp.province,
     m_gdp.city,
@@ -411,10 +359,9 @@ JOIN sum_total
 ORDER BY province, RANK() OVER (ORDER BY gdp DESC);
 ```
 
-### 2.2 查看各个市 GDP 占各自省内排名前二的区域
-#### 2.2.1 准备数据
+## 3. 查看各个市 GDP 占各自省内排名前二的区域
 ```
-USE    test;
+# 1. 准备数据
 DROP   TABLE IF EXISTS m_gdp;
 CREATE TABLE m_gdp(
     province VARCHAR(20),
@@ -435,10 +382,8 @@ INSERT INTO m_gdp VALUES('北京', '东城', 8);
 INSERT INTO m_gdp VALUES('天津', '滨海新区', 5);
 INSERT INTO m_gdp VALUES('天津', '武清', 6);
 INSERT INTO m_gdp VALUES('天津', '塘沽', 6);
-```
 
-#### 2.2.2 并列的数据都返回, 每组结果可能超过两个
-```
+# 2. 并列的数据都返回, 每组结果可能超过两个
 SELECT *
 FROM (
     SELECT
@@ -449,10 +394,8 @@ FROM (
     FROM m_gdp
 ) t
 WHERE t.m_rank <= 2;
-```
 
-#### 2.2.3 每组结果可能最多两个, 并列的数据只取前两个
-```
+# 3. 每组结果可能最多两个, 并列的数据只取前两个
 SELECT *
 FROM (
     SELECT
@@ -465,10 +408,9 @@ FROM (
 WHERE t.m_rank <= 2;
 ```
 
-### 2.3 综合测试
-#### 2.3.1 准备数据, 内容为 日期和销售额
+## 4. 综合测试
 ```
-USE    test;
+# 1. 准备数据, 内容为 日期和销售额
 DROP   TABLE IF EXISTS m_company;
 CREATE TABLE m_company (
     order_date DATE UNIQUE,
@@ -516,20 +458,16 @@ INSERT INTO m_company VALUES('2025-03-02', 7);
 INSERT INTO m_company VALUES('2025-04-02', 8);
 
 SELECT * FROM m_company ORDER BY order_date;
-```
 
-#### 2.3.2 查看公司各个月的销售
-```
+# 2. 查看公司各个月的销售
 SELECT
     year(order_date) AS year,
     month(order_date) AS month,
     SUM(sale) AS sale
 FROM m_company
 GROUP BY year(order_date), month(order_date);
-```
 
-#### 2.3.3 查看公司各个月的销售和每个月累计销售, 年销售总额
-```
+# 3. 查看公司各个月的销售和每个月累计销售, 年销售总额
 SELECT
     year  AS '年',
     month AS '月',
@@ -541,10 +479,8 @@ FROM (
     FROM m_company
     GROUP BY year(order_date), month(order_date)
 ) t;
-```
 
-#### 2.3.3 查看公司各个月的销售和年销售总额, 月销售占比
-```
+# 4. 查看公司各个月的销售和年销售总额, 月销售占比
 SELECT
     year  AS '年',
     month AS '月',
@@ -557,10 +493,8 @@ FROM (
     GROUP BY year(order_date), month(order_date)
 ) t
 WINDOW w1 AS (PARTITION BY year);
-```
 
-#### 2.3.4 销售量前二的月份及其占比
-```
+# 5. 销售量前二的月份及其占比
 SELECT *
 FROM
 (
@@ -579,10 +513,8 @@ FROM
   WINDOW w1 AS (PARTITION BY year)
 ) t2
 WHERE t2.row_rank <= 2;
-```
 
-#### 2.3.5 销售量的季度和
-```
+# 6. 销售量的季度和
 SELECT *
 FROM
 (
@@ -599,10 +531,8 @@ FROM
     ) t1
 ) t2
 WHERE t2.月 % 3 = 0;
-```
 
-#### 2.3.6 销售量的季度和及其占比
-```
+# 7. 销售量的季度和及其占比
 SELECT *
 FROM
 (
@@ -622,10 +552,8 @@ FROM
             w2 AS (PARTITION BY year)
 ) t2
 WHERE t2.月 % 3 = 0;
-```
 
-#### 2.3.7 月销售量排名
-```
+# 8. 月销售量排名
 SELECT
     year   AS '年',
     month  AS '月',
@@ -637,10 +565,8 @@ FROM (
     GROUP BY year(order_date), month(order_date)
 ) t1
 ORDER BY year, row_rank;
-```
 
-#### 2.3.8 月销售量比前一个月高的月份
-```
+# 9. 月销售量比前一个月高的月份
 SELECT *
 FROM (
     SELECT
@@ -654,10 +580,8 @@ FROM (
     ) t1
 ) t2
 WHERE last_price < sale OR last_price IS NULL;
-```
 
-#### 2.3.9 月销售量排名前 40% 的月份 (不好, 月份不完整有问题)
-```
+# 10. 月销售量排名前 40% 的月份 (不好, 月份不完整有问题)
 SELECT *
 FROM (
     SELECT
@@ -672,10 +596,8 @@ FROM (
     ) t1
 ) t2
 WHERE row_level <= 4;
-```
 
-#### 2.3.10 月销售量排名前 40% 的月份 (好, 月份不完整没有问题) -- 数量超过时, 相同的销量会同时包含
-```
+# 11. 月销售量排名前 40% 的月份 (好, 月份不完整没有问题) -- 数量超过时, 相同的销量会同时包含
 SELECT *
 FROM (
     SELECT
@@ -690,10 +612,8 @@ FROM (
     ) t1
 ) t2
 WHERE row_level >= 0.6;
-```
 
-#### 2.3.11 月销售量排名前 40% 的月份 (好, 月份不完整没有问题) --  数量超过时, 相同的销量会同时舍弃
-```
+# 12 月销售量排名前 40% 的月份 (好, 月份不完整没有问题) --  数量超过时, 相同的销量会同时舍弃
 SELECT *
 FROM (
     SELECT
@@ -710,10 +630,9 @@ FROM (
 WHERE row_level <= 0.4;
 ```
 
-### 2.4 连续登录的最大天数
-#### 2.4.1 准备数据, 内容为 ID, 用户名, 日期
+## 5. 连续登录的最大天数
 ```
-USE    test;
+# 1. 准备数据, 内容为 ID, 用户名, 日期
 DROP   TABLE IF EXISTS m_user;
 CREATE TABLE m_user (
     id         INT,
@@ -745,22 +664,17 @@ INSERT INTO m_user VALUES(1, '张三', '2023-10-02');
 INSERT INTO m_user VALUES(1, '张三', '2023-10-04');
 
 SELECT * FROM m_user ORDER BY id, login_date;
-```
-#### 2.4.2 去重
-```
-SELECT DISTINCT * FROM m_user;
-```
 
-#### 2.4.3 用户分组, 日期排名
-```
+# 2. 去重
+SELECT DISTINCT * FROM m_user;
+
+# 3. 用户分组, 日期排名
 SELECT
     *,
     rank() OVER (PARTITION BY id ORDER BY login_date) row_rank
 FROM (SELECT DISTINCT * FROM m_user) t1;
-```
 
-#### 2.4.4 求日期和排名的差值
-```
+# 4. 求日期和排名的差值
 SELECT
     *,
     DATE_SUB(login_date, INTERVAL row_rank DAY) AS diffe_date
@@ -769,11 +683,9 @@ FROM (
         *,
         rank() OVER (PARTITION BY id ORDER BY login_date) row_rank
     FROM (SELECT DISTINCT * FROM m_user) t1
-) t2
-```
+) t2;
 
-#### 2.4.5 统计连续登录的信息
-```
+# 5. 统计连续登录的信息
 SELECT
     id,
     name,
@@ -795,5 +707,5 @@ GROUP BY id, name, diff_date
 HAVING count(*) > 1;
 ```
 
-## 3. 官网
+## 6. 官网
 * https://dev.mysql.com/doc/refman/9.0/en/window-functions.html
