@@ -150,7 +150,7 @@ EXPLAIN SELECT * FROM tb1 WHERE t2 = 1;
 EXPLAIN SELECT * FROM tb1 WHERE t2 + 1 = 1; # 计算导致索引失效
 ```
 
-# 4. 范围查找导致右侧的索引失效
+## 4. 范围查找导致右侧的索引失效
 ```
 DROP TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (
