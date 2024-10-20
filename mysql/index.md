@@ -79,7 +79,7 @@ ALTER  TABLE student ADD INDEX index_name(id);
 SHOW   INDEX FROM student;
 
 # 3. 修改
-# 3.3 设置索引是否可见
+# 3.1 设置索引是否可见
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, INDEX index_name(id));
 SHOW   INDEX FROM student;
