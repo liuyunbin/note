@@ -14,66 +14,47 @@
 ```
 
 ### 1. 创建
-#### 1.1 列级约束(单列): 约束名和索引名为 PRIMARY (推荐)
 ```
-USE    test;
+# 1. 列级约束(单列): 约束名和索引名为 PRIMARY (推荐)
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT PRIMARY KEY, name VARCHAR(20));
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
-```
 
-#### 1.2 列级约束(多列): 报错
-```
-USE    test;
+# 2. 列级约束(多列): 报错
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT PRIMARY KEY, name VARCHAR(20) PRIMARY KEY);
-```
 
-#### 1.3 表级约束, 不指定约束名和索引名: 约束名和索引名都为 PRIMARY (推荐)
-```
-USE    test;
+# 3. 表级约束, 不指定约束名和索引名: 约束名和索引名都为 PRIMARY (推荐)
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, name VARCHAR(20), PRIMARY KEY(id));
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
-```
 
-#### 1.4 表级约束, 指定约束名和索引名: 约束名和索引名都为 PRIMARY
-```
-USE    test;
+# 4. 表级约束, 指定约束名和索引名: 约束名和索引名都为 PRIMARY
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, name VARCHAR(20), CONSTRAINT constraint_name PRIMARY KEY index_name(id));
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
-```
 
-#### 1.5 表级约束, 只指定约束名: 约束名和索引名都为 PRIMARY
-```
-USE    test;
+# 5. 表级约束, 只指定约束名: 约束名和索引名都为 PRIMARY
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, name VARCHAR(20), CONSTRAINT constraint_name PRIMARY KEY(id));
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
-```
 
-#### 1.6 表级约束, 只指定索引名: 约束名和索引名都为 PRIMARY
-```
-USE    test;
+# 6. 表级约束, 只指定索引名: 约束名和索引名都为 PRIMARY
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, name VARCHAR(20), PRIMARY KEY index_name(id));
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
-```
 
-#### 1.7 表级约束(同时在多列指定): 约束名和索引名都为 PRIMARY (推荐)
-```
-USE    test;
+# 7. 表级约束(同时在多列指定): 约束名和索引名都为 PRIMARY (推荐)
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, name VARCHAR(20), PRIMARY KEY(id, name));
 DESC   student;
@@ -82,9 +63,8 @@ SHOW   INDEX FROM student;
 ```
 
 ### 2. 添加
-#### 2.1 可以添加表级或列级主键约束 (推荐)
 ```
-USE    test;
+# 1. 可以添加表级或列级主键约束 (推荐)
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, name VARCHAR(20));
 DESC   student;
@@ -94,11 +74,8 @@ ALTER  TABLE student ADD PRIMARY KEY(id);
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
-```
 
-#### 2.2 只能添加列级主键约束
-```
-USE    test;
+# 2. 只能添加列级主键约束
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, name VARCHAR(20));
 DESC   student;
@@ -111,9 +88,8 @@ SHOW   INDEX FROM student;
 ```
 
 ### 3. 删除
-#### 3.1 删除主键: 会删除对应的索引, 但非空约束还在
 ```
-USE    test;
+# 1. 删除主键: 会删除对应的索引, 但非空约束还在
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT PRIMARY KEY, name VARCHAR(20));
 DESC   student;
@@ -123,22 +99,16 @@ ALTER  TABLE student DROP PRIMARY KEY;
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
-```
 
-#### 3.2 删除主键约束名: 报错
-```
-USE    test;
+# 2. 删除主键约束名: 报错
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT PRIMARY KEY, name VARCHAR(20));
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
 ALTER  TABLE student DROP CONSTRAINT PRIMARY;
-```
 
-#### 3.3 删除主键索引: 报错
-```
-USE    test;
+# 3. 删除主键索引: 报错
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT PRIMARY KEY, name VARCHAR(20));
 DESC   student;
@@ -149,7 +119,6 @@ ALTER  TABLE student DROP INDEX PRIMARY;
 
 ### 4. 不可以存储 NULL, 不可以重复
 ```
-USE    test;
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT PRIMARY KEY, name VARCHAR(20));
 DESC   student;
