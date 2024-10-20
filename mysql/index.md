@@ -114,8 +114,9 @@ ALTER  TABLE student RENAME INDEX index_name TO new_index_name;
 SHOW   INDEX FROM student;
 ```
 
-## 2. 测试最左前缀原则
+## 2. 测试 where 中使用索引
 ```
+# 1. 测试最左前缀原则
 DROP TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -132,10 +133,8 @@ EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 = 1;            # 使用部分索�
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t3 = 1;            # 使用部分索引, t1 的索引 (key_len = 4)
 EXPLAIN SELECT * FROM tb1 WHERE t2 = 1 AND t3 = 1;            # 不使用索引
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 = 1 AND t3 = 1; # 使用全部索引 (key_len = 12)
-```
 
-## 3. 使用计算, 函数和类型转换导致索引失效
-```
+# 2. 使用计算, 函数和类型转换导致索引失效
 DROP TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -151,10 +150,8 @@ EXPLAIN SELECT * FROM tb1 WHERE UPPER(t1) = '1';   # 函数导致索引失效
 CREATE  INDEX index_t2 ON tb1(t2);
 EXPLAIN SELECT * FROM tb1 WHERE t2 = 1;
 EXPLAIN SELECT * FROM tb1 WHERE t2 + 1 = 1; # 计算导致索引失效
-```
 
-## 4. 范围查找导致右侧的索引失效
-```
+# 3. 范围查找导致右侧的索引失效
 DROP TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -174,10 +171,8 @@ EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 = 1 AND t3 = 1; # 使用全部索�
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 > 1 AND t3 = 1; # 使用全部索引 (key_len = 12)
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t3 = 1 AND t2 > 1; # 使用全部索引 (key_len = 12)
                                                               # 建立联合索引时, 将范围查找的字段放到末尾
-```
 
-## 5. 测试 !=  和 IS NULL 和 IS NOT NULL, 索引不一定失效
-```
+# 4. 测试 !=  和 IS NULL 和 IS NOT NULL, 索引不一定失效
 DROP TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -187,24 +182,20 @@ CREATE  INDEX index_t1 ON tb1(t1);
 EXPLAIN SELECT * FROM tb1 WHERE t1 != 2; 
 EXPLAIN SELECT * FROM tb1 WHERE t1 IS NULL;
 EXPLAIN SELECT * FROM tb1 WHERE t1 IS NOT NULL;
-```
 
-## 6. 测试 LIKE, 索引不一定失效
-```
+# 5. 测试 LIKE, 索引不一定失效
 DROP TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (
     id INT PRIMARY KEY AUTO_INCREMENT,
     t1 VARCHAR(20));
-    
+
 CREATE  INDEX index_t1 ON tb1(t1);
 EXPLAIN SELECT * FROM tb1 WHERE t1 LIKE 'abc%';
 EXPLAIN SELECT * FROM tb1 WHERE t1 LIKE '%bc'; 
 EXPLAIN SELECT * FROM tb1 WHERE t1 LIKE 'abc_'; 
 EXPLAIN SELECT * FROM tb1 WHERE t1 LIKE '_bc%'; 
-```
 
-## 7. 测试 OR, 一边不包含索引时, 导致索引失效   
-```
+# 6. 测试 OR, 一边不包含索引时, 导致索引失效   
 DROP TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -215,6 +206,48 @@ CREATE INDEX index_t1 ON tb1(t1);
 
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 OR t2 = 1;
 ```
+
+## 3. 测试 order by 中使用索引
+```
+DROP   TABLE IF EXISTS tb1;
+CREATE TABLE tb1 (t1 INT, t2 INT, t3 INT);
+
+EXPLAIN SELECT * FROM tb1 ORDER BY t1, t2, t3; # 文件排序
+CREATE INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
+EXPLAIN SELECT * FROM tb1 ORDER BY t1, t2, t3; # 索引排序
+```
+
+## 4. 测试 group by 分组优化
+```
+DROP   TABLE IF EXISTS tb1;
+CREATE TABLE tb1 (t1 INT, t2 INT, t3 INT);
+
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY t1, t2, t3;
+CREATE INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY t1, t2, t3;
+```
+
+## 5. 测试 where 和 order by 同时使用索引
+```
+DROP   TABLE IF EXISTS tb1;
+CREATE TABLE tb1 (t1 INT, t2 INT, t3 INT, t4 INT);
+
+EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 ORDER BY t2, t3, t4; # 全表扫描 + 文件排序
+CREATE INDEX index_t1_t2_t3 ON tb1(t1, t2, t3, t4);
+EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 ORDER BY t2, t3, t4;     # 索引查找 + 索引排序 (WHERE 和 ORDER BY 共用一个索引)
+EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 ORDER BY t1, t2, t3, t4; # 索引查找 + 索引排序 (ORDER BY 使用单独的索引)
+EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 ORDER BY t3, t4;         # 索引查找 + 文件排序
+
+EXPLAIN SELECT * FROM tb1 WHERE t1 > 1 ORDER BY t2, t3, t4;     # 索引查找 + 索引排序 
+EXPLAIN SELECT * FROM tb1 WHERE t1 > 1 ORDER BY t1, t2, t3, t4; # 索引查找 + 索引排序 (ORDER BY 使用单独的索引)
+EXPLAIN SELECT * FROM tb1 WHERE t1 > 1 ORDER BY t3, t4;         # 索引查找 + 文件排序
+```
+
+## 6. 测试 where 和 group by 同时使用索引
+
+## 7. 测试 order by 和 group by 同时使用索引
+
+## 8. 测试 where, order by 和 group by 同时使用索引
 
 ## 8. 测试多表查询 (左连接 或 右连接)
 ```
@@ -266,25 +299,6 @@ EXPLAIN SELECT tb1.* FROM tb1 WHERE t1 IN (SELECT t1 FROM tb2); # 子查询 (可
 EXPLAIN SELECT tb1.* FROM tb1, tb2 WHERE tb1.t1 = tb2.t1; # 多表查询 (建议)
 ```
 
-## 11. 排序优化 -- 避免文件排序
-```
-DROP   TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (t1 INT, t2 INT, t3 INT);
-
-EXPLAIN SELECT * FROM tb1 ORDER BY t1, t2, t3; # 文件排序
-CREATE INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
-EXPLAIN SELECT * FROM tb1 ORDER BY t1, t2, t3; # 索引排序
-```
-
-## 12. 分组优化
-```
-DROP   TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (t1 INT, t2 INT, t3 INT);
-
-EXPLAIN SELECT count(*) FROM tb1 GROUP BY t1, t2, t3;
-CREATE INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
-EXPLAIN SELECT count(*) FROM tb1 GROUP BY t1, t2, t3;
-```
 
 ## 13. 索引覆盖 -- 不需要回表
 ```
@@ -296,3 +310,4 @@ CREATE INDEX index_t1 ON tb1(t1);
 EXPLAIN SELECT *  FROM tb1 WHERE t1 = 123; # 需要回表
 EXPLAIN SELECT id FROM tb1 WHERE t1 = 123; # 不要回表
 ```
+
