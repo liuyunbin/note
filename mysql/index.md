@@ -229,11 +229,14 @@ CREATE INDEX index_t1 ON tb2(t1);                           # 5. 在被驱动表
 EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.t1 = tb2.t1; # 6. 查看左连接
 ```
 
+## 9. 测试多表查询 (内连接)
+```
+DROP TABLE IF EXISTS tb1;
+CREATE TABLE tb1 (t1 INT);
 
-SHOW INDEX FROM tb1;
+DROP TABLE IF EXISTS tb2;
+CREATE TABLE tb2 (t1 INT);
 
-DROP INDEX index_t1 ON tb1;
-DROP INDEX index_t1 ON tb2;
 EXPLAIN SELECT * FROM tb1 JOIN tb2 ON tb1.t1 = tb2.t1; # 1. 查看内连接
 CREATE INDEX index_t1 ON tb1(t1);                      # 2. 表 t1 建立索引
 EXPLAIN SELECT * FROM tb1 JOIN tb2 ON tb1.t1 = tb2.t1; # 3. 查看内连接, 有索引的表可以做被驱动表
@@ -245,8 +248,4 @@ INSERT INTO tb1 VALUES(3);
 EXPLAIN SELECT * FROM tb1 JOIN tb2 ON tb1.t1 = tb2.t1; # 7. t1 和 t2 都有索引
                                                        #    t1 比 t2 大
                                                        #    小表驱动大表, 所以使用 t1 的索引
-
-
-
-
 ```
