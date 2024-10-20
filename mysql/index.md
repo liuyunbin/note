@@ -213,22 +213,22 @@ CREATE INDEX index_t1 ON tb1(t1);
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 OR t2 = 1;
 ```
 
-# 6. 测试多表查询
+## 8. 测试多表查询 (左连接 或 右连接)
+```
 DROP TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (t1 INT);
     
 DROP TABLE IF EXISTS tb2;
 CREATE TABLE tb2 (t1 INT);
 
-DROP INDEX index_t1 ON tb1;
-DROP INDEX index_t1 ON tb2;  
 EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.t1 = tb2.t1; # 1. 查看左连接
-CREATE INDEX index_t1 ON tb1(t1);                           # 2. 在驱动表上建立索引, 意义不大
+CREATE INDEX index_t1 ON tb1(t1);                           # 2. 在驱动表上建立索引, 意义不大 (可能被优化成内连接)
 EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.t1 = tb2.t1; # 3. 查看左连接
 DROP INDEX index_t1 ON tb1;                                 # 4. 删除驱动表上的索引
 CREATE INDEX index_t1 ON tb2(t1);                           # 5. 在被驱动表上建立索引, 有用
 EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.t1 = tb2.t1; # 6. 查看左连接
-DROP INDEX index_t1 ON tb2;                                 # 7. 删除被驱动表上的索引
+```
+
 
 SHOW INDEX FROM tb1;
 
