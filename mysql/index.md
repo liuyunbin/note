@@ -131,9 +131,8 @@ EXPLAIN SELECT * FROM tb1 WHERE t2 = 1 AND t3 = 1;            # 不使用索引
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 = 1 AND t3 = 1; # 使用全部索引 (key_len = 12)
 ```
 
-
-
-# 2. 使用计算, 函数和类型转换导致索引失效
+## 3. 使用计算, 函数和类型转换导致索引失效
+```
 DROP TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -142,14 +141,14 @@ CREATE TABLE tb1 (
     );
 
 CREATE INDEX index_t1 ON tb1(t1);
-CREATE INDEX index_t2 ON tb1(t2);
-
 EXPLAIN SELECT * FROM tb1 WHERE t1 = '1';
 EXPLAIN SELECT * FROM tb1 WHERE t1 =  1;           # 类型转换导致索引失效
 EXPLAIN SELECT * FROM tb1 WHERE UPPER(t1) = '1';   # 函数导致索引失效
 
+CREATE INDEX index_t2 ON tb1(t2);
 EXPLAIN SELECT * FROM tb1 WHERE t2 = 1;
 EXPLAIN SELECT * FROM tb1 WHERE t2 + 1 = 1; # 计算导致索引失效
+```
 
 # 3. 范围查找导致右侧的索引失效
 DROP TABLE IF EXISTS tb1;
