@@ -6,7 +6,6 @@
 
 ### 1. 创建
 ```
-USE    test;
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT NOT NULL);
 DESC   student;
@@ -14,7 +13,6 @@ DESC   student;
 
 ### 2. 添加
 ```
-USE    test;
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT);
 DESC   student;
@@ -24,7 +22,6 @@ DESC   student;
 
 ### 3. 删除
 ```
-USE    test;
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT NOT NULL);
 DESC   student;
