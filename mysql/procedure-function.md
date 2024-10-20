@@ -1,7 +1,7 @@
 
 ## 1. 存储过程
-### 1.1 优缺点
 ```
+# 1. 优缺点
 * 提前编译, 效率高
 * 简化操作
 * 提高复用
@@ -13,10 +13,8 @@
 * 分表时, 不好维护
 * 跨数据库不好移植
 * 不好做版本管理
-```
 
-### 1.2 说明
-```
+# 2. 说明
 DELIMITER $
 CREATE PROCEDURE procedure_name(...) ------- IN, OUT, INOUT
 [characteristics ...]
@@ -38,11 +36,8 @@ characteristics:
 * COMMENT string --------- 注释信息
 
 CALL procedure_name(...)
-```
 
-### 1.3 示例
-```
-USE test;
+# 3. 示例
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name()
@@ -56,15 +51,13 @@ SHOW  CREATE PROCEDURE procedure_name;
 ```
 
 ## 2. 函数
-### 2.1 和存储过程的区别
 ```
+# 1. 和存储过程的区别
 * 有返回值
 * 参数只能是 IN
 * 需要设置: SET GLOBAL log_bin_trust_function_creators = 1
-```
 
-### 2.2 说明
-```
+# 2. 说明
 DELIMITER $
 CREATE FUNCTION function_name(...)
 [characteristics ...]
@@ -75,13 +68,10 @@ END $
 DELIMITER ;
 
 SELECT procedure_name(...)
-```
 
-### 2.3 实例
-```
+# 3. 实例
 SET GLOBAL log_bin_trust_function_creators = 1; # 使用 root 用户或有权限的用户设置
 
-USE  test;
 DROP FUNCTION  IF EXISTS function_name;
 DELIMITER $
 CREATE FUNCTION function_name()
@@ -96,8 +86,8 @@ SHOW CREATE FUNCTION function_name;
 ```
 
 ## 3. 变量
-### 3.1. 全局变量
 ```
+# 1. 全局变量
 SHOW   GLOBAL  VARIABLES LIKE 'character%';    # 查询全局系统变量
 SHOW   SESSION VARIABLES LIKE 'character%';    # 查询会话系统变量
 
@@ -107,29 +97,22 @@ SELECT @@SESSION.character_set_client;         # 查询会话系统变量
 SET    @@GLOBAL.character_set_client = 变量值; # 设置全局系统变量 -- 不能跨服务器重启
 SET   @@PERSIST.character_set_client = 变量值; # 设置全局系统变量 -- 能跨服务器重启
 SET   @@session.character_set_client = 变量值; # 设置会话系统变量
-```
 
-### 3.2 会话用户变量
-```
-USE    test;
+# 2. 会话用户变量
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT);
 SET    @num = 100;                      # 设置会话用户变量
 SELECT @num;                            # 查看会话用户变量
 SELECT count(*) INTO @num FROM student; # 设置会话用户变量
 SELECT @num;                            # 查看会话用户变量
-```
 
-### 3.3 局部变量
-```
+# 3. 局部变量
 * 只在BEGIN 和 END 之间使用, 定义只能放在开头
 * 需要指定类型
 * DECLARE 定义
-```
 
-### 3.4 测试
-#### 3.4.1: SET SELECT
-```
+# 4. 测试
+# 4.1: SET SELECT
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name()
@@ -141,10 +124,8 @@ END $
 DELIMITER ;
 
 CALL procedure_name()
-```
 
-#### 3.4.2: SET DEFAULT SELECT
-```
+# 4.2: SET DEFAULT SELECT
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name()
@@ -157,11 +138,8 @@ END $
 DELIMITER ;
 
 CALL procedure_name()
-```
 
-#### 3.4.3: SELECT INTO
-```
-USE    test;
+# 4.3: SELECT INTO
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT);
     
@@ -176,11 +154,8 @@ END $
 DELIMITER ;
 
 CALL procedure_name()
-```
 
-#### 3.4.4: 混用局部变量和用户会话变量
-```
-USE    test;
+# 4.4 混用局部变量和用户会话变量
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT);
     
@@ -199,8 +174,8 @@ SELECT @num;
 ```
 
 ## 4. 流程控制
-### 4.1 语句: IF
 ```
+# 1. 语句: IF
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name()
@@ -218,10 +193,8 @@ END $
 DELIMITER ;
 
 CALL procedure_name();
-```
 
-### 4.2 语句: CASE (情况一: 类似 switch)
-```
+# 2. 语句: CASE (情况一: 类似 switch)
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name()
@@ -240,10 +213,8 @@ END $
 DELIMITER ;
 
 CALL procedure_name();
-```
 
-### 4.3 语句: CASE (情况二)
-```
+# 3. 语句: CASE (情况二)
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name()
@@ -262,10 +233,8 @@ END $
 DELIMITER ;
 
 CALL procedure_name();
-```
 
-### 4.4 语句: LOOP
-```
+# 4. 语句: LOOP
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name()
@@ -283,10 +252,8 @@ END $
 DELIMITER ;
 
 CALL procedure_name();
-```
 
-### 4.5 语句: WHILE
-```
+# 5. 语句: WHILE
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name()
@@ -302,10 +269,8 @@ END $
 DELIMITER ;
 
 CALL procedure_name();
-```
 
-### 4.6 语句: REPEAT (类似 do ... while)
-```
+# 6. 语句: REPEAT (类似 do ... while)
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name()
@@ -322,10 +287,8 @@ END $
 DELIMITER ;
 
 CALL procedure_name();
-```
 
-### 4.7 语句: ITERATE(与 continue 类似)
-```
+# 7. 语句: ITERATE(与 continue 类似)
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name()
@@ -345,10 +308,8 @@ END $
 DELIMITER ;
 
 CALL procedure_name();
-```
 
-### 4.8 语句: LEAVE(与 break 类似)
-```
+# 8. 语句: LEAVE(与 break 类似)
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name()
@@ -369,8 +330,8 @@ CALL procedure_name();
 ```
 
 ## 5. 异常处理
-### 5.1 定义条件: 方便后续使用
 ```
+# 1. 定义条件: 方便后续使用
 DECLARE 错误名称 CONDITION FOR 错误码（或错误条件）
 
 错误码: 整形
@@ -378,10 +339,8 @@ DECLARE 错误名称 CONDITION FOR 错误码（或错误条件）
 
 DECLARE Field_Not_Be_NULL CONDITION FOR 1048;
 DECLARE Field_Not_Be_NULL CONDITION FOR SQLSTATE '23000';
-```
 
-### 5.2 定义程序: 发生错误执行的代码
-```
+# 2. 定义程序: 发生错误执行的代码
 DECLARE 处理方式 HANDLER FOR 错误类型 处理语句
 SIGNAL  错误类型 .....     ------ 抛出错误
 
