@@ -13,9 +13,8 @@
 ```
 
 ### 1. 创建
-#### 1.1 不指定约束名和索引名: 约束名不是列名, 由系统生成, 索引名是列名 (建议)
 ```
-USE    test;
+# 1. 不指定约束名和索引名: 约束名不是列名, 由系统生成, 索引名是列名 (建议)
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -28,11 +27,8 @@ CREATE TABLE student(
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
-```
 
-#### 1.2 同时指定约束名和索引名: 索引名没意义, 约束名和索引名都变成指定的约束名
-```
-USE    test;
+# 2. 同时指定约束名和索引名: 索引名没意义, 约束名和索引名都变成指定的约束名
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -45,11 +41,8 @@ CREATE TABLE student(
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
-```
 
-#### 1.3 只指定约束名: 约束名和索引名都变成指定的约束名
-```
-USE    test;
+# 3. 只指定约束名: 约束名和索引名都变成指定的约束名
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -62,11 +55,8 @@ CREATE TABLE student(
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
-```
 
-#### 1.4 只指定索引名: 约束名不是列名, 由系统生成, 索引名是指定名
-```
-USE    test;
+# 4. 只指定索引名: 约束名不是列名, 由系统生成, 索引名是指定名
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -79,11 +69,8 @@ CREATE TABLE student(
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
-```
 
-#### 1.5 不指定约束名和索引名(多个外键) (建议)
-```
-USE    test;
+# 5. 不指定约束名和索引名(多个外键) (建议)
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20) UNIQUE);
@@ -102,7 +89,6 @@ SHOW   INDEX FROM student;
 
 ### 2. 添加
 ```
-USE    test;
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -121,9 +107,8 @@ SHOW   INDEX FROM student;
 ```
 
 ### 3. 删除
-#### 3.1 删除外键, 索引不会自动删除 (建议)
 ```
-USE    test;
+# 1. 删除外键, 索引不会自动删除 (建议)
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -144,11 +129,8 @@ ALTER  TABLE student DROP INDEX constraint_name;
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
-```
 
-#### 3.2 删除索引, 报错
-```
-USE    test;
+# 2. 删除索引, 报错
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -162,11 +144,8 @@ DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
 ALTER  TABLE student DROP INDEX constraint_name;
-```
 
-#### 3.3 删除约束名, 和删除外键相同, 索引不会自动删除
-```
-USE    test;
+# 3. 删除约束名, 和删除外键相同, 索引不会自动删除
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -190,9 +169,8 @@ SHOW   INDEX FROM student;
 ```
 
 ### 4. 约束等级
-#### 4.1 CASCADE --- 父表更新时, 同步更新子表
 ```
-USE    test;
+# 1. CASCADE --- 父表更新时, 同步更新子表
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -209,11 +187,8 @@ SELECT * FROM student;
 UPDATE teacher SET id = 2 WHERE id = 1;
 SELECT * FROM teacher;
 SELECT * FROM student;
-```
 
-#### 4.2 CASCADE --- 父表删除时, 同步删除子表对应的行
-```
-USE    test;
+# 2. CASCADE --- 父表删除时, 同步删除子表对应的行
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -230,11 +205,8 @@ SELECT * FROM student;
 DELETE FROM teacher WHERE id = 1;
 SELECT * FROM teacher;
 SELECT * FROM student;
-```
 
-#### 4.3 SET NULL --- 父表更新时, 同步更新子表对应字段为 NULL (该列不能为 NOT NULL)
-```
-USE    test;
+# 3. SET NULL --- 父表更新时, 同步更新子表对应字段为 NULL (该列不能为 NOT NULL)
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -251,11 +223,8 @@ SELECT * FROM student;
 UPDATE teacher SET id = 2 WHERE id = 1;
 SELECT * FROM teacher;
 SELECT * FROM student;
-```
 
-#### 4.4 SET NULL --- 父表删除时, 同步更新子表对应字段为 NULL (该列不能为 NOT NULL)
-```
-USE    test;
+# 4. SET NULL --- 父表删除时, 同步更新子表对应字段为 NULL (该列不能为 NOT NULL)
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -272,11 +241,8 @@ SELECT * FROM student;
 DELETE FROM teacher WHERE id = 1;
 SELECT * FROM teacher;
 SELECT * FROM student;
-```
 
-#### 4.5 NO ACTION (同 RESTRICT) --- 父表更新时, 如果子表对应字段已使用, 报错, 未使用时, 更新成功 (默认)
-```
-USE    test;
+# 5. NO ACTION (同 RESTRICT) --- 父表更新时, 如果子表对应字段已使用, 报错, 未使用时, 更新成功 (默认)
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -297,11 +263,8 @@ UPDATE teacher SET id = 11 WHERE id = 1; # 成功
 UPDATE teacher SET id = 22 WHERE id = 2;
 SELECT * FROM teacher;
 SELECT * FROM student;
-```
 
-#### 4.6 NO ACTION (同 RESTRICT) --- 父表删除时, 如果子表对应字段已使用, 报错, 未使用时, 删除成功 (默认)
-```
-USE    test;
+# 6. NO ACTION (同 RESTRICT) --- 父表删除时, 如果子表对应字段已使用, 报错, 未使用时, 删除成功 (默认)
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
@@ -322,11 +285,8 @@ DELETE FROM teacher WHERE id = 1; # 成功
 DELETE FROM teacher WHERE id = 2;
 SELECT * FROM teacher;
 SELECT * FROM student;
-```
 
-#### 4.7 建议: ON UPDATE CASCADE ON DELETE RESTRICT -- 同步更新, 删除严格
-```
-USE    test;
+# 7. 建议: ON UPDATE CASCADE ON DELETE RESTRICT -- 同步更新, 删除严格
 DROP   TABLE IF EXISTS student;
 DROP   TABLE IF EXISTS teacher;
 CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(20));
