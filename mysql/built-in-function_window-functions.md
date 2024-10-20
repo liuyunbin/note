@@ -87,7 +87,7 @@ INSERT INTO student VALUES('2022-01-01', '李七', 2, 80);
 SELECT * FROM student;
 
 # 2. 静态窗口函数
-# 2.1 序号函数 
+# 2.1 序号函数
 SELECT
     *,
           RANK() OVER (w ORDER BY score DESC) AS       rank_desc, -- 相同的值排名相同, 排名不连续, 例如 1 2 2 4
@@ -613,7 +613,7 @@ FROM (
 ) t2
 WHERE row_level >= 0.6;
 
-# 12 月销售量排名前 40% 的月份 (好, 月份不完整没有问题) --  数量超过时, 相同的销量会同时舍弃
+# 12. 月销售量排名前 40% 的月份 (好, 月份不完整没有问题) --  数量超过时, 相同的销量会同时舍弃
 SELECT *
 FROM (
     SELECT
