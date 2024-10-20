@@ -173,7 +173,8 @@ EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t3 = 1 AND t2 > 1; # 使用全部索�
                                                               # 建立联合索引时, 将范围查找的字段放到末尾
 ```
 
-# 3. 测试 !=  和 IS NULL 和 IS NOT NULL, 索引不一定失效
+## 5. 测试 !=  和 IS NULL 和 IS NOT NULL, 索引不一定失效
+```
 DROP TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -183,6 +184,7 @@ CREATE INDEX index_t1 ON tb1(t1);
 EXPLAIN SELECT * FROM tb1 WHERE t1 != 2; 
 EXPLAIN SELECT * FROM tb1 WHERE t1 IS NULL;
 EXPLAIN SELECT * FROM tb1 WHERE t1 IS NOT NULL;
+```
 
 # 4. 测试 LIKE, 索引不一定失效
 DROP TABLE IF EXISTS tb1;
