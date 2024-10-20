@@ -113,7 +113,6 @@ SHOW   INDEX FROM student;
 
 ## 2. 测试最左前缀原则
 ```
-# 1. 
 DROP TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -130,7 +129,7 @@ EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 = 1;            # 使用部分索�
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t3 = 1;            # 使用部分索引, t1 的索引 (key_len = 4)
 EXPLAIN SELECT * FROM tb1 WHERE t2 = 1 AND t3 = 1;            # 不使用索引
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 = 1 AND t3 = 1; # 使用全部索引 (key_len = 12)
-
+```
 
 
 
