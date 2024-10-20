@@ -200,7 +200,8 @@ EXPLAIN SELECT * FROM tb1 WHERE t1 LIKE 'abc_';
 EXPLAIN SELECT * FROM tb1 WHERE t1 LIKE '_bc%'; 
 ```
 
-# 5. 测试 OR, 一边不包含索引时, 导致索引失效   
+## 7. 测试 OR, 一边不包含索引时, 导致索引失效   
+```
 DROP TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -210,6 +211,7 @@ CREATE TABLE tb1 (
 CREATE INDEX index_t1 ON tb1(t1);
 
 EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 OR t2 = 1;
+```
 
 # 6. 测试多表查询
 DROP TABLE IF EXISTS tb1;
