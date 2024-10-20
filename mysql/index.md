@@ -1,18 +1,23 @@
 
-## INDEX --- 索引
+# INDEX --- 索引
+## 0. 总结
 ```
 * 类型
-  * 普通索引 ----- 无任何限制
-  * 唯一索引 ----- 和 唯一键 对应
-  * 主键索引 ----- 和   主键 对应
-  * 全文索引 ----- 很少使用
-  * 空间索引 ----- 很少使用
+    * 普通索引 --- 无任何限制
+    * 唯一索引 --- 和 唯一键 对应
+    * 主键索引 --- 和   主键 对应 -- 最好保持全局的唯一性(不单是该表中)
+    * 全文索引 --- 很少使用
+    * 空间索引 --- 很少使用
 * 范围
-  * 单列索引 -----
-  * 多列索引 ----- 最左前缀原则 -- 最常用的放最左边
+    * 单列索引
+    * 多列索引
+        * 最左前缀原则
+        * 最常用的放最左边
+        * 范围查找放最右边
+    * 联合索引好于多个单列索引
 * 实现
   * 聚簇索引 ----- 主键 -- 只有一个
-  * 非聚簇索引 --- 可以多个
+  * 非聚簇索引 --- 可以多个. 需要回表
 * 新特性
   * 降序索引 ----- 如果查找是降序的话, 可以提高效率 --- DESC
   * 隐藏索引 ----- 便于观察删除索引的影响 --- INVISIBLE VISIBLE
@@ -23,11 +28,9 @@
     * 很少变化的列
 * 不适合建索引
     * 表很小
-* 联合索引好于多个单列索引
 * 删除无用或冗余的索引
-* 联合索引
-    * 区分度大的列放到前面
-    * 范围查找的列放最后
+* WHERE 中使用索引 ------ 避免全表扫描
+* ORDER BY 中使用索引 --- 避免文件排序
 ```
 
 ## 1. 基础
@@ -248,4 +251,48 @@ INSERT  INTO tb1 VALUES(3);
 EXPLAIN SELECT * FROM tb1 JOIN tb2 ON tb1.t1 = tb2.t1; # 7. t1 和 t2 都有索引
                                                        #    t1 比 t2 大
                                                        #    小表驱动大表, 所以使用 t1 的索引
+```
+
+## 10. 子查询优化
+```
+DROP   TABLE IF EXISTS tb1;
+CREATE TABLE tb1 (t1 INT);
+
+DROP   TABLE IF EXISTS tb2;
+CREATE TABLE tb2 (t1 INT);
+
+EXPLAIN SELECT tb1.* FROM tb1 WHERE t1 IN (SELECT t1 FROM tb2); # 子查询 (可能被优化成多表查询)
+
+EXPLAIN SELECT tb1.* FROM tb1, tb2 WHERE tb1.t1 = tb2.t1; # 多表查询 (建议)
+```
+
+## 11. 排序优化 -- 避免文件排序
+```
+DROP   TABLE IF EXISTS tb1;
+CREATE TABLE tb1 (t1 INT, t2 INT, t3 INT);
+
+EXPLAIN SELECT * FROM tb1 ORDER BY t1, t2, t3; # 文件排序
+CREATE INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
+EXPLAIN SELECT * FROM tb1 ORDER BY t1, t2, t3; # 索引排序
+```
+
+## 12. 分组优化
+```
+DROP   TABLE IF EXISTS tb1;
+CREATE TABLE tb1 (t1 INT, t2 INT, t3 INT);
+
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY t1, t2, t3;
+CREATE INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY t1, t2, t3;
+```
+
+## 13. 索引覆盖 -- 不需要回表
+```
+DROP   TABLE IF EXISTS tb1;
+CREATE TABLE tb1 (id INT PRIMARY KEY, t1 INT, t2 INT, t3 INT);
+
+CREATE INDEX index_t1 ON tb1(t1);
+
+EXPLAIN SELECT *  FROM tb1 WHERE t1 = 123; # 需要回表
+EXPLAIN SELECT id FROM tb1 WHERE t1 = 123; # 不要回表
 ```
