@@ -35,54 +35,54 @@
 
 ## 1. 基础
 ```
-# 1. 创建
-# 1.1 单列: 不指定索引名称: 索引名称默认是列名
+# 1.1 创建
+# 1.1.1 单列: 不指定索引名称: 索引名称默认是列名
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, INDEX(id));
 SHOW   INDEX FROM student;
 
-# 1.2 单列: 指定索引名称
+# 1.1.2 单列: 指定索引名称
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, INDEX index_name(id));
 SHOW   INDEX FROM student;
 
-# 1.3 多列: 不指定索引名称: 索引名称默认是第一个列名
+# 1.1.3 多列: 不指定索引名称: 索引名称默认是第一个列名
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, name VARCHAR(20), INDEX(id, name));
 SHOW   INDEX FROM student;
 
-# 1.4 多列: 指定索引名称
+# 1.1.4 多列: 指定索引名称
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, name VARCHAR(20), INDEX index_name(id, name));
 SHOW   INDEX FROM student;
 
-# 1.5 单列: 指定降序索引
+# 1.1.5 单列: 指定降序索引
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, INDEX(id DESC));
 SHOW   INDEX FROM student;
 
-# 1.6 单列: 指定不可见索引
+# 1.1.6 单列: 指定不可见索引
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, INDEX(id) INVISIBLE);
 SHOW   INDEX FROM student;
 
-# 2. 添加
-# 2.1 使用 CREATE INDEX 添加 (推荐)
+# 1.2 添加
+# 1.2.1 使用 CREATE INDEX 添加 (推荐)
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT);
 SHOW   INDEX FROM student;
 CREATE INDEX index_name ON student(id);
 SHOW   INDEX FROM student;
 
-# 2.2 使用 ALTER 添加
+# 1.2.2 使用 ALTER 添加
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT);
 SHOW   INDEX FROM student;
 ALTER  TABLE student ADD INDEX index_name(id);
 SHOW   INDEX FROM student;
 
-# 3. 修改
-# 3.1 设置索引是否可见
+# 1.3 修改
+# 1.3.1 设置索引是否可见
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, INDEX index_name(id));
 SHOW   INDEX FROM student;
@@ -91,22 +91,22 @@ SHOW   INDEX FROM student;
 ALTER  TABLE student ALTER INDEX index_name VISIBLE;
 SHOW   INDEX FROM student;
 
-# 4. 删除
-# 4.1 使用 DROP (推荐)
+# 1.4 删除
+# 1.4.1 使用 DROP (推荐)
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, INDEX index_name(id));
 SHOW   INDEX FROM student;
 DROP   INDEX index_name ON student;
 SHOW   INDEX FROM student;
 
-# 4.2 使用 ALTER
+# 1.4.2 使用 ALTER
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, INDEX index_name(id));
 SHOW   INDEX FROM student;
 ALTER  TABLE student DROP INDEX index_name;
 SHOW   INDEX FROM student;
 
-# 5. 重命名索引
+# 1.5 重命名索引
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, INDEX index_name(id));
 SHOW   INDEX FROM student;
