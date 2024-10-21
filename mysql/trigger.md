@@ -17,7 +17,7 @@ DROP TRIGGER   table_name.trigger_name; # 删除触发器
 
 ### 2. 测试
 ```
-# 1. 日志记录
+# 2.1 日志记录
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT, name VARCHAR(20));
 DROP   TABLE IF EXISTS student_log;
@@ -32,7 +32,7 @@ INSERT INTO student VALUES(1, "张三");
 SELECT * FROM student; 
 SELECT * FROM student_log;
 
-# 2. 检查入参 (只是测试, 用唯一键更合适)
+# 2.2 检查入参 (只是测试, 用唯一键更合适)
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT, name VARCHAR(20));
 DROP   TABLE IF EXISTS student_log;
