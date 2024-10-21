@@ -1,5 +1,6 @@
 
 ## 1. 数值函数
+
 | 函数                | 用法                                                         |
 | ------------------- | ------------------------------------------------------------ |
 | ABS(x)              | 返回x的绝对值                                                |
@@ -53,9 +54,13 @@
 | REPEAT(str, n)                    | 返回str重复n次的结果                                         |
 | SPACE(n)                          | 返回n个空格                                                  |
 | STRCMP(s1,s2)                     | 比较字符串s1,s2的ASCII码值的大小                             |
-| SUBSTR(s,index,len) | 返回从字符串s的index位置其len个字符，作用与SUBSTRING(s,n,len)、MID(s,n,len)相同 |
-| LOCATE(substr,str)  | 返回字符串substr在字符串str中首次出现的位置，作用于POSITION(substr IN str)、INSTR(str,substr)相同。未找到，返回0 |
-| ELT(m,s1,s2,…,sn)   | 返回指定位置的字符串，如果m=1，则返回s1，如果m=2，则返回s2，如果m=n，则返回sn |
+| SUBSTR(s,index,len)               | 返回从字符串s的index位置其len个字符                          |
+| SUBSTRING(s,n,len)                | 同上                                                         |
+| MID(s,n,len)                      | 同上                                                         |
+| LOCATE(substr,str)                | 返回字符串substr在字符串str中首次出现的位置                  |
+| POSITION(substr IN str)           | 同上                                                         |
+| INSTR(str,substr)                 | 同上                                                         |
+| ELT(m,s1,s2,…,sn)                 | 返回指定位置的字符串，如果m=2，则返回s2，如果m=n，则返回sn   |
 | FIELD(s,s1,s2,…,sn)               | 返回字符串s在字符串列表中第一次出现的位置                    |
 | FIND_IN_SET(s1,s2)  | 返回字符串s1在字符串s2中出现的位置。其中，字符串s2是一个以逗号分隔的字符串 |
 | REVERSE(s)                        | 返回s反转后的字符串                                          |
@@ -81,15 +86,19 @@ SELECT NULLIF('德国人', '中国人');
 ```
 
 ## 4. 日期和时间函数
-##### 4.1 获取日期、时间
+#### 4.1 获取日期、时间
 
-| 函数                                                         | 用法                           |
-| ------------------------------------------------------------ | ------------------------------ |
-| **CURDATE()** ，CURRENT_DATE()                               | 返回当前日期，只包含年、月、日 |
-| **CURTIME()** ， CURRENT_TIME()                              | 返回当前时间，只包含时、分、秒 |
-| **NOW()** / SYSDATE() / CURRENT_TIMESTAMP() / LOCALTIME() / LOCALTIMESTAMP() | 返回当前系统日期和时间         |
-| UTC_DATE()                                                   | 返回UTC（世界标准时间）日期    |
-| UTC_TIME()                                                   | 返回UTC（世界标准时间）时间    |
+| 函数                                | 用法                           |
+| ----------------------------------- | ------------------------------ |
+| **CURDATE()** ，CURRENT_DATE()      | 返回当前日期，只包含年、月、日 |
+| **CURTIME()** ， CURRENT_TIME()     | 返回当前时间，只包含时、分、秒 |
+| **NOW()**                           | 返回当前系统日期和时间         |
+| SYSDATE()                           | 返回当前系统日期和时间         |
+| CURRENT_TIMESTAMP()                 | 返回当前系统日期和时间         |
+| LOCALTIME()                         | 返回当前系统日期和时间         |
+| LOCALTIMESTAMP()                    | 返回当前系统日期和时间         |
+| UTC_DATE()                          | 返回UTC（世界标准时间）日期    |
+| UTC_TIME()                          | 返回UTC（世界标准时间）时间    |
 
 ```
 SELECT 
@@ -115,7 +124,7 @@ SELECT
     FROM_UNIXTIME(0)      AS '时间戳 -> 日期';
 ```
 
-#### 4.3 获取月份、星期、星期数、天数等函数
+## 4.3 获取月份、星期、星期数、天数等函数
 
 | 函数                                     | 用法                                            |
 | ---------------------------------------- | ----------------------------------------------- |
@@ -171,7 +180,7 @@ SELECT  DAYOFWEEK('2024-01-01') '周一',
         DAYOFWEEK('2024-01-08') '周一'
 ```
 
-#### 4.4 日期的操作函数
+## 4.4 日期的操作函数
 | 函数                    | 用法                                       |
 | ----------------------- | ------------------------------------------ |
 | EXTRACT(type FROM date) | 返回指定日期中特定的部分，type指定返回的值 |
@@ -184,7 +193,7 @@ SELECT
     EXTRACT(MINUTE_SECOND FROM NOW())
 ```
 
-#### 4.5 时间和秒钟转换的函数
+## 4.5 时间和秒钟转换的函数
 
 | 函数                 | 用法                                                         |
 | -------------------- | ------------------------------------------------------------ |
@@ -201,10 +210,12 @@ SELECT SEC_TO_TIME(78774);
 #### 4.6 计算日期和时间的函数
 ##### 第1组
 
-| 函数                                             | 用法                                           |
-| ---------------------------------- | ----------------------------------------- |
-| DATE_ADD(datetime, INTERVAL  expr type)，ADDDATE(date,INTERVAL expr type) | 返回与给定日期时间相差INTERVAL时间段的日期时间 |
-| DATE_SUB(date,INTERVAL expr type)，SUBDATE(date,INTERVAL expr type) | 返回与date相差INTERVAL时间间隔的日期           |
+| 函数                                    | 用法                                           |
+| --------------------------------------- | ---------------------------------------------- |
+| DATE_ADD(datetime, INTERVAL  expr type) | 返回与给定日期时间相差INTERVAL时间段的日期时间 |
+| ADDDATE(date,INTERVAL expr type)        | 返回与给定日期时间相差INTERVAL时间段的日期时间 |
+| DATE_SUB(date,INTERVAL expr type)       | 返回与date相差INTERVAL时间间隔的日期           |
+| SUBDATE(date,INTERVAL expr type)        | 返回与date相差INTERVAL时间间隔的日期           |
 
 ```
 SELECT 
@@ -377,7 +388,7 @@ SELECT CHARSET('ABC');
 SELECT COLLATION('ABC');
 ```
 
-## 8. 其他函数
+## 8. 其他单行函数
 
 | 函数                           | 用法                                                         |
 | ------------------------------ | ------------------------------------------------------------ |
@@ -402,7 +413,7 @@ SELECT BENCHMARK(1000000, MD5('mysql'));
 SELECT CHARSET('mysql'), CHARSET(CONVERT('mysql' USING 'utf8'));
 ```
 
-## 聚合函数
+## 9. 聚合函数
 ```
 * 不能嵌套
 
