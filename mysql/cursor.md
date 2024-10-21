@@ -13,7 +13,7 @@ CLOSE   cursor_name;                        # 4. 关闭游标, 需要及时关�
 
 ### 2. 实例
 ```
-# 1. 数据准备
+# 2.1 数据准备
 DROP   TABLE IF EXISTS employees;
 CREATE TABLE employees(id INT, name VARCHAR(20), salary INT);
 INSERT INTO  employees values(1, "张三",  7000);
@@ -22,7 +22,7 @@ INSERT INTO  employees values(3, "王五",  9000);
 INSERT INTO  employees values(4, "赵六", 10000);
 INSERT INTO  employees values(4, "田七", 11000);
 
-# 2. 定义存储过程
+# 2.2 定义存储过程
 DROP PROCEDURE IF EXISTS procedure_name;
 DELIMITER $
 CREATE PROCEDURE procedure_name(IN total_salary INT, OUT ret int, INOUT sum_salary INT, INOUT count_salary INT)
@@ -52,7 +52,7 @@ BEGIN
 END $
 DELIMITER ;
 
-# 3. 测试
+# 2.3 测试
 SET @ret          = 0;
 SET @sum_salary   = 0;
 SET @count_salary = 0;
