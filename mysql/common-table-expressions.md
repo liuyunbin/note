@@ -8,7 +8,7 @@ WITH CTE名称
 AS （子查询）
 SELECT|DELETE|UPDATE 语句;
 
-# 1. 准备数据
+# 1.1 准备数据
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), class_id INT, score DECIMAL);
 INSERT INTO  student VALUES(1, "一班张三", 1, 80);
@@ -27,8 +27,8 @@ INSERT INTO  student VALUES(11, "三班李四", 3, 98);
 INSERT INTO  student VALUES(12, "三班王五", 3, 60);
 INSERT INTO  student VALUES(13, "三班赵六", 3, 70);
 
-# 2. 测试
-# 2.1 测试成绩比 一班张三 高的学生, 并且该学生和张三在同一个班 (子查询)
+# 1.2 测试
+# 1.2.1 测试成绩比 一班张三 高的学生, 并且该学生和张三在同一个班 (子查询)
 SELECT *
 FROM student
 WHERE score > (
@@ -42,7 +42,7 @@ AND class_id = (
   WHERE  name = '一班张三'
 );
 
-# 2.2 测试成绩比 一班张三 高的学生, 并且该学生和张三在同一个班 (公共表表达式)
+# 1.2.2 测试成绩比 一班张三 高的学生, 并且该学生和张三在同一个班 (公共表表达式)
 WITH t1
 AS (SELECT * FROM student WHERE name = '一班张三')
 SELECT student.*
@@ -56,7 +56,7 @@ WITH RECURSIVE
 CTE名称 AS （子查询）
 SELECT|DELETE|UPDATE 语句;
 
-# 1. 准备数据
+# 2.1 准备数据
 DROP   TABLE IF EXISTS employees;
 CREATE TABLE employees (id INT PRIMARY KEY, name VARCHAR(20), manager_id INT);
 INSERT INTO  employees VALUES(1, "汉献帝", -1);
@@ -86,8 +86,9 @@ INSERT INTO  employees VALUES(19, "司马昭",   5);
 
 INSERT INTO  employees VALUES(20, "姜维", 16);
 
-# 2. 测试
-# 2.1 显示第四层员工
+# 2.2 测试
+# 2.2.1 显示第四层员工
+
 SELECT * FROM employees;
 
 WITH RECURSIVE cte 
