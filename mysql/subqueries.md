@@ -1,7 +1,7 @@
 
 ## 1. 测试在 SELECT FROM WHERE HAVING 中使用
 ```
-# 1. 准备数据
+# 1.1 准备数据
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), class_id INT, score DECIMAL);
 INSERT INTO  student VALUES(1, "一班张三", 1, 80);
@@ -20,8 +20,8 @@ INSERT INTO  student VALUES(11, "三班李四", 3, 98);
 INSERT INTO  student VALUES(12, "三班王五", 3, 60);
 INSERT INTO  student VALUES(13, "三班赵六", 3, 70);
 
-# 2. 测试
-# 2.1 测试成绩比 一班张三 高的学生
+# 1.2 测试
+# 1.2.1 测试成绩比 一班张三 高的学生
 SELECT *
 FROM student
 WHERE score > (
@@ -30,7 +30,7 @@ WHERE score > (
   WHERE  name = '一班张三'
 );
 
-# 2.2 测试成绩比 一班张三 高的学生, 并且该学生和张三在同一个班
+# 1.2.2 测试成绩比 一班张三 高的学生, 并且该学生和张三在同一个班
 SELECT *
 FROM student
 WHERE score > (
@@ -44,7 +44,7 @@ AND class_id = (
   WHERE  name = '一班张三'
 );
 
-# 2.3 测试成绩比 一班张三 高的学生, 并且该学生和张三不在同一个班
+# 1.2.3 测试成绩比 一班张三 高的学生, 并且该学生和张三不在同一个班
 SELECT *
 FROM student
 WHERE score > (
@@ -58,16 +58,16 @@ AND class_id != (
   WHERE name = '一班张三'
 );
 
-# 2.4 查看年级平均成绩
+# 1.2.4 查看年级平均成绩
 SELECT avg(score)
 FROM student;
 
-# 2.5 查看班级平均成绩
+# 1.2.5 查看班级平均成绩
 SELECT class_id, avg(score)
 FROM student
 GROUP BY class_id;
 
-# 2.6 测试成绩比平均成绩高的学生
+# 1.2.6 测试成绩比平均成绩高的学生
 SELECT *
 FROM student
 WHERE score > (
@@ -75,22 +75,22 @@ WHERE score > (
   FROM student
 );
 
-# 2.7 测试成绩比本班平均成绩高的学生 -- 关联子查询
+# 1.2.7 测试成绩比本班平均成绩高的学生 -- 关联子查询
 SELECT *
 FROM student s1
 WHERE score > (
   SELECT avg(s2.score)
   FROM student s2
   WHERE s1.class_id = s2.class_id
-)
+);
 
-# 2.8 测试每个学生成绩以及年级平均成绩
+# 1.2.8 测试每个学生成绩以及年级平均成绩
 SELECT 
   *,
   (SELECT avg(score) FROM student) avg_class
 FROM student;
 
-# 2.9 测试每个学生成绩以及所属班级平均成绩 --- 关联子查询
+# 1.2.9 测试每个学生成绩以及所属班级平均成绩 --- 关联子查询
 SELECT 
   *,
   (
@@ -100,23 +100,23 @@ SELECT
   ) avg_class
 FROM student s1;
 
-# 2.10 测试每个学生成绩以及年级平均成绩
+# 1.2.10 测试每个学生成绩以及年级平均成绩
 SELECT 
   *
 FROM student, (
   SELECT avg(score) FROM student
 ) s2;
 
-# 2.11 测试每个学生成绩以及班级平均成绩
+# 1.2.11 测试每个学生成绩以及班级平均成绩
 SELECT 
   s1.*,
   s2.avg_score
 FROM student s1, (
   SELECT class_id, avg(score) avg_score FROM student GROUP BY class_id
 ) s2
-WHERE s1.class_id = s2.class_id
+WHERE s1.class_id = s2.class_id;
 
-# 2.12 测试班级平均成绩比一班平均成绩高的班级
+# 1.2.12 测试班级平均成绩比一班平均成绩高的班级
 SELECT 
     class_id,
     avg(score)
@@ -124,55 +124,55 @@ FROM student
 GROUP BY class_id
 HAVING avg(score) >= (
     SELECT avg(score) FROM student WHERE class_id = 1
-)
+);
 
-# 2.13 测试成绩最高的学生 (方法一)
+# 1.2.13 测试成绩最高的学生 (方法一)
 SELECT 
     *
 FROM  student
-WHERE score >= ALL(SELECT score FROM student)
+WHERE score >= ALL(SELECT score FROM student);
 
-# 2.14 测试成绩最高的学生 (方法二)
+# 1.2.14 测试成绩最高的学生 (方法二)
 SELECT 
     *
 FROM  student
-WHERE score = (SELECT max(score) FROM student)
+WHERE score = (SELECT max(score) FROM student);
 
-# 2.15 测试成绩最高的学生 (方法三) 有误 -- 只取一个
+# 1.2.15 测试成绩最高的学生 (方法三) 有误 -- 只取一个
 SELECT 
     *
 FROM  student
 ORDER BY score DESC
-LIMIT 1
+LIMIT 1;
 
-# 2.16 测试成绩最高的学生 (方法四)
+# 1.2.16 测试成绩最高的学生 (方法四)
 SELECT 
     *
 FROM  student
-WHERE NOT score < ANY(SELECT score FROM student)
+WHERE NOT score < ANY(SELECT score FROM student);
 
-# 2.17 测试成绩最高的学生 (方法五)
+# 1.2.17 测试成绩最高的学生 (方法五)
 SELECT 
     *
 FROM  student
-WHERE score IN (SELECT  MAX(score) FROM  student)
+WHERE score IN (SELECT  MAX(score) FROM  student);
 
-# 2.18 测试成绩最高的学生 (方法六)
+# 1.2.18 测试成绩最高的学生 (方法六)
 SELECT 
     *
 FROM  student s1
-WHERE NOT EXISTS (SELECT * FROM  student s2 WHERE s1.score < s2.score)
+WHERE NOT EXISTS (SELECT * FROM  student s2 WHERE s1.score < s2.score);
 
-# 2.19 测试成绩比任意班平均成绩低的学生
+# 1.2.19 测试成绩比任意班平均成绩低的学生
 SELECT 
     *
 FROM  student
-WHERE score < ANY(SELECT avg(score) FROM student GROUP BY class_id)
+WHERE score < ANY(SELECT avg(score) FROM student GROUP BY class_id);
 ```
 
 ## 2. 测试在 GROUP BY, ORDER BY 中使用
 ```
-# 1. 准备数据
+# 2.1 准备数据
 DROP   TABLE IF EXISTS student_base;
 CREATE TABLE student_base (id INT PRIMARY KEY, name VARCHAR(20), score DECIMAL);
 INSERT INTO  student_base VALUES(1, "张三", 80);
@@ -190,13 +190,13 @@ INSERT INTO  student_detail VALUES(4, "张五", '山西');
 SELECT * FROM student_base;
 SELECT * FROM student_detail;
 
-# 2. 查看每个地区成绩的平均成绩 (GROUP BY)
+# 2.2 查看每个地区成绩的平均成绩 (GROUP BY)
 SELECT
   avg(score)
 FROM student_base
 GROUP BY (SELECT province FROM student_detail WHERE student_base.id = student_detail.id);
 
-# 3. 查看成绩按照省份排序 (ORDER BY)
+# 2.3 查看成绩按照省份排序 (ORDER BY)
 SELECT * FROM student_base;
 SELECT * FROM student_detail;
 
