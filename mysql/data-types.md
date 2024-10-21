@@ -182,6 +182,7 @@ SELECT * FROM test_enum;
 
 
 ```
+DROP   TABLE IF EXISTS test_set;
 CREATE TABLE test_set(
 s SET ('A', 'B', 'C')
 );
