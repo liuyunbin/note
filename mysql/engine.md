@@ -1,0 +1,14 @@
+
+engine
+
+SHOW ENGINES;
+
+
+DROP TABLE IF EXISTS student;
+CREATE TABLE student (id INT, name VARCHAR(20)) ENGINE = MYISAM;
+
+SHOW tables;
+
+INSERT INTO student VALUES(1, "TOM");
+
+EXPLAIN SELECT * FROM student;
