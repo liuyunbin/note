@@ -148,7 +148,7 @@ EXPLAIN SELECT * FROM tb1 WHERE id = (SELECT id FROM tb2 WHERE id = 123); # 两�
 EXPLAIN SELECT * FROM tb1;
 EXPLAIN SELECT * FROM tb1, tb2;
 
-# 2.2.2 PRIMARY -------- 包含 UNION 和 UNION ALL 子查询的主查询
+# 2.2.2 PRIMARY -------- 包含 UNION 和 UNION ALL 和 子查询的主查询
 EXPLAIN SELECT * FROM tb1 UNION     SELECT * FROM tb2;
 EXPLAIN SELECT * FROM tb1 UNION ALL SELECT * FROM tb2;
 EXPLAIN SELECT * FROM tb1 WHERE id = (SELECT id FROM tb2 WHERE id = 123);
@@ -209,20 +209,26 @@ EXPLAIN SELECT * FROM tb1 WHERE id = (SELECT id FROM tb2 WHERE id = 123); # 两�
 #### 2.5 type -- 针对单表的访问方法
 ```
 # 2.5.1 system --- 只有一条记录, 精确
+DROP    TABLE IF EXISTS student;
+CREATE  TABLE student (id INT, name VARCHAR(20));
+INSERT  INTO  student VALUES(1, 'abc');
+EXPLAIN SELECT * FROM student;   # InnoDB 不使用
+ALTER  TABLE student ENGINE = MyISAM;
+EXPLAIN SELECT * FROM student;   # MyISAM 使用
 
 # 2.5.2 const ---- 常量 与主键或唯一键 等值匹配 --- 最多取一个
 EXPLAIN SELECT * FROM tb1 WHERE id = 1;
 
-# 2.5.3 eq_ref --- 连接查询 或 子查询时，被驱动表 使用主键 或 唯一键 + NOT NULL 进行字段等值匹配
-EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.id = tb2.id;
+# 2.5.3 eq_ref --- 连接查询 或 子查询时，被驱动表 使用主键 或 唯一键 进行字段等值匹配
+EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.id    = tb2.id;
 EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.id;
-EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.id = tb2.int_1;
+EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.id    = tb2.int_1;
 
 # 2.5.4 ref ------ 常数或另一表中的字段 与普通索引等值匹配 
 CALL drop_index("test", "tb1");
 CREATE INDEX index_name on tb1(int_1);
 
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 123; 
+EXPLAIN SELECT * FROM tb1      WHERE tb1.int_1 = 123; 
 EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1;
 
 CALL drop_index("test", "tb1");
@@ -233,12 +239,12 @@ CALL drop_index("test", "tb1");
 CALL drop_index("test", "tb1");
 CREATE INDEX index_name on tb1(int_1);
 
-EXPLAIN SELECT * FROM tb1 WHERE int_1  = 123 OR int_1 IS NULL;
+EXPLAIN SELECT * FROM tb1      WHERE tb1.int_1 = 123       OR tb1.int_1 IS NULL;
 EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1 OR tb1.int_1 IS NULL;
 
 CALL drop_index("test", "tb1");
 
-# 2.5.7 index_merge -- 单表多字段查询, 查询之间使用 OR, 可能索引合并
+# 2.5.7 index_merge -- 索引合并
 CALL drop_index("test", "tb1");
 CREATE INDEX index_int_1 on tb1(int_1);
 CREATE INDEX index_int_2 on tb1(int_2);
@@ -248,33 +254,40 @@ EXPLAIN SELECT * FROM tb1 WHERE int_1 = 123 AND int_2 = 123;
 
 CALL drop_index("test", "tb1");
 
-# 2.5.8 unique_subquery --- (子查询 + IN) 转化成 (子查询 + EXISTS)
+# 2.5.8 unique_subquery --- (IN  + 子查询) 转化成 (EXISTS + 子查询) (主键或唯一键)
 EXPLAIN SELECT * FROM tb1 WHERE int_1 NOT IN (SELECT id FROM tb2 WHERE tb1.str_1 LIKE '123%');
+EXPLAIN SELECT * FROM tb1 WHERE int_1 NOT IN (SELECT id FROM tb2 WHERE tb1.id != 123);
 
-# 2.5.9 index_subquery ---- 与 unique_subquery 类似，只不过子查询中的表时使用的是普通的索引 --- 没复现
-EXPLAIN SELECT * FROM tb1 WHERE int_1 NOT IN (SELECT id FROM tb2 WHERE tb1.str_1 LIKE '123%'); -- TODO
+# 2.5.9 index_subquery ---- (IN  + 子查询) 转化成 (EXISTS + 子查询) (普通索引)
+CALL drop_index("test", "tb2");
+CREATE INDEX index_int_1 on tb2(int_1);
+EXPLAIN SELECT * FROM tb1 WHERE int_1 NOT IN (SELECT int_1 FROM tb2 WHERE tb1.id != 123);
+
+CALL drop_index("test", "tb2");
 
 # 2.5.10 range --- 使用索引范围查找
 EXPLAIN SELECT * FROM tb1 WHERE id IN (1, 2, 3);
 EXPLAIN SELECT * FROM tb1 WHERE id > 1 AND id < 3;
 
-# 2.5.11 index -- TODO
+# 2.5.11 index
 * 复合索引
 * 查找时索引不是第一个字段
 * 不需要回表, 只用索引就能满足要求
 
-DROP TABLE IF EXISTS tb1;
-CREATE TABLE tb1(t1 INT, t2 INT,  t3 int, t4 int);
-CREATE INDEX index_123 ON tb1(t1, t2, t3);
+CALL drop_index("test", "tb1");
+CREATE INDEX index_int_1_2_3 on tb1(int_1, int_2, int_3);
 
-EXPLAIN SELECT t2 FROM tb1 WHERE t3 = 123;
+EXPLAIN SELECT int_2 FROM tb1 WHERE int_3 = 123;
+
+CALL drop_index("test", "tb1");
 
 # 2.5.12 ALL: 全表扫描
 EXPLAIN SELECT * FROM tb1;
 EXPLAIN SELECT * FROM tb1 WHERE int_1 = 123;
 
 # 2.5.13 结果值从最好到最坏依次是
-system > const > eq_ref > ref** > ref_or_null > index_merge > unique_subquery > index_subquery > range > index > ALL 
+system > const > eq_ref > ref > ref_or_null > index_merge 
+> unique_subquery > index_subquery > range > index > ALL 
 
 至少要达到 range 级别，要求是 ref 级别，最好是 consts级别
 ```
@@ -297,28 +310,28 @@ EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.id = tb2.id;
 
 ### 2.12 Extra -------------- 一些额外的信息
 ```
-# 2.12.1 Backward index scan -- 索引是正序的, 但以降序排序查找使用
+# 2.12.1 Backward index scan -- 索引是正序的, 但以降序排序查找使用 -- 貌似对效率影响不大
 CALL drop_index("test", "tb1");
 CREATE INDEX index_name on tb1(int_1);
 
 EXPLAIN SELECT * FROM tb1 ORDER BY id;      # 1.608s
 EXPLAIN SELECT * FROM tb1 ORDER BY id DESC; # 1.592s
 
-EXPLAIN SELECT * FROM tb1 ORDER BY int_1;      # 1.735s
-EXPLAIN SELECT * FROM tb1 ORDER BY int_1 DESC; # 2.251s
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1      LIMIT 10; # 0.189
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1 DESC LIMIT 10; # 0.188s
 
-CALL drop_index("test", "tb1")
+CALL drop_index("test", "tb1");
 
 # 2.12.2 Child of 'table' pushed join@1 -- NDB tables only
 
-# 2.12.3 const row not found -- 空表 -- 没看懂 -- 未复现
-DROP TABLE IF EXISTS test1;
-CREATE TABLE test1 (id INT);
-EXPLAIN SELECT * FROM test1;
+# 2.12.3 const row not found -- 空表 -- 未复现
 
-# 2.12.4 Deleting all rows --- 删除所有行, 未复现
-# 2.12.5 Distinct ---- 没看懂 -- 未复现
+# 2.12.4 Deleting all rows --- 删除所有行 -- 未复现
+
+# 2.12.5 Distinct ---- 没看懂
+
 # 2.12.6 FirstMatch(tbl_name) --- 没看懂
+
 # 2.12.7 Full scan on NULL key -- 没看懂
 
 # 2.12.8 Impossible HAVING --- 不可能的 HAVING
@@ -328,7 +341,7 @@ EXPLAIN SELECT count(*) FROM tb1 GROUP BY int_1 HAVING 1 = 0;
 EXPLAIN SELECT count(*) FROM tb1 WHERE 1 = 0;
 
 # 2.12.10 Impossible WHERE noticed after reading const tables 
-                 -- 使用 onst 或 system 扫描表后, 发现 WHERE 不可能
+                 -- 使用 const 或 system 扫描表后, 发现 WHERE 不可能
 
 EXPLAIN SELECT * FROM tb1 WHERE id = 111 AND int_1 = 111;
 
@@ -337,8 +350,9 @@ EXPLAIN SELECT * FROM tb1 WHERE id = 111 AND int_1 = 111;
 # 2.12.12 No matching min/max row -- 有 MIN 或者 MAX 聚合函数，但是没有符合 WHERE的搜索条件的记录
 EXPLAIN SELECT max(id) FROM tb1 WHERE id < 0;
 
-# 2.12.13 no matching row in const table --- 多表查询, 唯一键或主键比较时, 匹配不到数据
+# 2.12.13 no matching row in const table --- 唯一键或主键比较时, 匹配不到数据
 EXPLAIN SELECT * FROM tb1 JOIN tb2 ON tb1.id = tb2.int_2 AND tb2.int_2 = NULL;
+EXPLAIN SELECT id FROM tb1 WHERE id = -1;
 
 # 2.12.14 No matching rows after partition pruning --- 没看懂
 
@@ -357,11 +371,11 @@ EXPLAIN
 WITH RECURSIVE cte 
 AS 
 (
-    SELECT id, int_1, 1 AS n FROM tb1 WHERE id = 123 -- 找到根: 汉献帝
+    SELECT id, int_1, 1 AS n FROM tb1 WHERE id = 123
     UNION ALL
     SELECT a.id, a.int_1, n + 1
     FROM tb1 AS a JOIN cte
-    ON (a.int_1 = cte.int_1) -- 递归查询
+    ON (a.int_1 = cte.int_1)
 )
 SELECT id FROM cte WHERE n = 4;
 
@@ -369,31 +383,31 @@ SELECT id FROM cte WHERE n = 4;
 
 # 2.12.21 Scanned N databases --- 没看懂
 
-# 2.12.22 Select tables optimized away -- 聚合函数 可以优化成只使用索引表实现
+# 2.12.22 Select tables optimized away
+* 返回的行数最多一行
+* 处理的行数是确定的
+* 单独的可以只通过索引实现, 不需要回表
+
 CALL drop_index("test", "tb1");
 CREATE INDEX index_int_1 on tb1(int_1);
 CREATE INDEX index_int_2 on tb1(int_2);
 
 EXPLAIN SELECT max(id), min(int_1), min(int_2) FROM tb1; # 可以优化成只使用 索引表 实现
+                                                         # 先单独求, 然后合并
 EXPLAIN SELECT max(id), min(int_1), min(int_2) FROM tb1 WHERE int_1 > 100;
                                                          # 这个不行, 因为每组的结果不确定
-
 CALL drop_index("test", "tb1");
 
 CREATE INDEX index_int_1_int_2 on tb1(int_1, int_2);
-
 EXPLAIN SELECT max(int_2) FROM tb1 WHERE int_1 = 100; # 这个也可以
 
 CALL drop_index("test", "tb1");
-
 
 # 2.12.23 Skip_open_table, Open_frm_only, Open_full_table --- 没看懂
 
 # 2.12.24 Start temporary, End temporary -- 没看懂
 
-# 2.12.25 unique row not found
-
-For a query such as SELECT ... FROM tbl_name, no rows satisfy the condition for a UNIQUE index or PRIMARY KEY on the table.
+# 2.12.25 unique row not found -- 没看懂
 
 # 2.12.26 Using filesort -- 使用文件排序, 使用内存或磁盘排序 --- 尽量避免
 EXPLAIN SELECT * FROM tb1 ORDER BY int_1;
@@ -404,27 +418,34 @@ CREATE INDEX index_name ON tb1(int_1);
 EXPLAIN SELECT int_1 FROM tb1 WHERE int_1 = 123;
 CALL drop_index("test", "tb1");
 
-# 2.12.28 Using index condition -- 搜索条件中虽然出现了索引列，但却有不能使用索引的情况
-EXPLAIN SELECT * FROM tb1 WHERE id >= 100; --- tODO
+# 2.12.28 Using index condition --  Index Condition Pushdown 索引条件下推
+* 通过索引列的判断, 减少回表的次数 (不包括主键和唯一键)
 
-Tables are read by accessing index tuples and testing them first to determine whether to read full table rows. In this way, index information is used to defer (“push down”) reading full table rows unless it is necessary. See Section 10.2.1.6, “Index Condition Pushdown Optimization”.
+CALL drop_index("test", "tb1");
+CREATE INDEX index_name ON tb1(int_1);
 
-# 2.12.29 Using index for group-by
+EXPLAIN SELECT * FROM tb1 WHERE int_1 > 1000 AND int_1 < 2000;
 
-EXPLAIN SELECT id, count(id) FROM tb1 GROUP BY id;
+CALL drop_index("test", "tb1");
 
-Similar to the Using index table access method, Using index for group-by indicates that MySQL found an index that can be used to retrieve all columns of a GROUP BY or DISTINCT query without any extra disk access to the actual table. Additionally, the index is used in the most efficient way so that for each group, only a few index entries are read. For details, see Section 10.2.1.17, “GROUP BY Optimization”.
+EXPLAIN SELECT * FROM tb1 WHERE id > 1000 AND id < 2000; # 主键不会 
 
-# 2.12.30 Using index for skip scan
+# 2.12.29 Using index for group-by --- GROUP BY 中使用索引优化
+CALL drop_index("test", "tb1");
+CREATE INDEX index_name ON tb1(int_1);
 
-Indicates that the Skip Scan access method is used. See Skip Scan Range Access Method.
+EXPLAIN SELECT int_1 FROM tb1 GROUP BY int_1;
+
+CALL drop_index("test", "tb1");
+
+# 2.12.30 Using index for skip scan --- 使用索引跳过扫描
 
 # 2.12.31  连接查询执行过程中, 可能分配新内存提高效率
 # 2.12.31.1 Using join buffer (Block Nested Loop)
 # 2.12.31.2 Using join buffer (Batched Key Access)
 # 2.12.31.3 Using join buffer (hash join) 
 
-# 2.12.32 Using MRR
+# 2.12.32 Using MRR --- 没看懂
 
 # 2.12.33 多个索引同时使用
 # 2.12.33.1 Using intersect(...) --- 交集
@@ -454,7 +475,7 @@ EXPLAIN SELECT * FROM tb1 WHERE int_1 < 123 OR int_2 = 123;
 
 CALL drop_index("test", "tb1");
 
-# 2.12.34 Using temporary --- 使用临时表
+# 2.12.34 Using temporary --- 使用临时表 -- 这个尽量少
 EXPLAIN
 SELECT * FROM tb1
 UNION
@@ -475,19 +496,4 @@ EXPLAIN SELECT * FROM tb1 LIMIT 0;
 EXPLAIN             SELECT * FROM teacher1;
 EXPLAIN FORMAT=JSON SELECT * FROM teacher1; # JSON
 EXPLAIN FORMAT=tree SELECT * FROM teacher1; # TREE
-```
-
-## 4. 查看进一步的优化
-```
-EXPLAIN
-SELECT * FROM teacher1 WHERE id in (SELECT teacher_id FROM student);
-SHOW WARNINGS;
-
-select `test`.`teacher1`.`id` AS `id`,
-       `test`.`teacher1`.`name` AS `name`,
-       `test`.`teacher1`.`addr` AS `addr`,
-       `test`.`teacher1`.`extra` AS `extra` 
-from `test`.`teacher1` semi 
-join (`test`.`student`)
-where (`test`.`teacher1`.`id` = `<subquery2>`.`teacher_id`)
 ```
