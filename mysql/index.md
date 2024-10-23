@@ -114,200 +114,278 @@ ALTER  TABLE student RENAME INDEX index_name TO new_index_name;
 SHOW   INDEX FROM student;
 ```
 
-## 2. 测试 where 中使用索引
+## 2. 准备测试数据
 ```
-# 1. 测试最左前缀原则
-DROP TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    t1 INT NOT NULL,
-    t2 INT NOT NULL,
-    t3 INT NOT NULL,
-    t4 INT);
-
-CREATE  INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1;                       # 使用部分索引, t1 的索引 (key_len = 4)
-EXPLAIN SELECT * FROM tb1 WHERE t2 = 1;                       # 不使用索引
-EXPLAIN SELECT * FROM tb1 WHERE t3 = 1;                       # 不使用索引
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 = 1;            # 使用部分索引, t1 t2 的索引 (key_len = 8)
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t3 = 1;            # 使用部分索引, t1 的索引 (key_len = 4)
-EXPLAIN SELECT * FROM tb1 WHERE t2 = 1 AND t3 = 1;            # 不使用索引
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 = 1 AND t3 = 1; # 使用全部索引 (key_len = 12)
-
-# 2. 使用计算, 函数和类型转换导致索引失效
-DROP TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    t1 VARCHAR(10) NOT NULL,
-    t2 INT NOT NULL
-    );
-
-CREATE  INDEX index_t1 ON tb1(t1);
-EXPLAIN SELECT * FROM tb1 WHERE t1 = '1';
-EXPLAIN SELECT * FROM tb1 WHERE t1 =  1;           # 类型转换导致索引失效
-EXPLAIN SELECT * FROM tb1 WHERE UPPER(t1) = '1';   # 函数导致索引失效
-
-CREATE  INDEX index_t2 ON tb1(t2);
-EXPLAIN SELECT * FROM tb1 WHERE t2 = 1;
-EXPLAIN SELECT * FROM tb1 WHERE t2 + 1 = 1; # 计算导致索引失效
-
-# 3. 范围查找导致右侧的索引失效
-DROP TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    t1 INT NOT NULL,
-    t2 INT NOT NULL,
-    t3 INT NOT NULL,
-    t4 INT);
-
-CREATE  INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 = 1 AND t3 = 1; # 使用全部索引 (key_len = 12)
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 > 1 AND t3 = 1; # 使用部分索引, 范围查找 t3 上的索引失效 (key_len = 8)
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t3 = 1 AND t2 > 1; # 系统会按照联合索引声明的方式使用, 所以还是失效
-
-DROP    INDEX index_t1_t2_t3 ON tb1;                                       
-CREATE  INDEX index_t1_t2_t3 ON tb1(t1, t3, t2);              # 修改联合索引声明的顺序
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 = 1 AND t3 = 1; # 使用全部索引 (key_len = 12)
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t2 > 1 AND t3 = 1; # 使用全部索引 (key_len = 12)
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 AND t3 = 1 AND t2 > 1; # 使用全部索引 (key_len = 12)
-                                                              # 建立联合索引时, 将范围查找的字段放到末尾
-
-# 4. 测试 !=  和 IS NULL 和 IS NOT NULL, 索引不一定失效
-DROP TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    t1 INT);
-    
-CREATE  INDEX index_t1 ON tb1(t1);
-EXPLAIN SELECT * FROM tb1 WHERE t1 != 2; 
-EXPLAIN SELECT * FROM tb1 WHERE t1 IS NULL;
-EXPLAIN SELECT * FROM tb1 WHERE t1 IS NOT NULL;
-
-# 5. 测试 LIKE, 索引不一定失效
-DROP TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    t1 VARCHAR(20));
-
-CREATE  INDEX index_t1 ON tb1(t1);
-EXPLAIN SELECT * FROM tb1 WHERE t1 LIKE 'abc%';
-EXPLAIN SELECT * FROM tb1 WHERE t1 LIKE '%bc'; 
-EXPLAIN SELECT * FROM tb1 WHERE t1 LIKE 'abc_'; 
-EXPLAIN SELECT * FROM tb1 WHERE t1 LIKE '_bc%'; 
-
-# 6. 测试 OR, 一边不包含索引时, 导致索引失效   
-DROP TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    t1 INT,
-    t2 INT);
-    
-CREATE INDEX index_t1 ON tb1(t1);
-
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 OR t2 = 1;
-```
-
-## 3. 测试 order by 中使用索引
-```
+# 2.1 创建两张表
 DROP   TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (t1 INT, t2 INT, t3 INT);
-
-EXPLAIN SELECT * FROM tb1 ORDER BY t1, t2, t3; # 文件排序
-CREATE INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
-EXPLAIN SELECT * FROM tb1 ORDER BY t1, t2, t3; # 索引排序
-```
-
-## 4. 测试 group by 分组优化
-```
-DROP   TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (t1 INT, t2 INT, t3 INT);
-
-EXPLAIN SELECT count(*) FROM tb1 GROUP BY t1, t2, t3;
-CREATE INDEX index_t1_t2_t3 ON tb1(t1, t2, t3);
-EXPLAIN SELECT count(*) FROM tb1 GROUP BY t1, t2, t3;
-```
-
-## 5. 测试 where 和 order by 同时使用索引
-```
-DROP   TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (t1 INT, t2 INT, t3 INT, t4 INT);
-
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 ORDER BY t2, t3, t4; # 全表扫描 + 文件排序
-CREATE INDEX index_t1_t2_t3 ON tb1(t1, t2, t3, t4);
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 ORDER BY t2, t3, t4;     # 索引查找 + 索引排序 (WHERE 和 ORDER BY 共用一个索引)
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 ORDER BY t1, t2, t3, t4; # 索引查找 + 索引排序 (ORDER BY 使用单独的索引)
-EXPLAIN SELECT * FROM tb1 WHERE t1 = 1 ORDER BY t3, t4;         # 索引查找 + 文件排序
-
-EXPLAIN SELECT * FROM tb1 WHERE t1 > 1 ORDER BY t2, t3, t4;     # 索引查找 + 索引排序 
-EXPLAIN SELECT * FROM tb1 WHERE t1 > 1 ORDER BY t1, t2, t3, t4; # 索引查找 + 索引排序 (ORDER BY 使用单独的索引)
-EXPLAIN SELECT * FROM tb1 WHERE t1 > 1 ORDER BY t3, t4;         # 索引查找 + 文件排序
-```
-
-## 6. 测试 where 和 group by 同时使用索引
-
-## 7. 测试 order by 和 group by 同时使用索引
-
-## 8. 测试 where, order by 和 group by 同时使用索引
-
-## 8. 测试多表查询 (左连接 或 右连接)
-```
-DROP   TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (t1 INT);
-    
-DROP   TABLE IF EXISTS tb2;
-CREATE TABLE tb2 (t1 INT);
-
-EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.t1 = tb2.t1; # 1. 查看左连接
-CREATE  INDEX index_t1 ON tb1(t1);                          # 2. 在驱动表上建立索引, 意义不大 (可能被优化成内连接)
-EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.t1 = tb2.t1; # 3. 查看左连接
-DROP    INDEX index_t1 ON tb1;                              # 4. 删除驱动表上的索引
-CREATE  INDEX index_t1 ON tb2(t1);                          # 5. 在被驱动表上建立索引, 有用
-EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.t1 = tb2.t1; # 6. 查看左连接
-```
-
-## 9. 测试多表查询 (内连接)
-```
-DROP   TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (t1 INT);
+CREATE TABLE tb1 (
+    id    INT AUTO_INCREMENT PRIMARY KEY, 
+    int_1 INT NOT NULL,
+    int_2 INT NOT NULL,
+    int_3 INT NOT NULL,
+    str_1 VARCHAR(20) NOT NULL,
+    str_2 VARCHAR(20) NOT NULL,
+    str_3 VARCHAR(20) NOT NULL
+);
 
 DROP   TABLE IF EXISTS tb2;
-CREATE TABLE tb2 (t1 INT);
+CREATE TABLE tb2 (
+    id    INT AUTO_INCREMENT PRIMARY KEY, 
+    int_1 INT NOT NULL,
+    int_2 INT NOT NULL,
+    int_3 INT NOT NULL,
+    str_1 VARCHAR(20) NOT NULL,
+    str_2 VARCHAR(20) NOT NULL,
+    str_3 VARCHAR(20) NOT NULL
+);
 
-EXPLAIN SELECT * FROM tb1 JOIN tb2 ON tb1.t1 = tb2.t1; # 1. 查看内连接
-CREATE  INDEX index_t1 ON tb1(t1);                     # 2. 表 t1 建立索引
-EXPLAIN SELECT * FROM tb1 JOIN tb2 ON tb1.t1 = tb2.t1; # 3. 查看内连接, 有索引的表可以做被驱动表
-CREATE  INDEX index_t1 ON tb2(t1);                     # 4. 表 t2 建立索引
-EXPLAIN SELECT * FROM tb1 JOIN tb2 ON tb1.t1 = tb2.t1; # 5. 查看内连接, 有索引的表可以做被驱动表
-INSERT  INTO tb1 VALUES(1);                            # 6. t1 插入数据
-INSERT  INTO tb1 VALUES(2);
-INSERT  INTO tb1 VALUES(3);
-EXPLAIN SELECT * FROM tb1 JOIN tb2 ON tb1.t1 = tb2.t1; # 7. t1 和 t2 都有索引
-                                                       #    t1 比 t2 大
-                                                       #    小表驱动大表, 所以使用 t1 的索引
+# 2.2 创建帮助函数
+# 2.2.1 返回随机字符串
+DROP FUNCTION IF EXISTS rand_string;
+DELIMITER $
+CREATE FUNCTION rand_string(n INT)
+	RETURNS VARCHAR(255) 
+BEGIN
+    DECLARE  chars_str VARCHAR(100) DEFAULT 'abcdefghijklmnopqrstuvwxyzABCDEFJHIJKLMNOPQRSTUVWXYZ';
+	DECLARE return_str VARCHAR(255) DEFAULT '';
+    DECLARE i          INT          DEFAULT 0;
+
+    WHILE i < n DO
+    	SET return_str =CONCAT(return_str,SUBSTRING(chars_str,FLOOR(1+RAND()*52),1));
+    	SET i = i + 1;
+    END WHILE;
+    RETURN return_str;
+END $
+DELIMITER ;
+
+# 2.2.2 返回随机数字
+DROP FUNCTION IF EXISTS rand_num;
+DELIMITER $
+CREATE FUNCTION rand_num (from_num INT, to_num INT)
+RETURNS INT(11)
+BEGIN
+    DECLARE i INT DEFAULT 0;
+    SET i = FLOOR(from_num +RAND()*(to_num - from_num+1)) ;
+    RETURN i;
+END $
+DELIMITER ;
+
+# 2.2.3 插入数据 
+DROP   PROCEDURE IF EXISTS insert_table;
+DELIMITER $
+CREATE PROCEDURE insert_table(max_num INT, table_name VARCHAR(20))
+BEGIN
+    DECLARE i INT DEFAULT 0;
+    SET autocommit = 0;
+    REPEAT
+        SET i = i + 1;
+        
+        SET @str = CONCAT("INSERT INTO " , table_name, " (int_1, int_2, int_3, str_1, str_2, str_3) VALUES
+            (rand_num(0,10000), rand_num(0,10000), rand_num(0,10000),
+             rand_string(6), rand_string(9), rand_string(10))");
+        PREPARE sql_str FROM @str ;
+        EXECUTE sql_str;
+        DEALLOCATE PREPARE sql_str;
+    UNTIL i = max_num
+    END REPEAT;
+    COMMIT;
+END $
+DELIMITER ;
+
+# 2.2.4 清除除主键外的所有索引
+DROP   PROCEDURE IF EXISTS drop_index;
+DELIMITER $
+CREATE PROCEDURE drop_index (dbname VARCHAR(200), tablename VARCHAR(200))
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE current_index VARCHAR(200);
+    DECLARE cursor_name CURSOR FOR
+        SELECT index_name
+        FROM   information_schema.STATISTICS
+        WHERE
+               table_schema  = dbname AND
+               table_name    = tablename AND
+               seq_in_index  = 1 AND
+               index_name   != 'PRIMARY';
+        DECLARE CONTINUE HANDLER FOR NOT FOUND set done = 1; # 无数据时, 设置 done 为 1
+    OPEN cursor_name;
+    
+    FETCH cursor_name INTO current_index;
+    WHILE done = 0 DO
+        SET @str = CONCAT("DROP INDEX " , current_index , " ON " , tablename );
+        PREPARE sql_str FROM @str ;
+        EXECUTE sql_str;
+        DEALLOCATE PREPARE sql_str;
+        FETCH cursor_name INTO current_index;
+    END WHILE;
+    CLOSE cursor_name;
+END $
+DELIMITER ;
+
+# 2.3 插入数据
+TRUNCATE tb1;
+CALL insert_table(1000000, "tb1"); # 100 万数据, 125.408s
+SELECT count(*) FROM tb1;
+
+TRUNCATE tb2;
+CALL insert_table(2000000, "tb2"); # 200 万数据, 271.414s
+SELECT count(*) FROM tb2;
+```
+
+## 3. 测试 WHERE 中使用索引 --- 避免全表扫描
+```
+# 3.1 最左前缀原则
+CALL drop_index("test", "tb1");
+CREATE  INDEX index_name ON tb1(int_1, int_2, int_3);     # 
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1;                # 使用部分索引 (key_len = 4)
+EXPLAIN SELECT * FROM tb1 WHERE int_2 = 1;                # 不使用索引
+EXPLAIN SELECT * FROM tb1 WHERE int_3 = 1;                # 不使用索引
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2 = 2;  # 使用部分索引 (key_len = 8)
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_3 = 3;  # 使用部分索引 (key_len = 4)
+EXPLAIN SELECT * FROM tb1 WHERE int_2 = 1 AND int_3 = 1;  # 不使用索引
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2 = 1 AND int_3 = 1;
+                                                          # 使用全部索引 (key_len = 12)
+
+# 3.2 使用计算, 函数和类型转换导致索引失效
+CALL drop_index("test", "tb1");
+EXPLAIN SELECT * FROM tb1 WHERE str_1 = '1';          #
+CREATE  INDEX index_name ON tb1(str_1);               #
+EXPLAIN SELECT * FROM tb1 WHERE str_1 = '1';          #
+EXPLAIN SELECT * FROM tb1 WHERE str_1 =  1;           # 类型转换导致索引失效
+EXPLAIN SELECT * FROM tb1 WHERE UPPER(str_1) = '1';   # 函数导致索引失效
+
+CALL drop_index("test", "tb1");
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1;     #
+CREATE  INDEX index_t1 ON tb1(int_1);          #
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1;     #
+EXPLAIN SELECT * FROM tb1 WHERE int_1 + 1 = 2; # 计算导致索引失效
+
+CALL drop_index("test", "tb1");
+
+# 3.3 范围查找导致右侧的索引失效 (> >= < <= != LIKE)
+CALL drop_index("test", "tb1");
+CREATE  INDEX index_t1_t2_t3 ON tb1(int_1, int_2, int_3);              #
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2  = 1 AND int_3 = 1; # 使用全部索引(key_len = 12)
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2  > 1 AND int_3 = 1; # 使用部分索引(key_len = 8)
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2 != 1 AND int_3 = 1; # 使用部分索引(key_len = 8)
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_3  = 1 AND int_2 > 1; # 使用部分索引(key_len = 8)
+                                                         # 联合索引按照声明的顺序使用
+CALL drop_index("test", "tb1");                                       
+CREATE  INDEX index_t1_t2_t3 ON tb1(int_1, int_3, int_2);              # 修改联合索引声明的顺序
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2  = 1 AND int_3 = 1; # 使用全部索引(key_len = 12)
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2  > 1 AND int_3 = 1; # 使用全部索引(key_len = 12)
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2 != 1 AND int_3 = 1; # 使用部分索引(key_len = 12)
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_3  = 1 AND int_2 > 1; # 使用全部索引(key_len = 12)
+                                                         # 建立联合索引时, 将范围查找的字段放到末尾
+CALL drop_index("test", "tb1");
+
+# 3.4 测试 OR, 一边不包含索引时, 导致索引失效
+CALL drop_index("test", "tb1");
+
+CREATE INDEX index_t1 ON tb1(int_1);
+CREATE INDEX index_t2 ON tb1(int_2);
+
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1000;
+EXPLAIN SELECT * FROM tb1 WHERE int_2 = 1000;
+EXPLAIN SELECT * FROM tb1 WHERE int_3 = 1000;
+
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1000 OR int_2 = 1000; #   联合索引
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1000 OR int_3 = 1000; # 不使用索引
+EXPLAIN SELECT * FROM tb1 WHERE int_2 = 1000 OR int_3 = 1000; # 不使用索引
+
+CALL drop_index("test", "tb1");
+```
+
+## 3. 测试 group by 分组优化
+```
+CALL drop_index("test", "tb1");
+
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY int_1, int_2, int_3;
+CREATE INDEX index_t1_t2_t3 ON tb1(int_1, int_2, int_3);
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY int_1, int_2, int_3;
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY        int_2, int_3; # 这个也会使用
+
+CALL drop_index("test", "tb1");
+```
+
+## 4. 测试 order by 中使用索引 --- 避免文件排序
+```
+CALL drop_index("test", "tb1");
+
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1, int_2, int_3 LIMIT 10; # 文件排序
+CREATE INDEX index_t1_t2_t3 ON tb1(int_1, int_2, int_3);
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1, int_2, int_3 LIMIT 10; # 索引排序
+EXPLAIN SELECT * FROM tb1 ORDER BY        int_2, int_3 LIMIT 10; # 不满足最左前缀原则, 文件排序
+
+CALL drop_index("test", "tb1");
+```
+
+## 5. 测试 distinct 中使用索引
+```
+CALL drop_index("test", "tb1");
+
+EXPLAIN SELECT DISTINCT int_1, int_2, int_3 FROM tb1; # 临时表
+CREATE INDEX index_t1 ON tb1(int_1, int_2, int_3);
+EXPLAIN SELECT DISTINCT int_1, int_2, int_3 FROM tb1; # 索引
+EXPLAIN SELECT DISTINCT        int_2, int_3 FROM tb1; # 索引 + 临时表
+
+CALL drop_index("test", "tb1");
+```
+
+## 6. 索引覆盖 -- 不需要回表
+```
+CALL drop_index("test", "tb1");
+
+CREATE INDEX index_t1 ON tb1(int_1, int_2, int_3);
+EXPLAIN SELECT int_1, int_2, int_3        FROM tb1 WHERE int_1 = 1; # 索引覆盖, 不需要回表
+EXPLAIN SELECT int_1, int_2, int_3, str_1 FROM tb1 WHERE int_1 = 1; # 需要回表
+
+CALL drop_index("test", "tb1");
+```
+
+## 7. 测试多表查询 (左连接 或 右连接)
+```
+CALL drop_index("test", "tb1");
+CALL drop_index("test", "tb2");
+
+EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.int_1 = tb2.int_1;
+                                                    # 1. 查看左连接 (全表扫描)
+CREATE  INDEX index_t1 ON tb1(int_1);               # 2. 在驱动表上建立索引, 意义不大 (可能被优化成内连接)
+EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.int_1 = tb2.int_1;
+                                                    # 3. 查看左连接 (全表扫描)
+CREATE  INDEX index_t1 ON tb2(int_1);               # 4. 在被驱动表上建立索引, 有用
+EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.int_1 = tb2.int_1;
+                                                    # 5. 查看左连接 (被驱动表使用 ref)
+DROP    INDEX index_t1 ON tb1;                      # 6. 删除驱动表上的索引
+EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.int_1 = tb2.int_1;
+                                                    # 7. 查看左连接 (被驱动表使用 ref)
+                                                    
+CALL drop_index("test", "tb1");
+CALL drop_index("test", "tb2");
+```
+
+## 8. 测试多表查询 (内连接) (最好大表驱动小表) (没索引的驱动有索引的)
+```
+CALL drop_index("test", "tb1");
+CALL drop_index("test", "tb2");
+
+EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1;
+                                                    # 1. 查看内连接 (全表扫描)
+CREATE  INDEX index_t1 ON tb1(int_1);               # 2. 在 tb1 建立索引 (小表)
+EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1;
+                                                    # 3. 查看内连接 (大表驱动小表)
+CREATE  INDEX index_t1 ON tb2(int_1);               # 4. 在 tb2 建立索引 (大表)
+EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1;
+                                                    # 5. 查看内连接 (大表驱动小表) (why)
+DROP    INDEX index_t1 ON tb1;                      # 6. 删除 tb1 上的索引 (小表)
+EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1;
+                                                    # 7. 查看内连接 (小表驱动大表)
+CALL drop_index("test", "tb1");
+CALL drop_index("test", "tb2");
 ```
 
 ## 10. 子查询优化
 ```
-DROP   TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (t1 INT);
-
-DROP   TABLE IF EXISTS tb2;
-CREATE TABLE tb2 (t1 INT);
-
-EXPLAIN SELECT tb1.* FROM tb1 WHERE t1 IN (SELECT t1 FROM tb2); # 子查询 (可能被优化成多表查询)
-
-EXPLAIN SELECT tb1.* FROM tb1, tb2 WHERE tb1.t1 = tb2.t1; # 多表查询 (建议)
+EXPLAIN SELECT tb1.* FROM tb1 WHERE int_2 = (SELECT int_2 FROM tb2 WHERE tb2.int_1 = tb1.int_1); # 子查询
+EXPLAIN SELECT tb1.* FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1 AND tb1.int_2 = tb2.int_2; # 多表查询 (建议)
 ```
-
-
-## 13. 索引覆盖 -- 不需要回表
-```
-DROP   TABLE IF EXISTS tb1;
-CREATE TABLE tb1 (id INT PRIMARY KEY, t1 INT, t2 INT, t3 INT);
-
-CREATE INDEX index_t1 ON tb1(t1);
-
-EXPLAIN SELECT *  FROM tb1 WHERE t1 = 123; # 需要回表
-EXPLAIN SELECT id FROM tb1 WHERE t1 = 123; # 不要回表
-```
-
