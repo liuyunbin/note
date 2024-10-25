@@ -4,7 +4,29 @@
 * 效率
 
 
+
 ```
+## 核心业务主键设计
+1. 自增ID
+    不是全局唯一的
+    容易被猜测, 安全性不高
+    mysql 8.0 前, 服务器重启后, 自增 id 可能回溯
+    
+2. UUID()
+    全局唯一
+    
+    
+SELECT UUID(); 
+UUID = 时间+UUID版本（16字节）- 时钟序列（4字节） - MAC地址（12字节）
+36 
+
+SET @uuid = UUID();
+SELECT @uuid,
+       uuid_to_bin(@uuid), -- 去掉 - (16字节)
+       uuid_to_bin(@uuid,TRUE) -- 去掉 - 且 递增 (16字节)
+       
+       ;
+
 
 DDL: create drop alter rename truncate
 
