@@ -43,4 +43,45 @@ CREATE TABLE student(name varchar(20) UNIQUE);
 |                         | SELECT * FROM student;                     | 张六, 李四, 王五                 |
 | SELECT * FROM student;  |                                            | 张六, 李四, 王五                 |
 
+### 2.2 测试 第一次使用 SELECT 时, 建立快照, 不使用  WITH CONSISTENT SNAPSHOT
+| 会话A                                                  | 会话B                  | 说明                   |
+| ------------------------------------------------------ | ---------------------- | ------------           |
+| SET SESSION TRANSACTION_ISOLATION = 'REPEATABLE-READ'; |                        | 设置变量               |
+| TRUNCATE student;                                      |                        | 清空表                 |
+| INSERT INTO student VALUES('张三');                    |                        | 插入数据               |
+| INSERT INTO student VALUES('李四');                    |                        | 插入数据               |
+| INSERT INTO student VALUES('王五');                    |                        | 插入数据               |
+| SELECT * FROM student;                                 |                        | 张三, 李四, 王五       |
+| START TRANSACTION;                                     |                        | 开启事务               |
+|                         | UPDATE student SET name = '张六' WHERE name = '张三'; | 更新数据               |
+|                         | SELECT * FROM student;                     | 张六, 李四, 王五                 |
+| SELECT * FROM student;  |                                            | 张六, 李四, 王五 -- 建立快照     |
+|                         | UPDATE student SET name = '张七' WHERE name = '张六'; | 更新数据               |
+|                         | SELECT * FROM student;                     | 张七, 李四, 王五                 |
+| SELECT * FROM student;  |                                            | 张六, 李四, 王五 -- 使用快照     |
+| COMMIT;                 |                                            | 提交事务                         |
+|                         | SELECT * FROM student;                     | 张七, 李四, 王五                 |
+| SELECT * FROM student;  |                                            | 张七, 李四, 王五                 |
+
+
+
+
+
+
+
+| 会话A                                                  | 会话B                  | 说明                   |
+| ------------------------------------------------------ | ---------------------- | ------------           |
+| SET SESSION TRANSACTION_ISOLATION = 'REPEATABLE-READ'; |                        | 设置变量               |
+| TRUNCATE student;                                      |                        | 清空表                 |
+| INSERT INTO student VALUES('张三');                    |                        | 插入数据               |
+| INSERT INTO student VALUES('李四');                    |                        | 插入数据               |
+| INSERT INTO student VALUES('王五');                    |                        | 插入数据               |
+| SELECT * FROM student;                                 |                        | 张三, 李四, 王五       |
+| START TRANSACTION  WITH CONSISTENT SNAPSHOT;           |                        | 开启事务, 快照所有表   |
+|                         | UPDATE student SET name = '张六' WHERE name = '张三'; | 更新数据               |
+|                         | SELECT * FROM student;                     | 张六, 李四, 王五                 |
+| SELECT * FROM student;  |                                            | 张三, 李四, 王五 -- 使用快照数据 |
+| COMMIT;                 |                                            | 提交事务                         |
+|                         | SELECT * FROM student;                     | 张六, 李四, 王五                 |
+| SELECT * FROM student;  |                                            | 张六, 李四, 王五                 |
 
