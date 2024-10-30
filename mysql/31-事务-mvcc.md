@@ -63,7 +63,7 @@ CREATE TABLE student(id INT PRIMARY KEY, name varchar(20) UNIQUE);
 |                         | SELECT * FROM student;                     | 张七, 李四, 王五                 |
 | SELECT * FROM student;  |                                            | 张七, 李四, 王五                 |
 
-### 2.3 测试使用 SELECT 时, 建立快照
+### 2.3 测试使用 SELECT 时, 会对整张表建立快照
 | 会话A                                                  | 会话B                  | 说明                   |
 | ------------------------------------------------------ | ---------------------- | ------------           |
 | SET SESSION TRANSACTION_ISOLATION = 'REPEATABLE-READ'; |                        | 设置变量               |
@@ -78,10 +78,30 @@ CREATE TABLE student(id INT PRIMARY KEY, name varchar(20) UNIQUE);
 |                         | UPDATE student SET name = '李六' WHERE id = 20;       | 更新数据               |
 |                         | SELECT * FROM student;                     | 张六, 李六, 王五                  |
 | SELECT * FROM student;  |                                            | 张三, 李四, 王五 -- 使用快照      |
-| SELECT * FROM student = 10;  |                                       | 张三 -- 使用快照     |
-| SELECT * FROM student = 20;  |                                       | 李四 -- 使用快照     |
-| SELECT * FROM student = 30;  |                                       | 王五 -- 使用快照     |
+| SELECT * FROM student WHERE id = 10;  |                              | 张三 -- 使用快照     |
+| SELECT * FROM student WHERE id = 20;  |                              | 李四 -- 使用快照     |
+| SELECT * FROM student WHERE id = 30;  |                              | 王五 -- 使用快照     |
 | COMMIT;                 |                                            | 提交事务                         |
 |                         | SELECT * FROM student;                     | 张六, 李六, 王五                 |
 | SELECT * FROM student;  |                                            | 张六, 李六, 王五                 |
+
+### 2.3 测试加锁的 SELECT
+| 会话A                                                  | 会话B                  | 说明                   |
+| ------------------------------------------------------ | ---------------------- | ------------           |
+| SET SESSION TRANSACTION_ISOLATION = 'REPEATABLE-READ'; |                        | 设置变量               |
+| TRUNCATE student;                                      |                        | 清空表                 |
+| INSERT INTO student VALUES(10, '张三');                |                        | 插入数据               |
+| INSERT INTO student VALUES(20, '李四');                |                        | 插入数据               |
+| INSERT INTO student VALUES(30, '王五');                |                        | 插入数据               |
+| SELECT * FROM student;                                 |                        | 张三, 李四, 王五       |
+| START TRANSACTION;                                     |                        | 开启事务               |
+| SELECT * FROM student;  |                                            | 张六, 李四, 王五 -- 建立快照      |
+|                         | UPDATE student SET name = '张六' WHERE id = 10;       | 更新数据               |
+|                         | SELECT * FROM student;                     | 张六, 李四, 王五                  |
+| SELECT * FROM student;  |                                            | 张三, 李四, 王五 -- 使用快照      |
+| SELECT * FROM student FOR SHARE;  |                                  | 张六, 李四, 王五 -- 使用当前读    |
+| COMMIT;                 |                                            | 提交事务                          |
+|                         | SELECT * FROM student;                     | 张六, 李四, 王五                  |
+| SELECT * FROM student;  |                                            | 张六, 李四, 王五                  |
+
 
