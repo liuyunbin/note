@@ -95,7 +95,7 @@ CREATE TABLE student(id INT PRIMARY KEY, name varchar(20) UNIQUE);
 | INSERT INTO student VALUES(30, '王五');                |                        | 插入数据               |
 | SELECT * FROM student;                                 |                        | 张三, 李四, 王五       |
 | START TRANSACTION;                                     |                        | 开启事务               |
-| SELECT * FROM student;  |                                            | 张六, 李四, 王五 -- 建立快照      |
+| SELECT * FROM student;  |                                            | 张三, 李四, 王五 -- 建立快照      |
 |                         | UPDATE student SET name = '张六' WHERE id = 10;       | 更新数据               |
 |                         | SELECT * FROM student;                     | 张六, 李四, 王五                  |
 | SELECT * FROM student;  |                                            | 张三, 李四, 王五 -- 使用快照      |
@@ -103,5 +103,22 @@ CREATE TABLE student(id INT PRIMARY KEY, name varchar(20) UNIQUE);
 | COMMIT;                 |                                            | 提交事务                          |
 |                         | SELECT * FROM student;                     | 张六, 李四, 王五                  |
 | SELECT * FROM student;  |                                            | 张六, 李四, 王五                  |
+
+### 2.4 测试加锁的 SELECT, 其他事务尝试修改
+| 会话A                                                  | 会话B                  | 说明                   |
+| ------------------------------------------------------ | ---------------------- | ------------           |
+| SET SESSION TRANSACTION_ISOLATION = 'REPEATABLE-READ'; |                        | 设置变量               |
+| TRUNCATE student;                                      |                        | 清空表                 |
+| INSERT INTO student VALUES(10, '张三');                |                        | 插入数据               |
+| INSERT INTO student VALUES(20, '李四');                |                        | 插入数据               |
+| INSERT INTO student VALUES(30, '王五');                |                        | 插入数据               |
+| SELECT * FROM student;                                 |                        | 张三, 李四, 王五       |
+| START TRANSACTION;                                     |                        | 开启事务               |
+| SELECT * FROM student;  |                                            | 张三, 李四, 王五 -- 建立快照      |
+| SELECT * FROM student FOR SHARE;  |                                  | 张三, 李四, 王五 -- 使用当前读    |
+|                         | UPDATE student SET name = '张六' WHERE id = 10;       | 更新数据 --- 等待      |
+| COMMIT;                 |                                            | 提交事务                          |
+|                         | SELECT * FROM student;                     | 张三, 李四, 王五                  |
+| SELECT * FROM student;  |                                            | 张三, 李四, 王五                  |
 
 
