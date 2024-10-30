@@ -124,17 +124,16 @@ CREATE TABLE student(id INT PRIMARY KEY, name varchar(20) UNIQUE);
 ### 2.5 测试隔离级别是 SERIALIZABLE
 | 会话A                                                  | 会话B                  | 说明                   |
 | ------------------------------------------------------ | ---------------------- | ------------           |
-| SET SESSION TRANSACTION_ISOLATION = 'SERIALIZABLE'; |                           | 设置变量               |
+| SET SESSION TRANSACTION_ISOLATION = 'SERIALIZABLE';    |                        | 设置变量               |
 | TRUNCATE student;                                      |                        | 清空表                 |
 | INSERT INTO student VALUES(10, '张三');                |                        | 插入数据               |
 | INSERT INTO student VALUES(20, '李四');                |                        | 插入数据               |
 | INSERT INTO student VALUES(30, '王五');                |                        | 插入数据               |
 | SELECT * FROM student;                                 |                        | 张三, 李四, 王五       |
 | START TRANSACTION;                                     |                        | 开启事务               |
-| SELECT * FROM student                                  |             | 张三, 李四, 王五 -- 使用当前读    |
+| SELECT * FROM student;                                 |                        | 加锁                   |
+| SELECT * FROM student WHERE id = 10;                   |                        | 加锁                   |
 |                         | UPDATE student SET name = '张六' WHERE id = 10;       | 更新数据 --- 等待      |
 | COMMIT;                 |                                            | 提交事务                          |
 |                         | SELECT * FROM student;                     | 张三, 李四, 王五                  |
 | SELECT * FROM student;  |                                            | 张三, 李四, 王五                  |
-
-
