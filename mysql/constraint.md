@@ -412,13 +412,13 @@ SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
 ```
 
-#### 5.1.8 表级约束(同时在多列指定): 约束名和索引名都为 PRIMARY (推荐) --- 主键不能不可见
+#### 5.1.9 表级约束(同时在多列指定): 约束名和索引名都为 PRIMARY (推荐) --- 主键不能不可见
 ```
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT, name VARCHAR(20), PRIMARY KEY(id, name) INVISIBLE);
 ```
 
-### 5.2. 添加
+### 5.2 添加
 #### 5.2.1 可以添加表级或列级主键约束 (推荐)
 ```
 DROP   TABLE IF EXISTS student;
@@ -445,7 +445,7 @@ SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
 ```
 
-### 5.3. 删除
+### 5.3 删除
 #### 5.3.1 删除主键: 会删除对应的索引, 但非空约束还在
 ```
 DROP   TABLE IF EXISTS student;
@@ -479,7 +479,7 @@ SHOW   INDEX FROM student;
 ALTER  TABLE student DROP INDEX PRIMARY;
 ```
 
-### 5.4. 不可以存储 NULL, 不可以重复
+### 5.4 不可以存储 NULL, 不可以重复
 ```
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT PRIMARY KEY, name VARCHAR(20));
@@ -502,7 +502,7 @@ INSERT INTO student VALUES(1,    "BOB"); # 报错
 * 只能通过删除唯一索引的方式删除唯一键
 * 删除唯一约束名报错
 
-### 6.1. 创建
+### 6.1 创建
 #### 6.1.1 列级约束(单列): 约束名和索引名默认和列名相同 (推荐)
 ```
 DROP   TABLE IF EXISTS student;
@@ -575,7 +575,7 @@ SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
 ```
 
-### 6.2. 添加
+### 6.2 添加
 #### 6.2.1 可以添加表级或列级唯一约束 (推荐)
 ```
 DROP   TABLE IF EXISTS student;
@@ -628,7 +628,7 @@ SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
 ```
 
-### 6.3. 删除
+### 6.3 删除
 #### 6.3.1 删除唯一索引: 使用 ALTER
 ```
 DROP   TABLE IF EXISTS student;
@@ -665,7 +665,7 @@ SHOW   INDEX FROM student;
 ALTER  TABLE student DROP CONSTRAINTS id;
 ```
 
-### 6.4. 可以存储 NULL, NULL 可以重复, 其他不行
+### 6.4 可以存储 NULL, NULL 可以重复, 其他不行
 ```
 DROP   TABLE IF EXISTS student;
 CREATE TABLE student(id INT UNIQUE, name VARCHAR(20) UNIQUE);
