@@ -340,6 +340,7 @@ SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 * 删除主键约束只能通过删除主键来实现, 删除主键索引或主键约束名报错
 * 删除主键约束后, 主键索引也会删除, 但非空约束还在
 * 和唯一键的区别: 非空 + 最多只有一个
+* 主键不能是不可见的
 
 ### 5.1 创建
 #### 5.1.1 列级约束(单列): 约束名和索引名为 PRIMARY (推荐)
@@ -409,6 +410,12 @@ CREATE TABLE student(id INT, name VARCHAR(20), PRIMARY KEY(id, name));
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
+```
+
+#### 5.1.8 表级约束(同时在多列指定): 约束名和索引名都为 PRIMARY (推荐) --- 主键不能不可见
+```
+DROP   TABLE IF EXISTS student;
+CREATE TABLE student(id INT, name VARCHAR(20), PRIMARY KEY(id, name) INVISIBLE);
 ```
 
 ### 5.2. 添加
@@ -562,7 +569,7 @@ SHOW   INDEX FROM student;
 #### 6.1.8 表级约束(多列): 约束名和索引名默认和第一列的列名相同 (推荐) -- 索引不可见
 ```
 DROP   TABLE IF EXISTS student;
-CREATE TABLE student(id INT, name VARCHAR(20), UNIQUE(id, name) invisible);
+CREATE TABLE student(id INT, name VARCHAR(20), UNIQUE(id, name) INVISIBLE);
 DESC   student;
 SELECT * FROM information_schema.table_constraints WHERE table_name = 'student';
 SHOW   INDEX FROM student;
