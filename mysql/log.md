@@ -1,6 +1,15 @@
 
+## 0. 总结
+```
+* 会损耗性能
+* 日志最好不要和数据放在同一个磁盘
+
+```
+
 ## 1. 慢查询日志
 ```
+默认关闭
+
 SHOW VARIABLES LIKE '%slow_query_log%';          # 1. 查看慢查询日志是否开启及日志文件位置
 SET  GLOBAL slow_query_log='ON';                 # 2. 开启慢查询日志
 SHOW VARIABLES LIKE '%slow_query_log%';          # 3. 再次查看慢查询日志是否开启及日志文件位置
@@ -53,9 +62,43 @@ mysqladmin -uroot -p flush-logs;  # 刷新日志
 主从架构中的从服务器存放
 ```
 
-## 5. 二进制日志
+## 5. redo log
+```
+* 记录的是 物理操作
+* 为解决 服务器 或 操作系统 意外崩溃导致数据丢失的情况
+* 为了实现持久性和效率的平衡
+* 落盘: 内存中的文件存入磁盘
+* 事务完成前, 把所有修改的页落盘 (修改量和落盘量不成比例, 随机 IO 效率低)
+* 事务完成前, 只把修改的内容的日志落盘 (顺序 IO 效率高, 占用空间小, 降低刷盘的频率)
+* Write-Ahead Logging: 先写日志(此时, 可以完成事务了), 再写磁盘(定期写入即可)
+* 事务执行过程中就会 redo log
+* innodb_flush_log_at_trx_commit = 0
+    * 提交事务成功, 保证将 redo log 写入 MySQL 缓冲区
+    * 主线程 刷新缓冲区, 每一秒落盘
+    * MySQL 崩溃了, 可能会丢失数据
+    * 操作系统崩溃了, 可能丢失数据
+* innodb_flush_log_at_trx_commit = 1 (默认)
+    * 提交事务成功, 保证将 redo log 写入内核缓冲区, 同时刷盘
+    * MySQL 崩溃了, 不会丢失数据
+    * 操作系统崩溃了, 不会丢失数据
+* innodb_flush_log_at_trx_commit = 2 
+    * 提交事务成功, 保证将 redo log 写入内核缓冲区
+    * 主线程每一秒落盘
+    * MySQL 崩溃了, 不会丢失数据
+    * 操作系统崩溃了, 可能丢失数据
+```
+
+## 6. undo log
+```
+* 记录的是 逻辑操作
+* 比如 执行 INSERT 操作, 就记录一条 DELETE 操作
+* 用于事务的回滚
+```
+
+## 7. 二进制日志
 ```
 主从复制, 数据备份
+默认开启
 
 show variables like '%log_bin%';   # 日志信息
 log_bin_basename -------------------- 文件路径
@@ -72,7 +115,7 @@ Row: 记录修改的结果 --- 文件会比较大
 Mixed: 前两个的混合
 ```
 
-### 5.1 配置文件
+### 7.1 配置文件
 ```
 [mysqld]
 log-bin=..... ---------------------- 目录
@@ -85,7 +128,7 @@ binlog-do-db=test       # 复制的库名称, 默认全部复制
 binlog_format=STATEMENT # 格式
 ```
 
-### 5.2 主从复制
+### 7.2 主从复制
 ```
                                                      # 主机
 server-id=1                                          # 1. 配置主机ID
@@ -109,7 +152,7 @@ MASTER_PASSWORD='123abcABC@',
 MASTER_LOG_FILE='binlog.000068',
 MASTER_LOG_POS=157;
 START  SLAVE;                                        # 6. 开启slave
-SHOW SLAVE STATUS\G;      # 7. 查看主从信息 -- 两项都为 YES 成功
+SHOW SLAVE STATUS\G;     # 7. 查看主从信息 -- 两项都为 YES 成功
      Slave_IO_Running: Yes
      Slave_SQL_Running: Yes
 
