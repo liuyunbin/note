@@ -23,7 +23,7 @@
 ## 2. 测试
 ```
 DROP TABLE if EXISTS student;
-CREATE TABLE student(id INT PRIMARY KEY, name varchar(20) UNIQUE);
+CREATE TABLE student(id INT PRIMARY KEY, name varchar(20));
 ```
 
 ### 2.1 测试 开启事务的时候, 就建立快照, 使用  WITH CONSISTENT SNAPSHOT
@@ -137,3 +137,23 @@ CREATE TABLE student(id INT PRIMARY KEY, name varchar(20) UNIQUE);
 | COMMIT;                 |                                            | 提交事务                          |
 |                         | SELECT * FROM student;                     | 张三, 李四, 王五                  |
 | SELECT * FROM student;  |                                            | 张三, 李四, 王五                  |
+
+### 2.6 测试隔离级别是 SERIALIZABLE --- 隐式事务, 使用快照
+| 会话A                                                  | 会话B                  | 说明                   |
+| ------------------------------------------------------ | ---------------------- | ------------           |
+| SET SESSION TRANSACTION_ISOLATION = 'SERIALIZABLE';    |                        | 设置变量               |
+|                        | SET SESSION TRANSACTION_ISOLATION = 'SERIALIZABLE';    | 设置变量               |
+| TRUNCATE student;                                      |                        | 清空表                 |
+| INSERT INTO student VALUES(10, '张三');                |                        | 插入数据               |
+| INSERT INTO student VALUES(20, '李四');                |                        | 插入数据               |
+| INSERT INTO student VALUES(30, '王五');                |                        | 插入数据               |
+| SELECT * FROM student;                                 |                        | 张三, 李四, 王五       |
+| START TRANSACTION;                                     |                        | 开启事务               |
+| UPDATE student SET name = '张六' WHERE id = 10;        |                        | 更新数据 --- 加锁      |
+|                         | SELECT * FROM student WHERE id = 10;                  | 使用快照读             |
+|                         | SELECT * FROM student WHERE id = 10 FOR SHARE;        | 使用当前读 --- 等待    |
+| COMMIT;                 |                                            | 提交事务                          |
+|                         | SELECT * FROM student;                     | 张六, 李四, 王五                  |
+|                         | SELECT * FROM student FOR SHARE;           | 张六, 李四, 王五                  |
+| SELECT * FROM student;  |                                            | 张六, 李四, 王五                  |
+
