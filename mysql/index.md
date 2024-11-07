@@ -2,35 +2,42 @@
 # INDEX --- 索引
 ## 0. 总结
 ```
-* 类型
-    * 普通索引 --- 无任何限制
-    * 唯一索引 --- 和 唯一键 对应
-    * 主键索引 --- 和   主键 对应 -- 最好保持全局的唯一性(不单是该表中)
-    * 全文索引 --- 很少使用
-    * 空间索引 --- 很少使用
-* 范围
-    * 单列索引
-    * 多列索引
-        * 最左前缀原则
-        * 最常用的放最左边
-        * 范围查找放最右边
-    * 联合索引好于多个单列索引
-* 实现
-  * 聚簇索引 ----- 主键 -- 只有一个
-  * 非聚簇索引 --- 可以多个. 需要回表
-* 新特性
-  * 降序索引 ----- 如果查找是降序的话, 可以提高效率 --- DESC
-  * 隐藏索引 ----- 便于观察删除索引的影响 --- INVISIBLE VISIBLE
+* WHERE    列使用索引 --- 避免全表扫描
+* GROUP BY 列使用索引 --- 避免使用临时表
+* ORDER BY 列使用索引 --- 避免文件排序
+* DISTINCT 列使用索引 --- 避免使用临时表
+* 查询时, 一张表中最多使用一个索引
+* 联合索引建议
+    * 联合索引优于多个单列索引
+    * 范围查找建议放到联合索引的右侧 --- 最左前缀原则
+    * 建立索引的顺序建议: WHERE, GROUP BY, DISTINCT, DISTINCT
+* 索引查找尽量不要使用范围查找(包括不等于)
 * 适合建索引
-    * WHERE GROUP BY ORDER BY 中频繁使用
+    * WHERE GROUP BY ORDER BY DISTINCT 中频繁使用
     * 区分度大的列
-    * DISTINCT 列
     * 很少变化的列
 * 不适合建索引
     * 表很小
-* 删除无用或冗余的索引
-* WHERE 中使用索引 ------ 避免全表扫描
-* ORDER BY 中使用索引 --- 避免文件排序
+* 最左前缀原则
+    * 对于联合索引 index(int_1, int_2, int_3)
+    * 使用的时候, 只能先使用 int_1 再使用 int_2, int3
+    * 直接使用 int_2 或 int_3 不能使用该索引
+* 索引覆盖 -- Using index
+    * 使用当前索引就可以满足条件, 不需要回表
+* 索引下推 -- Using index condition
+    * 使用索引表提前判断, 减少回表的情况   
+* 隐藏索引 -- INVISIBLE VISIBLE
+    * 便于观察删除索引的影响
+* 降序索引 -- DESC
+    * 如果查找是降序的话, 可以提高效率
+    * 对联合索引提高明显
+* 唯一索引和普通索引
+    * 查询效率, 唯一索引 略强于 普通索引
+    * 更新效率, 普通索引   强于 唯一索引 
+    * 插入效率, 普通索引   强于 唯一索引 
+    * 可以考虑使用普通索引代替唯一索引
+
+  
 ```
 
 ## 1. 基础
@@ -116,6 +123,9 @@ SHOW   INDEX FROM student;
 
 ## 2. 准备测试数据
 ```
+# 2.0 设置变量
+SET GLOBAL log_bin_trust_function_creators = 1;
+
 # 2.1 创建两张表
 DROP   TABLE IF EXISTS tb1;
 CREATE TABLE tb1 (
@@ -232,118 +242,303 @@ CALL insert_table(2000000, "tb2"); # 200 万数据, 271.414s
 SELECT count(*) FROM tb2;
 ```
 
-## 3. 测试 WHERE 中使用索引 --- 避免全表扫描
+## 3. 测试
+#### 3.1 只在 WHERE 中使用索引 --- 避免全表扫描
 ```
-# 3.1 最左前缀原则
+# 3.1.1 只使用索引列 (单列索引, 整型)
 CALL drop_index("test", "tb1");
-CREATE  INDEX index_name ON tb1(int_1, int_2, int_3);     # 
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1;                # 使用部分索引 (key_len = 4)
-EXPLAIN SELECT * FROM tb1 WHERE int_2 = 1;                # 不使用索引
-EXPLAIN SELECT * FROM tb1 WHERE int_3 = 1;                # 不使用索引
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2 = 2;  # 使用部分索引 (key_len = 8)
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_3 = 3;  # 使用部分索引 (key_len = 4)
-EXPLAIN SELECT * FROM tb1 WHERE int_2 = 1 AND int_3 = 1;  # 不使用索引
+CREATE  INDEX index_int_1 ON tb1(int_1);
+
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1;
+* key_len = 4 ------------ 使用索引
+
+EXPLAIN SELECT * FROM tb1 WHERE int_1 =  '1';
+* key_len = 4 ------------ 使用索引 --- 为什么这个优化了 --- 整型转字符串是 1对1 的
+
+EXPLAIN SELECT * FROM tb1 WHERE UPPER(int_1) = '1';
+* Using where ------ 函数导致索引失效
+
+EXPLAIN SELECT * FROM tb1 WHERE int_1 + 1 = 2;
+* Using where ------ 计算导致索引失效 -- 为什么不优化了
+
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 2 - 1;
+* key_len = 4 ------------ 使用索引
+
+EXPLAIN SELECT * FROM tb1 WHERE int_1 != 1;
+* Using where ------------ != 导致索引失效
+
+# 3.1.2 只使用索引列 (单列索引, 字符串)
+CALL drop_index("test", "tb1");
+CREATE  INDEX index_str_1 ON tb1(str_1);
+
+EXPLAIN SELECT * FROM tb1 WHERE str_1 = '1';
+* key_len = 82 ------------ 使用索引
+
+EXPLAIN SELECT * FROM tb1 WHERE str_1 =  1;
+* Using where ------ 类型转换导致索引失效 --- 为什么这个不优化了 -- 字符串转整型 不是 1 对一的
+
+EXPLAIN SELECT * FROM tb1 WHERE UPPER(str_1) = '1';
+* Using where ------ 函数导致索引失效
+
+EXPLAIN SELECT * FROM tb1 WHERE str_1 LIKE '%1';
+EXPLAIN SELECT * FROM tb1 WHERE str_1 LIKE '%1';
+* Using where ------ like % 开头导致索引失效
+
+EXPLAIN SELECT * FROM tb1 WHERE str_1 LIKE '1%';
+EXPLAIN SELECT * FROM tb1 WHERE str_1 LIKE '.1';
+EXPLAIN SELECT * FROM tb1 WHERE str_1 LIKE '.1';
+* Using index condition --- like 非 % 开头 使用索引下推
+
+# 3.1.3 只使用索引列 (联合索引)
+CALL drop_index("test", "tb1");
+CREATE  INDEX index_name ON tb1(int_1, int_2, int_3);
+
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1; 
+* key_len = 4 ----- 使用部分索引
+                                                       
+EXPLAIN SELECT * FROM tb1 WHERE int_2 = 1;
+* key_len = 0 ----- 不满足最左前缀原则
+* Using where ----- 使用全表扫描
+
+EXPLAIN SELECT * FROM tb1 WHERE int_3 = 1;
+* key_len = 0 ----- 不满足最左前缀原则
+* Using where ----- 使用全表扫描
+
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2 = 2;
+* key_len = 8 ----- 使用部分索引
+
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_3 = 3;
+* key_len = 4 ------------- 使用部分索引
+* Using index condition --- 索引下推
+
+EXPLAIN SELECT * FROM tb1 WHERE int_2 = 1 AND int_3 = 1;
+* key_len = 0 ----- 不满足最左前缀原则
+* Using where ----- 使用全表扫描
+
 EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2 = 1 AND int_3 = 1;
-                                                          # 使用全部索引 (key_len = 12)
+* key_len = 8 ------------- 使用全部索引
 
-# 3.2 使用计算, 函数和类型转换导致索引失效
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2  > 1 AND int_3 = 1;
+* key_len = 8 ------------- 范围查找导致右侧索引实现, 不是书写的右侧, 而是联合索引的右侧
+* Using index condition --- 使用索引下推
+* 建立联合索引时, 建议将范围查找放到末尾
+
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2  = 1 AND int_3 > 1;
+* key_len = 12 ------------ 使用完整索引
+* Using index condition --- 使用索引下推
+* 建立联合索引时, 建议将范围查找放到末尾
+
+# 3.1.4 包含非索引列
 CALL drop_index("test", "tb1");
-EXPLAIN SELECT * FROM tb1 WHERE str_1 = '1';          #
-CREATE  INDEX index_name ON tb1(str_1);               #
-EXPLAIN SELECT * FROM tb1 WHERE str_1 = '1';          #
-EXPLAIN SELECT * FROM tb1 WHERE str_1 =  1;           # 类型转换导致索引失效
-EXPLAIN SELECT * FROM tb1 WHERE UPPER(str_1) = '1';   # 函数导致索引失效
+CREATE  INDEX index_int_1 ON tb1(int_1);
+CREATE  INDEX index_int_2 ON tb1(int_2);
 
-CALL drop_index("test", "tb1");
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1;     #
-CREATE  INDEX index_t1 ON tb1(int_1);          #
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1;     #
-EXPLAIN SELECT * FROM tb1 WHERE int_1 + 1 = 2; # 计算导致索引失效
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 OR int_2 = 1;
+* Using union(index_int_1,index_int_2) --- OR 两侧的列都包含索引, 所以使用两个索引
+* Using where ---------------------------- 拆成两个查询然后合并
 
-CALL drop_index("test", "tb1");
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 OR int_3 = 1;
+* Using where --- OR 一侧不包含索引, 所以使用全表扫描
 
-# 3.3 范围查找导致右侧的索引失效 (> >= < <= != LIKE)
-CALL drop_index("test", "tb1");
-CREATE  INDEX index_t1_t2_t3 ON tb1(int_1, int_2, int_3);              #
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2  = 1 AND int_3 = 1; # 使用全部索引(key_len = 12)
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2  > 1 AND int_3 = 1; # 使用部分索引(key_len = 8)
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2 != 1 AND int_3 = 1; # 使用部分索引(key_len = 8)
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_3  = 1 AND int_2 > 1; # 使用部分索引(key_len = 8)
-                                                         # 联合索引按照声明的顺序使用
-CALL drop_index("test", "tb1");                                       
-CREATE  INDEX index_t1_t2_t3 ON tb1(int_1, int_3, int_2);              # 修改联合索引声明的顺序
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2  = 1 AND int_3 = 1; # 使用全部索引(key_len = 12)
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2  > 1 AND int_3 = 1; # 使用全部索引(key_len = 12)
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_2 != 1 AND int_3 = 1; # 使用部分索引(key_len = 12)
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 AND int_3  = 1 AND int_2 > 1; # 使用全部索引(key_len = 12)
-                                                         # 建立联合索引时, 将范围查找的字段放到末尾
-CALL drop_index("test", "tb1");
-
-# 3.4 测试 OR, 一边不包含索引时, 导致索引失效
-CALL drop_index("test", "tb1");
-
-CREATE INDEX index_t1 ON tb1(int_1);
-CREATE INDEX index_t2 ON tb1(int_2);
-
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1000;
-EXPLAIN SELECT * FROM tb1 WHERE int_2 = 1000;
-EXPLAIN SELECT * FROM tb1 WHERE int_3 = 1000;
-
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1000 OR int_2 = 1000; #   联合索引
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1000 OR int_3 = 1000; # 不使用索引
-EXPLAIN SELECT * FROM tb1 WHERE int_2 = 1000 OR int_3 = 1000; # 不使用索引
-
-CALL drop_index("test", "tb1");
+EXPLAIN SELECT * FROM tb1 WHERE int_1 = 2 OR int_3 = 1;
+* Using where --- OR 一侧不包含索引, 所以使用全表扫描
 ```
 
-## 3. 测试 group by 分组优化
+#### 3.2 只在 GROUP BY 中使用索引 -- 避免使用临时表
 ```
+# 3.2.1 只使用索引列
 CALL drop_index("test", "tb1");
+CREATE  INDEX index_name ON tb1(int_1, int_2, int_3);
+
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY int_1;
+* key_len = 12
+* Using index --- 索引覆盖
+
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY int_2;
+* key_len = 12
+* Using index -------- 索引覆盖
+* Using temporary ---- 使用临时表
+
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY int_3;
+* key_len = 12
+* Using index -------- 索引覆盖
+* Using temporary ---- 使用临时表
+
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY int_1, int_2;
+* key_len = 12
+* Using index --- 索引覆盖
+
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY int_1, int_3;
+* key_len = 12
+* Using index -------- 索引覆盖
+* Using temporary ---- 使用临时表
+
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY int_2, int_3;
+* key_len = 12
+* Using index -------- 索引覆盖
+* Using temporary ---- 使用临时表
 
 EXPLAIN SELECT count(*) FROM tb1 GROUP BY int_1, int_2, int_3;
-CREATE INDEX index_t1_t2_t3 ON tb1(int_1, int_2, int_3);
-EXPLAIN SELECT count(*) FROM tb1 GROUP BY int_1, int_2, int_3;
-EXPLAIN SELECT count(*) FROM tb1 GROUP BY        int_2, int_3; # 这个也会使用
+* key_len = 12
+* Using index --- 索引覆盖
 
+# 3.2.2 包含非索引列
 CALL drop_index("test", "tb1");
+CREATE  INDEX index_name ON tb1(int_1);
+
+EXPLAIN SELECT count(*) FROM tb1 GROUP BY int_1, int_2;
+* Using temporary ------ 使用临时表
 ```
 
-## 4. 测试 order by 中使用索引 --- 避免文件排序
+#### 3.3 只在 ORDER BY 中使用索引 --- 避免文件排序
 ```
+# 3.3.1 只使用索引列
 CALL drop_index("test", "tb1");
+CREATE  INDEX index_name ON tb1(int_1, int_2, int_3);
 
-EXPLAIN SELECT * FROM tb1 ORDER BY int_1, int_2, int_3 LIMIT 10; # 文件排序
-CREATE INDEX index_t1_t2_t3 ON tb1(int_1, int_2, int_3);
-EXPLAIN SELECT * FROM tb1 ORDER BY int_1, int_2, int_3 LIMIT 10; # 索引排序
-EXPLAIN SELECT * FROM tb1 ORDER BY        int_2, int_3 LIMIT 10; # 不满足最左前缀原则, 文件排序
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1 LIMIT 10;
+* key_len = 12 --- 使用完整索引
 
+EXPLAIN SELECT * FROM tb1 ORDER BY int_2 LIMIT 10;
+* Using filesort ---- 不满足最左前缀原则, 文件排序
+
+EXPLAIN SELECT * FROM tb1 ORDER BY int_3 LIMIT 10;
+* Using filesort ---- 不满足最左前缀原则, 文件排序
+
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1, int_2 LIMIT 10;
+* key_len = 12 --- 使用完整索引
+
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1, int_3 LIMIT 10;
+* Using filesort ---- 回表太多, 所以直接使用文件排序 (不一定)
+
+EXPLAIN SELECT * FROM tb1 ORDER BY int_2, int_3 LIMIT 10;
+* Using filesort ---- 不满足最左前缀原则, 文件排序
+
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1, int_2, int_3 LIMIT 10;
+* key_len = 12 --- 使用完整索引
+
+# 3.3.2 包含非索引列
 CALL drop_index("test", "tb1");
+CREATE  INDEX index_name ON tb1(int_1);
+
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1, int_2 LIMIT 10;
+* Using filesort ---- 使用文件排序
 ```
 
-## 5. 测试 distinct 中使用索引
+#### 3.4 只在 distinct 中使用索引
 ```
+# 3.4.1 只使用索引列
 CALL drop_index("test", "tb1");
+CREATE  INDEX index_name ON tb1(int_1, int_2, int_3);
 
-EXPLAIN SELECT DISTINCT int_1, int_2, int_3 FROM tb1; # 临时表
-CREATE INDEX index_t1 ON tb1(int_1, int_2, int_3);
-EXPLAIN SELECT DISTINCT int_1, int_2, int_3 FROM tb1; # 索引
-EXPLAIN SELECT DISTINCT        int_2, int_3 FROM tb1; # 索引 + 临时表
+EXPLAIN SELECT DISTINCT int_1 FROM tb1;
+* key_len = 4 ----------------- 使用部分索引
+* Using index for group-by ---- 使用索引分组
 
+EXPLAIN SELECT DISTINCT int_2 FROM tb1;
+* key_len = 12 ------------- 使用全部索引
+* Using index -------------- 使用索引覆盖
+* Using temporary ---------- 使用临时表
+
+EXPLAIN SELECT DISTINCT int_3 FROM tb1;
+* key_len = 12 ------------- 使用全部索引
+* Using index -------------- 使用索引覆盖
+* Using temporary ---------- 使用临时表
+
+EXPLAIN SELECT DISTINCT int_1, int_2 FROM tb1;
+* key_len = 12 ------------- 使用全部索引
+* Using index -------------- 使用索引覆盖
+
+EXPLAIN SELECT DISTINCT int_1, int_3 FROM tb1;
+* key_len = 12 ------------- 使用全部索引
+* Using index -------------- 使用索引覆盖
+* Using temporary ---------- 使用临时表
+
+EXPLAIN SELECT DISTINCT int_2, int_3 FROM tb1;
+* key_len = 12 ------------- 使用全部索引
+* Using index -------------- 使用索引覆盖
+* Using temporary ---------- 使用临时表
+
+EXPLAIN SELECT DISTINCT int_1, int_2, int_3 FROM tb1;
+* key_len = 12 ------------- 使用全部索引
+* Using index -------------- 使用索引覆盖
+
+# 3.4.2 包含非索引列
 CALL drop_index("test", "tb1");
+CREATE  INDEX index_name ON tb1(int_1);
+
+EXPLAIN SELECT DISTINCT int_1, int_2 FROM tb1;
+* Using temporary ---------- 使用临时表
 ```
 
-## 6. 索引覆盖 -- 不需要回表
+#### 3.5 where 和 group by 中同时使用
 ```
+# 3.5.1 同时使用联合索引
 CALL drop_index("test", "tb1");
+CREATE  INDEX index_name ON tb1(int_1, int_2);
 
-CREATE INDEX index_t1 ON tb1(int_1, int_2, int_3);
-EXPLAIN SELECT int_1, int_2, int_3        FROM tb1 WHERE int_1 = 1; # 索引覆盖, 不需要回表
-EXPLAIN SELECT int_1, int_2, int_3, str_1 FROM tb1 WHERE int_1 = 1; # 需要回表
+EXPLAIN SELECT count(*) FROM tb1 WHERE int_1 = 1 GROUP BY int_2;
+* key_len = 4 ---------- 使用索引
+* Using index ---------- 使用索引覆盖
 
+EXPLAIN SELECT count(*) FROM tb1 WHERE int_1 > 1 GROUP BY int_2;
+* key_len = 4 ---------- 使用索引
+* Using where ---------- 存在联合索引, 但只能使用部分, int_2 不能使用
+* Using index ---------- 使用索引覆盖
+* Using temporary ------ 使用临时表
+
+# 3.5.2 WHERE 有索引, GROUP BY 没索引
 CALL drop_index("test", "tb1");
+CREATE  INDEX index_name ON tb1(int_1);
+
+EXPLAIN SELECT count(*) FROM tb1 WHERE int_1 = 1 GROUP BY int_2;
+* key_len = 4 ---------- 使用索引
+* Using temporary ------ 使用临时表
+
+# 3.5.3 WHERE 没有索引, GROUP BY 有索引
+CALL drop_index("test", "tb1");
+CREATE  INDEX index_name ON tb1(int_2);
+
+EXPLAIN SELECT count(*) FROM tb1 WHERE int_1 = 1 GROUP BY int_2;
+* 优化成, 先分组, 再 WHERE
+* key_len = 4 ---------- 使用索引
+* Using where ---------- WHERE 不使用索引
+
+其他组合类似, 就不一个一个测试了
 ```
 
-## 7. 测试多表查询 (左连接 或 右连接)
+#### 3.6 测试降序索引
+```
+# 3.6.1 单列使用 效果不明显
+CALL drop_index("test", "tb1");
+CREATE  INDEX index_name_1 ON tb1(int_1);
+CREATE  INDEX index_name_2 ON tb1(int_2 DESC);
+
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1      LIMIT 10; # 0.174s
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1 DESC LIMIT 10; # 0.181s
+EXPLAIN SELECT * FROM tb1 ORDER BY int_2      LIMIT 10; # 0.181s
+EXPLAIN SELECT * FROM tb1 ORDER BY int_2 DESC LIMIT 10; # 0.179s
+
+# 3.6.2 联合索引 效果明显
+CALL drop_index("test", "tb1");
+CREATE  INDEX index_name ON tb1(int_1, int_2);
+
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1,      int_2      LIMIT 10; # 0.178s
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1,      int_2 DESC LIMIT 10; # 0.511s
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1 DESC, int_2      LIMIT 10; # 0.505s
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1 DESC, int_2 DESC LIMIT 10; # 0.176s
+
+CALL drop_index("test", "tb1");
+CREATE  INDEX index_name ON tb1(int_1, int_2 DESC);
+
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1,      int_2      LIMIT 10; # 0.508s
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1,      int_2 DESC LIMIT 10; # 0.183s
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1 DESC, int_2      LIMIT 10; # 0.181s
+EXPLAIN SELECT * FROM tb1 ORDER BY int_1 DESC, int_2 DESC LIMIT 10; # 0.512s
+```
+
+
+#### 3.7 测试多表查询 (左连接 或 右连接)
 ```
 CALL drop_index("test", "tb1");
 CALL drop_index("test", "tb2");
@@ -364,7 +559,7 @@ CALL drop_index("test", "tb1");
 CALL drop_index("test", "tb2");
 ```
 
-## 8. 测试多表查询 (内连接) (最好小表驱动大表) (没索引的驱动有索引的)
+#### 3.8 测试多表查询 (内连接) (最好小表驱动大表) (没索引的驱动有索引的)
 ```
 CALL drop_index("test", "tb1");
 CALL drop_index("test", "tb2");
@@ -384,7 +579,7 @@ CALL drop_index("test", "tb1");
 CALL drop_index("test", "tb2");
 ```
 
-## 10. 子查询优化
+#### 3.9 子查询优化
 ```
 EXPLAIN SELECT tb1.* FROM tb1 WHERE int_2 = (SELECT int_2 FROM tb2 WHERE tb2.int_1 = tb1.int_1); # 子查询
 EXPLAIN SELECT tb1.* FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1 AND tb1.int_2 = tb2.int_2; # 多表查询 (建议)
