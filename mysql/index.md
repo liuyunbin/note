@@ -36,8 +36,6 @@
     * 更新效率, 普通索引   强于 唯一索引 
     * 插入效率, 普通索引   强于 唯一索引 
     * 可以考虑使用普通索引代替唯一索引
-
-  
 ```
 
 ## 1. 基础
@@ -535,52 +533,4 @@ EXPLAIN SELECT * FROM tb1 ORDER BY int_1,      int_2      LIMIT 10; # 0.508s
 EXPLAIN SELECT * FROM tb1 ORDER BY int_1,      int_2 DESC LIMIT 10; # 0.183s
 EXPLAIN SELECT * FROM tb1 ORDER BY int_1 DESC, int_2      LIMIT 10; # 0.181s
 EXPLAIN SELECT * FROM tb1 ORDER BY int_1 DESC, int_2 DESC LIMIT 10; # 0.512s
-```
-
-
-#### 3.7 测试多表查询 (左连接 或 右连接)
-```
-CALL drop_index("test", "tb1");
-CALL drop_index("test", "tb2");
-
-EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.int_1 = tb2.int_1;
-                                                    # 1. 查看左连接 (全表扫描)
-CREATE  INDEX index_t1 ON tb1(int_1);               # 2. 在驱动表上建立索引, 意义不大 (可能被优化成内连接)
-EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.int_1 = tb2.int_1;
-                                                    # 3. 查看左连接 (全表扫描)
-CREATE  INDEX index_t1 ON tb2(int_1);               # 4. 在被驱动表上建立索引, 有用
-EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.int_1 = tb2.int_1;
-                                                    # 5. 查看左连接 (被驱动表使用 ref)
-DROP    INDEX index_t1 ON tb1;                      # 6. 删除驱动表上的索引
-EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.int_1 = tb2.int_1;
-                                                    # 7. 查看左连接 (被驱动表使用 ref)
-                                                    
-CALL drop_index("test", "tb1");
-CALL drop_index("test", "tb2");
-```
-
-#### 3.8 测试多表查询 (内连接) (最好小表驱动大表) (没索引的驱动有索引的)
-```
-CALL drop_index("test", "tb1");
-CALL drop_index("test", "tb2");
-
-EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1;
-                                                    # 1. 查看内连接 (全表扫描)
-CREATE  INDEX index_t1 ON tb1(int_1);               # 2. 在 tb1 建立索引 (小表)
-EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1;
-                                                    # 3. 查看内连接 (大表驱动小表)
-CREATE  INDEX index_t1 ON tb2(int_1);               # 4. 在 tb2 建立索引 (大表)
-EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1;
-                                                    # 5. 查看内连接 (大表驱动小表) (why)
-DROP    INDEX index_t1 ON tb1;                      # 6. 删除 tb1 上的索引 (小表)
-EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1;
-                                                    # 7. 查看内连接 (小表驱动大表)
-CALL drop_index("test", "tb1");
-CALL drop_index("test", "tb2");
-```
-
-#### 3.9 子查询优化
-```
-EXPLAIN SELECT tb1.* FROM tb1 WHERE int_2 = (SELECT int_2 FROM tb2 WHERE tb2.int_1 = tb1.int_1); # 子查询
-EXPLAIN SELECT tb1.* FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1 AND tb1.int_2 = tb2.int_2; # 多表查询 (建议)
 ```
