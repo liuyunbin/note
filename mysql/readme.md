@@ -3,9 +3,48 @@
 * 数据持久化
 * 效率
 
+SHOW TABLEs;
 
+连接器 -> 缓存(8.0 已删) ->  分析器 -> 优化器 -> 执行器
 
+show processlist;              # 查看目前的连接
+SELECT @@wait_timeout; # 查看自动断开的时间. 默认是 8 小时
+
+mysql_reset_connection
+
+RTO（恢复目标时间）
+
+SELECT @@innodb_io_capacity 
+
+SELECT @@innodb_flush_neighbors 
+
+SELECT @@innodb_change_buffer_max_size 
+
+SELECT @@sort_buffer_size/1024/1024
+
+SELECT @@max_connections 
+
+SELECT @@binlog_group_commit_sync_delay 
+
+SELECT @@binlog_row_image 
+
+SELECT @@MAX_EXECUTION_TIME ;
+
+# 查询事务持续时间高于 60s 的事务
+select * from information_schema.innodb_trx where TIME_TO_SEC(timediff(now(),trx_started))>60
 ```
+
+## 1. 为什么 MySQL 的默认隔离级别是 RR
+```
+* 排除 READ-UNCOMMITTED, 会导致脏读
+* 排除 SERIALIZABLE, 效率太低
+* 排除 READ-COMMITTED
+    * BINLOG 格式为 STATEMENT 时, 可能导致主从数据不一致
+    * 旧版本的 BINLOG 的格式为 STATEMENT
+    * 修改 隔离级别为 READ-COMMITTED 时, 要将 BINLOG 的格式修改为 ROW
+```
+
+
 ## 核心业务主键设计
 1. 自增ID
     不是全局唯一的
@@ -34,8 +73,6 @@ DDL(数据定义语言): CREATE DROP   ALTER
 DML(数据操作语言): INSERT UPDATE SELECT DELETE
 DCL(数据控制语言): GRANT  REVOKE COMMIT ROLLBACK SAVEPOINT
 
-source ...
-
 DB: 数据库 Database
 DBMS: 数据库管理系统 Database Management System
 SQL: 结构化查询语言 Structured Query Language
@@ -60,15 +97,4 @@ E-R(entity-relationship 实体-联系)模型中有三个主要概念是 实体�
 反引用: 与关键字冲突时, 使用
 
 库名 表名 表别名 字段名 字段别名 小写, 其他建议大写
-
-## 其他
-mysql -D <库名> -h <域名> -u <用户名> -p<密码>  # 登录
-myqsl -D testdb < 1.sql                         # 从文件导入
-mysqldump database_name table_name > 1.sql      # 导出到文件
-select .. into outfile .. fields terminated by ',' optionally enclosed by '"' lines terminated by '\n' from ..
-                                                # 保存数据到文件
-
-mysql_install_db --user=mysql --ldata=/var/lib/mysql # 添加用户 mysql 使mysqld 可以使用 systemctl 启动
-
-set global max_allowed_packet=64*1024*1024 # 设置插入的上限
-
+```

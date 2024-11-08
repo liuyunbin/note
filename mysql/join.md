@@ -158,3 +158,46 @@ SELECT s2.*
 FROM   student s1, student s2
 WHERE  s1.name = '一班张三' AND s2.score > s1.score AND s2.class_id != s1.class_id;
 ```
+
+
+
+#### 3.7 测试多表查询 (左连接 或 右连接)
+```
+CALL drop_index("test", "tb1");
+CALL drop_index("test", "tb2");
+
+EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.int_1 = tb2.int_1;
+                                                    # 1. 查看左连接 (全表扫描)
+CREATE  INDEX index_t1 ON tb1(int_1);               # 2. 在驱动表上建立索引, 意义不大 (可能被优化成内连接)
+EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.int_1 = tb2.int_1;
+                                                    # 3. 查看左连接 (全表扫描)
+CREATE  INDEX index_t1 ON tb2(int_1);               # 4. 在被驱动表上建立索引, 有用
+EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.int_1 = tb2.int_1;
+                                                    # 5. 查看左连接 (被驱动表使用 ref)
+DROP    INDEX index_t1 ON tb1;                      # 6. 删除驱动表上的索引
+EXPLAIN SELECT * FROM tb1 LEFT JOIN tb2 ON tb1.int_1 = tb2.int_1;
+                                                    # 7. 查看左连接 (被驱动表使用 ref)
+                                                    
+CALL drop_index("test", "tb1");
+CALL drop_index("test", "tb2");
+```
+
+#### 3.8 测试多表查询 (内连接) (最好小表驱动大表) (没索引的驱动有索引的)
+```
+CALL drop_index("test", "tb1");
+CALL drop_index("test", "tb2");
+
+EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1;
+                                                    # 1. 查看内连接 (全表扫描)
+CREATE  INDEX index_t1 ON tb1(int_1);               # 2. 在 tb1 建立索引 (小表)
+EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1;
+                                                    # 3. 查看内连接 (大表驱动小表)
+CREATE  INDEX index_t1 ON tb2(int_1);               # 4. 在 tb2 建立索引 (大表)
+EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1;
+                                                    # 5. 查看内连接 (大表驱动小表) (why)
+DROP    INDEX index_t1 ON tb1;                      # 6. 删除 tb1 上的索引 (小表)
+EXPLAIN SELECT * FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1;
+                                                    # 7. 查看内连接 (小表驱动大表)
+CALL drop_index("test", "tb1");
+CALL drop_index("test", "tb2");
+```

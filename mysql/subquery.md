@@ -203,3 +203,10 @@ SELECT * FROM student_detail;
 SELECT * FROM student_base
 ORDER  BY (SELECT province FROM student_detail WHERE student_base.id = student_detail.id);
 ```
+
+#### 3.9 子查询优化
+```
+EXPLAIN SELECT tb1.* FROM tb1 WHERE int_2 = (SELECT int_2 FROM tb2 WHERE tb2.int_1 = tb1.int_1); # 子查询
+EXPLAIN SELECT tb1.* FROM tb1, tb2 WHERE tb1.int_1 = tb2.int_1 AND tb1.int_2 = tb2.int_2; # 多表查询 (建议)
+```
+
