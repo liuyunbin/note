@@ -5,6 +5,16 @@
 
 SHOW TABLEs;
 
+SELECT * FROM teacher;
+
+CREATE TABLE teacher (
+id INT PRIMARY key,
+name VARCHAR(20) UNIQUE
+);
+
+alter table teacher drop primary key;
+alter table teacher add primary key(id);
+
 连接器 -> 缓存(8.0 已删) ->  分析器 -> 优化器 -> 执行器
 
 show processlist;              # 查看目前的连接
