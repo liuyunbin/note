@@ -252,7 +252,7 @@ EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1;
 * key_len = 4 ------------ 使用索引
 
 EXPLAIN SELECT * FROM tb1 WHERE int_1 =  '1';
-* key_len = 4 ------------ 使用索引 --- 为什么这个优化了 --- 整型转字符串是 1对1 的
+* key_len = 4 ------------ 使用索引 --- 为什么这个优化了 --- 整型转字符串是一对一的
 
 EXPLAIN SELECT * FROM tb1 WHERE UPPER(int_1) = '1';
 * Using where ------ 函数导致索引失效
@@ -274,7 +274,7 @@ EXPLAIN SELECT * FROM tb1 WHERE str_1 = '1';
 * key_len = 82 ------------ 使用索引
 
 EXPLAIN SELECT * FROM tb1 WHERE str_1 =  1;
-* Using where ------ 类型转换导致索引失效 --- 为什么这个不优化了 -- 字符串转整型 不是 1 对一的
+* Using where ------ 类型转换导致索引失效 --- 为什么这个不优化了 -- 字符串转整型 不是 一对一的
 
 EXPLAIN SELECT * FROM tb1 WHERE UPPER(str_1) = '1';
 * Using where ------ 函数导致索引失效
@@ -339,7 +339,7 @@ EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 OR int_2 = 1;
 EXPLAIN SELECT * FROM tb1 WHERE int_1 = 1 OR int_3 = 1;
 * Using where --- OR 一侧不包含索引, 所以使用全表扫描
 
-EXPLAIN SELECT * FROM tb1 WHERE int_1 = 2 OR int_3 = 1;
+EXPLAIN SELECT * FROM tb1 WHERE int_2 = 1 OR int_3 = 1;
 * Using where --- OR 一侧不包含索引, 所以使用全表扫描
 ```
 
