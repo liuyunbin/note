@@ -3,6 +3,85 @@
 * 数据持久化
 * 效率
 
+DROP TABLE IF EXISTS tb1;
+
+CREATE TABLE tb1 (
+    t1 INT PRIMARY KEY,
+    t2 INT UNIQUE,
+    t3 INT,
+    t4 int,
+    INDEX(t3)
+);
+
+
+INSERT INTO tb1 VALUES(5,   5,  5,  5);
+INSERT INTO tb1 VALUES(10, 10, 10, 10);
+INSERT INTO tb1 VALUES(15, 15, 15, 15);
+INSERT INTO tb1 VALUES(20, 20, 20, 20);
+
+SELECT * FROM tb1;
+
+SELECT t1 FROM tb1 WHERE t2 = 7 FOR 
+
+select *             from information_schema.table_constraints;  # 查看约束
+select *             from information_schema.innodb_trx;         # 查看事务信息
+
+select *             from information_schema.processlist;        # 目前的连接信息
+
+select *             from sys.innodb_lock_waits where locked_table=`'test'.'t'`
+
+SELECT *             FROM performance_schema.data_locks
+
+ SELECT blocking_pid from  sys.schema_table_lock_waits;          # 获取造成阻塞的 ID
+
+SELECT @@innodb_deadlock_detect; # 开启死锁的自动回滚
+SELECT @@innodb_lock_wait_timeout ; # 死锁等待的超时时间
+
+SELECT @@innodb_max_dirty_pages_pct; # 脏页的最大比例
+SELECT @@innodb_io_capacity;         # 磁盘IOPS 
+
+
+
+SELECT @@Innodb_buffer_pool_pages_dirty;
+SELECT @@Innodb_buffer_pool_pages_total;
+
+CREATE table student (id INT);
+
+LOCK TABLE student WRITE;
+
+show processlist;      # 查看目前的连接
+
+
+DESC   student;
+SHOW   INDEX FROM student;
+
+show processlist;      # 查看目前的连接
+SELECT @@wait_timeout; # 查看自动断开的时间. 默认是 8 小时
+mysql_reset_connection # 重置连接资源, 使之和刚建立连接时一样
+
+transaction_isolation
+
+select * from information_schema.innodb_trx where TIME_TO_SEC(timediff(now(),trx_started))>60
+
+
+
+
+## 2. 重建表
+```
+alter table A engine=InnoDB --- 重建表
+analyze  table t -------------- 对表的索引信息做重新统计
+optimize table t -------------- 上述两者的和
+
+重建表
+1. 添加表写锁, 扫描主键, 存入临时文件 --- 此时不能修改数据
+2. 表写锁退化为表读锁, 后续对表的增删改都写入日志文件 --- 此时可以修改数据
+3. 拷贝数据 -- 最耗时的操作
+4. 读取日志文件, 作用于临时文件, 完成表重建
+```
+
+SELECT count(*) FROM tb1;
+SELECT count(*) FROM tb2;
+
 SHOW TABLEs;
 
 SELECT * FROM teacher;
@@ -15,16 +94,27 @@ name VARCHAR(20) UNIQUE
 alter table teacher drop primary key;
 alter table teacher add primary key(id);
 
-连接器 -> 缓存(8.0 已删) ->  分析器 -> 优化器 -> 执行器
 
-show processlist;              # 查看目前的连接
+连接器 ->  分析器 -> 优化器 -> 执行器
+
+1. 连接器
+show processlist;      # 查看目前的连接
 SELECT @@wait_timeout; # 查看自动断开的时间. 默认是 8 小时
+mysql_reset_connection # 重置连接资源, 使之和刚建立连接时一样
 
-mysql_reset_connection
+
+2. 分析器
+3. 优化器
+4. 执行器
+
 
 RTO（恢复目标时间）
 
-SELECT @@innodb_io_capacity 
+select VARIABLE_VALUE into @a from global_status where VARIABLE_NAME = 'Innodb_buffer_pool_pages_dirty';
+select VARIABLE_VALUE into @b from global_status where VARIABLE_NAME = 'Innodb_buffer_pool_pages_total';
+select @a/@b;
+
+SELECT * FROM sys.schema_table_lock_waits;
 
 SELECT @@innodb_flush_neighbors 
 

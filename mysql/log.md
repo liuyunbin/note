@@ -4,6 +4,7 @@
 * 位于引擎层 --- InnoDB 独有
 * 记录的是 物理操作, 页面的修改
 * 落盘: 内存中的文件存入磁盘
+* 脏页: 数据页和磁盘数据不一致
 * 所占的空间是固定的, 循环使用的, 满了的话必须落盘
 * 查看日志文件大小: SELECT @@innodb_log_file_size
 * 提高了落盘的效率 (持久性)
@@ -29,7 +30,15 @@
         * 主线程 刷新缓冲区, 落盘
         * MySQL 崩溃了, 不会丢失数据
         * 操作系统崩溃了, 可能丢失数据
-
+* 刷新脏页
+    * redo log 空间满了
+    * 内存不够
+    * 空闲时间主动刷
+    * 停止或重启, 主动刷
+* 磁盘 IO
+    * 查看磁盘性能
+        fio -filename=filename -direct=1 -iodepth 1 -thread -rw=randrw -ioengine=psync -bs=16k -size=500M -numjobs=10 -runtime=10 -group_reporting -name=mytest
+    * SELECT @@innodb_io_capacity -- 查看 或设置
 ```
 
 ## 2. binlog
@@ -37,12 +46,8 @@
 * 位于 server 层, 所有存储引擎共有
 * 记录的是逻辑操作, SQL 语言 或 行修改
 * 所占的空间是可以叠加的
-
-
 * 为了主从复制, 数据备份, 归档, 恢复
 * 默认开启
-
-
 * 解决 服务器 或 操作系统 意外崩溃 --- crash-safe
     * sync_binlog = 0: binlog 生成前落盘
     * sync_binlog = 1: 每个 binlog 都落盘  (默认)
@@ -53,17 +58,88 @@
     * Statement: 记录会修改数据的 sql -- 有些结果不确定的函数可能出问题
     * Row: 记录修改的结果 --- 文件会比较大 
     * Mixed: 前两个的混合
+```
+
+## 3. 两阶段提交
+```
+# 3.1 流程
+1. 修改内存中的数据
+2. 写入 redo log ------ prepare
+3. 写入 binlog -------- 主从复制
+4. redo log: prepare -> commit
+5. 提交事务
+
+# 3.2 恢复数据
+1. 如果 1 后崩溃, 相当于该事务没有执行
+2. 如果 2 后崩溃
+    * redo log 处于 prepare
+    * binlog 没有对应数据, 从库中没有对应数据
+    * 相当于该事务未执行
+3. 如果 3 后崩溃
+    * redo log 处于 prepare
+    * binlog 有对应数据, 从库中有对应数据
+    * 相当于该事务已执行
+    * 使用 redo log  恢复当前库  
+4. 如果 4 后崩溃
+    * redo log 处于 commit
+    * binlog 有对应数据, 从库中有对应数据
+    * 相当于该事务已执行
+    * 使用 redo log  恢复当前库
+5. 如果 5 后崩溃 -- 事务已完成
+
+# 3.3 不能先写 redo log, 再写 binlog
+1. 修改内存中的数据
+2. 写入 binlog -- 主从复制  --- prepare
+3. 写入 redo log
+4. binlog: prepare -> commit
+5. 提交事务
+
+如果, 执行 2 后 MySQL 意外重启,
+此时, 本库已有数据, 需要手动处理
+此时, 从库可能已有数据, 需要手动处理
+而, redo log 会自动处理
+
+# 3.4 不使用两阶段提交: 先写 redo log, 再写 binlog
+1. 修改内存中的数据
+2. 写入 redo log
+3. 写入 binlog -- 主从复制
+4. 提交事务
+
+如果执行完 2, MySQL 意外重启了
+* 使用 redo log 恢复了数据
+* binlog 不包括修改, 导致主从不一致
+
+# 3.5 不使用两阶段提交: 先写 binlog , 再写 redo log
+1. 修改内存中的数据
+2. 写入 binlog -- 主从复制
+3. 写入 redo log
+4. 提交事务
+
+如果执行完 2, MySQL 意外重启了
+* binlog 包括修改, 从机器获取了修改的内容
+* redo log 没有修改的数据, 主机器没有修改的数据
+* 导致主从不一致
+
+# 3.6 只使用 binlog
+* binlog 不支持崩溃后恢复
+
+# 3.7 只使用 redo log
+* redo log 使用 固定的, 循环使用的 存储空间, 无法归档数据
+```
+
+
+
+
+
+
+   
     
-    
 
 
 
 
 
 
-
-show variables like 'innodb_log%';
-## 1. 二进制日志 --- binlog
 ```
 # 1.1 
 主从复制, 数据备份
@@ -159,76 +235,6 @@ RESET MASTER;                            # 删除所有的日志文件
     
     
 ```
-
-## 3. 两阶段提交
-```
-# 3.1 流程
-1. 修改内存中的数据
-2. 写入 redo log --- prepare
-3. 写入 binlog -- 主从复制
-4. redo log: prepare -> commit
-5. 提交事务
-
-# 3.2 恢复数据
-1. 如果 1 后崩溃, 相当于该事务没有执行
-2. 如果 2 后崩溃
-    * redo log 处于 prepare
-    * binlog 没有对应数据, 从库中没有对应数据
-    * 相当于该事务未执行
-3. 如果 3 后崩溃
-    * redo log 处于 prepare
-    * binlog 有对应数据, 从库中有对应数据
-    * 相当于该事务已执行
-    * 使用 redo log  恢复当前库  
-4. 如果 4 后崩溃
-    * redo log 处于 commit
-    * binlog 有对应数据, 从库中有对应数据
-    * 相当于该事务已执行
-    * 使用 redo log  恢复当前库
-5. 如果 5 后崩溃 -- 事务已完成
-
-# 3.3 不能先写 redo log, 再写 binlog
-1. 修改内存中的数据
-2. 写入 binlog -- 主从复制  --- prepare
-3. 写入 redo log
-4. binlog: prepare -> commit
-5. 提交事务
-
-如果, 执行 2 后 MySQL 意外重启,
-需要手动删除 binlog, 会自找烦恼
-而, redo log 会自动处理
-
-# 3.4 不使用两阶段提交: 先写 redo log, 再写 binlog
-1. 修改内存中的数据
-2. 写入 redo log
-3. 写入 binlog -- 主从复制
-4. 提交事务
-
-如果执行完 2, MySQL 意外重启了
-* 使用 redo log 恢复了数据
-* binlog 不包括修改, 导致主从不一致
-
-# 3.5 不使用两阶段提交: 不能先写 binlog , 再写 redo log
-1. 修改内存中的数据
-2. 写入 binlog -- 主从复制
-3. 写入 redo log
-4. 提交事务
-
-如果执行完 2, MySQL 意外重启了
-* binlog 包括修改, 从机器获取了修改的内容
-* redo log 没有修改的数据, 主机器没有修改的数据
-* 导致主从不一致
-
-# 3.6 只使用 binlog
-* binlog 不支持崩溃后恢复
-
-# 3.7 只使用 redo log
-* redo log 使用 固定的, 循环使用的 存储空间, 无法归档数据
-```
-
-
-
-
 
 
 
