@@ -13,6 +13,10 @@ ulimit -c unlimited # 设置允许生成, 可写入 bashrc
 
 # 5. core 文件不在当前目录
 echo 'core.%e.%p' > /proc/sys/kernel/core_pattern # 此步可写入 bashrc
+
+# 6. 磁盘空间满了
+
+# 7. 进程设置了 SUID, 且进程所有者与执行者不同
 ```
 
 ## ubuntu 下设置生成 core --- 废弃
