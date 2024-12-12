@@ -1,39 +1,13 @@
 
-## systemctl
-```
-# 1. 启动服务
-systemctl list-unit-files | grep mysql # 1. 查看服务的名称 及其 状态
-systemctl is-active  mysql.service     # 2. 查看是否已启动
-systemctl start      mysql.service     # 3. 启动服务
-systemctl is-active  mysql.service     # 4. 再次查看是否已启动
-
-# 2. 停止服务
-systemctl list-unit-files | grep mysql # 1. 查看服务的名称 及其 状态
-systemctl is-active  mysql.service     # 2. 查看是否已启动
-systemctl stop       mysql.service     # 3. 停止服务
-systemctl is-active  mysql.service     # 4. 再次查看是否已启动
-
-# 3. 重启服务
-systemctl list-unit-files | grep mysql # 1. 查看服务的名称 及其 状态
-systemctl is-active  mysql.service     # 2. 查看是否已启动
-systemctl restart    mysql.service     # 3. 重启服务
-systemctl is-active  mysql.service     # 4. 再次查看是否已启动
-
-# 4. 设置开机启动
-systemctl list-unit-files | grep mysql # 1. 查看服务的名称 及其 状态
-systemctl is-enabled mysql.service     # 2. 查看是否开机自动启动
-systemctl    enable  mysql.service     # 3. 设置开机自动启动
-systemctl is-enabled mysql.service     # 4. 再次查看是否开机自动启动
-
-# 5. 禁止开机启动
-systemctl list-unit-files | grep mysql # 1. 查看服务的名称 及其 状态
-systemctl is-enabled mysql.service     # 2. 查看是否开机自动启动
-systemctl   disable  mysql.service     # 3. 禁止开机自动启动
-systemctl is-enabled mysql.service     # 4. 再次查看是否开机自动启动
-```
 
 ## firewall-cmd
 ```
+# 0. 安装及启动 firewall-cmd
+apt install firewalld                      # 1. 安装
+systemctl list-unit-files | grep firewall  # 2. 查看服务名称
+systemctl enable  firewalld.service        # 3. 设置开机启动
+systemctl start   firewalld.service        # 4. 启动
+
 # 1. 开启防火墙服务
 firewall-cmd --list-services                 # 1. 查看目前开启的服务
 firewall-cmd --permanent --add-service=mysql # 2. 永久开启服务
@@ -84,12 +58,25 @@ firewall-cmd --permanent --remove-forward-port=port=80:proto=tcp:toaddr=192.168.
 firewall-cmd --reload                          # 3. 重新加载防火墙
 firewall-cmd --list-forward-ports              # 4. 再次查看端口转发
 
-# 9. 将当前防火墙的规则永久保存
+# 9. 拒绝所有的包
+firewall-cmd --query-panic  # 查看是否拒绝
+firewall-cmd --panic-on     # 拒绝所有包
+firewall-cmd --query-panic  # 查看是否拒绝
+
+# 10. 取消拒绝所有的包
+firewall-cmd --query-panic  # 查看是否拒绝
+firewall-cmd --panic-off    # 取消拒绝状态
+firewall-cmd --query-panic  # 查看是否拒绝
+
+# 11. 将当前防火墙的规则永久保存
 firewall-cmd --runtime-to-permanent
 
-# 10. 查看所有的内容
+# 12. 查看所有的内容
 firewall-cmd --list-all
 ```
+
+
+
 
 ${v:-w}              # v 不为空, 返回 $v, 否则, 返回 w
 ${v:=w}              # v 不为空, 返回 $v, 否则, 令 v=w, 返回 w
