@@ -39,61 +39,63 @@ firewall-cmd --reload                         # 3. 重新加载防火墙
 firewall-cmd --list-ports                     # 4. 再次查看所有打开的端口
 ```
 
-## 5. 允许伪装IP
-```
-firewall-cmd             --query-masquerade    # 1. 检查是否允许伪装IP
-firewall-cmd --permanent   --add-masquerade    # 2. 永久允许防火墙伪装IP
-firewall-cmd --reload                          # 3. 重新加载防火墙
-firewall-cmd             --query-masquerade    # 4. 再次检查是否允许伪装IP
-```
-
-## 6. 禁止伪装IP
-```
-firewall-cmd              --query-masquerade    # 1. 检查是否允许伪装IP
-firewall-cmd --permanent --remove-masquerade    # 2. 永久禁止防火墙伪装IP
-firewall-cmd --reload                           # 3. 重新加载防火墙
-firewall-cmd              --query-masquerade    # 4. 再次检查是否允许伪装IP
-```
-
-## 7. 设置端口号转发(需提前设置允许伪装IP)
-```
-firewall-cmd --list-forward-ports              # 1. 查看端口转发
-firewall-cmd --permanent --add-forward-port=port=80:proto=tcp:toaddr=192.168.0.1:toport=8080
-                                               # 2. 端口转发, 0.0.0.0:80 --> 192.168.0.1:8080
-firewall-cmd --reload                          # 3. 重新加载防火墙
-firewall-cmd --list-forward-ports              # 4. 再次查看端口转发
-```
-
-## 8. 停止端口号转发
-```
-firewall-cmd --list-forward-ports              # 1. 查看端口转发
-firewall-cmd --permanent --remove-forward-port=port=80:proto=tcp:toaddr=192.168.0.1:toport=8080
-                                               # 2. 移除端口转发, 0.0.0.0:80 --> 192.168.0.1:8080
-firewall-cmd --reload                          # 3. 重新加载防火墙
-firewall-cmd --list-forward-ports              # 4. 再次查看端口转发
-```
-
-## 9. 拒绝所有的包
+## 5. 拒绝所有的包
 ```
 firewall-cmd --query-panic  # 查看是否拒绝
 firewall-cmd --panic-on     # 拒绝所有包
 firewall-cmd --query-panic  # 查看是否拒绝
 ```
 
-## 10. 取消拒绝所有的包
+## 6. 取消拒绝所有的包
 ```
 firewall-cmd --query-panic  # 查看是否拒绝
 firewall-cmd --panic-off    # 取消拒绝状态
 firewall-cmd --query-panic  # 查看是否拒绝
 ```
 
-## 11. 将当前防火墙的规则永久保存
+## 7. 将当前防火墙的规则永久保存
 ```
 firewall-cmd --runtime-to-permanent
 ```
 
-## 12. 查看所有的内容
+## 8. 查看所有的内容
 ```
 firewall-cmd --list-all
+firewall-cmd --list-all-policies
+```
+
+## 9. 设置端口号转发 -- 有问题 -- 可以使用 ssh 端口转发
+```
+firewall-cmd --list-forward-ports              # 1. 查看端口转发
+firewall-cmd --query-masquerade                # 2. 检查是否允许伪装IP
+firewall-cmd --permanent --add-port=81/tcp;    # 3. 防火墙开启端口
+firewall-cmd --permanent --add-port=8181/tcp;  #
+firewall-cmd --permanent --add-masquerade;     # 4. 允许伪装 IP
+firewall-cmd --permanent --add-forward-port=port=8181:proto=tcp:toaddr=127.0.0.1:toport=81
+                                               # 5. 端口转发
+firewall-cmd --reload;                         # 6. 重新加载防火墙
+firewall-cmd --list-forward-ports              # 7. 再次查看端口转发
+```
+
+## 10. 停止端口号转发
+```
+firewall-cmd --list-forward-ports              # 1. 查看端口转发
+firewall-cmd --query-masquerade                # 2. 检查是否允许伪装IP
+firewall-cmd --permanent --remove-masquerade   # 3. 永久禁止防火墙伪装IP
+firewall-cmd --permanent --remove-forward-port=port=80:proto=tcp:toaddr=192.168.0.1:toport=8080
+                                               # 4. 移除端口转发, 0.0.0.0:80 --> 192.168.0.1:8080
+firewall-cmd --reload                          # 5. 重新加载防火墙
+firewall-cmd --list-forward-ports              # 6. 再次查看端口转发
+```
+## 11. 设置端口号转发(rich language) -- 远程访问有问题 -- 可以使用 ssh 端口转发
+```
+firewall-cmd --permanent --delete-policy=portforward; # 1. 删除旧策略 (可选)
+firewall-cmd --permanent --new-policy=portforward;    # 2. 新增新策略
+firewall-cmd --permanent --add-port=82/tcp;           # 3. 添加端口号
+firewall-cmd --permanent --add-port=8282/tcp;
+firewall-cmd --permanent --policy=portforward --add-ingress-zone=HOST; # 4. 设置入口
+firewall-cmd --permanent --policy=portforward --add-egress-zone=ANY;   # 5. 设置出口
+firewall-cmd --permanent --policy=portforward --add-rich-rule='rule family="ipv4" forward-port port="8282" protocol="tcp" to-port="82" to-addr="127.0.0.1"';            # 6. 设置端口转发
+firewall-cmd --reload;                                # 7. 重新加载防火墙
 ```
 
