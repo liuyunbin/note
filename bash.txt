@@ -1,14 +1,6 @@
 
-systemctl list-unit-files | grep mysql # 查看服务的名称及其状态
-systemctl is-active  mysql.service     # 查看是否已启动
-systemctl is-enabled mysql.service     # 查看是否开机启动
-systemctl start      mysql.service     # 启动服务
-systemctl stop       mysql.service     # 停止服务
-systemctl restart    mysql.service     # 重启服务
-systemctl    enable  mysql.service     # 设置开机自动启动
-systemctl   disable  mysql.service     # 禁止开机自动启动
 
-tcpdump -nn -i any host 127.0.0.1 and port 9999 -w 1.pcap
+
 
 ${v:-w}              # v 不为空, 返回 $v, 否则, 返回 w
 ${v:=w}              # v 不为空, 返回 $v, 否则, 令 v=w, 返回 w
@@ -246,6 +238,7 @@ unrar    e 1.rar ...      # 解压缩到指定路径, 忽略压缩包内的路�
 unrar    x 1.rar ...      # 解压缩到指定路径, 使用完整的压缩包路径
 unrar    x 1.rar ... ...  # 解压缩到指定路径, 使用完整的压缩包路径, 只解压部分文件
 
+tcpdump -nn -i any host 127.0.0.1 and port 9999 -w 1.pcap
 
 passwd -stdin     # 修改 root 密码, 从标准输入读取
 
