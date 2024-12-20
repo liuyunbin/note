@@ -56,60 +56,89 @@ GatewayPorts no            # 远程转发时, 是否允许其他主机使该端�
 
 ## 端口转发
 ```
-# 1. 基础
-0. 网络机器: net_a, net_b, net_c
-1.   路由器: route
-2. 本地机器: host_a, host_b, host_c
-3. 本地机器之间可以直接相互连接
-4. 网络机器之间可以直接相互连接
-5. host_a 通过路由器可以直接访问网络机器
-6. 除 host_a 外的本地机器不能通过路由器直接访问网络机器
-7. 网络机器不能直接访问本地机器
+# 1. 测试环境: 四台虚拟机
+192.168.198.10 -- 以下简称 host-10
+192.168.198.20 -- 以下简称 host-20
+192.168.198.30 -- 以下简称 host-30
+192.168.198.40 -- 以下简称 host-40
 
-# 2. 测试一: 除 host_a 外的本地机器如何访问网络机器 (本地端口转发)
-在 host_b 上执行: ssh -L host_b_port:net_a_ip:net_a_port host_a_user@host_a_ip
-此时, 连接建立的方向: host_b -> host_a -> route -> net_a
-此时, 访问 host_b_ip:host_b_port 相当于访问 net_a_ip:net_a_port
-在 host_c 上执行: ssh -p host_b_port net_a_user@host_b_ip
-相当于: ssh -p net_a_port net_a_user@net_a_ip
-数据流的方向: host_c -> host_b -> host_a -> route -> net_a
-数据流的方向和连接方向相同
+# 2. 本地端口转发
+# 2.1 问题
+* host-10 上有一服务
+* host-20 可以直接访问 host-10 上的服务
+* host-30 和 host-40 无法直接访问 host-10 上的服务
+* host-30 和 host-40 可以直接连接 host-20
+* host-30 和 host-40 如何才能访问 host-10 上的服务
 
-# 3. 测试二: 网络机器如何访问本地机器上的服务 (远程端口转发)
-在 host_a 上执行: ssh -R net_a_port:host_b_ip:host_b_port net_a_user@net_a_ip
-此时, 连接建立的方向: host_a -> route -> net_a
-此时, 访问 net_a_ip:net_a_port 相当于访问 host_b_ip:host_b_port
-在 net_b 上执行: ssh -p net_a_port host_b_user@net_a_ip
-相当于: ssh -p host_b_port host_b_user@host_b_ip
-数据流的方向: net_b -> net_a -> route -> host_a -> host_b
-数据流的方向和连接方向相反
+# 2.2 基础设置
+1. host-10 开启防火墙端口号: firewall-cmd --add-port=1234/tcp;
+2. host-10 启动服务: nc -lkv 1234
+3. host-20 设置允许端口转发 (需要 root 权限)
+    在 /etc/ssh/sshd_config 内添加配置项: AllowTcpForwarding yes
+    重启 sshd 服务: sudo systemctl restart sshd
+4. host-30 开启防火墙端口号: firewall-cmd --add-port=4567/tcp;
 
-# 4. 总结
-本地端口转发:
-* 现状:
-    host_b -> net_a  失败
-    host_a -> net_a  成功
-    hoat_b -> host_a 成功
-    host_a -> host_b 成功或失败
-* 目标:
-    host_b -> net_a 成功
-* 实现:
-    在 host_b 执行: ssh -CqTnN -L host_b_port:net_a_ip:net_a_port host_a_user@host_a_ip
-    此时, 访问: host_b_ip:host_b_port 相当于访问 net_a_ip:net_a_port
+# 2.3 解决
+1. 在 host-30 上执行: ssh -L 0.0.0.0:4567:192.168.198.10:1234 lyb@192.168.198.20
+    将本机的 4567 端口号的数据, 经由 host-20 转发到 host-10 的 1234 端口号
+    此时, host-30 和 host-20:22 建立了连接
+2. host-40 连接 host-30 的 4567 端口号: nc 192.168.198.30 4567
+    此时, host-40 和 host-30:4567 端口号建立了连接
+    此时, host-20 和 host-10:1234 端口号建立了连接
+    此时, host-10:1234 收到 host-20 的数据
+    建立端口转发: host-30 -> host-20
+    数据流: host-40 -> host-30:4567
+            host-30 -> host-20:22 (设置端口转发时已建立好的)
+            host-20 -> host-10:1234
+    建立连接和数据流的方向是同一个
+    此时, host-40 到 host-30 的数据是不加密的
+3. host-30 连接本机的 4567 端口号: nc 192.168.198.30 4567
+    和上面类似, 但所有数据都是加密的
+# 2.4 实际用途
+* 访问 Google
 
-远程端口转发:
-* 现状:
-    net_a  -> host_a 失败
-    host_a -> net_a  成功
-* 目标:
-    net_a -> host_a 成功
-* 实现:
-    在 host_a 执行:  ssh -CqTnN -R net_a_port:host_a_ip:host_a_port net_a_user@net_a_ip
-    此时, 访问: net_a_ip:net_a_port 相当于访问 host_a_ip:host_a_port
-    需要在 net_a 上配置 GatewayPorts
+# 3. 远程端口转发
+# 3.1 问题
+* host-10 上有一服务
+* host-20 可以直接访问 host-10 上的服务
+* host-30 和 host-40 无法直接访问 host-10 上的服务
+* host-30 和 host-40 无法直接连接 host-20 (这一行和上面有区别)
+* host-20 可以直连 host-30 和 host-40 (这一行新增)
+* host-30 和 host-40 如何才能访问 host-10 上的服务
 
-动态端口转发:
-* ssh -CqTnN -D host_a_port host_a_user@host_a_ip
-* 在 host_a_ip:host_a_port 启动 socks5 服务
+# 3.2 基础设置
+1. host-10 开启防火墙端口号: firewall-cmd --add-port=1234/tcp;
+2. host-10 启动服务: nc -lkv 1234
+3. host-30 设置允许远程端口转发 (需要 root 权限)
+    在 /etc/ssh/sshd_config 内添加配置项: GatewayPorts yes
+    重启 sshd 服务: sudo systemctl restart sshd
+    (如果只是本机访问 4567 端口的话, 不需要设置)
+4. host-30 开启防火墙端口号: firewall-cmd --add-port=4567/tcp;
+
+# 3.3 解决
+1. 在 host-20 执行 ssh -R 0.0.0.0:4567:192.168.198.10:1234 lyb@192.168.198.30
+    将 host-30 的 4567 端口号的数据, 经由 host-20 转发到 host-10 的 1234 端口号
+    此时, host-20 和 host-30:22 建立了连接
+2. host-40 连接 host-30 的 4567 端口号: nc 192.168.198.30 4567
+    此时, host-40 和 host-30:4567 端口号建立了连接
+    此时, host-20 和 host-10:1234 端口号建立了连接
+    此时, host-10:1234 收到 host-20 的数据
+    建立端口转发: host-20 -> host-30
+    数据流: host-40 -> host-30:4567
+            host-30 -> host-20:22 (设置端口转发时已建立好的)
+            host-20 -> host-10:1234
+    建立连接和数据流的方向是相反
+    此时, host-40 到 host-30 的数据是不加密的
+3. host-30 连接本机的 4567 端口号: nc 192.168.198.30 4567
+    和上面类似, 但所有数据都是加密的
+# 3.4 实际用途
+* 互联网访问本地服务
+
+# 4. 动态端口转发
+* ssh -D host_a_port host_a_user@host_a_ip
+* 使用 socks5 服务
+
+# 5. 端口转发时可以额外添加的配置项
+* CqTnN
 ```
 
