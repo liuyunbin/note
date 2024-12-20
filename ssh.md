@@ -52,6 +52,7 @@ ListenAddress 1.2.3.4      # 监听地址
 PasswordAuthentication     # 指定是否允许密码登录，默认值为 yes
 Port 22                    # 监听端口号
 GatewayPorts no            # 远程转发时, 是否允许其他主机使该端口号, 默认不允许
+AllowTcpForwarding yes     # 是否允许本地端口转发
 ```
 
 ## 端口转发
