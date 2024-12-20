@@ -64,38 +64,61 @@ firewall-cmd --list-all
 firewall-cmd --list-all-policies
 ```
 
-## 9. 设置端口号转发 -- 有问题 -- 可以使用 ssh 端口转发
+## 9. 端口转发
 ```
-firewall-cmd --list-forward-ports              # 1. 查看端口转发
-firewall-cmd --query-masquerade                # 2. 检查是否允许伪装IP
-firewall-cmd --permanent --add-port=81/tcp;    # 3. 防火墙开启端口
-firewall-cmd --permanent --add-port=8181/tcp;  #
-firewall-cmd --permanent --add-masquerade;     # 4. 允许伪装 IP
-firewall-cmd --permanent --add-forward-port=port=8181:proto=tcp:toaddr=127.0.0.1:toport=81
-                                               # 5. 端口转发
-firewall-cmd --reload;                         # 6. 重新加载防火墙
-firewall-cmd --list-forward-ports              # 7. 再次查看端口转发
-```
+# 1. 测试环境: 四台虚拟机
+192.168.198.10 -- 以下简称 host-10
+192.168.198.20 -- 以下简称 host-20
+192.168.198.30 -- 以下简称 host-30
 
-## 10. 停止端口号转发
-```
-firewall-cmd --list-forward-ports              # 1. 查看端口转发
-firewall-cmd --query-masquerade                # 2. 检查是否允许伪装IP
-firewall-cmd --permanent --remove-masquerade   # 3. 永久禁止防火墙伪装IP
-firewall-cmd --permanent --remove-forward-port=port=80:proto=tcp:toaddr=192.168.0.1:toport=8080
-                                               # 4. 移除端口转发, 0.0.0.0:80 --> 192.168.0.1:8080
-firewall-cmd --reload                          # 5. 重新加载防火墙
-firewall-cmd --list-forward-ports              # 6. 再次查看端口转发
-```
-## 11. 设置端口号转发(rich language) -- 远程访问有问题 -- 可以使用 ssh 端口转发
-```
-firewall-cmd --permanent --delete-policy=portforward; # 1. 删除旧策略 (可选)
-firewall-cmd --permanent --new-policy=portforward;    # 2. 新增新策略
-firewall-cmd --permanent --add-port=82/tcp;           # 3. 添加端口号
-firewall-cmd --permanent --add-port=8282/tcp;
-firewall-cmd --permanent --policy=portforward --add-ingress-zone=HOST; # 4. 设置入口
-firewall-cmd --permanent --policy=portforward --add-egress-zone=ANY;   # 5. 设置出口
-firewall-cmd --permanent --policy=portforward --add-rich-rule='rule family="ipv4" forward-port port="8282" protocol="tcp" to-port="82" to-addr="127.0.0.1"';            # 6. 设置端口转发
+# 2. 问题
+1. host-10 上有服务
+2. host-20 可以直接访问 host-10 上的服务
+3. host-30 无法直接访问 host-10 上的服务
+4. host-30 可以直接访问 host-20
+
+# 3. 基础设置
+1. host-10 开启防火墙端口号: firewall-cmd --add-port=1234/tcp;
+2. host-10 开启防火墙端口号: firewall-cmd --add-port=4567/tcp;
+3. host-10 启动服务: nc -lkv 1234
+4. host-20 开启防火墙端口号: firewall-cmd --add-port=4567/tcp;
+5. host-20 设置允许伪装IP:   firewall-cmd --add-masquerade
+
+# 4. 解决一
+1. 在 host-20 上执行, 将本机的 4567 端口转发到 host-10 的 1234
+firewall-cmd --add-forward-port=port=4567:proto=tcp:toaddr=192.168.198.10:toport=1234
+此时, 需要开启伪装 IP: firewall-cmd --add-masquerade
+此时, 4567 并没有处于监听状态: ss -tal
+2. 此时, host-20 上访问失败: nc 192.168.198.20 4567
+3. 此时, host-30 上访问成功: nc 192.168.198.20 4567
+    host-30 -> host-20:4567
+    host-20 -> host-10:1234
+4. 在 host-20 上移除端口转发:
+firewall-cmd --remove-forward-port=port=4567:proto=tcp:toaddr=192.168.198.10:toport=1234
+
+# 5. 解决二
+1. 在 host-10 上执行, 将本机的 4567 端口转发到 host-10 的 1234
+firewall-cmd --add-forward-port=port=4567:proto=tcp:toaddr=192.168.198.10:toport=1234
+此时, 不需要开启伪装 IP
+查看端口转发: firewall-cmd --list-forward-ports
+此时, 4567 并没有处于监听状态: ss -tal
+2. 此时, host-10 上访问失败: nc 192.168.198.10 4567
+3. 此时, host-20 上访问成功: nc 192.168.198.10 4567 (实际上是与 1234 相连)
+    host-20 -> host-10:1234
+4. 在 host-20 上移除端口转发:
+firewall-cmd --remove-forward-port=port=4567:proto=tcp:toaddr=192.168.198.10:toport=1234
+
+证明, 此方法在端口转发的机器上不能访问转发的端口
+
+# 6. 解决三 rich language -- 远程访问有问题 -- 待验证
+
+1. firewall-cmd --permanent --delete-policy=portforward; # 1. 删除旧策略 (可选)
+2. firewall-cmd --permanent --new-policy=portforward;    # 2. 新增新策略
+3. firewall-cmd --permanent --add-port=1234/tcp;           # 3. 添加端口号
+4. firewall-cmd --permanent --add-port=4567/tcp;
+5. firewall-cmd --permanent --policy=portforward --add-ingress-zone=HOST; # 4. 设置入口
+6. firewall-cmd --permanent --policy=portforward --add-egress-zone=ANY;   # 5. 设置出口
+7. firewall-cmd --permanent --policy=portforward --add-rich-rule='rule family="ipv4" forward-port port="8282" protocol="tcp" to-port="82" to-addr="127.0.0.1"';            # 6. 设置端口转发
 firewall-cmd --reload;                                # 7. 重新加载防火墙
 ```
 
