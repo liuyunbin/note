@@ -72,17 +72,18 @@ AllowTcpForwarding yes     # 是否允许本地端口转发
 * host-30 和 host-40 如何才能访问 host-10 上的服务
 
 # 2.2 基础设置
-1. host-10 开启防火墙端口号: firewall-cmd --add-port=1234/tcp;
+1. host-10 开启防火墙端口号: sudo firewall-cmd --add-port=1234/tcp;
 2. host-10 启动服务: nc -lkv 1234
 3. host-20 设置允许端口转发 (需要 root 权限)
     在 /etc/ssh/sshd_config 内添加配置项: AllowTcpForwarding yes
     重启 sshd 服务: sudo systemctl restart sshd
-4. host-30 开启防火墙端口号: firewall-cmd --add-port=4567/tcp;
+4. host-30 开启防火墙端口号: sudo firewall-cmd --add-port=4567/tcp;
 
 # 2.3 解决
-1. 在 host-30 上执行: ssh -L 0.0.0.0:4567:192.168.198.10:1234 lyb@192.168.198.20
+1. 在 host-30 上执行: ssh -CqTnNf -L 0.0.0.0:4567:192.168.198.10:1234 lyb@192.168.198.20
     将本机的 4567 端口号的数据, 经由 host-20 转发到 host-10 的 1234 端口号
     此时, host-30 和 host-20:22 建立了连接
+    此时, 本机的 4567 端口处于监听状态: ss -taln
 2. host-40 连接 host-30 的 4567 端口号: nc 192.168.198.30 4567
     此时, host-40 和 host-30:4567 端口号建立了连接
     此时, host-20 和 host-10:1234 端口号建立了连接
@@ -91,7 +92,7 @@ AllowTcpForwarding yes     # 是否允许本地端口转发
     数据流: host-40 -> host-30:4567
             host-30 -> host-20:22 (设置端口转发时已建立好的)
             host-20 -> host-10:1234
-    建立连接和数据流的方向是同一个
+    建立连接和数据流的方向是一致的
     此时, host-40 到 host-30 的数据是不加密的
 3. host-30 连接本机的 4567 端口号: nc 192.168.198.30 4567
     和上面类似, 但所有数据都是加密的
@@ -108,18 +109,19 @@ AllowTcpForwarding yes     # 是否允许本地端口转发
 * host-30 和 host-40 如何才能访问 host-10 上的服务
 
 # 3.2 基础设置
-1. host-10 开启防火墙端口号: firewall-cmd --add-port=1234/tcp;
+1. host-10 开启防火墙端口号: sudo firewall-cmd --add-port=1234/tcp;
 2. host-10 启动服务: nc -lkv 1234
 3. host-30 设置允许远程端口转发 (需要 root 权限)
     在 /etc/ssh/sshd_config 内添加配置项: GatewayPorts yes
     重启 sshd 服务: sudo systemctl restart sshd
     (如果只是本机访问 4567 端口的话, 不需要设置)
-4. host-30 开启防火墙端口号: firewall-cmd --add-port=4567/tcp;
+4. host-30 开启防火墙端口号: sudo firewall-cmd --add-port=4567/tcp;
 
 # 3.3 解决
-1. 在 host-20 执行 ssh -R 0.0.0.0:4567:192.168.198.10:1234 lyb@192.168.198.30
+1. 在 host-20 执行: ssh -CqTnNf -R 0.0.0.0:4567:192.168.198.10:1234 lyb@192.168.198.30
     将 host-30 的 4567 端口号的数据, 经由 host-20 转发到 host-10 的 1234 端口号
     此时, host-20 和 host-30:22 建立了连接
+    此时, host-30 上的 4567 处于监听状态: ss -taln
 2. host-40 连接 host-30 的 4567 端口号: nc 192.168.198.30 4567
     此时, host-40 和 host-30:4567 端口号建立了连接
     此时, host-20 和 host-10:1234 端口号建立了连接
@@ -136,10 +138,7 @@ AllowTcpForwarding yes     # 是否允许本地端口转发
 * 互联网访问本地服务
 
 # 4. 动态端口转发
-* ssh -D host_a_port host_a_user@host_a_ip
+* ssh -CqTnNf -D host_a_port host_a_user@host_a_ip
 * 使用 socks5 服务
-
-# 5. 端口转发时可以额外添加的配置项
-* CqTnN
 ```
 
