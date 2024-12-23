@@ -66,7 +66,7 @@ firewall-cmd --list-all-policies
 
 ## 9. 端口转发
 ```
-# 1. 测试环境: 四台虚拟机
+# 1. 测试环境: 三台虚拟机
 192.168.198.10 -- 以下简称 host-10
 192.168.198.20 -- 以下简称 host-20
 192.168.198.30 -- 以下简称 host-30
@@ -78,47 +78,65 @@ firewall-cmd --list-all-policies
 4. host-30 可以直接访问 host-20
 
 # 3. 基础设置
-1. host-10 开启防火墙端口号: firewall-cmd --add-port=1234/tcp;
-2. host-10 开启防火墙端口号: firewall-cmd --add-port=4567/tcp;
+1. host-10 开启防火墙端口号: sudo firewall-cmd --add-port=1234/tcp;
+2. host-10 开启防火墙端口号: sudo firewall-cmd --add-port=4567/tcp;
 3. host-10 启动服务: nc -lkv 1234
-4. host-20 开启防火墙端口号: firewall-cmd --add-port=4567/tcp;
-5. host-20 设置允许伪装IP:   firewall-cmd --add-masquerade
+4. host-20 开启防火墙端口号: sudo firewall-cmd --add-port=4567/tcp;
 
-# 4. 解决一
-1. 在 host-20 上执行, 将本机的 4567 端口转发到 host-10 的 1234
-firewall-cmd --add-forward-port=port=4567:proto=tcp:toaddr=192.168.198.10:toport=1234
-此时, 需要开启伪装 IP: firewall-cmd --add-masquerade
-此时, 4567 并没有处于监听状态: ss -tal
+# 4. 解决一 (在 host-20 上不能访问转发的端口)
+1. 在 host-20 上开启端口转发
+    1.1 查看端口转发: sudo firewall-cmd --list-forward-ports
+    1.2 执行端口转发, 将本机的 4567 端口转发到 host-10 的 1234
+        sudo firewall-cmd --add-forward-port=port=4567:proto=tcp:toaddr=192.168.198.10:toport=1234
+    1.3 开启伪装 IP: sudo firewall-cmd --add-masquerade
+    1.4 此时, 4567 并没有处于监听状态: ss -taln
 2. 此时, host-20 上访问失败: nc 192.168.198.20 4567
 3. 此时, host-30 上访问成功: nc 192.168.198.20 4567
     host-30 -> host-20:4567
     host-20 -> host-10:1234
 4. 在 host-20 上移除端口转发:
-firewall-cmd --remove-forward-port=port=4567:proto=tcp:toaddr=192.168.198.10:toport=1234
+    sudo firewall-cmd --remove-forward-port=port=4567:proto=tcp:toaddr=192.168.198.10:toport=1234
+5. 在 host-20 上禁止IP伪装: sudo firewall-cmd --remove-masquerade
 
-# 5. 解决二
-1. 在 host-10 上执行, 将本机的 4567 端口转发到 host-10 的 1234
-firewall-cmd --add-forward-port=port=4567:proto=tcp:toaddr=192.168.198.10:toport=1234
-此时, 不需要开启伪装 IP
-查看端口转发: firewall-cmd --list-forward-ports
-此时, 4567 并没有处于监听状态: ss -tal
+# 5. 解决二 (在 host-10 上不能访问转发的端口)
+1. 在 host-10 上开启端口转发
+    1.1 查看端口转发: sudo firewall-cmd --list-forward-ports
+    1.2 执行端口转发, 将本机的 4567 端口转发到 host-10 的 1234
+        sudo firewall-cmd --add-forward-port=port=4567:proto=tcp:toaddr=192.168.198.10:toport=1234
+    1.3 不需要开启伪装 IP
+    1.4 此时, 4567 并没有处于监听状态: ss -taln
 2. 此时, host-10 上访问失败: nc 192.168.198.10 4567
 3. 此时, host-20 上访问成功: nc 192.168.198.10 4567 (实际上是与 1234 相连)
     host-20 -> host-10:1234
-4. 在 host-20 上移除端口转发:
-firewall-cmd --remove-forward-port=port=4567:proto=tcp:toaddr=192.168.198.10:toport=1234
+4. 在 host-10 上移除端口转发:
+    sudo firewall-cmd --remove-forward-port=port=4567:proto=tcp:toaddr=192.168.198.10:toport=1234
 
-证明, 此方法在端口转发的机器上不能访问转发的端口
+# 6. 解决三 rich language -- 只允许 非本机访问 -- 使用 vps 验证
+1. sudo firewall-cmd --permanent --delete-policy=portforward; # 1. 删除旧策略 (可选)
+2. sudo firewall-cmd --permanent --new-policy=portforward;    # 2. 新增新策略
+3. sudo firewall-cmd --permanent --add-port=1234/tcp;         # 3. 添加端口号
+4. sudo firewall-cmd --permanent --add-port=4567/tcp;
+5. sudo firewall-cmd --permanent --policy=portforward --add-ingress-zone=ANY;  # 4. 设置入口网络访问
+6. sudo firewall-cmd --permanent --policy=portforward --add-egress-zone=ANY;   # 5. 设置出口
+7. sudo firewall-cmd --permanent --policy=portforward --add-rich-rule='rule family="ipv4" forward-port port="4567" protocol="tcp" to-port="1234" to-addr="144.168.57.124"';     # 6. 设置端口转发
+8. sudo firewall-cmd --reload;                            # 7. 重新加载防火墙
+9. 启动服务: nc -lkv 1234
+10. 此时, 4567 不处于监听状态: ss -taln
+11.   本机访问: nc 144.168.57.124 4567 -- 失败
+12. 非本机访问: nc 144.168.57.124 4567 -- 成功 (实际上是与 1234 相连)
 
-# 6. 解决三 rich language -- 远程访问有问题 -- 待验证
-
-1. firewall-cmd --permanent --delete-policy=portforward; # 1. 删除旧策略 (可选)
-2. firewall-cmd --permanent --new-policy=portforward;    # 2. 新增新策略
-3. firewall-cmd --permanent --add-port=1234/tcp;           # 3. 添加端口号
-4. firewall-cmd --permanent --add-port=4567/tcp;
-5. firewall-cmd --permanent --policy=portforward --add-ingress-zone=HOST; # 4. 设置入口
-6. firewall-cmd --permanent --policy=portforward --add-egress-zone=ANY;   # 5. 设置出口
-7. firewall-cmd --permanent --policy=portforward --add-rich-rule='rule family="ipv4" forward-port port="8282" protocol="tcp" to-port="82" to-addr="127.0.0.1"';            # 6. 设置端口转发
-firewall-cmd --reload;                                # 7. 重新加载防火墙
+# 7. 解决三 rich language -- 只允许 非本机访问 -- 使用 vps 验证
+1. sudo firewall-cmd --permanent --delete-policy=portforward; # 1. 删除旧策略 (可选)
+2. sudo firewall-cmd --permanent --new-policy=portforward;    # 2. 新增新策略
+3. sudo firewall-cmd --permanent --add-port=1234/tcp;         # 3. 添加端口号
+4. sudo firewall-cmd --permanent --add-port=4567/tcp;
+5. sudo firewall-cmd --permanent --policy=portforward --add-ingress-zone=HOST; # 4. 设置入口本机访问
+6. sudo firewall-cmd --permanent --policy=portforward --add-egress-zone=ANY;   # 5. 设置出口
+7. sudo firewall-cmd --permanent --policy=portforward --add-rich-rule='rule family="ipv4" forward-port port="4567" protocol="tcp" to-port="1234" to-addr="144.168.57.124"';     # 6. 设置端口转发
+8. sudo firewall-cmd --reload;                            # 7. 重新加载防火墙
+9. 启动服务: nc -lkv 1234
+10. 此时, 4567 不处于监听状态: ss -taln
+11. 非本机访问: nc 144.168.57.124 4567 -- 成功 (实际上是与 1234 相连)
+12.   本机访问: nc 144.168.57.124 4567 -- 失败
 ```
 
