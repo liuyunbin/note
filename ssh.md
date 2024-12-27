@@ -145,15 +145,15 @@ sudo firewall-cmd --list-ports;                    # 4. 查看所有打开的端
 * host-30 是本地机器, 运行的服务: nc -lkv 1234
 * host-30   可以访问 host-10 host-20
 * host-10 host-20 不可以访问 host-30
-* 问: host-10 host-20 如何访问 host-10 的服务
+* 问: host-10 host-20 如何访问 host-30 的服务
 
-# 2. 情景一: 外网访问内网
+方案一:
 1. 在 host-20 上设置允许远程端口转发 -- 如果只是本机访问的话, 不需要设置
 2. 在 host-30 执行: ssh -CqTnNf -R 0.0.0.0:4567:host-30:1234 lyb@host-20
     将 host-20 的 4567 端口号的数据, 经由 host-30 转发到 host-30 的 1234 端口号
     此时, host-30 和 host-20:22 建立了连接
     此时, host-20 上的 4567 处于监听状态: ss -taln
-2. host-10 连接 host-20 的 4567 端口号: nc host-20 4567
+3. host-10 连接 host-20 的 4567 端口号: nc host-20 4567
     此时, host-10 和 host-20:4567 端口号建立了连接
     此时, host-30 和 host-30:1234 端口号建立了连接
     此时, host-30:1234 收到 host-30 的数据
@@ -162,7 +162,7 @@ sudo firewall-cmd --list-ports;                    # 4. 查看所有打开的端
             host-20:22 -> host-30      (已使用 ssh 加密) (设置端口转发时已建立好的)
             host-30    -> host-30:1234 (已使用 ssh 加密)
     建立连接和数据流的方向是相反
-3. host-20 连接 host-20 的 4567 端口号: nc host-20 4567
+4. host-20 连接 host-20 的 4567 端口号: nc host-20 4567
     和上面类似, 但 host-20 -> host-20:4567 (明文, 本机器)
 ```
 
@@ -170,7 +170,6 @@ sudo firewall-cmd --list-ports;                    # 4. 查看所有打开的端
 ```
 # 0. 定义
 使用 socks 协议, 不明确转发的端口号, 由客户端指定
-
 
 # 1. 情景一: 穿越防火墙
 * host-10 是网络机器, 运行的服务: nc -lkv 1234
