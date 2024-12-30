@@ -1,0 +1,36 @@
+
+## 基本命令
+```
+curl www.google.com
+curl www.google.com -o 1.html                   # 指定目标文件名称
+curl www.google.com --silent                    # 不显示进度信息
+curl www.google.com -C -                        # 断点续传
+curl www.google.com --referer http://google.com # 指定跳转前的界面
+curl www.google.com --cookie ...                # 指定 cookie
+curl www.google.com --user-agent "Mozilla/5.0"  # 设置浏览器信息
+curl www.google.com -H ...                      # 指定其他header
+curl www.google.com --limit-rate 20k            # 限速
+curl www.google.com --max-filesize 100M         # 设置最大大小
+curl www.google.com -u user:pass                # 设置用户名和密码
+curl www.google.com --head                      # 只打印响应头部
+curl www.google.com -k                          # 忽略证书验证
+curl 127.0.0.1/test -X POST -H "Content-Type: application/json" -d '{}' # 发送 POST 请求, 数据为 JSON
+```
+
+## 代理
+```
+# 1. http + 无用户和密码
+curl -x http://192.168.68.1:7890  https://www.google.com
+
+export  http_proxy=http://192.168.68.1:7890
+export https_proxy=http://192.168.68.1:7890
+curl https://www.google.com
+
+# 2. socks5h + 无用户和密码
+curl -x socks5h://192.168.68.1:7890  https://www.google.com
+
+export  http_proxy=socks5h://192.168.68.1:7890
+export https_proxy=socks5h://192.168.68.1:7890
+curl https://www.google.com
+```
+
