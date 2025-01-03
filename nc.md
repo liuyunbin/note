@@ -40,5 +40,8 @@ nc -X connect  -x host-60:4567  host-10 1234 # http   + 无认证
 
 nc -X 5        -x host-60:7890 -P admin host-10 1234 # socks5 + 认证 -- 不支持
 nc -X connect  -x host-60:7890 -P admin host-10 1234 # http   + 认证
+
+# 7. 貌似不支持 https 代理 -- TODO
+
 ```
 
