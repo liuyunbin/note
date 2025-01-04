@@ -99,30 +99,6 @@ iconv -f gbk -t utf-8 1.txt -o 1.txt
 
 uptime -s # 列出系统启动时间
 
-wget www.google.com
-wget www.google.com -O 1.html                 # 指定目标文件名称
-wget www.google.com -o 1.log                  # 指定日志文件
-wget www.google.com -c                        # 断点续传
-wget www.google.com -t 3                      # 指定重试的次数, 0 不停的尝试
-wget www.google.com --limit-rate 10k          # 限速
-wget www.google.com --quota 100M              # 限制最大下载量
-wget www.google.com --mirror --convert-links  # 镜像下载, 递归, 并转换为本地 url
-wget www.google.com --user ... --password ... # 指定用户名和密码
-
-curl www.google.com
-curl www.google.com -o 1.html                   # 指定目标文件名称
-curl www.google.com --silent                    # 不显示进度信息
-curl www.google.com -C -                        # 断点续传
-curl www.google.com --referer http://google.com # 指定跳转前的界面
-curl www.google.com --cookie ...                # 指定 cookie
-curl www.google.com --user-agent "Mozilla/5.0"  # 设置浏览器信息
-curl www.google.com -H ...                      # 指定其他header
-curl www.google.com --limit-rate 20k            # 限速
-curl www.google.com --max-filesize 100M         # 设置最大大小
-curl www.google.com -u user:pass                # 设置用户名和密码
-curl www.google.com --head                      # 只打印响应头部
-curl 127.0.0.1/test -X POST -H "Content-Type: application/json" -d '{}" # 发送 POST 请求, 数据为 JSON
-
 docker run ubuntu:15.10 -d --name "lyb"           # 启动 docker, 给起一个名字
 docker run ubuntu:15.10 -d --net=host             # 主机和 docker 共享 IP 和 端口号
 docker run ubuntu:15.10 -d -P                     # docke 内使用随机端口映射主机端口
@@ -140,22 +116,6 @@ docker exec     容器ID ls  # 对于在后台运行的容器, 执行命令
 
 redis flushdb # 清空数据
 redis -c ...  # 集群时需要使用 -c 启动, 否则查不到数据
-
-                                        # 注意, 有不同版本的 nc, 参数不一定相同
-nc -l             8080                  # 服务端(tcp), 接收单个连接
-nc -lk            8080                  # 服务端(tcp), 接收多个连接
-nc -lv            8080                  # 服务端(tcp), 显示连接信息
-nc -lu            8080                  # 服务端(udp)
-nc      127.0.0.1 8080                  # 客户端(tcp)
-nc -n   127.0.0.1 8080                  # 客户端(tcp), 不进行域名解析, 节省时间
-nc -N   127.0.0.1 8080                  # 客户端(tcp), 收到 EOF 后, 退出(有的版本不需要此参数, 会自动退出)
-nc -w 3 127.0.0.1 8080                  # 客户端(tcp), 设置超时时间
-nc -vz  127.0.0.1 8080                  # 客户端(tcp), 不发送信息, 只显示连接信息(测试单个端口)
-nc -vz  127.0.0.1 8080-8090             # 客户端(tcp), 不发送信息, 只显示连接信息(测试多个端口)
-nc -u   127.0.0.1 8080                  # 客户端(udp)
-nc -lk            8080 | pv > /dev/null # 测速-服务端, 注意重定向, 否则会受限于终端的写速率
-nc      127.0.0.1 8080      < /dev/zero # 测试-客户端
-
 nmap             127.0.0.1 # 主机发现 -> 端口扫描, 默认扫描 1000 个端口
 nmap -p  80      127.0.0.1 # 主机发现 -> 端口扫描, 指定端口号
 nmap -p  80-85   127.0.0.1 # 主机发现 -> 端口扫描, 指定端口号
