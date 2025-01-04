@@ -13,31 +13,9 @@ git config --global alias.lg "log --pretty=format:'%ad %h %s %d %C(bold)%an%Cres
                                                       # 6. 配置日志显示格式
 git config --global core.quotepath false              # 7. 中文显示不乱码
 git config --global --list                            # 8. 查看配置
-ssh-keygen -t rsa                                     # 9. 生成秘钥
+ssh-keygen -t ed25519                                 # 9. 生成秘钥
                                                       # 10. 复制公钥到 GitHub
 ssh -T git@github.com                                 # 11. 测试连接
-```
-
-## https 协议代理
-```
-git config --global http.proxy socks5://192.168.68.1:7890
-git config --global --unset http.proxy # 取消代理
-```
-
-## ssh 协议代理 windows
-```
-在 ~/.ssh/config 里添加如下配置
-
-Host github.com
-ProxyCommand connect -H 127.0.0.1:7890 %h %p
-```
-
-## ssh 协议代理 Linux
-```
-在 ~/.ssh/config 里添加如下配置
-
-Host github.com
-ProxyCommand nc -x 192.168.68.1:7890 %h %p
 ```
 
 ## 常用命令
