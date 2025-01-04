@@ -1,0 +1,57 @@
+
+## ubuntu 24.04 修改 sshd 端口号
+```
+1. 修改 /usr/lib/systemd/system/ssh.socket 里的 ListenStream
+2. 重新加载配置: systemctl daemon-reload
+3. 重启服务: systemctl restart ssh.socket
+```
+
+## 常用命令
+```
+密钥登录主目录权限不能是 777
+
+ssh -p port        # 指定服务器端口号
+ssh -F             # 指定配置文件
+ssh -l lyb 1.2.3.4
+ssh    lyb@1.2.3.4
+ssh -i ~/.ssh/id_rsa lyb # 指定私钥文件名
+
+ssh-keygen -t rsa              # 指定密钥算法, 默认就是 rsa
+ssh-keygen -b 1024             # 指定密钥的二进制位数
+ssh-keygen -C username@host    # 指定注释
+ssh-keygen -f lyb              # 指定密钥的文件
+ssh-keygen -R username@host    # 将 username@host 的公钥移出 known_hosts 文件
+
+ssh-copy-id -i ~/id_rsa username@host # 添加公钥到服务器中的 ~/.ssh/authorized_keys
+                                      # -i 未指定时, 将使用 ~/.ssh/id_rsa.pub
+```
+
+## ssh 客户端的常见配置
+```
+~/.ssh/config, /etc/ssh/ssh_config, man ssh_config
+
+Host *                          # 对所有机器都生效, 使用 通配符, 配置直到下一个 host
+Host 123                        # 可以起一个别名
+HostName 1.2.3.4                # 远程主机
+Port 2222                       # 远程端口号
+BindAddress 192.168.10.235      # 本地 IP
+User lyb                        # 用户名
+IdentityFile ~/.ssh/id.rsa      # 密钥文件
+                                # 此时, 使用 ssh 123 相当于使用 ssh -p 2222 lyb@1.2.3.4 -i ~/.ssh/id.rsa
+DynamicForward 1080             # 指定动态转发端口
+LocalForward  1234 1.2.3.4:5678 # 指定本地端口转发
+RemoteForward 1234 1.2.3.4:5678 # 指定远程端口转发
+```
+
+## 服务端的常见配置
+```
+/etc/ssh/sshd_config, man sshd_config
+
+AllowTcpForwarding yes     # 是否允许端口转发, 默认允许
+ListenAddress 1.2.3.4      # 监听地址
+PasswordAuthentication     # 指定是否允许密码登录，默认值为 yes
+Port 22                    # 监听端口号
+GatewayPorts no            # 远程转发时, 是否允许其他主机使该端口号, 默认不允许
+AllowTcpForwarding yes     # 是否允许本地端口转发
+```
+
