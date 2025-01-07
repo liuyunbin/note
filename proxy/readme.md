@@ -34,7 +34,8 @@ yunbinliu.com ----- 远程机器 VPS
 windows ----------- windows 10
 ```
 
-## 3. [设置代理](./set_proxy.md)
+## 3. 设置代理
+* [设置代理](./set_proxy.md)
 
 ## 4. 测试
 * [curl](./curl.md)
