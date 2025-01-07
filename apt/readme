@@ -1,5 +1,8 @@
 
 apt update      # 更新软件源                          -- 常用
+                # 更新目录 /var/lib/apt/lists
+
+
                 # 软件源: /etc/apt/sources.list
                 #         /etc/apt/sources.list.d/
                 # 格式:  包类别(deb-软件包 deb-src-源码包) url 发行版本号 分类
