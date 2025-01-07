@@ -1,7 +1,19 @@
 
+## wget
+```
+wget www.google.com
+wget www.google.com -O 1.html                 # 指定目标文件名称
+wget www.google.com -o 1.log                  # 指定日志文件
+wget www.google.com -c                        # 断点续传
+wget www.google.com -t 3                      # 指定重试的次数, 0 不停的尝试
+wget www.google.com --limit-rate 10k          # 限速
+wget www.google.com --quota 100M              # 限制最大下载量
+wget www.google.com --mirror --convert-links  # 镜像下载, 递归, 并转换为本地 url
+wget www.google.com --user ... --password ... # 指定用户名和密码
+```
 
 
-
+```
 ${v:-w}              # v 不为空, 返回 $v, 否则, 返回 w
 ${v:=w}              # v 不为空, 返回 $v, 否则, 令 v=w, 返回 w
 ${v:+w}              # v 不为空, 返回  w, 否则, 返回空
@@ -206,5 +218,6 @@ sudo -u USERNAME COMMAND                      # 指定用户执行命令
 sudo -S date -s "20210722 10:10:10" <<< "123" # 脚本中免密码使用
 
 ntpdate -s time-b.nist.gov # 使用时间服务器更新时间
+```
 
 
