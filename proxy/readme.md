@@ -6,8 +6,8 @@ http ------ 有用户认证 --- 远程域名解析
 socks4 ---- 无用户认证 --- 本地域名解析
 socks4a --- 无用户认证 --- 远程或本地域名解析 --- 兼容 socks4
 socks5 ---- 有用户认证 --- 远程或本地域名解析
-socks5h --- 有用户认证 --- 远程域名解析 --- 使用的还是 socks5
-https ----- 有用户认证 --- 远程域名解析 --- 一般命令不支持
+socks5h --- 有用户认证 --- 远程域名解析 --------- 使用的还是 socks5
+https ----- 有用户认证 --- 远程域名解析 --------- 一般命令不支持
 
 # 2. 环境变量
 http_proxy ---- HTTP_PROXY ---- http 请求的代理
@@ -35,8 +35,8 @@ windows ----------- windows 10
             测试: ./test_proxy_curl.sh
       支持的协议: http socks4 socks4a socks5 socks5h https(ubuntu 24.04)
     不支持的协议: https(centos7)
-      建议的协议: http socks4a socks5h
-    不建议的协议: socks4 socks5 https
+      建议的协议: http   socks5h
+    不建议的协议: socks4 socks5
   支持的环境变量: http_proxy https_proxy all_proxy HTTPS_PROXY ALL_PROXY
 不支持的环境变量: HTTP_PROXY
 ```
@@ -62,7 +62,7 @@ nc -lkv 8000;                          # 开启服务
       支持的协议: http socks4 socks4a socks5
     不支持的协议: https
       建议的协议: http   socks5
-    不建议的协议: socks4 socks4a
+    不建议的协议: socks4
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 
@@ -71,7 +71,7 @@ nc -lkv 8000;                          # 开启服务
       支持的协议: http(认证时需要输入密码) socks4 socks4a socks5(不支持认证)
     不支持的协议: https
       建议的协议: http   socks5
-    不建议的协议: socks4 socks4a
+    不建议的协议: socks4
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 ```
