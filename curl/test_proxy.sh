@@ -10,7 +10,7 @@ function do_test_base() {
     if curl $argv $1 &> /dev/null; then
         log_info "测试 $1 成功"
     else
-        log_info "测试 $1 成功"
+        log_info "测试 $1 失败"
     fi
 }
 
