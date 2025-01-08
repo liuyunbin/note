@@ -7,7 +7,7 @@ function log_erro() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty; e
 
 function do_test_base() {
     argv=${2:+-x $2}
-    if curl $argv $1 &> /dev/null; then
+    if curl $argv $1 --connect-timeout 3 &> /dev/null; then
         log_info "测试 $1 成功"
     else
         log_info "测试 $1 失败"
