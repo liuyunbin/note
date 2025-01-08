@@ -30,9 +30,12 @@ function test_proxy_env() {
         log_info ""
         log_info "测试 $1=http://host-60:8001"
         export $1=http://host-60:8001
+        do_test_base $2
+        [[ $# == 2 ]] || do_test_base $3
+    else
+        do_test_base  http://www.google.com
+        do_test_base https://www.google.com
     fi
-    do_test_base  http://www.google.com
-    do_test_base https://www.google.com
 }
 
 function test_proxy_command() {
@@ -58,10 +61,10 @@ test_proxy_command
 
 log_info ""
 log_info "测试环境变量使用代理:"
-test_proxy_env http_proxy
-test_proxy_env https_proxy
-test_proxy_env all_proxy
-test_proxy_env HTTP_PROXY
-test_proxy_env HTTPS_PROXY
-test_proxy_env ALL_PROXY
+test_proxy_env http_proxy    http://www.google.com
+test_proxy_env https_proxy  https://www.google.com
+test_proxy_env all_proxy     http://www.google.com https://www.google.com
+test_proxy_env HTTP_PROXY    http://www.google.com
+test_proxy_env HTTPS_PROXY  https://www.google.com
+test_proxy_env ALL_PROXY     http://www.google.com https://www.google.com
 
