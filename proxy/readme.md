@@ -1,12 +1,18 @@
 
-## 1. 代理协议
+## 1. 前置知识
 ```
+# 1. 代理协议
 http ------ 有用户认证 --- 远程域名解析
 socks4 ---- 无用户认证 --- 本地域名解析
 socks4a --- 无用户认证 --- 远程或本地域名解析 --- 兼容 socks4
 socks5 ---- 有用户认证 --- 远程或本地域名解析
 socks5h --- 有用户认证 --- 远程域名解析 --- 使用的还是 socks5
 https ----- 有用户认证 --- 远程域名解析 --- 一般命令不支持
+
+# 2. 环境变量
+http_proxy ---- HTTP_PROXY ---- http 请求的代理
+https_proxy --- HTTPS_PROXY --- https 请求的代理
+all_proxy ----- ALL_PROXY ----- http 和 https 请求的代理
 ```
 
 ## 2. 测试环境
