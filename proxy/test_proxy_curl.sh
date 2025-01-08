@@ -16,15 +16,15 @@ function set_proxy_env_empty() {
 
 function test_proxy_base() {
     if curl $@ --connect-timeout 5 &> /dev/null; then
-        log_info "测试 curl $@ 成功"
+        log_info "curl $@ --- 成功"
     else
-        log_info "测试 curl $@ 失败"
+        log_info "curl $@ --- 失败"
     fi
 }
 
 function test_proxy_protocol_help() {
-    test_proxy_base  http://www.google.com -x $@
-    test_proxy_base https://www.google.com -x $@
+    test_proxy_base -x $@  http://www.google.com
+    test_proxy_base -x $@ https://www.google.com
 }
 
 function test_proxy_protocol() {
@@ -50,9 +50,10 @@ function test_no_proxy() {
 
 
 function test_proxy_use_env_help() {
-    log_info "测试 $1=http://host-60:8001"
+    log_info "测试 export $1=http://host-60:8001"
     set_proxy_env_empty
     export $1=http://host-60:8001
+    shift 1
     test_proxy_base $@
 }
 
@@ -63,16 +64,15 @@ function test_proxy_use_env() {
     test_proxy_use_env_help  HTTP_PROXY  http://www.google.com
     test_proxy_use_env_help HTTPS_PROXY https://www.google.com
     test_proxy_use_env_help   ALL_PROXY  http://www.google.com https://www.google.com
+    log_info ""
 }
 
 log_info "测试未设置代理:"
 test_no_proxy
 
-log_info ""
 log_info "测试支持的代理协议:"
 test_proxy_protocol
 
-log_info ""
-log_info "测试环境变量使用代理:"
+log_info "测试使用环境变量来代理:"
 test_proxy_use_env
 
