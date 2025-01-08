@@ -61,8 +61,17 @@ nc -lkv 8000;                          # 开启服务
             测试: ./test_proxy_nc_centos.sh
       支持的协议: http socks4 socks4a socks5
     不支持的协议: https
-      建议的协议: http
-    不建议的协议: socks4 socks4a socks5
+      建议的协议: http   socks5
+    不建议的协议: socks4 socks4a
+  支持的环境变量:
+不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+
+# 3. 测试 ubuntu 24.04
+            测试: ./test_proxy_nc_ubuntu.sh
+      支持的协议: http(认证时需要输入密码) socks4 socks4a socks5(不支持认证)
+    不支持的协议: https
+      建议的协议: http   socks5
+    不建议的协议: socks4 socks4a
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 ```
