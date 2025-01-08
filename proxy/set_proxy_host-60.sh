@@ -7,19 +7,19 @@ function log_erro() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty; e
 
 log_info "1. 安装 gost..."
 if which gost &> /dev/null; then
-    log_info "gost 已安装, 跳过"
+    log_info "\tgost 已安装, 跳过"
 else
     sudo snap install core;
     sudo snap install gost;
-    log_info "gost 安装完成"
+    log_info "\tgost 安装完成"
 fi
 
 log_info "2. 处理防火墙端口"
 if sudo firewall-cmd --query-port=8001-8008/tcp &> /dev/null; then
-    log_info "防火墙端口已开启, 跳过"
+    log_info "\t防火墙端口已开启, 跳过"
 else
     sudo firewall-cmd --add-port=8001-8008/tcp;
-    log_info "防火墙端口开启完成"
+    log_info "\t防火墙端口开启完成"
 fi
 
 log_info "3. 启动代理, 注意修改域名..."
