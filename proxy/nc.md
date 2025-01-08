@@ -1,9 +1,4 @@
 
-## 1. 在 vps 上 开启服务
-```
-sudo firewall-cmd --add-port=8000/tcp; # 添加防火墙端口号
-nc -lkv 8000;                          # 开启服务
-```
 
 ## 2. 在 host-10 上测试代理 -- centos
 #### 2.1 http 代理
