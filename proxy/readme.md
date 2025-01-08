@@ -29,3 +29,15 @@ windows ----------- windows 10
 ./set_proxy_host.sh # 在 host-60 上启动代理
 ```
 
+## 4. 测试
+### 4.1 curl
+```
+            测试: ./test_proxy_curl.sh
+      支持的协议: http socks4 socks4a socks5 socks5h https(ubuntu 24.04)
+    不支持的协议: https(centos7)
+      建议的协议: http socks4a socks5h
+    不建议的协议: socks4 socks5 https
+  支持的环境变量: http_proxy https_proxy all_proxy HTTPS_PROXY ALL_PROXY
+不支持的环境变量: HTTP_PROXY
+```
+
