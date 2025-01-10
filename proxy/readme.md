@@ -100,3 +100,20 @@ nc -lkv 8000;                          # 开启服务
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 ```
 
+### 4.5 apt
+```
+# 1. 命令行使用
+            测试: ./test_proxy_apt_cmd.sh
+      支持的协议: http   socks5h https
+    不支持的协议: socks4 socks4a socks5
+  支持的环境变量:
+不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+
+# 2. 配置文件使用
+            测试: ./test_proxy_apt_config.sh
+      支持的协议: http   socks5h https
+    不支持的协议: socks4 socks4a socks5
+  支持的环境变量:
+不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+```
+

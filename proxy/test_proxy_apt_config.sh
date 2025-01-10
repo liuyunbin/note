@@ -15,8 +15,8 @@ function set_proxy_env_empty() {
 }
 
 function test_proxy_base() {
-    sudo rm -r /var/lib/apt/lists/*                                       # 清空缓存
-    if sudo apt update $@ &> /dev/null; then
+    sudo rm -rf /var/lib/apt/lists/*
+    if sudo apt update &> /dev/null; then
         log_info "apt $@ --- 成功"
     else
         log_info "apt $@ --- 失败"
@@ -24,7 +24,11 @@ function test_proxy_base() {
 }
 
 function test_proxy_protocol_help() {
-    test_proxy_base -o Acquire::http::Proxy=$@
+    echo ' Acquire::http::Proxy "'$@'";' | sudo tee    /etc/apt/apt.conf.d/proxy.conf
+    echo 'Acquire::https::Proxy "'$@'";' | sudo tee -a /etc/apt/apt.conf.d/proxy.conf
+    echo '  Acquire::ftp::Proxy "'$@'";' | sudo tee -a /etc/apt/apt.conf.d/proxy.conf
+    test_proxy_base $@
+    echo '' | sudo tee /etc/apt/apt.conf.d/proxy.conf
 }
 
 function test_proxy_protocol() {
