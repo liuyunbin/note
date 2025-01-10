@@ -144,6 +144,21 @@ nc -lkv 8000;                          # 开启服务
                  Acquire::http::Proxy "socks5h://host-60:8005";
                 Acquire::https::Proxy "socks5h://host-60:8005";
                   Acquire::ftp::Proxy "socks5h://host-60:8005";
-            * git clone git@github.com:liuyunbin/note
+            * sudo apt update
+```
+
+### 4.6 yum
+```
+# 1. 配置文件使用
+            测试: ./test_proxy_apt_config.sh
+      支持的协议: http  socks4 socks4a socks5 socks5h
+    不支持的协议: https
+  支持的环境变量:
+不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+        最佳实践:
+            * 在 /etc/yum.conf 内添加
+                proxy=socks5://host-60:8005
+            * sudo yum clean all
+            * sudo yum makecache
 ```
 
