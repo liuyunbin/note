@@ -22,4 +22,3 @@ yum list updates         # 列出可用更新
 yum provides vim         # 查看软件属于哪个软件包
 yum provides /etc/vimrc  # 查看文件由哪个软件使用
 
-TODO: 软件源的建立, 清除
