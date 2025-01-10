@@ -35,8 +35,6 @@ windows ----------- windows 10
             测试: ./test_proxy_curl.sh
       支持的协议: http socks4 socks4a socks5 socks5h https(ubuntu 24.04)
     不支持的协议: https(centos7)
-      建议的协议: http   socks5h
-    不建议的协议: socks4 socks5
   支持的环境变量: http_proxy https_proxy all_proxy HTTPS_PROXY ALL_PROXY
 不支持的环境变量: HTTP_PROXY
 ```
@@ -46,8 +44,6 @@ windows ----------- windows 10
             测试: ./test_proxy_wget.sh
       支持的协议: http
     不支持的协议: socks4 socks4a socks5 socks5h https
-      建议的协议: http
-    不建议的协议:
   支持的环境变量: http_proxy https_proxy
 不支持的环境变量:  all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 ```
@@ -61,8 +57,6 @@ nc -lkv 8000;                          # 开启服务
             测试: ./test_proxy_nc_centos.sh
       支持的协议: http socks4 socks4a socks5
     不支持的协议: https
-      建议的协议: http   socks5
-    不建议的协议: socks4
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 
@@ -70,8 +64,6 @@ nc -lkv 8000;                          # 开启服务
             测试: ./test_proxy_nc_ubuntu.sh
       支持的协议: http(认证时需要输入密码) socks4 socks4a socks5(不支持认证)
     不支持的协议: https
-      建议的协议: http   socks5
-    不建议的协议: socks4
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 ```
@@ -82,8 +74,6 @@ nc -lkv 8000;                          # 开启服务
             测试: ./test_proxy_git_http.sh
       支持的协议: http socks4 socks4a socks5 https
     不支持的协议:
-      建议的协议: http   socks5 https
-    不建议的协议:
   支持的环境变量: https_proxy
 不支持的环境变量: http_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 
@@ -92,8 +82,6 @@ nc -lkv 8000;                          # 开启服务
             测试: ./test_proxy_git_ssh_centos.sh
       支持的协议: http socks4 socks4a socks5
     不支持的协议: https
-      建议的协议: http   socks5
-    不建议的协议:
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 
@@ -101,8 +89,6 @@ nc -lkv 8000;                          # 开启服务
             测试: ./test_proxy_git_ssh_centos.sh
       支持的协议: http(认证时需要输入密码) socks4 socks4a socks5(不支持认证)
     不支持的协议: https
-      建议的协议: http   socks5
-    不建议的协议: socks4
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 
