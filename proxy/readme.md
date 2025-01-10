@@ -105,6 +105,12 @@ nc -lkv 8000;                          # 开启服务
     不建议的协议: socks4
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+
 # 2.3 测试 windows
+            测试: ./test_proxy_git_ssh_windows.sh
+      支持的协议: http(不支持认证) socks5(不支持认证)
+    不支持的协议: https socks4 socks4a
+  支持的环境变量:
+不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 ```
 
