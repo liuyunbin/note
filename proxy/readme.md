@@ -37,6 +37,7 @@ windows ----------- windows 10
     不支持的协议: https(centos7)
   支持的环境变量: http_proxy https_proxy all_proxy HTTPS_PROXY ALL_PROXY
 不支持的环境变量: HTTP_PROXY
+        最佳实践: curl -x socks5h://host-60:8005 https://www.google.com
 ```
 
 ### 4.2 wget
@@ -46,6 +47,7 @@ windows ----------- windows 10
     不支持的协议: socks4 socks4a socks5 socks5h https
   支持的环境变量: http_proxy https_proxy
 不支持的环境变量:  all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+        最佳实践: wget -e https_proxy=http://host-60:8001 https://www.google.com
 ```
 
 ### 4.3 nc
@@ -59,6 +61,7 @@ nc -lkv 8000;                          # 开启服务
     不支持的协议: https
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+        最佳实践: nc --proxy-type socks5 --proxy host-60:8005 yunbinliu.com 8000
 
 # 3. 测试 ubuntu 24.04
             测试: ./test_proxy_nc_ubuntu.sh
@@ -66,16 +69,21 @@ nc -lkv 8000;                          # 开启服务
     不支持的协议: https
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+        最佳实践: nc -X 5 -x host-60:8005 yunbinliu.com 8000
 ```
 
 ### 4.4 git
 ```
 # 1. 测试 http 协议
             测试: ./test_proxy_git_http.sh
-      支持的协议: http socks4 socks4a socks5 https
+      支持的协议: http socks4 socks4a socks5 socks5h https
     不支持的协议:
   支持的环境变量: https_proxy
 不支持的环境变量: http_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+        最佳实践:
+            * git config --global http.proxy socks5h://host-60:8005
+            * git clone https://github.com/liuyunbin/note
+            * git config --global --unset http.proxy
 
 # 2. 测试 ssh 协议
 # 2.1 测试 centos7
@@ -84,6 +92,11 @@ nc -lkv 8000;                          # 开启服务
     不支持的协议: https
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+        最佳实践:
+            * 在 ~/.ssh/config 内添加
+                Host github.com
+                ProxyCommand nc --proxy-type socks5 --proxy host-60:8005 %h %p
+            * git clone git@github.com:liuyunbin/note
 
 # 2.2 测试 ubuntu 24.04
             测试: ./test_proxy_git_ssh_centos.sh
@@ -91,6 +104,11 @@ nc -lkv 8000;                          # 开启服务
     不支持的协议: https
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+        最佳实践:
+            * 在 ~/.ssh/config 内添加
+                Host github.com
+                ProxyCommand nc -X 5 -x host-60:8005 %h %p
+            * git clone git@github.com:liuyunbin/note
 
 # 2.3 测试 windows
             测试: ./test_proxy_git_ssh_windows.sh
@@ -98,6 +116,11 @@ nc -lkv 8000;                          # 开启服务
     不支持的协议: https socks4 socks4a
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+        最佳实践:
+            * 在 ~/.ssh/config 内添加
+                Host github.com
+                ProxyCommand connect -S host-60:8005 %h %p
+            * git clone git@github.com:liuyunbin/note
 ```
 
 ### 4.5 apt
@@ -108,6 +131,7 @@ nc -lkv 8000;                          # 开启服务
     不支持的协议: socks4 socks4a socks5
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+        最佳实践: sudo apt update -o "Acquire::http::Proxy=socks5h://host-60:8005"
 
 # 2. 配置文件使用
             测试: ./test_proxy_apt_config.sh
@@ -115,5 +139,11 @@ nc -lkv 8000;                          # 开启服务
     不支持的协议: socks4 socks4a socks5
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+        最佳实践:
+            * 在 /etc/apt/apt.conf.d/proxy.conf 内添加
+                 Acquire::http::Proxy "socks5h://host-60:8005";
+                Acquire::https::Proxy "socks5h://host-60:8005";
+                  Acquire::ftp::Proxy "socks5h://host-60:8005";
+            * git clone git@github.com:liuyunbin/note
 ```
 
