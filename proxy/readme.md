@@ -76,3 +76,21 @@ nc -lkv 8000;                          # 开启服务
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 ```
 
+### 4.4 git
+```
+# 1. 测试 http 协议
+            测试: ./test_proxy_git_http.sh
+      支持的协议: http socks4 socks4a socks5 https
+    不支持的协议:
+      建议的协议: http   socks5 https
+    不建议的协议:
+  支持的环境变量: https_proxy
+不支持的环境变量: http_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+
+# 2. 测试 ssh 协议
+
+# 2.1 测试 centos7
+# 2.2 测试 ubuntu 24.04
+# 2.3 测试 windows
+```
+
