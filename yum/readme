@@ -1,4 +1,10 @@
 
+## 代理
+* 在 /etc/yum.conf 内添加
+    proxy=socks5h://127.0.0.1:7890
+* sudo yum clean all
+* sudo yum makecache
+
 yum install epel-release # 安装软件源 epel -- 常用
 yum check-update         # 更新软件源      -- 常用
                          # 软件源: /etc/yum.repos.d/
