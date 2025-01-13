@@ -46,7 +46,6 @@ windows ----------- windows 10
     不支持的协议: socks4 socks4a socks5 socks5h https
   支持的环境变量: http_proxy https_proxy
 不支持的环境变量:  all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
-        最佳实践: wget -e https_proxy=http://host-60:8001 https://www.google.com
 ```
 
 ### 4.3 nc
