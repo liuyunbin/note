@@ -115,12 +115,6 @@ nc -lkv 8000;                          # 开启服务
     不支持的协议: socks4 socks4a socks5
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
-        最佳实践:
-            * 在 /etc/apt/apt.conf.d/proxy.conf 内添加
-                 Acquire::http::Proxy "socks5h://host-60:8005";
-                Acquire::https::Proxy "socks5h://host-60:8005";
-                  Acquire::ftp::Proxy "socks5h://host-60:8005";
-            * sudo apt update
 ```
 
 ### 4.6 yum
