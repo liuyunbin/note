@@ -152,21 +152,6 @@ iconv -f gbk -t utf-8 1.txt -o 1.txt
 
 uptime -s # 列出系统启动时间
 
-docker run ubuntu:15.10 -d --name "lyb"           # 启动 docker, 给起一个名字
-docker run ubuntu:15.10 -d --net=host             # 主机和 docker 共享 IP 和 端口号
-docker run ubuntu:15.10 -d -P                     # docke 内使用随机端口映射主机端口
-docker run ubuntu:15.10 -d -p 2000:3000           # 本机:2000 绑定 docker:3000
-docker run ubuntu:15.10 -d -v /home/123:/home/456 # 本机:/home/123 绑定 docker:/home/456
-
-docker port     容器ID     # 查看端口号映射
-docker ps                  # 列出当前运行的容器
-docker ps -a               # 列出所有容器
-docker start    容器ID     # 启动容器
-docker stop     容器ID     # 停止容器
-docker restart  容器ID     # 重新启动容器
-docker rm -f    容器ID     # 删除容器
-docker exec     容器ID ls  # 对于在后台运行的容器, 执行命令
-
 redis flushdb # 清空数据
 redis -c ...  # 集群时需要使用 -c 启动, 否则查不到数据
 nmap             127.0.0.1 # 主机发现 -> 端口扫描, 默认扫描 1000 个端口
