@@ -59,7 +59,6 @@ nc -lkv 8000;                          # 开启服务
     不支持的协议: https
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
-        最佳实践: nc --proxy-type socks5 --proxy host-60:8005 yunbinliu.com 8000
 
 # 3. 测试 ubuntu 24.04
             测试: ./test_proxy_nc_ubuntu.sh
