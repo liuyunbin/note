@@ -125,10 +125,5 @@ nc -lkv 8000;                          # 开启服务
     不支持的协议: https
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
-        最佳实践:
-            * 在 /etc/yum.conf 内添加
-                proxy=socks5://host-60:8005
-            * sudo yum clean all
-            * sudo yum makecache
 ```
 
