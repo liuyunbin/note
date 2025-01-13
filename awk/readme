@@ -1,6 +1,4 @@
 
-## 常用命令
-```
 awk '
      BEGIN   { getline     } #  可选  读取一行
      pattern { commands    } #  pattern 类型
@@ -79,5 +77,4 @@ awk -v lyb=... '{ print $0 }' 1.txt # 定义变量
     #       * RLENGTH    由match函数所匹配的子字符串的长度
     #       * RSTART     由match函数所匹配的子字符串的起始位置
     # * 函数, 执行 shell 命令及测试 见: test.sh
-```
 
