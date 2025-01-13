@@ -25,14 +25,14 @@ windows ----------- windows 10
 
 ## 3. 设置代理
 ```
-./set_proxy_vps.sh  # 在 vps     上启动代理
-./set_proxy_host.sh # 在 host-60 上启动代理
+./set_vps.sh  # 在 vps     上启动代理
+./set_host.sh # 在 host-60 上启动代理
 ```
 
 ## 4. 测试
 ### 4.1 curl
 ```
-            测试: ./test_proxy_curl.sh
+            测试: ./test_curl.sh
       支持的协议: http socks4 socks4a socks5 socks5h https(ubuntu 24.04)
     不支持的协议: https(centos7)
   支持的环境变量: http_proxy https_proxy all_proxy HTTPS_PROXY ALL_PROXY
@@ -41,7 +41,7 @@ windows ----------- windows 10
 
 ### 4.2 wget
 ```
-            测试: ./test_proxy_wget.sh
+            测试: ./test_wget.sh
       支持的协议: http
     不支持的协议: socks4 socks4a socks5 socks5h https
   支持的环境变量: http_proxy https_proxy
@@ -54,14 +54,14 @@ windows ----------- windows 10
 nc -lkv 8000;                          # 开启服务
 
 # 2. 测试 centos7
-            测试: ./test_proxy_nc_centos.sh
+            测试: ./test_nc_centos.sh
       支持的协议: http socks4 socks4a socks5
     不支持的协议: https
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 
 # 3. 测试 ubuntu 24.04
-            测试: ./test_proxy_nc_ubuntu.sh
+            测试: ./test_nc_ubuntu.sh
       支持的协议: http(认证时需要输入密码) socks4 socks4a socks5(不支持认证)
     不支持的协议: https
   支持的环境变量:
@@ -71,7 +71,7 @@ nc -lkv 8000;                          # 开启服务
 ### 4.4 git
 ```
 # 1. 测试 http 协议
-            测试: ./test_proxy_git_http.sh
+            测试: ./test_git_http.sh
       支持的协议: http socks4 socks4a socks5 socks5h https
     不支持的协议:
   支持的环境变量: https_proxy
@@ -79,21 +79,21 @@ nc -lkv 8000;                          # 开启服务
 
 # 2. 测试 ssh 协议
 # 2.1 测试 centos7
-            测试: ./test_proxy_git_ssh_centos.sh
+            测试: ./test_git_ssh_centos.sh
       支持的协议: http socks4 socks4a socks5
     不支持的协议: https
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 
 # 2.2 测试 ubuntu 24.04
-            测试: ./test_proxy_git_ssh_centos.sh
+            测试: ./test_git_ssh_centos.sh
       支持的协议: http(认证时需要输入密码) socks4 socks4a socks5(不支持认证)
     不支持的协议: https
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 
 # 2.3 测试 windows
-            测试: ./test_proxy_git_ssh_windows.sh
+            测试: ./test_git_ssh_windows.sh
       支持的协议: http(不支持认证) socks5(不支持认证)
     不支持的协议: https socks4 socks4a
   支持的环境变量:
@@ -103,14 +103,14 @@ nc -lkv 8000;                          # 开启服务
 ### 4.5 apt
 ```
 # 1. 命令行使用
-            测试: ./test_proxy_apt_cmd.sh
+            测试: ./test_apt_cmd.sh
       支持的协议: http   socks5h https
     不支持的协议: socks4 socks4a socks5
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
 
 # 2. 配置文件使用
-            测试: ./test_proxy_apt_config.sh
+            测试: ./test_apt_config.sh
       支持的协议: http   socks5h https
     不支持的协议: socks4 socks4a socks5
   支持的环境变量:
@@ -120,7 +120,7 @@ nc -lkv 8000;                          # 开启服务
 ### 4.6 yum
 ```
 # 1. 配置文件使用
-            测试: ./test_proxy_apt_config.sh
+            测试: ./test_apt_config.sh
       支持的协议: http  socks4 socks4a socks5 socks5h
     不支持的协议: https
   支持的环境变量:
