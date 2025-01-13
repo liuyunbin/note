@@ -37,7 +37,6 @@ windows ----------- windows 10
     不支持的协议: https(centos7)
   支持的环境变量: http_proxy https_proxy all_proxy HTTPS_PROXY ALL_PROXY
 不支持的环境变量: HTTP_PROXY
-        最佳实践: curl -x socks5h://host-60:8005 https://www.google.com
 ```
 
 ### 4.2 wget
