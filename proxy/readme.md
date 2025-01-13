@@ -76,10 +76,6 @@ nc -lkv 8000;                          # 开启服务
     不支持的协议:
   支持的环境变量: https_proxy
 不支持的环境变量: http_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
-        最佳实践:
-            * git config --global http.proxy socks5h://host-60:8005
-            * git clone https://github.com/liuyunbin/note
-            * git config --global --unset http.proxy
 
 # 2. 测试 ssh 协议
 # 2.1 测试 centos7
