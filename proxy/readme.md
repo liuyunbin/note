@@ -108,7 +108,6 @@ nc -lkv 8000;                          # 开启服务
     不支持的协议: socks4 socks4a socks5
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
-        最佳实践: sudo apt update -o "Acquire::http::Proxy=socks5h://host-60:8005"
 
 # 2. 配置文件使用
             测试: ./test_proxy_apt_config.sh
