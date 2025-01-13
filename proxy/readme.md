@@ -84,11 +84,6 @@ nc -lkv 8000;                          # 开启服务
     不支持的协议: https
   支持的环境变量:
 不支持的环境变量: http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
-        最佳实践:
-            * 在 ~/.ssh/config 内添加
-                Host github.com
-                ProxyCommand nc --proxy-type socks5 --proxy host-60:8005 %h %p
-            * git clone git@github.com:liuyunbin/note
 
 # 2.2 测试 ubuntu 24.04
             测试: ./test_proxy_git_ssh_centos.sh
