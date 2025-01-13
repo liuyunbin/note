@@ -1,4 +1,6 @@
 
+curl -x socks5h://127.0.0.1:7890 https://www.google.com
+
 curl www.google.com
 curl www.google.com -o 1.html                   # 指定目标文件名称
 curl www.google.com --silent                    # 不显示进度信息
