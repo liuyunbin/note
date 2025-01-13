@@ -1,4 +1,20 @@
 
+## 代理
+#### hhtp 协议
+git config --global http.proxy socks5h://127.0.0.1:7890
+git clone https://github.com/liuyunbin/note
+git config --global --unset http.proxy
+
+#### ssh 协议
+在 ~/.ssh/config 内添加
+    Host github.com
+    # centos
+    ProxyCommand nc --proxy-type socks5 --proxy host-60:8005 %h %p
+    # ubuntu
+    ProxyCommand nc -X 5 -x host-60:8005 %h %p
+    # windows
+    ProxyCommand connect -S host-60:8005 %h %p
+
 git clone --recurse-submodules https://github.com... # 克隆包含子模块的项目
 
 git diff             # 暂存区域 和 已修改   的差异
