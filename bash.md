@@ -1,5 +1,12 @@
 
 ```
+nc --proxy-type socks5 --proxy 127.0.0.1:7890 yunbinliu.com 8000 # 代理 centos
+nc           -X 5           -x 127.0.0.1:7890 yunbinliu.com 8000 # 代理 ubuntu
+nc -lkv 1234                            # 服务端: 监听 1234 端口, 允许多个连接, 显示连接信息
+nc      127.0.0.1 1234                  # 客户端
+nc -lk            8080 | pv > /dev/null # 测速-服务端, 注意重定向, 否则会受限于终端的写速率
+nc      127.0.0.1 8080      < /dev/zero # 测试-客户端
+
 ${v:-w}              # v 不为空, 返回 $v, 否则, 返回 w
 ${v:=w}              # v 不为空, 返回 $v, 否则, 令 v=w, 返回 w
 ${v:+w}              # v 不为空, 返回  w, 否则, 返回空
