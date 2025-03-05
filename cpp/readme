@@ -1,4 +1,11 @@
 
+crtp
+将派生类作为模板参数传递给它自己的基类
+实现静态多态
+
+c++模板并实现可以放到cpp文件中的, 需要显示实例化
+
+
 类: 具有相同属性和功能的对象的抽象集合
       对对象的抽象
 抽象类: 对类的抽象
@@ -47,10 +54,10 @@ std::getline(std::cin, str);  // 读取一行, 包括换行符, str 不会存储
 
 浮点数要注意精度
 
-static_cast      -- 不含底层 const 的转换, 明确定义, 比如, long->int, void *->int*
-const_cast       -- 底层const的转换, 比如, const int* = > int *
-reinterpret_cast -- 重新解释底层存储, 比如 long *->double*
-dynamic_cast     -- 基类 => 派生类
+static_cast      -- 不含底层 const 的转换, 明确定义
+const_cast       -- 添加或删除底层 const 的转换 -- 很少用
+reinterpret_cast -- 重新解释底层存储 -- 很少用
+dynamic_cast     -- 运行时, 基类 => 派生类 -- 可能损失效率
 
 mutable 类可变成员
 
