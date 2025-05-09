@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <cstdint>
 
 #include <algorithm>
 #include <bitset>
@@ -10,6 +9,7 @@
 #include <cfenv>
 #include <cfloat>
 #include <cmath>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <iomanip>
@@ -47,7 +47,7 @@ std::map<int, std::string> dict_except{{FE_DIVBYZERO, "除以0"},
                                        {FE_OVERFLOW, "上溢"},
                                        {FE_UNDERFLOW, "下溢"}};
 
-//存储舍入模式
+// 存储舍入模式
 std::map<int, std::string> dict_round{{FE_DOWNWARD, "向下舍入"},
                                       {FE_TONEAREST, "最近舍入"},
                                       {FE_TOWARDZERO, "向零舍入"},

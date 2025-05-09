@@ -11,6 +11,8 @@ int main() {
     test_round("2.5", 2.5);
     test_round("3.5", 3.5);
 
+    test_double("1", 1);
+
     log();
     log("主进程正常退出");
     log();
