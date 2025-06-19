@@ -1,4 +1,6 @@
+#!/bin/bash
 
+set -ueo pipefail
 
 for year in {2010..2030}; do
     echo -n "handle $year..."
