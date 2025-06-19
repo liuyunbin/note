@@ -3,9 +3,9 @@
 ```
 gov-desc ----------- 政府网县级及以上行政区划变更情况
 gov-mca-desc ------- 民政部县级及以上行政区划变更情况
-gov-mca-csv -------- 民政部数据
+gov-mca-csv -------- 民政部数据 (1980-2022)
 gov-mca-sql -------- 民政部数据对应的数据库文件, 数据源为 gov-mca-csv
-gov-stats-csv ------ 统计局数据
+gov-stats-csv ------ 统计局数据 (2009-2022)
 gov-stats-sql ------ 统计局数据对应的数据库文件, 数据源为 gov-stats-csv
 ```
 
@@ -39,7 +39,7 @@ pip install -r ./script/requirements.txt # 安装依赖
     * 2022-至今 有 省 市 区县 的区划代码, 有 乡镇 的区划代码的变更情况
 
 #### 2, 2009-至今 统计局的 省 市 区县  乡镇 村 数据
-* 官网: https://www.stats.gov.cn/sj/tjbz/qhdm/
+* 官网: https://www.stats.gov.cn/sj/tjbz/qhdm/ --- 网址已失效
 * 编码: 2020 及其之前的网页使用 GBK, 2020 之后的网页使用 UTF-8
 * 说明:
     * 有些市的下一级直接就是乡镇, 没有区县这一级, 比如: 2023-东莞市
