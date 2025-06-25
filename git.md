@@ -32,6 +32,26 @@ ssh-keygen -t ed25519                                 # 9. 生成秘钥
 ssh -T git@github.com                                 # 11. 测试连接
 ```
 
+## 撤销文件的修改 -- 暂存区和当前目录相同
+```
+git checkout --    README # 暂存区域 -> 当前目录 ------------- 撤销取消文件的修改
+git checkout HEAD~ README # 某个版本 -> 当前目录和暂存区域 --- 获取某个版本的文件
+
+git reset    HEAD~ README # 某个版本 -> 暂存区域 ------------- 取消暂存
+git reset    HEAD~ --hard # 回退到某个版本, 暂存区和工作目录
+
+git remote
+git remote -v
+git remote add    ... ....
+git remote rename ... ....
+git remote remove ... ....
+
+git pull --rebase
+
+git add -u ... # 添加已跟踪的文件
+git add -p     # 交互添加文件
+
+git commit -a -m .....
 
 git clone --recurse-submodules https://github.com... # 克隆包含子模块的项目
 
@@ -47,30 +67,11 @@ git log -L :10:main.cpp              # 查询某一行的变更记录
 git log -L 8,10:main.cpp             # 查询某几行的变更记录
 git log -S doRzrqPtywHqzqdmxx        # 搜索字符串的增加 删除
 
+git log --no-merges
+
 git revert -m 1 HEAD # 撤销合并提交, -m 后要保留的父提交的索引
 
-git reset HEAD~ --soft         # 只修改仓库
-git reset HEAD~                # 修改仓库和暂存区
-git reset HEAD~ --hard         # 修改仓库, 暂存区和工作目录
-git reset HEAD~ README         # 替换暂存区域中的 README
-                               # 有取消暂存区中文件修改的作用
-
-git checkout    -- README             # 使用暂存区域内的 README 替换当前目录的 README
-                                      # 有取消工作目录中文件修改的作用
-git checkout HEAD~ README             # 使用 HEAD~ 的 README 替换当前目录 和 暂存区域 中的 README
-                                      # 可以用于拉取, 某一提交的一个文件
 git checkout --orphan test-branch     # 新建并切换到独立分支
-
-git restore                     README # 使用 暂存区 的 README 覆盖 当前目录 中 的 README
-                                       # 有取消工作目录中文件修改的作用
-git restore --staged            README # 使用 HEAD   的 README 覆盖 暂存区 的 README
-                                       # 和 git reset -- README 意思相同
-git restore --staged --worktree README # 使用 HEAD   的 README 覆盖 暂存区 和 当前目录 中的 README
-                                       # 和 git checkout HEAD README 意思相同
-git restore --staged --worktree --source HEAD~2 README
-                                       # 使用 HEAD~2 的 README 覆盖 暂存区 和 当前目录 中的 README
-                                       # 如果 指定提交 或 暂存区域不含 README, 则删除对应的 README
-                                       # 和 git checkout HEAD~2 README 意思相同
 
 git submodule add https://github.com...      # 添加子模块
 git submodule init                           # 初始化本地子模块的配置
@@ -85,4 +86,5 @@ git reflog show --date=iso                   # 记录每一次提交, 用于找�
 
 git apply --check ...                        # 检查补丁是否能成功应用
 git apply         ...                        # 应用补丁
+```
 
