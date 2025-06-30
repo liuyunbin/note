@@ -1,10 +1,9 @@
 
-PS1='\[\e[1m\]$(date "+%Y-%m-%d %H:%M:%S %z") \[\e[0m\]'
 
 if [[ $UID == 0 ]]; then
-    PS1=$PS1"# "
+    PS1='\[\e[1m\]$(date "+%Y-%m-%d %H:%M:%S %z") # \[\e[0m\]'
 else
-    PS1=$PS1"$ "
+    PS1='\[\e[1m\]$(date "+%Y-%m-%d %H:%M:%S %z") $ \[\e[0m\]'
 fi
 
 note=~/github/note
