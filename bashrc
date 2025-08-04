@@ -7,7 +7,7 @@ else
 fi
 
 note=~/github/note
-PATH=$PATH:$note/bash
+PATH=$PATH:$note
 
 alias lsatime="    ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrtu" # 以 文件访问时间     排序, 不准确
 alias lsmtime="    ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrt"  # 以 文件内容修改时间 排序
