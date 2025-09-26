@@ -1,5 +1,5 @@
 
-## 0. 安装及启动 firewall-cmd
+## 0. 安装及启动
 apt install firewalld                      # 1. 安装
 systemctl list-unit-files | grep firewall  # 2. 查看服务名称
 systemctl enable  firewalld.service        # 3. 设置开机启动
