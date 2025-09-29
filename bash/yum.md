@@ -1,10 +1,14 @@
 
 ## 代理
+```
 * 在 /etc/yum.conf 内添加
     proxy=socks5h://127.0.0.1:7890
 * sudo yum clean all
 * sudo yum makecache
+```
 
+## 常用命令
+```
 yum install epel-release # 安装软件源 epel -- 常用
 yum check-update         # 更新软件源      -- 常用
                          # 软件源: /etc/yum.repos.d/
@@ -27,4 +31,5 @@ yum list vim             # 列出某软件包的详细信息
 yum list updates         # 列出可用更新
 yum provides vim         # 查看软件属于哪个软件包
 yum provides /etc/vimrc  # 查看文件由哪个软件使用
+```
 
