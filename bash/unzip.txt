@@ -1,0 +1,8 @@
+
+unzip    1.zip -d ... # 解压缩到指定目录
+unzip -j 1.zip        # 解压时, 文件都移到顶层路径
+unzip -o 1.zip        # 解压时, 直接覆盖重复的文件, 不提醒
+unzip -n 1.zip        # 解压时,   不覆盖重复的文件
+unzip -l 1.zip        # 列出 1.zip 的目录结构, 简单
+unzip -v 1.zip        # 列出 1.zip 的目录结构, 详细点
+
