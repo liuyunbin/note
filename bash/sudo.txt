@@ -1,0 +1,4 @@
+
+sudo -u USERNAME COMMAND                      # 指定用户执行命令
+sudo -S date -s "20210722 10:10:10" <<< "123" # 脚本中免密码使用
+
