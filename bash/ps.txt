@@ -1,0 +1,5 @@
+
+ps -o pmem,rsz,vsz           # 内存百分比,内存,内存(含交换分区)
+ps -o pcpu,c,bsdtime,cputime # cpu: 百分比,百分比整数,user+system,system
+ps -o lstart,etime,etimes    # 启动时间,运行时间,运行时间(秒), 无法对 etimes 进行排序
+
