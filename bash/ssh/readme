@@ -4,6 +4,12 @@
 2. 重新加载配置: systemctl daemon-reload
 3. 重启服务: systemctl restart ssh.socket
 
+## 禁止密码登录
+1. 在 /etc/ssh/sshd_config 末尾添加
+Match User lyb
+    PasswordAuthentication no
+2. 重启 ssh 服务
+
 ## 常用命令
 密钥登录主目录权限不能是 777
 
