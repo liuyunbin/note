@@ -12,9 +12,9 @@ PORT=443
 SERVICE=https
 
 function update_os() {
-    apt -y -qq update     # 更新软件源
-    apt -y -qq upgrade    # 更新软件
-    apt -y -qq autoremove # 卸载没用的软件
+    apt -y -qq update     &> /dev/null # 更新软件源
+    apt -y -qq upgrade    &> /dev/null # 更新软件
+    apt -y -qq autoremove &> /dev/null # 卸载没用的软件
 }
 
 function handle_cerbot() {
@@ -50,7 +50,7 @@ function handle_firewall() {
 }
 
 function handle_cron() {
-    apt -y -qq cron
+    apt -y -qq install cron
 
     cmd="certbot renew --force-renewal"
     crontab -l | grep "$cmd" || echo "0 0 1 * * $cmd" >> /var/spool/cron/crontabs/root
@@ -70,7 +70,11 @@ function handle_user() {
     grep -q lyb /etc/ssh/sshd_config || echo "DenyUsers lyb" >> /etc/ssh/sshd_config # 禁止用户使用 ssh 登录
     systemctl restart ssh
 
-    su - lyb
+    echo "123"
+    whoami
+    su - lyb -c "pwd" || true
+    whoami
+    echo "123456"
 }
 
 function handle_git() {
