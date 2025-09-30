@@ -5,6 +5,9 @@ set -ueo pipefail
 function log_info() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty;          }
 function log_erro() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty; exit -1; }
 
+log_info "0. 安装软件"
+sudo apt -y -qq install git icdiff &> /dev/null
+
 log_info "1. 配置用户名"
 git config --global user.name "Yunbin Liu"
 
