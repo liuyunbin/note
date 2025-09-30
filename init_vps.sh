@@ -14,21 +14,20 @@ SERVICE=https
 
 # 1. 安装常用软件
 log_info "1. 安装常用软件"
-apt -y update                       # 更新软件源
-apt -y upgrade                      # 更新软件
-apt install -y git vim lrzsz icdiff # 安装常用软件
-#python3-pip
-apt -y autoremove                   # 卸载多余的软件
+sudo apt -y update                       # 更新软件源
+sudo apt -y upgrade                      # 更新软件
+sudo apt install -y git vim lrzsz icdiff # 安装常用软件
+sudo apt -y autoremove                   # 卸载多余的软件
 
 # 2. 安装 certbot, 签证书
 log_info "2. 安装 certbot, 签证书"
-apt install -y certbot
-certbot certificates | grep "$DOMAIN" || certbot certonly --standalone -d "$DOMAIN"
+sudo apt install -y certbot
+certbot certificates | grep "$DOMAIN" || sudo certbot certonly --standalone -d "$DOMAIN"
 
 # 3. 安装 docker
 log_info "3. 安装 docker"
-which docker || bash <(curl -fsSL https://get.docker.com)
-systemctl enable docker
+which docker || sudo bash <(curl -fsSL https://get.docker.com)
+sudo systemctl enable docker
 
 # 4. 安装 gost
 log_info "4. 安装 gost"
