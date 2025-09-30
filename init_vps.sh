@@ -14,14 +14,16 @@ SERVICE=https
 
 # 1. 安装常用软件
 log_info "1. 安装常用软件"
+
+
 sudo apt -y update                       # 更新软件源
 sudo apt -y upgrade                      # 更新软件
-sudo apt install -y git vim lrzsz icdiff # 安装常用软件
+sudo apt -y install git vim lrzsz icdiff # 安装常用软件
 sudo apt -y autoremove                   # 卸载多余的软件
 
 # 2. 安装 certbot, 签证书
 log_info "2. 安装 certbot, 签证书"
-sudo apt install -y certbot
+sudo apt -y install certbot
 certbot certificates | grep "$DOMAIN" || sudo certbot certonly --standalone -d "$DOMAIN"
 
 # 3. 安装 docker
@@ -48,14 +50,14 @@ docker ps --format "{{.Names}}" | grep gost || docker start gost
 
 # 5. 处理防火墙
 log_info "5. 处理防火墙"
-apt install -y   firewalld
+apt -y install   firewalld
 systemctl enable firewalld
 firewall-cmd --add-service=${SERVICE} --permanent --zone=public
 firewall-cmd --reload
 
 # 6. 添加定时任务
 log_info "6. 添加定时任务"
-apt install -y cron
+apt -y install  cron
 
 cmd="certbot renew --force-renewal"
 crontab -l | grep "$cmd" || echo "0 0 1 * * $cmd" >> /var/spool/cron/crontabs/root
@@ -65,8 +67,8 @@ crontab -l | grep "$cmd" || echo "5 0 1 * * $cmd" >> /var/spool/cron/crontabs/ro
 
 # 7. 安装 man 文档
 log_info "7. 安装 man 文档"
-apt install -y man-db
-unminimize
+apt -y install man-db
+#unminimize
 
 log_info "完成"
 
