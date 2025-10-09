@@ -59,28 +59,6 @@ function handle_cron() {
     crontab -l | grep "$cmd" || echo "5 0 1 * * $cmd" >> /var/spool/cron/crontabs/root
 }
 
-function handle_user() {
-    sudo useradd -m -s /bin/bash lyb || true  # 添加用户
-    echo "lyb:654321" | sudo chpasswd         # 设置密码
-
-    chmod +w /etc/sudoers
-    grep -q lyb /etc/sudoers || echo "lyb	ALL=(ALL:ALL) ALL" >> /etc/sudoers # 赋予 sudo 权限
-    chmod -w /etc/sudoers
-
-    grep -q lyb /etc/ssh/sshd_config || echo "DenyUsers lyb" >> /etc/ssh/sshd_config # 禁止用户使用 ssh 登录
-    systemctl restart ssh
-
-    echo "123"
-    whoami
-    su - lyb -c "pwd" || true
-    whoami
-    echo "123456"
-}
-
-function handle_vim() {
-    apt -y -qq install vim
-    cp ~/github/note/vimrc ~/.vimrc
-}
 
 function handle_other_soft() {
     apt -y -qq install lrzsz man-db
@@ -101,12 +79,6 @@ handle_firewall
 
 log_info "5. 添加定时任务..."
 handle_cron
-
-log_info "6. 处理用户..."
-handle_user
-
-log_info "8. 处理 vim..."
-handle_vim
 
 log_info "9. 安装其他常用软件..."
 handle_other_soft
