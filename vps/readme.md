@@ -6,5 +6,6 @@
 ./bash.sh  # 3. 初始化 bashrc
 ./vim.sh   # 4. 初始化 vimrc
 ./man.sh   # 5. 初始化 man
+./proxy.sh # 6. 初始化 代理, 需要 root 权限
 ```
 
