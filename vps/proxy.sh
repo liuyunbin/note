@@ -8,8 +8,7 @@ function log_erro() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty; e
 DOMAIN=yunbinliu.com
 USER=yunbinliu
 PASS=lyb2636196546
-PORT=443
-SERVICE=https
+PORT=442
 
 function update_os() {
     apt -y -qq update     &> /dev/null # 更新软件源
@@ -45,7 +44,7 @@ function handle_gost() {
 function handle_firewall() {
     apt -y -qq install firewalld
     systemctl enable firewalld
-    firewall-cmd --add-service=${SERVICE} --permanent --zone=public
+    firewall-cmd --permanent --zone=public --add-port=$PORT/tcp --zone=public
     firewall-cmd --reload
 }
 
@@ -60,10 +59,6 @@ function handle_cron() {
 }
 
 
-function handle_other_soft() {
-    apt -y -qq install lrzsz man-db
-    unminimize
-}
 
 log_info "1. 更新系统..."
 update_os
@@ -79,9 +74,6 @@ handle_firewall
 
 log_info "5. 添加定时任务..."
 handle_cron
-
-log_info "9. 安装其他常用软件..."
-handle_other_soft
 
 log_info "完成"
 

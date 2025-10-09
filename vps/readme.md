@@ -5,8 +5,6 @@
 ./git.sh   # 2. 初始化 git
 ./bash.sh  # 3. 初始化 bashrc
 ./vim.sh   # 4. 初始化 vimrc
-
-
-
+./man.sh   # 5. 初始化 man
 ```
 
