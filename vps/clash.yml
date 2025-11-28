@@ -1,0 +1,54 @@
+port: 7890
+socks-port: 7891
+redir-port: 7892
+mixed-port: 7893
+ipv6: false
+allow-lan: true
+mode: Rule
+log-level: info
+external-controller: '0.0.0.0:9090'
+#external-ui: ui
+secret: ''
+tun:
+  enable: true
+  stack: system
+  dns-hijack:
+    - tcp://8.8.8.8:53
+    - udp://8.8.8.8:53
+
+# 两个代理服务器
+proxies:
+  # http
+  - name: "test"
+    type: http
+    server: yunbinliu.com
+    port: 442
+    username: yunbinliu
+    password: "lyb2636196546"
+    tls: true # https
+    skip-cert-verify: true
+
+# 配置 Group
+proxy-groups:
+  # 自动切换
+  - name: "auto"
+    type: url-test
+    proxies:
+      - test
+      #- us02_https
+      #- hk_https
+ #tolerance: 150
+    url: 'https://www.google.com/'
+    interval: 300
+
+rules:
+# LAN
+  - DOMAIN-SUFFIX,local,DIRECT,csc.com.cn
+  - IP-CIDR,127.0.0.0/8,DIRECT
+  - IP-CIDR,172.16.0.0/12,DIRECT
+  - IP-CIDR,192.168.0.0/16,DIRECT
+  - IP-CIDR,10.0.0.0/8,DIRECT
+
+# 最终规则（除了中国区的IP之外的，全部翻墙）
+  - GEOIP,CN,DIRECT
+  - MATCH,auto
