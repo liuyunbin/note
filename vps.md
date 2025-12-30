@@ -7,12 +7,39 @@ apt -y upgrade    # 更新软件
 apt -y autoremove # 卸载没用的软件
 ```
 
-### 2. 申请证书
+### 2. 设置变量
 ```
-apt -y install certbot                                                                 # 安装软件
-certbot certonly --standalone --agree-tos -n -m yunbinliu@outlook.com -d yunbinliu.com # 申请证书
+DOMAIN=yunbinliu.com
+EMAIL=yunbinliu@outlook.com
+USER=yunbinliu
+PASS=lyb2636196546
+PORT=442
 ```
 
+### 3. 申请证书
+```
+apt -y install certbot                                            # 安装软件
+certbot certonly --standalone --agree-tos -n -m $EMAIL -d $DOMAIN # 申请证书
+```
+
+### 4. 处理 gost
+```
+bash <(curl -fsSL https://get.docker.com) # 安装 docker
+systemctl enable docker                   # 开机自动启动
+
+BIND_IP=0.0.0.0
+CERT_DIR=/etc/letsencrypt
+CERT=${CERT_DIR}/live/${DOMAIN}/fullchain.pem
+KEY=${CERT_DIR}/live/${DOMAIN}/privkey.pem
+
+docker run -d \
+    --name gost \
+    -v ${CERT_DIR}:${CERT_DIR}:ro \
+    --net=host \
+    ginuerzh/gost -L "http2://${USER}:${PASS}@${BIND_IP}:${PORT}?cert=${CERT}&key=${KEY}&probe_resist=code:400&knock=www.google.com"
+
+docker start gost # 启动 gost
+```
 
 
 
@@ -69,29 +96,6 @@ ssh -T git@github.com
 
 
 
-DOMAIN=yunbinliu.com
-USER=yunbinliu
-PASS=lyb2636196546
-PORT=442
-
-log_info "3. 处理 gost..."
-which -s docker || bash <(curl -fsSL https://get.docker.com) # 安装 docker
-systemctl enable docker -q                                             # 开机自动启动
-
-if ! docker ps -a --format "{{.Names}}" | grep -q gost; then
-    BIND_IP=0.0.0.0
-    CERT_DIR=/etc/letsencrypt
-    CERT=${CERT_DIR}/live/${DOMAIN}/fullchain.pem
-    KEY=${CERT_DIR}/live/${DOMAIN}/privkey.pem
-
-    docker run -d \
-        --name gost \
-        -v ${CERT_DIR}:${CERT_DIR}:ro \
-        --net=host \
-        ginuerzh/gost -L "http2://${USER}:${PASS}@${BIND_IP}:${PORT}?cert=${CERT}&key=${KEY}&probe_resist=code:400&knock=www.google.com"
-fi
-
-docker ps --format "{{.Names}}" | grep -q gost || docker start gost # 启动 gost
 
 log_info "4. 处理防火墙..."
 apt -y -qq install firewalld &> /dev/null
