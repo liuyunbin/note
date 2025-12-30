@@ -44,6 +44,12 @@ firewall-cmd --permanent --zone=public --add-service=http   # 更新证书需要
 firewall-cmd --reload                                       # 重新加载防火墙
 ```
 
+### 6. 自动更新证书
+```
+apt -y install cron                                                                      # 安装软件
+echo "0 0 1 * * $(which certbot) renew --force-renewal" >> /var/spool/cron/crontabs/root # 更新证书
+echo "5 0 1 * * $(which docker) restart gost" >> /var/spool/cron/crontabs/root           # 重启 gost
+```
 
 
 
@@ -98,15 +104,4 @@ ssh -T git@github.com
 
 
 
-
-log_info "5. 添加定时任务..."
-apt -y -qq install cron &> /dev/null
-
-cmd="$(which certbot) renew --force-renewal"
-crontab -l | grep -q "$cmd" || echo "0 0 1 * * $cmd" >> /var/spool/cron/crontabs/root
-
-cmd="$(which docker) restart gost"
-crontab -l | grep -q "$cmd" || echo "5 0 1 * * $cmd" >> /var/spool/cron/crontabs/root
-
-log_info "6. 完成"
 
