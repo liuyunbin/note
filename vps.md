@@ -82,3 +82,9 @@ echo ". ~/github/note/bashrc" >> ~/.bashrc  # 配置 bashrc
 . ~/.bashrc                                 # 使 bashrc 生效
 ```
 
+### 9. 安装 man 文档
+```
+apt -y install man-db # 安装 man-db
+unminimize            # 解压 man-db
+```
+
