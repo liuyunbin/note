@@ -1,12 +1,10 @@
 
 ## 安装 vps 后要处理的事情
-### 1. 更新操作系统, 安装常用软件
+### 1. 更新操作系统
 ```
-apt -y -qq update      # 更新软件源
-apt -y -qq upgrade     # 更新软件
-apt -y -qq autoremove  # 卸载没用的软件
-
-
+apt -y update     # 更新软件源
+apt -y upgrade    # 更新软件
+apt -y autoremove # 卸载没用的软件
 ```
 
 
@@ -19,8 +17,8 @@ PORT=442
 
 log_info "1. 更新系统..."
 
-log_info "2. 申请证书..."
 apt -y -qq install certbot &> /dev/null
+log_info "2. 申请证书..."
 certbot certificates 2> /dev/null | grep -q "$DOMAIN" || certbot certonly --standalone -d "$DOMAIN" # 申请证书
 
 log_info "3. 处理 gost..."
