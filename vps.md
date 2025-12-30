@@ -7,13 +7,17 @@ apt -y upgrade    # 更新软件
 apt -y autoremove # 卸载没用的软件
 ```
 
-### 2. 设置变量
+### 2. 设置基本信息
 ```
-DOMAIN=yunbinliu.com
-EMAIL=yunbinliu@outlook.com
-USER=yunbinliu
-PASS=lyb2636196546
-PORT=442
+DOMAIN=yunbinliu.com                          # 域名
+EMAIL=yunbinliu@outlook.com                   # 邮箱
+USER=yunbinliu                                # 用户名
+PASS=lyb2636196546                            # 密码
+PORT=442                                      # 端口号
+BIND_IP=0.0.0.0                               # 绑定的IP
+CERT_DIR=/etc/letsencrypt                     # 证书的目录
+CERT=${CERT_DIR}/live/${DOMAIN}/fullchain.pem # 证书的公钥
+KEY=${CERT_DIR}/live/${DOMAIN}/privkey.pem    # 证书的私钥
 ```
 
 ### 3. 申请证书
@@ -26,19 +30,9 @@ certbot certonly --standalone --agree-tos -n -m $EMAIL -d $DOMAIN # 申请证书
 ```
 bash <(curl -fsSL https://get.docker.com) # 安装 docker
 systemctl enable docker                   # 开机自动启动
-
-BIND_IP=0.0.0.0
-CERT_DIR=/etc/letsencrypt
-CERT=${CERT_DIR}/live/${DOMAIN}/fullchain.pem
-KEY=${CERT_DIR}/live/${DOMAIN}/privkey.pem
-
-docker run -d \
-    --name gost \
-    -v ${CERT_DIR}:${CERT_DIR}:ro \
-    --net=host \
-    ginuerzh/gost -L "http2://${USER}:${PASS}@${BIND_IP}:${PORT}?cert=${CERT}&key=${KEY}&probe_resist=code:400&knock=www.google.com"
-
-docker start gost # 启动 gost
+docker run -d --name gost -v ${CERT_DIR}:${CERT_DIR}:ro --net=host ginuerzh/gost -L "http2://${USER}:${PASS}@${BIND_IP}:${PORT}?cert=${CERT}&key=${KEY}&probe_resist=code:400&knock=www.google.com"
+                                          # 配置代理
+docker start gost                         # 启动代理
 ```
 
 
