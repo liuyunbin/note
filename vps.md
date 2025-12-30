@@ -35,7 +35,14 @@ docker run -d --name gost -v ${CERT_DIR}:${CERT_DIR}:ro --net=host ginuerzh/gost
 docker start gost                         # 启动代理
 ```
 
-
+### 5. 处理防火墙
+```
+apt -y install firewalld                                    # 安装防火墙
+systemctl enable firewalld                                  # 开机自动启动
+firewall-cmd --permanent --zone=public --add-port=$PORT/tcp # 开启代理的端口号
+firewall-cmd --permanent --zone=public --add-service=http   # 更新证书需要
+firewall-cmd --reload                                       # 重新加载防火墙
+```
 
 
 
@@ -91,12 +98,6 @@ ssh -T git@github.com
 
 
 
-log_info "4. 处理防火墙..."
-apt -y -qq install firewalld &> /dev/null
-systemctl enable firewalld -q
-firewall-cmd -q --permanent --zone=public --add-port=$PORT/tcp
-firewall-cmd -q --permanent --zone=public --add-service=http    # 更新证书需要
-firewall-cmd -q --reload
 
 log_info "5. 添加定时任务..."
 apt -y -qq install cron &> /dev/null
