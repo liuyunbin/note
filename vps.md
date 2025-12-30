@@ -1,9 +1,16 @@
-#!/bin/bash
 
-set -ueo pipefail
+## 安装 vps 后要处理的事情
+### 1. 更新操作系统, 安装常用软件
+```
+apt -y -qq update      # 更新软件源
+apt -y -qq upgrade     # 更新软件
+apt -y -qq autoremove  # 卸载没用的软件
 
-function log_info() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty;          }
-function log_erro() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty; exit -1; }
+
+```
+
+
+
 
 DOMAIN=yunbinliu.com
 USER=yunbinliu
@@ -11,9 +18,6 @@ PASS=lyb2636196546
 PORT=442
 
 log_info "1. 更新系统..."
-apt -y -qq update     &> /dev/null # 更新软件源
-apt -y -qq upgrade    &> /dev/null # 更新软件
-apt -y -qq autoremove &> /dev/null # 卸载没用的软件
 
 log_info "2. 申请证书..."
 apt -y -qq install certbot &> /dev/null
