@@ -62,9 +62,10 @@ git config --global alias.st status
 git config --global alias.lg "log --pretty=format:'%ad %h %s %d %C(bold)%an%Creset' --graph"
 git config --global core.quotepath false             # 6. 中文显示不乱码
 git config --global --list                           # 7. 查看配置
-ssh-keygen -t ed25519                                # 8. 生成秘钥
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""     # 8. 生成秘钥
                                                      # 9. 复制公钥到 GitHub
-ssh -T git@github.com                                # 10. 测试连接
+ssh -T git@github.com -o BatchMode=yes -o StrictHostKeyChecking=no
+                                                     # 10. 测试连接
 ```
 
 ### 7. 初始化 note
@@ -76,7 +77,8 @@ git clone git@github.com:liuyunbin/note
 
 ### 8. 配置 vim bashrc
 ```
-cp ~/github/note/vimrc ~/.vimrc
-echo ". ~/github/note/bashrc" >> ~/.bashrc
+cp ~/github/note/vimrc ~/.vimrc             # 配置 vimrc
+echo ". ~/github/note/bashrc" >> ~/.bashrc  # 配置 bashrc
+. ~/.bashrc                                 # 使 bashrc 生效
 ```
 
