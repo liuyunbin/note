@@ -88,3 +88,8 @@ apt -y install man-db # 安装 man-db
 yes | unminimize      # 解压 man-db
 ```
 
+### 10. 安装其他常用命令
+```
+apt -y install g++
+```
+
