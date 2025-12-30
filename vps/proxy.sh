@@ -47,6 +47,8 @@ firewall-cmd -q --reload
 log_info "5. 添加定时任务..."
 apt -y -qq install cron &> /dev/null
 
+# TODO 建立可选择的版本, 使用绝对路径
+# 更新证书 80 端口必须开启
 cmd="certbot renew --force-renewal"
 crontab -l | grep -q "$cmd" || echo "0 0 1 * * $cmd" >> /var/spool/cron/crontabs/root
 
