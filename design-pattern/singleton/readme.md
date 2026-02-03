@@ -37,9 +37,80 @@ singleton singleton::ins;
 ```
 
 #### 分析
-1. 类的静态变量的构造和析构的顺序不确定, 可能导致问题
-2. main 之前就将单例构造好了, 可能导致资源浪费
-3. 第一次访问不会有效率的问题, 因为提前构造好了
+1. main 之前就将单例构造好了, 可能导致资源浪费
+2. 第一次访问不会有效率的问题, 因为提前构造好了
+3. 类的静态变量的构造和析构的顺序不确定, 可能导致问题
+
+### 第二个版本
+#### 实现
+```
+class singleton {
+public:
+    static singleton* instance() {
+        if (ptr == NULL)
+            ptr = new singleton;
+        return ptr;
+    }
+
+protected:
+    singleton() {}
+
+    singleton(const singleton&) = delete;
+    singleton(singleton&&)      = delete;
+
+    singleton operator=(const singleton&) = delete;
+    singleton operator=(singleton&&)      = delete;
+
+    static singleton* ptr;
+};
+
+singleton* singleton::ptr = NULL;
+```
+
+### 分析
+1. 需要时才构造, 避免了资源浪费
+2. 第一次访问时才构造, 效率要低一些
+3. 构造析构的顺序是固定的
+4. 多线程同时第一次访问时, 可能构造出多个对象, 造成内存泄露
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class singleton {
+public:
+    static singleton& instance() {
+        static singleton ins;
+        return ins;
+    }
+
+protected:
+    singleton() {}
+
+    singleton(const singleton&) = delete;
+    singleton(singleton&&)      = delete;
+
+    singleton& operator=(const singleton&) = delete;
+    singleton& operator=(singleton&&)      = delete;
+};
+```
+
+
 
 
 
@@ -47,6 +118,7 @@ singleton singleton::ins;
 * 尽量减少互斥锁的使用来提高效率
 
 01_饿汉模式.cc ----- 单个类(C++11 之前) -- 不建议使用
+
 02_饿汉模式.cc ----- 模板类(C++11 之前) -- 不建议使用
 03_饿汉模式.cc ----- 单个类(C++11) ------ 建议使用
 04_饿汉模式.cc ----- 模板类(C++11) ------ 建议使用
@@ -97,33 +169,6 @@ int main() {
 
 #include <iostream>
 
-class singleton {
-public:
-    static singleton& instance() {
-        static singleton ins;
-        std::cout << "获取单例模式" << std::endl;
-        return ins;
-    }
-
-private:
-    singleton() {
-        std::cout << "构造单例模式" << std::endl;
-    }
-
-    singleton(const singleton&) = delete;
-    singleton(singleton&&)      = delete;
-
-    singleton operator=(const singleton&) = delete;
-    singleton operator=(singleton&&)      = delete;
-};
-
-int main() {
-    singleton& ptr = singleton::instance();
-    return 0;
-}
-
-#include <iostream>
-
 template <typename T>
 class singleton {
 public:
@@ -154,5 +199,126 @@ protected:
 
 int main() {
     A& ptr = A::instance();
+    return 0;
+}
+
+------------------------------------------------------------
+#include <unistd.h>
+
+#include <iostream>
+#include <mutex>
+#include <thread>
+
+class singleton {
+public:
+    static singleton* instance() {
+        if (ptr == NULL) {
+            std::lock_guard<std::mutex> lock(mu);
+            if (ptr == NULL) {
+                std::cout << "构造单例模式中..." << std::endl;
+                sleep(3);
+                ptr = new singleton;
+                std::cout << "构造单例模式完成" << std::endl;
+            }
+        }
+
+        std::cout << "获取单例模式" << std::endl;
+        return ptr;
+    }
+
+protected:
+    singleton() {
+    }
+
+    singleton(const singleton&) = delete;
+    singleton(singleton&&)      = delete;
+
+    singleton operator=(const singleton&) = delete;
+    singleton operator=(singleton&&)      = delete;
+
+    static singleton* ptr;
+    static std::mutex mu;
+};
+
+singleton* singleton::ptr = NULL;
+std::mutex singleton::mu;
+
+void test() {
+    singleton::instance();
+}
+
+int main() {
+    std::thread t1(test);
+    std::thread t2(test);
+
+    t1.join();
+    t2.join();
+
+    return 0;
+}
+
+#include <unistd.h>
+
+#include <iostream>
+#include <mutex>
+#include <thread>
+
+template <typename T>
+class singleton {
+public:
+    static T* instance() {
+        if (ptr == NULL) {
+            std::lock_guard<std::mutex> lock(mu);
+            if (ptr == NULL) {
+                std::cout << "构造单例模式中..." << std::endl;
+                ptr = new T;
+                sleep(3);
+                std::cout << "构造单例模式完成" << std::endl;
+            }
+        }
+
+        std::cout << "获取单例模式" << std::endl;
+        return ptr;
+    }
+
+protected:
+    singleton() {
+    }
+
+    singleton(const singleton&) = delete;
+    singleton(singleton&&)      = delete;
+
+    singleton operator=(const singleton&) = delete;
+    singleton operator=(singleton&&)      = delete;
+
+    static T*         ptr;
+    static std::mutex mu;
+};
+
+template <typename T>
+T* singleton<T>::ptr = NULL;
+
+template <typename T>
+std::mutex singleton<T>::mu;
+
+class A : public singleton<A> {
+    friend class singleton<A>;
+
+protected:
+    A() {
+    }
+};
+
+void test() {
+    A::instance();
+}
+
+int main() {
+    std::thread t1(test);
+    std::thread t2(test);
+
+    t1.join();
+    t2.join();
+
     return 0;
 }
