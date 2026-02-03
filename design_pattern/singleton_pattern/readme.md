@@ -13,8 +13,30 @@
 2. 创建的时候是否线程安全, 是否需要锁, 效率怎么样
 3. 使用的时候是否线程安全, 是否需要锁, 效率怎么样
 
+## 实现
+####  第一个版本
+```
+class singleton {
+public:
+    static singleton& instance() {
+        return ins;
+    }
 
+protected:
+    singleton() {
+    }
 
+    singleton(const singleton&) = delete;
+    singleton(singleton&&)      = delete;
+
+    singleton operator=(const singleton&) = delete;
+    singleton operator=(singleton&&)      = delete;
+
+    static singleton ins;
+};
+
+singleton singleton::ins;
+```
 
 * 需要使用互斥锁来保证线程安全
 * 尽量减少互斥锁的使用来提高效率
@@ -28,36 +50,6 @@
 12_懒汉模式.cc ----- 单个类(多线程安全) -- 也可能出问题 -- 不建议使用
 13_懒汉模式.cc ----- 模板类(多线程安全) -- 也可能出问题 -- 不建议使用
 
-
-#include <iostream>
-
-class singleton {
-public:
-    static singleton& instance() {
-        std::cout << "获取单例模式" << std::endl;
-        return ins;
-    }
-
-protected:
-    singleton() {
-        std::cout << "构造单例模式" << std::endl;
-    }
-
-    singleton(const singleton&) = delete;
-    singleton(singleton&&)      = delete;
-
-    singleton operator=(const singleton&) = delete;
-    singleton operator=(singleton&&)      = delete;
-
-    static singleton ins;
-};
-
-singleton singleton::ins;
-
-int main() {
-    singleton& ptr = singleton::instance();
-    return 0;
-}
 
 #include <iostream>
 
