@@ -67,14 +67,114 @@ protected:
 singleton* singleton::ptr = NULL;
 ```
 
-### 分析
+#### 分析
 1. 需要时才构造, 避免了资源浪费
 2. 第一次访问时才构造, 效率要低一些
 3. 构造析构的顺序是固定的
 4. 多线程同时第一次访问时, 可能构造出多个对象, 造成内存泄露
 
 
+### 第三个版本
+#### 实现
+```
+class singleton {
+public:
+    static singleton* instance() {
+        std::lock_guard<std::mutex> lock(mu);
+        if (ptr == NULL)
+            ptr = new singleton;
+        return ptr;
+    }
 
+protected:
+    singleton() {}
+
+    singleton(const singleton&) = delete;
+    singleton(singleton&&)      = delete;
+
+    singleton& operator=(const singleton&) = delete;
+    singleton& operator=(singleton&&)      = delete;
+
+    static singleton* ptr;
+    static std::mutex mu;
+};
+
+singleton* singleton::ptr = NULL;
+std::mutex singleton::mu;
+```
+
+#### 分析
+1. 使用锁保证只能产生一个实例
+2. 但每次访问实例都使用锁, 导致效率低
+
+
+### 第四个版本
+#### 实现
+```
+class singleton {
+public:
+    static singleton* instance() {
+        if (ptr == NULL) {
+            std::lock_guard<std::mutex> lock(mu);
+            ptr = new singleton;
+        }
+        return ptr;
+    }
+
+protected:
+    singleton() {}
+
+    singleton(const singleton&) = delete;
+    singleton(singleton&&)      = delete;
+
+    singleton& operator=(const singleton&) = delete;
+    singleton& operator=(singleton&&)      = delete;
+
+    static singleton* ptr;
+    static std::mutex mu;
+};
+
+singleton* singleton::ptr = NULL;
+std::mutex singleton::mu;
+```
+
+#### 分析
+1. 缩小了锁的范围, 只有实例未初始化时才使用锁
+2. 多个线程同时实例化时, 可能导致内存泄漏
+
+### 第五个版本 --- 双重检查锁定
+#### 实现
+```
+class singleton {
+public:
+    static singleton* instance() {
+        if (ptr == NULL) {
+            std::lock_guard<std::mutex> lock(mu);
+            if (ptr == NULL)
+                ptr = new singleton;
+        }
+        return ptr;
+    }
+
+protected:
+    singleton() {}
+
+    singleton(const singleton&) = delete;
+    singleton(singleton&&)      = delete;
+
+    singleton& operator=(const singleton&) = delete;
+    singleton& operator=(singleton&&)      = delete;
+
+    static singleton* ptr;
+    static std::mutex mu;
+};
+
+singleton* singleton::ptr = NULL;
+std::mutex singleton::mu;
+```
+
+#### 分析
+1. 完美的解决了之前的问题, 就是太复杂了
 
 
 
@@ -203,59 +303,6 @@ int main() {
 }
 
 ------------------------------------------------------------
-#include <unistd.h>
-
-#include <iostream>
-#include <mutex>
-#include <thread>
-
-class singleton {
-public:
-    static singleton* instance() {
-        if (ptr == NULL) {
-            std::lock_guard<std::mutex> lock(mu);
-            if (ptr == NULL) {
-                std::cout << "构造单例模式中..." << std::endl;
-                sleep(3);
-                ptr = new singleton;
-                std::cout << "构造单例模式完成" << std::endl;
-            }
-        }
-
-        std::cout << "获取单例模式" << std::endl;
-        return ptr;
-    }
-
-protected:
-    singleton() {
-    }
-
-    singleton(const singleton&) = delete;
-    singleton(singleton&&)      = delete;
-
-    singleton operator=(const singleton&) = delete;
-    singleton operator=(singleton&&)      = delete;
-
-    static singleton* ptr;
-    static std::mutex mu;
-};
-
-singleton* singleton::ptr = NULL;
-std::mutex singleton::mu;
-
-void test() {
-    singleton::instance();
-}
-
-int main() {
-    std::thread t1(test);
-    std::thread t2(test);
-
-    t1.join();
-    t2.join();
-
-    return 0;
-}
 
 #include <unistd.h>
 
