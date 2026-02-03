@@ -14,17 +14,15 @@
 3. 使用的时候是否线程安全, 是否需要锁, 效率怎么样
 
 ## 实现
-####  第一个版本
+###  第一个版本
+#### 实现
 ```
 class singleton {
 public:
-    static singleton& instance() {
-        return ins;
-    }
+    static singleton& instance() { return ins; }
 
 protected:
-    singleton() {
-    }
+    singleton() {}
 
     singleton(const singleton&) = delete;
     singleton(singleton&&)      = delete;
@@ -37,6 +35,13 @@ protected:
 
 singleton singleton::ins;
 ```
+
+#### 分析
+1. 类的静态变量的构造和析构的顺序不确定, 可能导致问题
+2. main 之前就将单例构造好了, 可能导致资源浪费
+3. 第一次访问不会有效率的问题, 因为提前构造好了
+
+
 
 * 需要使用互斥锁来保证线程安全
 * 尽量减少互斥锁的使用来提高效率
