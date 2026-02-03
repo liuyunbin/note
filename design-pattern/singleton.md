@@ -203,161 +203,41 @@ protected:
 2. 但需要 C++11, 因为 C++11 保证函数静态变量线程安全
 3. 第一次使用的时候, 由于要实例化变量, 效率会低一些
 
-
-
-
-* 需要使用互斥锁来保证线程安全
-* 尽量减少互斥锁的使用来提高效率
-
-01_饿汉模式.cc ----- 单个类(C++11 之前) -- 不建议使用
-
-02_饿汉模式.cc ----- 模板类(C++11 之前) -- 不建议使用
-03_饿汉模式.cc ----- 单个类(C++11) ------ 建议使用
-04_饿汉模式.cc ----- 模板类(C++11) ------ 建议使用
-
-11_懒汉模式.cc ----- 单个类(多线程可能出问题) -- 不建议使用
-12_懒汉模式.cc ----- 单个类(多线程安全) -- 也可能出问题 -- 不建议使用
-13_懒汉模式.cc ----- 模板类(多线程安全) -- 也可能出问题 -- 不建议使用
-
-
-#include <iostream>
-
-template <typename T>
-class singleton {
-public:
-    static T& instance() {
-        std::cout << "获取单例模式" << std::endl;
-        return ins;
-    }
-
-protected:
-    singleton() {
-        std::cout << "构造单例模式" << std::endl;
-    }
-    singleton(const singleton&) = delete;
-    singleton(singleton&&)      = delete;
-
-    singleton operator=(const singleton&) = delete;
-    singleton operator=(singleton&&)      = delete;
-
-    static T ins;
-};
-
-template <typename T>
-T singleton<T>::ins;
-
-class A : public singleton<A> {
-    friend class singleton<A>;
-
-protected:
-    A() {
-    }
-};
-
-int main() {
-    A& ptr = A::instance();
-    return 0;
-}
-
-#include <iostream>
-
+### 第七个版本
+#### 实现
+```
 template <typename T>
 class singleton {
 public:
     static T& instance() {
         static T ins;
-        std::cout << "获取单例模式" << std::endl;
         return ins;
     }
 
 protected:
-    singleton() {
-        std::cout << "构造单例模式" << std::endl;
-    }
+    singleton() {}
+
     singleton(const singleton&) = delete;
     singleton(singleton&&)      = delete;
 
-    singleton operator=(const singleton&) = delete;
-    singleton operator=(singleton&&)      = delete;
+    singleton& operator=(const singleton&) = delete;
+    singleton& operator=(singleton&&)      = delete;
 };
 
 class A : public singleton<A> {
     friend class singleton<A>;
 
-protected:
-    A() {
-    }
+private:
+    A() {}
 };
+```
 
-int main() {
-    A& ptr = A::instance();
-    return 0;
-}
+#### 分析
+1. 使用模板便于子类使用单例模式
+2. 子类的构造函数的访问控制
+    * public, 可以从外部构造和子类对象 -- 禁止
+    * private, 禁止从外部和子类构造对象 -- 最好
+    * protected, 禁止从外部构造对象, 子类可以构造 -- 一般不要
+3. 为什么使用友元
+    * 便于父类使用子类的构造函数
 
-------------------------------------------------------------
-
-#include <unistd.h>
-
-#include <iostream>
-#include <mutex>
-#include <thread>
-
-template <typename T>
-class singleton {
-public:
-    static T* instance() {
-        if (ptr == NULL) {
-            std::lock_guard<std::mutex> lock(mu);
-            if (ptr == NULL) {
-                std::cout << "构造单例模式中..." << std::endl;
-                ptr = new T;
-                sleep(3);
-                std::cout << "构造单例模式完成" << std::endl;
-            }
-        }
-
-        std::cout << "获取单例模式" << std::endl;
-        return ptr;
-    }
-
-protected:
-    singleton() {
-    }
-
-    singleton(const singleton&) = delete;
-    singleton(singleton&&)      = delete;
-
-    singleton operator=(const singleton&) = delete;
-    singleton operator=(singleton&&)      = delete;
-
-    static T*         ptr;
-    static std::mutex mu;
-};
-
-template <typename T>
-T* singleton<T>::ptr = NULL;
-
-template <typename T>
-std::mutex singleton<T>::mu;
-
-class A : public singleton<A> {
-    friend class singleton<A>;
-
-protected:
-    A() {
-    }
-};
-
-void test() {
-    A::instance();
-}
-
-int main() {
-    std::thread t1(test);
-    std::thread t2(test);
-
-    t1.join();
-    t2.join();
-
-    return 0;
-}
