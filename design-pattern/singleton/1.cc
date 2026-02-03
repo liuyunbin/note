@@ -1,49 +1,71 @@
 
 #include <iostream>
-#include <thread>
-#include <chrono>
+#include <pthread.h>
+#include <unistd.h> // for usleep
 
 class singleton {
 public:
-    static singleton& instance() {
-        return ins;
+    static singleton* instance() {
+        if (ptr == NULL) {                   // 第一次检查
+            pthread_mutex_lock(&mu);
+            if (ptr == NULL) {               // 第二次检查
+                // 模拟构造耗时
+                usleep(1000); // 1ms
+                ptr = new singleton();
+            }
+            pthread_mutex_unlock(&mu);
+        }
+        return ptr;
     }
 
-    singleton(const singleton&) = delete;
-    singleton(singleton&&) = delete;
-    singleton& operator=(const singleton&) = delete;
-    singleton& operator=(singleton&&) = delete;
+    int value; // 构造完成前可能是随机值
 
-    void hello() {
-        std::cout << "Hello from singleton at " << this << std::endl;
+protected:
+    singleton() {
+        // 模拟耗时构造，让问题更容易出现
+        usleep(5000); // 5ms
+        value = 42;
     }
+
+    singleton(const singleton&) {}
+    singleton& operator=(const singleton&) { return *this; }
 
 private:
-    singleton() {
-        // 模拟慢构造，让两个线程容易同时进入
-        std::cout << "Constructing singleton at " << this << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
-
-    static singleton ins;  // 类静态成员，饿汉式
+    static singleton* ptr;
+    static pthread_mutex_t mu;
 };
 
-// 类外初始化
-singleton singleton::ins;
+singleton* singleton::ptr = NULL;
+pthread_mutex_t singleton::mu = PTHREAD_MUTEX_INITIALIZER;
 
-void threadFunc(int id) {
-    singleton& s = singleton::instance();
-    std::cout << "Thread " << id << " got singleton at " << &s << std::endl;
-    s.hello();
+volatile bool printed = false;
+
+void* thread_func(void* arg) {
+    int id = *(int*)arg;
+    singleton* s = singleton::instance();
+
+    // 检测未初始化值，只打印一次
+    if (s->value != 42 && !printed) {
+        printed = true;
+        std::cout << "Thread " << id << " saw uninitialized value: " << s->value << "\n";
+    }
+    return NULL;
 }
 
 int main() {
-    std::thread t1(threadFunc, 1);
-    std::thread t2(threadFunc, 2);
+    const int THREADS = 200;
+    pthread_t threads[THREADS];
+    int ids[THREADS];
 
-    t1.join();
-    t2.join();
+    for (int i = 0; i < THREADS; ++i) {
+        ids[i] = i;
+        pthread_create(&threads[i], NULL, thread_func, &ids[i]);
+    }
 
+    for (int i = 0; i < THREADS; ++i)
+        pthread_join(threads[i], NULL);
+
+    std::cout << "Done\n";
     return 0;
 }
 
