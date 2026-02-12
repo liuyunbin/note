@@ -4,13 +4,13 @@
 class singleton {
 public:
     static singleton& instance() {
-        std::cout << "构造函数" << std::endl;
+        std::cout << "获取实例" << std::endl;
         return ins;
     }
 
 protected:
     singleton() {
-        std::cout << "析构函数" << std::endl;
+        std::cout << "构造函数" << std::endl;
     }
 
     singleton(const singleton&) = delete;
