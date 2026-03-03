@@ -22,14 +22,11 @@
 * 使用 size 可以查看各个部分的大小
 ```
 
-# 常量 变量 作用域 存储
+# 变量和存储期
 ```
 * 普通全局变量
     * 作用域: 全局
-    *   存储:
-        * data -- 已初始化, 可写
-        * bss --- 未初始化, 程序启动时将初始化为0
-        * rodata -- 只读
+    *   存储: data/bss/rodata
     * 静态存储期
 * 静态全局变量
     * 作用域: 文件内
@@ -45,26 +42,11 @@
     * 静态存储期
 * 堆
     * 动态存储期
-
+```
 
 
 * constexpr: 常量, 在编译期确定
 * const: 只读变量, 可能在编译期确定, 也可能在允许期确定
-
-       int a1;
-static int a2;
-       const int a3 = 123;
-static const int a4 = 123;
-
-void test() {
-    int e;
-    static int f;
-
-
-
-}
-
-
 
 
 # const, constexpr 和 static
