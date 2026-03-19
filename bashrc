@@ -18,12 +18,12 @@ alias lsversion="  ls --time-style='+%Y-%m-%d %H:%M:%S %z' -lhrv"  # 以 文件�
 alias c="cd $note; pwd"
 alias d="certbot certificates"
 alias g="g++ -g -std=c++14"
-alias lastlog="tool.sh lastlog"
-alias lsnet="tool.sh lsnet"
+alias lastlog="bash.sh lastlog"
+alias lsnet="bash.sh lsnet"
 alias l=lsmtime
 alias m="make"
-alias p="tool.sh ps"
-alias t="tool.sh test"
+alias p="bash.sh ps"
+alias t="bash.sh test"
 alias v='vim'
 alias x='tar xvf'
 alias z='tar acf'
