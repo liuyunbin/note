@@ -14,15 +14,52 @@ PORT=442                        # gost 端口号
 SERVICE=https                   # 更新域名使用的服务
 mail=yunbinliu@outlook.com      # 邮箱
 
-log_info "1. 更新系统..."
+log_info "1. 更新系统"
 apt -y update     # 更新软件源
 apt -y upgrade    # 更新软件
 apt -y autoremove # 卸载没用的软件
 
-log_info "2. 安装软件..."
-apt -y install certbot firewalld cron man-db g++ vim lrzsz man-db
-which -s docker || bash <(curl -fsSL https://get.docker.com) # 安装 docker
-yes | unminimize      # 解压 man-db
+log_info "2. 安装软件"
+apt -y install certbot firewalld cron man-db g++ vim lrzsz man-db git icdiff # 安装常用软件
+which -s docker || bash <(curl -fsSL https://get.docker.com)                 # 安装 docker
+echo y  | unminimize                                                             # 解压 man-db
+
+log_info "3. 配置 Git"
+log_info "3.1 配置用户名"
+git config --global user.name "Yunbin Liu"
+
+log_info "3.2 配置邮箱"
+git config --global user.email yunbinliu@outlook.com
+
+log_info "3.3 配置编辑器"
+git config --global core.editor vim
+
+log_info "3.4 配置日期格式"
+git config --global log.date iso
+
+log_info "3.5 配置简要命令"
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.st status
+
+log_info "3.6 配置日志显示格式"
+git config --global alias.lg "log --pretty=format:'%ad %h %s %d %C(bold)%an%Creset' --graph"
+
+log_info "3.7 中文显示不乱码"
+git config --global core.quotepath false
+
+log_info "3.8 查看配置"
+git config --global --list
+
+log_info "3.9 生成秘钥"
+[[ -f ~/.ssh/id_ed25519.pub ]] || ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
+
+log_info "3.10 复制公钥到 GitHub, 按回车继续..."
+read
+
+log_info "3.11 测试连接"
+ssh -T git@github.com -o BatchMode=yes -o StrictHostKeyChecking=no
 
 exit 0
 
@@ -103,3 +140,4 @@ log_info "完成"
 #. ~/.bashrc                                 # 使 bashrc 生效
 #```
 #
+
