@@ -36,11 +36,11 @@ log_info "8. 查看配置"
 git config --global --list
 
 log_info "9. 生成秘钥"
-[[ -f ~/.ssh/id_ed25519.pub ]] || ssh-keygen -t ed25519
+[[ -f ~/.ssh/id_ed25519.pub ]] || ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
 
 log_info "10. 复制公钥到 GitHub, 按回车继续..."
 read
 
 log_info "11. 测试连接"
-ssh -T git@github.com
+ssh -T git@github.com -o BatchMode=yes -o StrictHostKeyChecking=no
 
