@@ -120,7 +120,7 @@ function handle_vim() {
 }
 
 function handle_bashrc() {
-    grep github/note/bashrc /etc/ssh/sshd_config || echo ". ~/github/note/bashrc" >> ~/.bashrc
+    grep github/note/bashrc ~/.bashrc || echo ". ~/github/note/bashrc" >> ~/.bashrc
     log "请执行: . ~/.bashrc"
 }
 
@@ -157,7 +157,7 @@ sudo -u lyb bash <<EOF
     $(declare -f log)
     $(declare -f handle_note)
     $(declare -f handle_vim)
-    $(declare -f handle_bash)
+    $(declare -f handle_bashrc)
 
     log "11. 克隆仓库 note"
     handle_note
