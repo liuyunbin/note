@@ -21,7 +21,7 @@ apt -y upgrade    # 更新软件
 apt -y autoremove # 卸载没用的软件
 
 log "02. 安装常用软件"
-apt -y install certbot cron firewalld g++ vim lrzsz man-db git icdiff
+apt -y install certbot cron firewalld g++ vim lrzsz man-db git icdiff clang-format
 
 log "03. 安装 docker"
 which docker || bash <(curl -fsSL https://get.docker.com)
