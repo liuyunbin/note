@@ -11,8 +11,7 @@ function log() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty; }
 DOMAIN=yunbinliu.com       # 域名
 USER=yunbinliu             # 用户名
 PASS=lyb2636196546         # 密码
-PORT=442                   # gost 端口号
-SERVICE=https              # 更新域名使用的服务
+PORT=443                   # gost 端口号
 MAIL=yunbinliu@outlook.com # 邮箱
 
 log "01. 更新系统"
@@ -56,8 +55,8 @@ cmd="$(which docker) restart gost"
 crontab -l | grep "$cmd" || echo "5 0 1 * * $cmd" >> /var/spool/cron/crontabs/root
 
 log "08. 处理防火墙"
-firewall-cmd --permanent --zone=public --add-port=${PORT}/tcp   # 代理
-firewall-cmd --permanent --zone=public --add-service=${SERVICE} # 更新证书
+firewall-cmd --permanent --zone=public --add-port=${PORT}/tcp # 代理
+firewall-cmd --permanent --zone=public --add-service=https    # 更新证书需要
 firewall-cmd --reload
 
 log "09. 处理 man 文档"
