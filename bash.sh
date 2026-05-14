@@ -54,12 +54,7 @@ function do_test() {
     g++ -std=c++14 $@ && ./a.out
 }
 
-begin_time=$(date +%s)
-
 cmd=$1
 shift
 do_$cmd $@
-
-end_time=$(date +%s)
-echo "took: $(( end_time - begin_time ))"
 
