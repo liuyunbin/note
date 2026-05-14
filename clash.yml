@@ -22,7 +22,7 @@ proxies:
   - name: "test"
     type: http
     server: yunbinliu.com
-    port: 442
+    port: 443
     username: yunbinliu
     password: "lyb2636196546"
     tls: true # https
