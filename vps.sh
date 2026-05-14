@@ -11,7 +11,8 @@ function log() { echo -e "$(date +'%Y-%m-%d %H:%M:%S %z') $@" > /dev/tty; }
 DOMAIN=yunbinliu.com       # 域名
 USER=yunbinliu             # 用户名
 PASS=lyb2636196546         # 密码
-PORT=443                   # gost 端口号
+PORT=443                   # gost 端口
+GOST=gost-$PORT            # gost 名称
 MAIL=yunbinliu@outlook.com # 邮箱
 
 log "01. 更新系统"
@@ -32,26 +33,26 @@ log "05. 处理证书"
 certbot certificates | grep $DOMAIN || certbot certonly --standalone --agree-tos -n -m $MAIL -d $DOMAIN
 
 log "06. 处理 gost"
-if ! docker ps -a --format "{{.Names}}" | grep gost; then
+if ! docker ps -a --format "{{.Names}}" | grep $GOST; then
     BIND_IP=0.0.0.0                                # 绑定的IP
     CERT_DIR=/etc/letsencrypt                      # 证书的目录
     CERT=${CERT_DIR}/live/${DOMAIN}/fullchain.pem  # 证书的公钥
     KEY=${CERT_DIR}/live/${DOMAIN}/privkey.pem     # 证书的私钥
 
     docker run -d \
-        --name gost \
+        --name $GOST \
         -v ${CERT_DIR}:${CERT_DIR}:ro \
         --net=host \
         ginuerzh/gost -L "http2://${USER}:${PASS}@${BIND_IP}:${PORT}?cert=${CERT}&key=${KEY}&probe_resist=code:400&knock=www.google.com"
 fi
 
-docker ps --format "{{.Names}}" | grep gost || docker start gost # 启动代理
+docker ps --format "{{.Names}}" | grep $GOST || docker start $GOST # 启动代理
 
 log "07. 添加定时任务"
 cmd="$(which certbot) renew --force-renewal"
 crontab -l | grep "$cmd" || echo "0 0 1 * * $cmd" >> /var/spool/cron/crontabs/root
 
-cmd="$(which docker) restart gost"
+cmd="$(which docker) restart $GOST"
 crontab -l | grep "$cmd" || echo "5 0 1 * * $cmd" >> /var/spool/cron/crontabs/root
 
 log "08. 处理防火墙"
