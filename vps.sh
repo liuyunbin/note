@@ -58,6 +58,7 @@ crontab -l | grep "$cmd" || echo "5 0 1 * * $cmd" >> /var/spool/cron/crontabs/ro
 log "08. 处理防火墙"
 firewall-cmd --permanent --zone=public --add-port=${PORT}/tcp # 代理
 firewall-cmd --permanent --zone=public --add-service=https    # 更新证书需要
+firewall-cmd --permanent --zone=public --add-service=http     # 更新证书需要
 firewall-cmd --reload
 
 log "09. 处理 man 文档"
