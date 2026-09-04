@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-void log(const std::string& msg) {
+void log(const std::string& msg = "") {
     time_t     now  = time(NULL);
     struct tm* info = localtime(&now);
     char       buf[1024];
@@ -16,7 +16,9 @@ void log(const std::string& msg) {
 }
 
 int main() {
-    log("僵尸进程-产生: 未处理 SIGCHLD");
+    log();
+    log("计算机操作系统-僵尸进程-产生: 未处理 SIGCHLD");
+    log();
 
     pid_t fd = fork();
 
@@ -35,6 +37,8 @@ int main() {
     log("子进程状态");
     system(cmd.data());
 
+    log();
     log("主进程正常退出");
+    log();
     return 0;
 }
