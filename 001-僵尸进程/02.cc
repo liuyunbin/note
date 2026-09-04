@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-void log(const std::string& msg = "") {
+void log(const std::string& msg) {
     time_t     now  = time(NULL);
     struct tm* info = localtime(&now);
     char       buf[1024];
@@ -24,9 +24,7 @@ void handle_signal(int sig, siginfo_t* sig_info, void*) {
 }
 
 int main() {
-    log();
-    log("计算机操作系统-僵尸进程-产生: 未正确处理 SIGCHLD");
-    log();
+    log("僵尸进程-产生: 未正确处理 SIGCHLD");
 
     log("设置 SIGCHLD 处理为: 调用 waitpid() 一次");
     struct sigaction act;
@@ -65,8 +63,6 @@ int main() {
     log("子进程的状态");
     system(cmd.data());
 
-    log();
     log("主进程正常退出");
-    log();
     return 0;
 }
