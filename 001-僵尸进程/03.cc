@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-void log(const std::string& msg = "") {
+void log(const std::string& msg) {
     time_t     now  = time(NULL);
     struct tm* info = localtime(&now);
     char       buf[1024];
@@ -16,9 +16,7 @@ void log(const std::string& msg = "") {
 }
 
 int main() {
-    log();
-    log("计算机操作系统-僵尸进程-预防: SIGCHLD 处理为 SIG_IGN");
-    log();
+    log("僵尸进程-预防: SIGCHLD 处理为 SIG_IGN");
 
     log("设置 SIGCHLD 的信号处理");
     signal(SIGCHLD, SIG_IGN);
@@ -53,8 +51,6 @@ int main() {
     log("子进程的状态");
     system(cmd.data());
 
-    log();
     log("主进程正常退出");
-    log();
     return 0;
 }
