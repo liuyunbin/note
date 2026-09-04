@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-void log(const std::string& msg = "") {
+void log(const std::string& msg) {
     time_t     now  = time(NULL);
     struct tm* info = localtime(&now);
     char       buf[1024];
@@ -16,9 +16,7 @@ void log(const std::string& msg = "") {
 }
 
 int main() {
-    log();
-    log("计算机操作系统-僵尸进程-测试: 产生僵尸进程不退出");
-    log();
+    log("僵尸进程-测试: 产生僵尸进程不退出");
 
     pid_t child = fork();
 
@@ -34,8 +32,6 @@ int main() {
     for (;;)
         ;
 
-    log();
     log("主进程正常退出");
-    log();
     return 0;
 }
